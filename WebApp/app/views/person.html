@@ -1,0 +1,59 @@
+﻿<div class="box person" style="height:100%;display:none;overflow-y:hidden">
+
+
+    <div ng-include="'app/views/header.html'" class="rowx header"></div>
+
+    <div class="rowx content" style="clear:both">
+        <div class=" col-lg-3 col-md-3 col-sm-3 col-xs-3 col2 filter" style="display:none">
+            <div class="filter-container box">
+                <div class="header">Filter</div>
+                <div class="content">
+                    <div ng-include="'app/views/filter.html'" ng-init="type = 'person';" style="flex: 1 1 auto;display: flex;  width:100%;"></div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class=" col-lg-9 col-md-9 col-sm-9 col-xs-9 col1" style="padding-right:2px;padding-left:2px;">
+            <div dx-data-grid="dg" id="grid">
+
+            </div>
+
+        </div>
+    </div>
+    <div class="rowx footer">
+
+        <div class=" col-lg-11 col-md-11 col-sm-11 col-xs-11 dx-border" style="padding:0;">
+            <table>
+                <tr>
+                    <td>  <div dx-select-box="sb_rankgroup" style="display:inline-block;background:white;"></div></td>
+                    <td style="padding-left:5px;"><div dx-check-box="chk_active"></div></td>
+                    <td style="padding-left:5px;"><div dx-button="btn_search"></div></td>
+                    <td style="padding-left:5px;"> <div dx-button="btn_view"></div></td>
+                    <td style="padding-left:5px;"><div dx-button="btn_new"></div></td>
+                    <td style="padding-left:5px;">  <div dx-button="btn_edit"></div></td>
+                    <td style="padding-left:5px;"> <div dx-button="btn_delete"></div></td>
+                </tr>
+            </table>
+          
+            
+            
+           
+            
+          
+
+           
+        </div>
+        <div class=" col-lg-1 col-md-1 col-sm-1 col-xs-1" style="padding:0;text-align:right">
+            <div dx-button="btn_filter"></div>
+        </div>
+        <div style="clear:both"></div>
+    </div>
+
+
+    <div ng-include="'app/views/personAdd.html'"></div>
+    <div ng-include="'app/views/personView.html'"></div>
+    <div dx-load-panel="loadPanel"></div>
+</div>
+
+

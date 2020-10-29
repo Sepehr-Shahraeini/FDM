@@ -1,0 +1,278 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title></title>
+
+    <link href="content/css/bootstrap.css" rel="stylesheet" />
+    <link href="content/css/w3.css" rel="stylesheet" />
+    <link href="content/css/ionicons.css" rel="stylesheet" />
+    <link href="content/css/fontawsome2.css" rel="stylesheet" />
+   <link href="content/css/dx.common.css" rel="stylesheet" /> 
+    <!--<link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/19.2.7/css/dx.common.css">-->
+    <link rel="dx-theme" data-theme="material.teal-light" href="content/css/material.teal-light.custom.css" data-active="false" />
+    <link rel="dx-theme" data-theme="material.purple-light" href="content/css/material.purple-light.custom.css" data-active="false" />
+    <link rel="dx-theme" data-theme="material.blue-light" href="content/css/material.blue-light.custom.css" data-active="false" />
+    <link rel="dx-theme" data-theme="material.gray-light" href="content/css/material.gray-light.custom.css" data-active="false" />
+    <link rel="dx-theme" data-theme="material.steel-light" href="content/css/material.steel-light.custom.css" data-active="false" />
+
+    <link rel="dx-theme" data-theme="generic.light" href="content/css/dx.light.css" data-active="false" />
+    <link rel="dx-theme" data-theme="generic.dark" href="content/css/dx.dark.css" data-active="false" />
+
+
+    <link href="content/css/fontiran.css" rel="stylesheet" />
+    <!-- <link href="content/css/material.teal-light.custom.css" rel="stylesheet" />-->
+    <link href="content/css/loading-bar.css" rel="stylesheet" />
+    <link href="content/css/social-buttons.css" rel="stylesheet" />
+    <link href="content/css/main.css" rel="stylesheet" />
+    <link href="content/css/core-ui.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+</head>
+<body>
+    <div ng-app="GriffinApp" style=" height:100%">
+        <!-- <ng-view></ng-view>-->
+        <div class="anfade" ng-view></div>
+    </div>
+
+    <script src="scripts/jquery-3.1.0.js"></script>
+
+    <script src="scripts/jszip.min.js"></script>
+    <script src="scripts/angular-1.7.2.js"></script>
+
+    <script src="scripts/angularjs-sanitize.js"></script>
+
+    <script src="scripts/angular-route-1.7.2.js"></script>
+
+    <script src="scripts/angular-animate.js"></script>
+    <script src="scripts/angular-local-storage.min.js"></script>
+    <script src="scripts/loading-bar.min.js"></script>
+    <script type="text/javascript" src="scripts/linq.min.js"></script>
+    <script src="scripts/moment.js"></script>
+    <script src="scripts/momenttz.js"></script>
+
+    <script src="scripts/knockout.js"></script>
+    <script src="scripts/jsrender.min.js"></script>
+
+
+    <!--<script src="scripts/jquery.validate.min.js"></script>
+    <script src="scripts/jquery.validate.unobtrusive.min.js"></script>-->
+    <!-- <script src="scripts/ejtotal.js" type="text/javascript"></script>-->
+    <!--<script src="scripts/properties.js" type="text/javascript"></script>
+    <script src="scripts/ej.widget.angular.min.js"></script>
+    <script src="scripts/ej.widget.ko.js"></script>-->
+    <!--<script src="scripts/jsonganttdata.js"></script>
+    <script type="text/javascript" src="scripts/knockout-3.4.0.js"></script>
+    <script src="scripts/ej.widget.ko.js"></script>-->
+
+    <script src="scripts/mobile-detect.min.js"></script>
+    <!-- <script type="text/javascript" src="scripts/persian-date.min.js"></script>-->
+    <script type="text/javascript" src="scripts/dx.all.js"></script>
+    <script src="https://unpkg.com/devextreme-aspnet-data@2.6.1/js/dx.aspnet.data.js"></script>
+    <!--<script type="text/javascript" src="https://cdn3.devexpress.com/jslib/19.2.7/js/dx.all.js"></script>-->
+    <!--<script type="text/javascript" src="scripts/ionicons.js"></script>-->
+
+    <script type="text/javascript" src="scripts/chart-bundle.js"></script>
+    <script type="text/javascript" src="scripts/chart.js"></script>
+    <script type="text/javascript" src="scripts/html2canvas.js"></script>
+    <!--Remove-->
+    <script type="text/javascript" src="scripts/jsonganttdata.js"></script>
+    <!-- <script type="text/javascript" src="scripts/gantt.js"></script>-->
+    <!--End-->
+
+
+    <link rel="stylesheet" href="content/css/persian-datepicker.min.css" />
+
+    <script src="scripts/persian-date.min.js"></script>
+    <script src="scripts/persian-datepicker.min.js"></script>
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+
+    <script src="scripts/custom-tooltip.js"></script>
+    <script src="scripts/config.js"></script>
+    <script src="scripts/core.js"></script>
+
+
+    <link href="scripts/styles.css" rel="stylesheet" />
+    <script src="scripts/selection.min.js"></script>
+    <!--  <script src="scripts/code.js"></script>-->
+
+
+    <script src="app/app.js?v=2"></script>
+
+    <!-- Load services -->
+    <script src="app/services/authInterceptorService.js?v=2"></script>
+    <script src="app/services/authService.js?v=2"></script>
+    <script src="app/services/weatherService.js"></script>
+    <script src="app/services/activityService.js"></script>
+    <script src="app/services/ordersService.js?v=2"></script>
+    <script src="app/services/testService.js?v=2"></script>
+    <script src="app/services/tokensManagerService.js?v=2"></script>
+    <script src="app/services/generalService.js"></script>
+    <script src="app/services/notificationService.js"></script>
+    <script src="app/services/locationService.js"></script>
+    <script src="app/services/airportService.js"></script>
+    <script src="app/services/aircraftService.js"></script>
+    <script src="app/services/courseService.js"></script>
+    <script src="app/services/personService.js"></script>
+    <script src="app/services/libraryService.js"></script>
+    <script src="app/services/organizationService.js"></script>
+    <script src="app/services/jobgroupService.js"></script>
+    <script src="app/services/flightService.js"></script>
+    <script src="app/services/statService.js"></script>
+    <script src="app/services/biService.js"></script>
+
+    <!--<script src="app/_service1.js?v=100"></script>-->
+    <!-- Load controllers -->
+    <script src="app/controllers/indexController.js?v=2"></script>
+    <script src="app/controllers/appsController.js?v=3"></script>
+    <script src="app/controllers/homeController.js?v=2"></script>
+    <script src="app/controllers/loginController.js?v=2"></script>
+    <script src="app/controllers/signupController.js?v=2"></script>
+
+    <script src="app/controllers/filterController.js?v=2"></script>
+
+
+    <script src="app/controllers/ordersController.js?v=2"></script>
+    <script src="app/controllers/testController.js?v=2"></script>
+    <script src="app/controllers/refreshController.js?v=2"></script>
+    <script src="app/controllers/tokensManagerController.js?v=2"></script>
+    <script src="app/controllers/associateController.js?v=2"></script>
+
+    <script src="app/controllers/aircraftSelectController.js"></script>
+    <script src="app/controllers/coursetypeSelectController.js"></script>
+    <script src="app/controllers/studyFieldSelectController.js"></script>
+    <script src="app/controllers/employeeSelectController.js"></script>
+    <script src="app/controllers/courseSelectController.js"></script>
+    <script src="app/controllers/jobgroupSelectController.js"></script>
+
+    <script src="app/controllers/locationAddController.js"></script>
+    <script src="app/controllers/locationController.js"></script>
+
+    <script src="app/controllers/organizationAddController.js"></script>
+    <script src="app/controllers/organizationController.js"></script>
+
+    <script src="app/controllers/personmiscAddController.js"></script>
+    <script src="app/controllers/personmiscController.js"></script>
+
+    <script src="app/controllers/journalAddController.js"></script>
+    <script src="app/controllers/journalController.js"></script>
+
+    <script src="app/controllers/airportAddController.js"></script>
+    <script src="app/controllers/airportController.js"></script>
+
+    <script src="app/controllers/aircraftTypeController.js"></script>
+
+    <script src="app/controllers/notificationController.js"></script>
+
+    <script src="app/controllers/courseTypeAddController.js"></script>
+    <script src="app/controllers/courseTypeController.js"></script>
+
+
+    <script src="app/controllers/courseAddController.js"></script>
+    <script src="app/controllers/courseController.js"></script>
+    <script src="app/controllers/coursepersonController.js"></script>
+    <script src="app/controllers/personcourseController.js"></script>
+    <script src="app/controllers/personbookController.js"></script>
+    <script src="app/controllers/certificateAddController.js"></script>
+    <script src="app/controllers/personcertificateController.js"></script>
+
+    <script src="app/controllers/personAddController.js"></script>
+    <script src="app/controllers/personController.js"></script>
+    <script src="app/controllers/personViewController.js"></script>
+    <script src="app/controllers/jobgroupAddController.js"></script>
+    <script src="app/controllers/jobgroupController.js"></script>
+
+    <script src="app/controllers/optionAddController.js"></script>
+    <script src="app/controllers/optionController.js"></script>
+
+    <script src="app/controllers/libraryAddController.js"></script>
+    <script src="app/controllers/documentAddController.js"></script>
+    <script src="app/controllers/libraryController.js"></script>
+
+    <script src="app/controllers/flightDesignController.js"></script>
+    <script src="app/controllers/flightDesignGridController.js"></script>
+    <script src="app/controllers/flightController.js"></script>
+    <script src="app/controllers/flightPlanningController.js"></script>
+    <script src="app/controllers/flightPlanningGanttViewController.js"></script>
+
+    <script src="app/controllers/flightPlanViewController.js"></script>
+
+    <script src="app/controllers/flightBoardAllController.js"></script>
+    <script src="app/controllers/flightBoardController.js"></script>
+    <script src="app/controllers/flightPlanRegisterController.js"></script>
+
+    <script src="app/controllers/flightPlansMaintenanceController.js"></script>
+    <script src="app/controllers/flightPlansCalendarMaintenanceController.js"></script>
+    <script src="app/controllers/planRegistersController.js"></script>
+    <script src="app/controllers/flightPlanApplyController.js"></script>
+    <script src="app/controllers/flightPlanApply2Controller.js"></script>
+    <script src="app/controllers/flightPlanPermitController.js"></script>
+    <script src="app/controllers/flightPlanCrew.js"></script>
+
+    <script src="app/controllers/crewtest.js"></script>
+    <script src="app/controllers/crewassign.js"></script>
+    <script src="app/controllers/crewassign2.js"></script>
+    <script src="app/controllers/crewReportController.js"></script>
+    <script src="app/controllers/fuelReport.js"></script>
+    <script src="app/controllers/flightDelaysController.js"></script>
+    <script src="app/controllers/flightPlanListController.js"></script>
+    <script src="app/controllers/flightListController.js"></script>
+    <script src="app/controllers/irregularFlightController.js"></script>
+    <script src="app/controllers/changeFlightRegisterController.js"></script>
+
+
+    <script src="app/controllers/mlistController.js"></script>
+    <script src="app/controllers/mlistAddController.js"></script>
+
+    <script src="app/controllers/planController.js"></script>
+    <script src="app/controllers/flightReportSecurityController.js"></script>
+    <script src="app/controllers/regAvailabilityController.js"></script>
+    <script src="app/controllers/routeAddController.js"></script>
+    <script src="app/controllers/routeController.js"></script>
+    <script src="app/controllers/delayCodesController.js"></script>
+
+    <script src="app/controllers/crewassignreg.js"></script>
+
+    <script src="app/controllers/rosterDailyController.js"></script>
+    <script src="app/controllers/ceoFlightBoardController.js"></script>
+    <script src="app/controllers/dailyRoster2Controller.js"></script>
+    <script src="app/controllers/crewtimereport.js"></script>
+    <script src="app/controllers/reportFlights.js"></script>
+    <script src="app/controllers/planningBoard.js"></script>
+    <script src="app/controllers/rosterController.js"></script>
+    <!--<script src="app/controllers/roster2.js"></script>-->
+    <script src="app/controllers/statDelayController.js"></script>
+    <script src="app/controllers/usersController.js"></script>
+
+    <script src="app/controllers/rosterReport.js"></script>
+    <script src="app/controllers/gnt.js"></script>
+
+    <script src="app/controllers/reportfdr.js"></script>
+    <script src="app/controllers/finreport.js"></script>
+    <script src="app/controllers/finMonthReport.js"></script>
+
+    <script src="app/controllers/delayReport.js"></script>
+
+    <script src="app/controllers/citypair.js"></script>
+
+    <script src="app/controllers/fdps.js"></script>
+
+    <script src="app/controllers/ipaccessController.js"></script>
+    <script src="app/controllers/verify.js"></script>
+    <script src="app/controllers/forma.js"></script>
+    <script src="app/controllers/board.js"></script>
+    <script src="app/controllers/boardtest.js"></script>
+    <script src="app/controllers/regflightmonthly.js"></script>
+    <script src="app/controllers/fixtimereport.js"></script>
+    <script src="app/controllers/flightsMonthly.js"></script>
+    <script src="app/controllers/formmovaled.js"></script>
+    <script src="app/controllers/fuelbi.js"></script>
+    <!--<script src="app/_part1.js?v=100"></script>
+    <script src="app/_part2.js?v=100"></script>
+    <script src="app/_part3.js?v=100"></script>-->
+    <!-- <script src="app/rosterController.js?v=100"></script>-->
+
+</body>
+</html>
