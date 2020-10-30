@@ -1,5 +1,6 @@
 ﻿'use strict';
 app.controller('appCertificateController', ['$scope', '$location', '$routeParams', '$rootScope', 'generalService', 'authService', 'notificationService', '$route', function ($scope, $location, $routeParams, $rootScope, generalService, authService, notificationService, $route) {
+    //test
     $scope.prms = $routeParams.prms;
     $scope.firstBind = true;
     $scope.active = $route.current.type;
