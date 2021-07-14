@@ -16,9 +16,9 @@ namespace EPAGriffinAPI.Models
     {
         public System.DateTime Date { get; set; }
         public int CrewId { get; set; }
-        public Nullable<double> Duration { get; set; }
-        public Nullable<double> DurationLocal { get; set; }
-        public Nullable<double> Duty7 { get; set; }
+        public Nullable<int> Duration { get; set; }
+        public Nullable<int> DurationLocal { get; set; }
+        public Nullable<int> Duty7 { get; set; }
         public Nullable<double> Duty7Local { get; set; }
     }
 }

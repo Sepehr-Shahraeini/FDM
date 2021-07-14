@@ -45,7 +45,7 @@ namespace EPAGriffinAPI.Models
         public Nullable<System.DateTime> Date { get; set; }
         public int FlightStatusID { get; set; }
         public Nullable<int> RegisterID { get; set; }
-        public Nullable<int> FlightTypeID { get; set; }
+        public int FlightTypeID { get; set; }
         public string FlightType { get; set; }
         public string FlightTypeAbr { get; set; }
         public int TypeId { get; set; }
@@ -55,8 +55,8 @@ namespace EPAGriffinAPI.Models
         public string FlightNumber { get; set; }
         public Nullable<int> FromAirport { get; set; }
         public Nullable<int> ToAirport { get; set; }
-        public Nullable<System.DateTime> STAPlanned { get; set; }
         public Nullable<System.DateTime> STDPlanned { get; set; }
+        public Nullable<System.DateTime> STAPlanned { get; set; }
         public Nullable<int> FlightHPlanned { get; set; }
         public Nullable<int> FlightMPlanned { get; set; }
         public string FlightPlan { get; set; }
@@ -64,7 +64,7 @@ namespace EPAGriffinAPI.Models
         public Nullable<System.DateTime> DateActive { get; set; }
         public string FromAirportName { get; set; }
         public string FromAirportIATA { get; set; }
-        public Nullable<int> FromAirportCityId { get; set; }
+        public int FromAirportCityId { get; set; }
         public string ToAirportName { get; set; }
         public string ToAirportIATA { get; set; }
         public string FromAirportCity { get; set; }
@@ -91,10 +91,10 @@ namespace EPAGriffinAPI.Models
         public string Manufacturer { get; set; }
         public string FromSortName { get; set; }
         public string FromContry { get; set; }
-        public Nullable<decimal> FromLatitude { get; set; }
-        public Nullable<decimal> FromLongitude { get; set; }
-        public Nullable<decimal> ToLatitude { get; set; }
-        public Nullable<decimal> ToLongitude { get; set; }
+        public Nullable<double> FromLatitude { get; set; }
+        public Nullable<double> FromLongitude { get; set; }
+        public Nullable<double> ToLatitude { get; set; }
+        public Nullable<double> ToLongitude { get; set; }
         public Nullable<int> CargoCount { get; set; }
         public Nullable<int> BaggageWeight { get; set; }
         public Nullable<int> FuelUnitID { get; set; }
@@ -102,9 +102,9 @@ namespace EPAGriffinAPI.Models
         public string ArrivalRemark { get; set; }
         public string DepartureRemark { get; set; }
         public Nullable<int> TotalSeat { get; set; }
-        public Nullable<int> EstimatedDelay { get; set; }
+        public int EstimatedDelay { get; set; }
         public Nullable<int> TotalPax { get; set; }
-        public Nullable<int> PaxOver { get; set; }
+        public int PaxOver { get; set; }
         public Nullable<System.DateTime> DateStatus { get; set; }
         public Nullable<int> FlightStatusUserId { get; set; }
         public Nullable<System.DateTime> STDDay { get; set; }
@@ -113,10 +113,10 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> DelayTakeoff { get; set; }
         public Nullable<int> DelayOnBlock { get; set; }
         public Nullable<int> DelayLanding { get; set; }
-        public Nullable<int> IsDelayOffBlock { get; set; }
-        public Nullable<int> IsDelayTakeoff { get; set; }
-        public Nullable<int> IsDelayOnBlock { get; set; }
-        public Nullable<int> IsDelayLanding { get; set; }
+        public int IsDelayOffBlock { get; set; }
+        public int IsDelayTakeoff { get; set; }
+        public int IsDelayOnBlock { get; set; }
+        public int IsDelayLanding { get; set; }
         public Nullable<int> ActualFlightHOffBlock { get; set; }
         public Nullable<decimal> ActualFlightMOffBlock { get; set; }
         public Nullable<int> ActualFlightHTakeoff { get; set; }
@@ -144,7 +144,7 @@ namespace EPAGriffinAPI.Models
         public Nullable<bool> IsActive { get; set; }
         public Nullable<int> BoxId { get; set; }
         public Nullable<int> CalendarId { get; set; }
-        public Nullable<int> BaseId { get; set; }
+        public int BaseId { get; set; }
         public string BaseIATA { get; set; }
         public string BaseName { get; set; }
         public Nullable<int> FPFlightHH { get; set; }
@@ -163,7 +163,7 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> BlockTime { get; set; }
         public Nullable<int> FlightTime { get; set; }
         public Nullable<int> FlightTimeActual { get; set; }
-        public Nullable<int> FixTime { get; set; }
+        public int FixTime { get; set; }
         public Nullable<int> SITATime { get; set; }
         public Nullable<decimal> UsedFuel { get; set; }
         public Nullable<int> JLBLHH { get; set; }

@@ -49,8 +49,8 @@ app.factory('authService', ['$http', '$q', 'localStorageService', 'ngAuthSetting
             else {
                 localStorageService.set('authorizationDataApp', { token: responseData.access_token, userName: loginData.userName, refreshToken: "", expires: responseData['.expires'],useRefreshTokens: false });
             }
-
-            localStorageService.set('userData', { Name: responseData.Name, UserId: responseData.UserId, EmployeeId: responseData.EmployeeId, JobGroup: responseData.JobGroup });
+            //5-2
+            localStorageService.set('userData', { Name: responseData.Name, UserId: responseData.UserId, EmployeeId: responseData.EmployeeId, JobGroup: responseData.JobGroup, EmailConfirmed: responseData.EmailConfirmed });
             
             _authentication.isAuth = true;
             _authentication.userName = loginData.userName;
@@ -60,6 +60,8 @@ app.factory('authService', ['$http', '$q', 'localStorageService', 'ngAuthSetting
             $rootScope.userId = responseData.UserId;
             $rootScope.employeeId = responseData.EmployeeId;
             $rootScope.JobGroup = responseData.JobGroup;
+            //5-2
+            $rootScope.EmailConfirmed = responseData.EmailConfirmed;
             deferred.resolve(response);
 
         }, function (err, status) {
@@ -99,6 +101,8 @@ app.factory('authService', ['$http', '$q', 'localStorageService', 'ngAuthSetting
                 $rootScope.userId = userData.UserId;
                 $rootScope.employeeId = userData.EmployeeId;
                 $rootScope.JobGroup = userData.JobGroup;
+                //5-2
+                $rootScope.EmailConfirmed = userData.EmailConfirmed;
             }
         }
 

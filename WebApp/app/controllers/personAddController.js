@@ -2,8 +2,13 @@
 app.controller('personAddController', ['$scope', '$location', 'personService', 'authService', '$routeParams', '$rootScope', function ($scope, $location, personService, authService, $routeParams, $rootScope) {
     
     $scope.isNew = true;
-    $scope.IsEditable = $rootScope.roles.indexOf('Admin') != -1 || $rootScope.userName.toLowerCase() == 'mohammadifard' || $rootScope.userName.toLowerCase() == 'ops.soltani';
+    $scope.IsEditable = $rootScope.roles.indexOf('Admin') != -1 || $rootScope.userName.toLowerCase() == 'mohammadifard'
+        || $rootScope.userName.toLowerCase() == 'ops.soltani'
+        || $rootScope.userName.toLowerCase() == 'train.moradi'
+        ;
+    $scope.IsCerDisabled = $rootScope.userName.toLowerCase() == 'ops.soltani';
 
+    //moradi
     $scope.entity = {
         Id: null,
         PersonId: null,
@@ -125,6 +130,12 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
             SMSExpireDate: null,
             FirstAidIssueDate: null,
             FirstAidExpireDate: null,
+            //moradi ok
+            LineIssueDate: null,
+            LineExpireDate: null,
+            RecurrentIssueDate: null,
+            RecurrentExpireDate: null,
+             
 
             AviationSecurityIssueDate: null,
             AviationSecurityExpireDate: null,
@@ -371,6 +382,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         $scope.entityDocument.Documents = [];
         $scope.uploader_document_instance.reset();
     };
+    //moradi
     $scope.clearEntity = function () {
         $scope.entity.Id = null;
         $scope.entity.PersonId = -1;
@@ -488,6 +500,12 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         $scope.entity.Person.SMSExpireDate = null;
         $scope.entity.Person.FirstAidIssueDate = null;
         $scope.entity.Person.FirstAidExpireDate = null;
+        //moradi
+        $scope.entity.Person.LineIssueDate = null;
+        $scope.entity.Person.LineExpireDate = null;
+        $scope.entity.Person.RecurrentIssueDate = null;
+        $scope.entity.Person.RecurrentExpireDate = null;
+
         $scope.entity.Person.AviationSecurityIssueDate = null;
         $scope.entity.Person.AviationSecurityExpireDate = null;
         $scope.entity.Person.EGPWSIssueDate = null;
@@ -620,6 +638,8 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         $scope.entityEducation.SysUrl = null;
         $scope.entityEducation.FileType = null;
     };
+
+    //moradi ok
     $scope.bindPerson = function (data) {
         //Person
         $scope.entity.Person.PersonId = data.PersonId;
@@ -706,7 +726,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         $scope.entity.Person.VisaExpireDate = data.VisaExpireDate;
 
         $scope.entity.Person.SEPTIssueDate = data.SEPTIssueDate;
-        $scope.entity.Person.SEPTExpireDate = data.SEPTExpireDate;
+        $scope.entity.Person.SEPTExpireDate = data.SEPTExpireDate; 
         $scope.entity.Person.SEPTPIssueDate = data.SEPTPIssueDate;
         $scope.entity.Person.SEPTPExpireDate = data.SEPTPExpireDate;
         $scope.entity.Person.DangerousGoodsIssueDate = data.DangerousGoodsIssueDate;
@@ -719,6 +739,12 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         $scope.entity.Person.SMSExpireDate = data.SMSExpireDate;
         $scope.entity.Person.FirstAidIssueDate = data.FirstAidIssueDate;
         $scope.entity.Person.FirstAidExpireDate = data.FirstAidExpireDate;
+        //moradi
+        $scope.entity.Person.LineIssueDate = data.LineIssueDate;
+        $scope.entity.Person.LineExpireDate = data.LineExpireDate;
+        $scope.entity.Person.RecurrentIssueDate = data.RecurrentIssueDate;
+        $scope.entity.Person.RecurrentExpireDate = data.RecurrentExpireDate;
+
 
         $scope.entity.Person.AircraftTypeId = data.AircraftTypeId;
         $scope.entity.Person.DateTypeIssue = data.DateTypeIssue;
@@ -1478,26 +1504,28 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         }
     };
     ///////////////////////////////////////////
-    
+    //soltani
     $scope.date_SEPTIssueDate = {
         width: '100%',
         type: 'date',
         displayFormat: $rootScope.DateBoxFormat,
         onValueChanged: function (e) {
-           // if (!($scope.isNew || !$scope.entity.Person.SEPTExpireDate))
-           //      return;
+            if (!($scope.isNew || !$scope.entity.Person.SEPTExpireDate))
+                  return;
             if (!e.value) {
                 $scope.entity.Person.SEPTExpireDate = null;
                 return;
             }
-            $scope.entity.Person.SEPTExpireDate = (new Date(e.value)).addYears(3);
+             //if ($scope.isNew || !$scope.entity.Person.SEPTExpireDate)
+                $scope.entity.Person.SEPTExpireDate = (new Date(e.value)).addYears(3);
         },
         bindingOptions: {
             value: 'entity.Person.SEPTIssueDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
-    
+    //soltani
     $scope.date_SEPTExpireDate = {
         width: '100%',
         type: 'date',
@@ -1505,6 +1533,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.SEPTExpireDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
     //////////////
@@ -1537,7 +1566,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         }
     };
     /////////////////
-    
+    //soltani
     $scope.date_DangerousGoodsIssueDate = {
         width: '100%',
         type: 'date',
@@ -1548,15 +1577,18 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
                 $scope.entity.Person.DangerousGoodsExpireDate = null;
                 return;
             }
+            if (!($scope.isNew || !$scope.entity.Person.DangerousGoodsExpireDate))
+                return;
             $scope.entity.Person.DangerousGoodsExpireDate = (new Date(e.value)).addYears(2);
         },
         displayFormat: $rootScope.DateBoxFormat,
         bindingOptions: {
             value: 'entity.Person.DangerousGoodsIssueDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
-    
+    //soltani
     $scope.date_DangerousGoodsExpireDate = {
         width: '100%',
         type: 'date',
@@ -1564,9 +1596,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.DangerousGoodsExpireDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
-    
+    //soltani
     $scope.date_CCRMIssueDate = {
         width: '100%',
         type: 'date',
@@ -1583,9 +1616,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.CCRMIssueDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
-    
+    //soltani
     $scope.date_CCRMExpireDate = {
         width: '100%',
         type: 'date',
@@ -1593,6 +1627,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.CCRMExpireDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
     
@@ -1624,7 +1659,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
             readOnly: 'IsMainDisabled',
         }
     };
-    
+    //soltani
     $scope.date_SMSIssueDate = {
         width: '100%',
         type: 'date',
@@ -1641,9 +1676,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.SMSIssueDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
-    
+    //soltani
     $scope.date_SMSExpireDate = {
         width: '100%',
         type: 'date',
@@ -1652,9 +1688,11 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.SMSExpireDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
     /////////////////////
+    //soltani
     $scope.date_FirstAidIssueDate = {
         width: '100%',
         type: 'date',
@@ -1671,9 +1709,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.FirstAidIssueDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
-
+    //soltani
     $scope.date_FirstAidExpireDate = {
         width: '100%',
         type: 'date',
@@ -1682,10 +1721,74 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.FirstAidExpireDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
+        }
+    };
+    ////moradi/////////
+    $scope.date_LineIssueDate = {
+        width: '100%',
+        type: 'date',
+        displayFormat: $rootScope.DateBoxFormat,
+        onValueChanged: function (e) {
+            if (!($scope.isNew || !$scope.entity.Person.LineExpireDate))
+                 return;
+            if (!e.value) {
+                $scope.entity.Person.LineExpireDate = null;
+                return;
+            }
+            $scope.entity.Person.LineExpireDate = (new Date(e.value)).addYears(1);
+        },
+        bindingOptions: {
+            value: 'entity.Person.LineIssueDate',
+            readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
+        }
+    };
+    
+    $scope.date_LineExpireDate = {
+        width: '100%',
+        type: 'date',
+        displayFormat: $rootScope.DateBoxFormat,
+
+        bindingOptions: {
+            value: 'entity.Person.LineExpireDate',
+            readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
+        }
+    };
+    $scope.date_RecurrentIssueDate = {
+        width: '100%',
+        type: 'date',
+        displayFormat: $rootScope.DateBoxFormat,
+        onValueChanged: function (e) {
+            if (!($scope.isNew || !$scope.entity.Person.RecurrentExpireDate))
+                 return;
+            if (!e.value) {
+                $scope.entity.Person.RecurrentExpireDate = null;
+                return;
+            }
+            $scope.entity.Person.RecurrentExpireDate = (new Date(e.value)).addYears(1);
+        },
+        bindingOptions: {
+            value: 'entity.Person.RecurrentIssueDate',
+            readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
+        }
+    };
+
+    $scope.date_RecurrentExpireDate = {
+        width: '100%',
+        type: 'date',
+        displayFormat: $rootScope.DateBoxFormat,
+
+        bindingOptions: {
+            value: 'entity.Person.RecurrentExpireDate',
+            readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
     //////////////
-    
+    //soltani
     $scope.date_AviationSecurityIssueDate = {
         width: '100%',
         type: 'date',
@@ -1702,9 +1805,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.AviationSecurityIssueDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
-    
+    //soltani
     $scope.date_AviationSecurityExpireDate = {
         width: '100%',
         type: 'date',
@@ -1712,6 +1816,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.AviationSecurityExpireDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
     
@@ -1734,7 +1839,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
             readOnly: 'IsMainDisabled',
         }
     };
-    
+    //soltani
     $scope.date_UpsetRecoveryTrainingIssueDate = {
         width: '100%',
         type: 'date',
@@ -1751,9 +1856,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.UpsetRecoveryTrainingIssueDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
-    
+    //soltani
     $scope.date_UpsetRecoveryTrainingExpireDate = {
         width: '100%',
         type: 'date',
@@ -1761,9 +1867,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.UpsetRecoveryTrainingExpireDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
-    
+    //soltani
     $scope.date_ColdWeatherOperationIssueDate = {
         width: '100%',
         type: 'date',
@@ -1780,8 +1887,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.ColdWeatherOperationIssueDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
+    //soltani
     $scope.date_ColdWeatherOperationExpireDate = {
         width: '100%',
         type: 'date',
@@ -1789,9 +1898,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.ColdWeatherOperationExpireDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
-    
+    //soltani
     $scope.date_HotWeatherOperationIssueDate = {
         width: '100%',
         type: 'date',
@@ -1808,8 +1918,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.HotWeatherOperationIssueDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
+    //soltani
     $scope.date_HotWeatherOperationExpireDate = {
         width: '100%',
         type: 'date',
@@ -1817,6 +1929,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.HotWeatherOperationExpireDate',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
     
@@ -1937,7 +2050,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         }
     };
 
-    
+    //soltani
     $scope.date_ProficiencyCheckDate = {
         width: '100%',
         type: 'date',
@@ -1945,9 +2058,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.ProficiencyCheckDate',
             readOnly: 'IsMainDisabled',
+            disabled:'IsCerDisabled',
         }
     };
-    
+    //soltani
     $scope.date_ProficiencyValidUntil = {
         width: '100%',
         type: 'date',
@@ -1955,9 +2069,11 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.ProficiencyValidUntil',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
     /////////////////
+    //soltani
     $scope.date_ProficiencyCheckDateOPC = {
         width: '100%',
         type: 'date',
@@ -1965,9 +2081,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.ProficiencyCheckDateOPC',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
-
+    //soltani
     $scope.date_ProficiencyValidUntilOPC = {
         width: '100%',
         type: 'date',
@@ -1975,11 +2092,12 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.ProficiencyValidUntilOPC',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
     ////////////////////
 
-    
+    //soltani
     $scope.date_ICAOLPRValidUntil = {
         width: '100%',
         type: 'date',
@@ -1987,7 +2105,8 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.ICAOLPRValidUntil',
             readOnly: 'IsMainDisabled',
-            disabled:'LPRDisabled',
+            disabled: 'LPRDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
 
@@ -2022,7 +2141,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
             readOnly: 'IsMainDisabled',
         }
     };
-
+    //soltani
     $scope.date_DateNextCheckUP = {
         width: '100%',
         type: 'date',
@@ -2030,8 +2149,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.DateNextCheckUP',
             readOnly: 'IsMainDisabled',
+            //disabled: 'IsCerDisabled',
         }
     };
+    //soltani
     $scope.date_DateLastCheckUP = {
         width: '100%',
         type: 'date',
@@ -2043,11 +2164,12 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
                 $scope.entity.Person.DateNextCheckUP = null;
                 return;
             }
-            $scope.entity.Person.DateNextCheckUP = (new Date(e.value)).addYears(1);
+            $scope.entity.Person.DateNextCheckUP = (new Date(e.value)).addYears(1); 
         },
         bindingOptions: {
             value: 'entity.Person.DateLastCheckUP',
             readOnly: 'IsMainDisabled',
+           // disabled: 'IsCerDisabled',
         }
     };
     /////////////////////
@@ -2072,7 +2194,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
 
         }
     };
-
+    //soltani
     $scope.date_TRIExpire = {
         width: '100%',
         type: 'date',
@@ -2083,8 +2205,10 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.DateTRIExpired',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
+    //soltani
     $scope.date_TREExpire = {
         width: '100%',
         type: 'date',
@@ -2092,6 +2216,7 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         bindingOptions: {
             value: 'entity.Person.DateTREExpired',
             readOnly: 'IsMainDisabled',
+            disabled: 'IsCerDisabled',
         }
     };
 
@@ -2989,6 +3114,21 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
         if ($scope.entity.Person.ProficiencyValidUntilOPC)
             $scope.entity.Person.ProficiencyValidUntilOPC = (new Date($scope.entity.Person.ProficiencyValidUntilOPC)).addMinutes(offset);
 
+
+        //moradi
+        if ($scope.entity.Person.LineIssueDate)
+            $scope.entity.Person.LineIssueDate = (new Date($scope.entity.Person.LineIssueDate)).addMinutes(offset);
+        if ($scope.entity.Person.LineExpireDate)
+            $scope.entity.Person.LineExpireDate = (new Date($scope.entity.Person.LineExpireDate)).addMinutes(offset);
+        if ($scope.entity.Person.RecurrentIssueDate)
+            $scope.entity.Person.RecurrentIssueDate = (new Date($scope.entity.Person.RecurrentIssueDate)).addMinutes(offset);
+        if ($scope.entity.Person.RecurrentExpireDate)
+            $scope.entity.Person.RecurrentExpireDate = (new Date($scope.entity.Person.RecurrentExpireDate)).addMinutes(offset);
+
+
+
+        //if ($scope.entity.Person.DangerousGoodsExpireDate)
+        //    $scope.entity.Person.DangerousGoodsExpireDate = (new Date($scope.entity.Person.DangerousGoodsExpireDate)).addMinutes(offset);
 
       //  $scope.datefrom = General.getDayFirstHour(new Date(dfrom));
      //   $scope.dateEnd = General.getDayLastHour(new Date(new Date(dfrom).addDays($scope.days_count - 1)));

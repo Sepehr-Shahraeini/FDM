@@ -265,20 +265,109 @@ app.controller('formaController', ['$scope', '$location', '$routeParams', '$root
       { dataField: 'MonthName', caption: 'MMM', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: false, fixedPosition: 'left', },
        { dataField: 'Month', caption: 'MM', allowResizing: true, alignment: 'center', dataType: 'numeric', allowEditing: false, width: 120, fixed: false, fixedPosition: 'left', sortIndex: 1, sortOrder: 'asc' },
 
-       { dataField: 'Distance', caption: 'Aircraft Kilometers', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'Legs', caption: 'Aircraft Departures', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'FlightHour', caption: 'Aircraft Hours', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'PaxTotal', caption: 'Passengers Carried', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'FreightTone', caption: 'Freight Tonnes Carried', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'PaxTotalDistRound', caption: 'Passenger-Kilometers Performed', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 170, fixed: false, fixedPosition: 'left', },
-       { dataField: 'TotalSeatDistRound', caption: 'Seat-Kilometers Available', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'PaxLoad', caption: 'Passenger Load Factor', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'PaxAllWeightDistance', caption: 'Passengers(Ton-Km)', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'FreightToneDistance', caption: 'Freight(Ton-Km)', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-        { dataField: 'TotalToneDistance', caption: 'Total(Ton-Km)', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'TotalToneDistanceAvailable', caption: 'Available(Ton-Km)', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'WeightLoadFactor', caption: 'Weight Load Factor', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Aircraft Kilometers', alignment: 'center', columns: [
+                { dataField: 'DistanceInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'Distance', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+       
 
+       //{ dataField: 'Legs', caption: 'Aircraft Departures', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Aircraft Departures', alignment: 'center', columns: [
+                { dataField: 'LegsInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'Legs', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+
+        //{ dataField: 'FlightHour', caption: 'Aircraft Hours', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Aircraft Hours', alignment: 'center', columns: [
+                { dataField: 'FlightHourInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'FlightHour', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+
+        //{ dataField: 'PaxTotal', caption: 'Passengers Carried', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Passengers Carried', alignment: 'center', columns: [
+                { dataField: 'PaxTotalInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'PaxTotal', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+
+        //{ dataField: 'FreightTone', caption: 'Freight Tonnes Carried', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Freight Tonnes Carried', alignment: 'center', columns: [
+                { dataField: 'FreightToneInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'FreightTone', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+
+        //{ dataField: 'PaxTotalDistRound', caption: 'Passenger-Kilometers Performed', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 170, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Passenger-Kilometers Performed', alignment: 'center', columns: [
+                { dataField: 'PaxTotalDistRoundInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'PaxTotalDistRound', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+
+        //{ dataField: 'TotalSeatDistRound', caption: 'Seat-Kilometers Available', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Seat-Kilometers Available', alignment: 'center', columns: [
+                { dataField: 'TotalSeatDistRoundInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'TotalSeatDistRound', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+
+        //{ dataField: 'PaxLoad', caption: 'Passenger Load Factor', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Passenger Load Factor', alignment: 'center', columns: [
+                { dataField: 'DPaxLoadInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'PaxLoad', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+
+       // { dataField: 'PaxAllWeightDistance', caption: 'Passengers(Ton-Km)', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Passengers(Ton-Km)', alignment: 'center', columns: [
+                { dataField: 'PaxAllWeightDistanceInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'PaxAllWeightDistance', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+
+        //{ dataField: 'FreightToneDistance', caption: 'Freight(Ton-Km)', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Freight(Ton-Km)', alignment: 'center', columns: [
+                { dataField: 'FreightToneDistanceInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'FreightToneDistance', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+
+        //{ dataField: 'TotalToneDistance', caption: 'Total(Ton-Km)', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Total(Ton-Km)', alignment: 'center', columns: [
+                { dataField: 'TotalToneDistanceInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'TotalToneDistance', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+
+        //{ dataField: 'TotalToneDistanceAvailable', caption: 'Available(Ton-Km)', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Available(Ton-Km)', alignment: 'center', columns: [
+                { dataField: 'TotalToneDistanceAvailableInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'TotalToneDistanceAvailable', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+
+        //{ dataField: 'WeightLoadFactor', caption: 'Weight Load Factor', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'Weight Load Factor', alignment: 'center', columns: [
+                { dataField: 'WeightLoadFactorInt', caption: 'Int', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+                { dataField: 'WeightLoadFactor', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', },
+            ]
+        },
        // { dataField: 'Legs', caption: 'Legs', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, fixed: false, fixedPosition: 'left', },
        //   { dataField: 'Delay2', caption: 'Delay', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130 },
 
@@ -1073,6 +1162,19 @@ app.controller('formaController', ['$scope', '$location', '$routeParams', '$root
             //$scope.bindReport();
 
             //$scope.popup_print_visible = true;
+        }
+    };
+
+    $scope.btn_year = {
+        text: 'Yearly Report',
+        type: 'default',
+
+        width: 200,
+
+        bindingOptions: {},
+        onClick: function (e) {
+
+            $window.open('#!/forma/yearly/', '_blank');
         }
     };
 

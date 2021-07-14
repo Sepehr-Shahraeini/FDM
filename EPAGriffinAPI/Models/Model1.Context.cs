@@ -94,7 +94,6 @@ namespace EPAGriffinAPI.Models
         public virtual DbSet<BookAutor> BookAutors { get; set; }
         public virtual DbSet<BookKeyword> BookKeywords { get; set; }
         public virtual DbSet<BookRelatedAircraftType> BookRelatedAircraftTypes { get; set; }
-        public virtual DbSet<BookRelatedGroup> BookRelatedGroups { get; set; }
         public virtual DbSet<BookRelatedStudyField> BookRelatedStudyFields { get; set; }
         public virtual DbSet<ViewBookAuthor> ViewBookAuthors { get; set; }
         public virtual DbSet<Journal> Journals { get; set; }
@@ -206,7 +205,6 @@ namespace EPAGriffinAPI.Models
         public virtual DbSet<RegisterGround> RegisterGrounds { get; set; }
         public virtual DbSet<ViewLibraryFolder> ViewLibraryFolders { get; set; }
         public virtual DbSet<ViewRegisterGround> ViewRegisterGrounds { get; set; }
-        public virtual DbSet<FlightRoute> FlightRoutes { get; set; }
         public virtual DbSet<ViewDelayCode> ViewDelayCodes { get; set; }
         public virtual DbSet<ViewDutyFDPDetail> ViewDutyFDPDetails { get; set; }
         public virtual DbSet<ViewRotserDailyCrew> ViewRotserDailyCrews { get; set; }
@@ -277,23 +275,18 @@ namespace EPAGriffinAPI.Models
         public virtual DbSet<ViewImportPlan> ViewImportPlans { get; set; }
         public virtual DbSet<Idea> Ideas { get; set; }
         public virtual DbSet<ThirdPartySyncHistory> ThirdPartySyncHistories { get; set; }
-        public virtual DbSet<ViewCrewTimeDetail> ViewCrewTimeDetails { get; set; }
         public virtual DbSet<Book> Books { get; set; }
         public virtual DbSet<BookChapter> BookChapters { get; set; }
         public virtual DbSet<BookFile> BookFiles { get; set; }
         public virtual DbSet<ViewBookFile> ViewBookFiles { get; set; }
         public virtual DbSet<ViewBookFileVisited> ViewBookFileVisiteds { get; set; }
         public virtual DbSet<ViewBookChapter> ViewBookChapters { get; set; }
-        public virtual DbSet<ViewFlightPlanCalanderCrew> ViewFlightPlanCalanderCrews { get; set; }
-        public virtual DbSet<ViewBoxCrew> ViewBoxCrews { get; set; }
-        public virtual DbSet<ViewFlightCrew2> ViewFlightCrew2 { get; set; }
         public virtual DbSet<Ac_MSN> Ac_MSN { get; set; }
         public virtual DbSet<ViewFlightCrewArchived> ViewFlightCrewArchiveds { get; set; }
         public virtual DbSet<ViewFlightCrewArchive> ViewFlightCrewArchives { get; set; }
         public virtual DbSet<ViewDayOffRanked> ViewDayOffRankeds { get; set; }
         public virtual DbSet<NiraHistory> NiraHistories { get; set; }
         public virtual DbSet<ViewFlightInformation> ViewFlightInformations { get; set; }
-        public virtual DbSet<ViewFlightCrewX> ViewFlightCrewXes { get; set; }
         public virtual DbSet<FDPItem> FDPItems { get; set; }
         public virtual DbSet<ViewFDPItem> ViewFDPItems { get; set; }
         public virtual DbSet<ViewFDPCrew> ViewFDPCrews { get; set; }
@@ -308,18 +301,13 @@ namespace EPAGriffinAPI.Models
         public virtual DbSet<SMSHistory> SMSHistories { get; set; }
         public virtual DbSet<FlightChangeHistory> FlightChangeHistories { get; set; }
         public virtual DbSet<ViewFlightChangeHistory> ViewFlightChangeHistories { get; set; }
-        public virtual DbSet<ViewFDRReport> ViewFDRReports { get; set; }
         public virtual DbSet<ViewCrewCode> ViewCrewCodes { get; set; }
         public virtual DbSet<ViewRoute> ViewRoutes { get; set; }
         public virtual DbSet<ViewFinMonthlyPersian> ViewFinMonthlyPersians { get; set; }
         public virtual DbSet<ViewFinMonthly> ViewFinMonthlies { get; set; }
         public virtual DbSet<ViewFinMonthlyReg> ViewFinMonthlyRegs { get; set; }
         public virtual DbSet<ViewFinMonthlyRouteReg> ViewFinMonthlyRouteRegs { get; set; }
-        public virtual DbSet<ViewFlightDelay> ViewFlightDelays { get; set; }
         public virtual DbSet<ViewFin> ViewFins { get; set; }
-        public virtual DbSet<ViewFinMonthlyRoute> ViewFinMonthlyRoutes { get; set; }
-        public virtual DbSet<FlightInformation> FlightInformations { get; set; }
-        public virtual DbSet<ViewDayDuty7> ViewDayDuty7 { get; set; }
         public virtual DbSet<ViewDayFlight28> ViewDayFlight28 { get; set; }
         public virtual DbSet<ViewAircraftType> ViewAircraftTypes { get; set; }
         public virtual DbSet<IPAccess> IPAccesses { get; set; }
@@ -327,10 +315,6 @@ namespace EPAGriffinAPI.Models
         public virtual DbSet<ViewCrewValid> ViewCrewValids { get; set; }
         public virtual DbSet<ViewFlightCrewNew> ViewFlightCrewNews { get; set; }
         public virtual DbSet<UserLogin> UserLogins { get; set; }
-        public virtual DbSet<Person> People { get; set; }
-        public virtual DbSet<ViewFormAMonthly> ViewFormAMonthlies { get; set; }
-        public virtual DbSet<ViewFDPKey> ViewFDPKeys { get; set; }
-        public virtual DbSet<ViewFormA> ViewFormAs { get; set; }
         public virtual DbSet<OffItem> OffItems { get; set; }
         public virtual DbSet<CrewPickupSM> CrewPickupSMS { get; set; }
         public virtual DbSet<ViewCrewPickupSM> ViewCrewPickupSMS { get; set; }
@@ -340,13 +324,9 @@ namespace EPAGriffinAPI.Models
         public virtual DbSet<ViewNotificationGroup> ViewNotificationGroups { get; set; }
         public virtual DbSet<Extension> Extensions { get; set; }
         public virtual DbSet<HelperFDP> HelperFDPs { get; set; }
-        public virtual DbSet<ViewFDP> ViewFDPs { get; set; }
-        public virtual DbSet<ViewFDPRest> ViewFDPRests { get; set; }
         public virtual DbSet<ExtensionHistory> ExtensionHistories { get; set; }
         public virtual DbSet<ViewOffItem> ViewOffItems { get; set; }
         public virtual DbSet<ViewRosterReport> ViewRosterReports { get; set; }
-        public virtual DbSet<ViewFlightsGantt> ViewFlightsGantts { get; set; }
-        public virtual DbSet<ViewEmployee> ViewEmployees { get; set; }
         public virtual DbSet<RptFDP> RptFDPs { get; set; }
         public virtual DbSet<RptFDPItem> RptFDPItems { get; set; }
         public virtual DbSet<RptFDPMonthly> RptFDPMonthlies { get; set; }
@@ -356,33 +336,98 @@ namespace EPAGriffinAPI.Models
         public virtual DbSet<Coord> Coords { get; set; }
         public virtual DbSet<CourseSession> CourseSessions { get; set; }
         public virtual DbSet<CourseSessionPresence> CourseSessionPresences { get; set; }
-        public virtual DbSet<ViewCourseSession> ViewCourseSessions { get; set; }
-        public virtual DbSet<ViewCourseSessionPresence> ViewCourseSessionPresences { get; set; }
         public virtual DbSet<ViewCrewCertificatesSummary> ViewCrewCertificatesSummaries { get; set; }
-        public virtual DbSet<RptFuelDaily> RptFuelDailies { get; set; }
-        public virtual DbSet<RptFuelDailyRegister> RptFuelDailyRegisters { get; set; }
-        public virtual DbSet<RptFuelDailyRoute> RptFuelDailyRoutes { get; set; }
-        public virtual DbSet<RptFuelLeg> RptFuelLegs { get; set; }
-        public virtual DbSet<RptFuelMonthlyRegister> RptFuelMonthlyRegisters { get; set; }
-        public virtual DbSet<RptFuelMonthlyRoute> RptFuelMonthlyRoutes { get; set; }
-        public virtual DbSet<FDP> FDPs { get; set; }
         public virtual DbSet<ViewDayDuty> ViewDayDuties { get; set; }
-        public virtual DbSet<ViewCrewDuty> ViewCrewDuties { get; set; }
-        public virtual DbSet<RptFuelDailyCal> RptFuelDailyCals { get; set; }
         public virtual DbSet<ViewFlightCockpit> ViewFlightCockpits { get; set; }
         public virtual DbSet<ViewLegTime> ViewLegTimes { get; set; }
-        public virtual DbSet<ViewCrew> ViewCrews { get; set; }
         public virtual DbSet<ViewCrewValidFTL> ViewCrewValidFTLs { get; set; }
-        public virtual DbSet<RptFuelMonthly> RptFuelMonthlies { get; set; }
-        public virtual DbSet<RptFuelMonthlyCal> RptFuelMonthlyCals { get; set; }
-        public virtual DbSet<RptFuelYearlyRoute> RptFuelYearlyRoutes { get; set; }
         public virtual DbSet<FixTimeRoute> FixTimeRoutes { get; set; }
-        public virtual DbSet<ViewFixTimeRoute> ViewFixTimeRoutes { get; set; }
         public virtual DbSet<FixTimeRouteHistory> FixTimeRouteHistories { get; set; }
         public virtual DbSet<RptFDPMonthlyPersian> RptFDPMonthlyPersians { get; set; }
         public virtual DbSet<RptNoFDP> RptNoFDPs { get; set; }
         public virtual DbSet<RptNoFDPMonthlyPersian> RptNoFDPMonthlyPersians { get; set; }
+        public virtual DbSet<ViewDispatchSMSEmployee> ViewDispatchSMSEmployees { get; set; }
+        public virtual DbSet<RptDelayLegMap> RptDelayLegMaps { get; set; }
+        public virtual DbSet<SumFlightDelay> SumFlightDelays { get; set; }
+        public virtual DbSet<ViewFDP> ViewFDPs { get; set; }
+        public virtual DbSet<ViewFlightCrewX> ViewFlightCrewXes { get; set; }
+        public virtual DbSet<FDP> FDPs { get; set; }
+        public virtual DbSet<ViewCrewDuty> ViewCrewDuties { get; set; }
+        public virtual DbSet<ViewFDPRest> ViewFDPRests { get; set; }
+        public virtual DbSet<FlightInformation> FlightInformations { get; set; }
+        public virtual DbSet<FDPLog> FDPLogs { get; set; }
+        public virtual DbSet<ViewCrewDutyNoReg> ViewCrewDutyNoRegs { get; set; }
+        public virtual DbSet<MVT> MVTs { get; set; }
+        public virtual DbSet<FDPVisibleDate> FDPVisibleDates { get; set; }
+        public virtual DbSet<TableDutyFDP> TableDutyFDPs { get; set; }
+        public virtual DbSet<ViewDayDuty7> ViewDayDuty7 { get; set; }
+        public virtual DbSet<ViewFlightsGantt> ViewFlightsGantts { get; set; }
+        public virtual DbSet<RptDelayAirportMonthlyCal> RptDelayAirportMonthlyCals { get; set; }
+        public virtual DbSet<RptDelayCatAirportMonthlyCal> RptDelayCatAirportMonthlyCals { get; set; }
+        public virtual DbSet<RptDelayCatMonthlyCal> RptDelayCatMonthlyCals { get; set; }
+        public virtual DbSet<RptDelayMonthlyCal> RptDelayMonthlyCals { get; set; }
+        public virtual DbSet<GrpFlight> GrpFlights { get; set; }
+        public virtual DbSet<GrpFlightCal> GrpFlightCals { get; set; }
+        public virtual DbSet<ViewFDPKey> ViewFDPKeys { get; set; }
+        public virtual DbSet<ViewFixTimeRoute> ViewFixTimeRoutes { get; set; }
+        public virtual DbSet<DelayNotified> DelayNotifieds { get; set; }
+        public virtual DbSet<SMSGroup> SMSGroups { get; set; }
+        public virtual DbSet<RptFuelYearlyRegister> RptFuelYearlyRegisters { get; set; }
+        public virtual DbSet<RptFuelYearlyRoute> RptFuelYearlyRoutes { get; set; }
+        public virtual DbSet<RptFuelYearlyType> RptFuelYearlyTypes { get; set; }
+        public virtual DbSet<ViewFlightPlanCalanderCrew> ViewFlightPlanCalanderCrews { get; set; }
+        public virtual DbSet<DlyGrpFlight> DlyGrpFlights { get; set; }
+        public virtual DbSet<RptFuelMonthlyRoute> RptFuelMonthlyRoutes { get; set; }
+        public virtual DbSet<FlightRoute> FlightRoutes { get; set; }
+        public virtual DbSet<ViewBoxCrew> ViewBoxCrews { get; set; }
+        public virtual DbSet<ViewFlightCrew2> ViewFlightCrew2 { get; set; }
+        public virtual DbSet<ViewDutyFlightLocal> ViewDutyFlightLocals { get; set; }
+        public virtual DbSet<ViewCrewTimeDetail> ViewCrewTimeDetails { get; set; }
+        public virtual DbSet<DlyGrpFlightCat> DlyGrpFlightCats { get; set; }
+        public virtual DbSet<RptDelayCatRegisterMonthlyCal> RptDelayCatRegisterMonthlyCals { get; set; }
+        public virtual DbSet<RptDelayLeg> RptDelayLegs { get; set; }
+        public virtual DbSet<Person> People { get; set; }
+        public virtual DbSet<ViewEmployee> ViewEmployees { get; set; }
+        public virtual DbSet<GrpDelayCategory> GrpDelayCategories { get; set; }
+        public virtual DbSet<GrpAirport> GrpAirports { get; set; }
+        public virtual DbSet<RptFuelDailyCal> RptFuelDailyCals { get; set; }
+        public virtual DbSet<ViewFDPLog> ViewFDPLogs { get; set; }
+        public virtual DbSet<LOG> LOGs { get; set; }
+        public virtual DbSet<C_ViewLegTime> C_ViewLegTime { get; set; }
+        public virtual DbSet<RptFuelDailyRegisterCal> RptFuelDailyRegisterCals { get; set; }
+        public virtual DbSet<RptFuelDailyRouteXCal> RptFuelDailyRouteXCals { get; set; }
+        public virtual DbSet<RptFuelDailyTypeCal> RptFuelDailyTypeCals { get; set; }
+        public virtual DbSet<RptFuelMonthlyRegisterCal> RptFuelMonthlyRegisterCals { get; set; }
+        public virtual DbSet<RptFuelMonthlyRouteX> RptFuelMonthlyRouteXes { get; set; }
+        public virtual DbSet<RptFuelMonthlyRouteXCal> RptFuelMonthlyRouteXCals { get; set; }
+        public virtual DbSet<RptFuelMonthlyTypeCal> RptFuelMonthlyTypeCals { get; set; }
+        public virtual DbSet<ViewCourseSession> ViewCourseSessions { get; set; }
+        public virtual DbSet<ViewCourseSessionPresence> ViewCourseSessionPresences { get; set; }
+        public virtual DbSet<ViewFinYearlyRoute> ViewFinYearlyRoutes { get; set; }
+        public virtual DbSet<ViewFormAMonthlyDom> ViewFormAMonthlyDoms { get; set; }
+        public virtual DbSet<ViewFormAMonthlyInt> ViewFormAMonthlyInts { get; set; }
+        public virtual DbSet<ViewFormAYearly> ViewFormAYearlies { get; set; }
+        public virtual DbSet<ViewFormAYearlyDom> ViewFormAYearlyDoms { get; set; }
+        public virtual DbSet<ViewFormAYearlyInt> ViewFormAYearlyInts { get; set; }
+        public virtual DbSet<ViewJobGroupType> ViewJobGroupTypes { get; set; }
+        public virtual DbSet<ViewRosterReportFP> ViewRosterReportFPs { get; set; }
+        public virtual DbSet<RptFuelMonthlyCal> RptFuelMonthlyCals { get; set; }
+        public virtual DbSet<RptFuelMonthlyRegister> RptFuelMonthlyRegisters { get; set; }
+        public virtual DbSet<ViewCrew> ViewCrews { get; set; }
         public virtual DbSet<ViewCrewList> ViewCrewLists { get; set; }
+        public virtual DbSet<ViewFDRReport> ViewFDRReports { get; set; }
+        public virtual DbSet<ViewFinMonthlyRoute> ViewFinMonthlyRoutes { get; set; }
+        public virtual DbSet<ViewFormA> ViewFormAs { get; set; }
+        public virtual DbSet<ViewFormAMonthly> ViewFormAMonthlies { get; set; }
+        public virtual DbSet<BookRelatedGroup> BookRelatedGroups { get; set; }
+        public virtual DbSet<RptFuelLeg> RptFuelLegs { get; set; }
+        public virtual DbSet<RptFuelMonthlyType> RptFuelMonthlyTypes { get; set; }
+        public virtual DbSet<RptDelayDailyCal> RptDelayDailyCals { get; set; }
+        public virtual DbSet<RptDelayAirportDailyCal> RptDelayAirportDailyCals { get; set; }
+        public virtual DbSet<RptDelayCatAirportDailyCal> RptDelayCatAirportDailyCals { get; set; }
+        public virtual DbSet<RptDelayCatRegisterDailyCal> RptDelayCatRegisterDailyCals { get; set; }
+        public virtual DbSet<RptDelayCatDailyCal> RptDelayCatDailyCals { get; set; }
+        public virtual DbSet<ViewFlightDelay> ViewFlightDelays { get; set; }
     
         public virtual int GetOverDuty(string aDate, Nullable<int> aDuty, Nullable<int> aFlight, Nullable<int> aPID)
         {

@@ -145,6 +145,10 @@ namespace EPAGriffinAPI.Models
         public Nullable<System.DateTime> ProficiencyValidUntilOPC { get; set; }
         public Nullable<System.DateTime> DateTRIExpired { get; set; }
         public Nullable<System.DateTime> DateTREExpired { get; set; }
+        public Nullable<System.DateTime> LineIssueDate { get; set; }
+        public Nullable<System.DateTime> LineExpireDate { get; set; }
+        public Nullable<System.DateTime> RecurrentIssueDate { get; set; }
+        public Nullable<System.DateTime> RecurrentExpireDate { get; set; }
     
         public virtual Option Option { get; set; }
         public virtual Option Option1 { get; set; }

@@ -26,8 +26,8 @@ namespace EPAGriffinAPI.Models
         public System.DateTime CreateDate { get; set; }
         public string Remark { get; set; }
     
+        public virtual Employee Employee { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<FlightInformation> FlightInformations { get; set; }
-        public virtual Employee Employee { get; set; }
     }
 }

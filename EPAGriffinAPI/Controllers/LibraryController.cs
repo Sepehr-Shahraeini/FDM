@@ -303,6 +303,7 @@ namespace EPAGriffinAPI.Controllers
 
             unitOfWork.BookRepository.FillBookRelatedEmployees(entity, dto);
             unitOfWork.BookRepository.FillBookRelatedGroups(entity, dto);
+            //unitOfWork.BookRepository.FillBookRelatedTypeGroups(entity, dto);
             unitOfWork.BookRepository.FillBookRelatedStudyFields(entity, dto);
             unitOfWork.BookRepository.FillBookAuthors(entity, dto);
             unitOfWork.BookRepository.FillBookKeywords(entity, dto);

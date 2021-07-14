@@ -103,6 +103,8 @@
     <Content Include="frmReportView.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomFontConverter.cs" />
+    <Compile Include="CustomFontsHelper.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -121,6 +123,42 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ReportFunctions.cs" />
+    <Compile Include="rptApt.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="rptApt.Designer.cs">
+      <DependentUpon>rptApt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="rptAptInt.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="rptAptInt.Designer.cs">
+      <DependentUpon>rptAptInt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RptAptRange.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RptAptRange.Designer.cs">
+      <DependentUpon>RptAptRange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RptCabinTrainingCard.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RptCabinTrainingCard.Designer.cs">
+      <DependentUpon>RptCabinTrainingCard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="rptDelay.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="rptDelay.Designer.cs">
+      <DependentUpon>rptDelay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="rptDelaySub.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="rptDelaySub.Designer.cs">
+      <DependentUpon>rptDelaySub.cs</DependentUpon>
+    </Compile>
     <Compile Include="RptEASAFCLCompliant16X.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -132,6 +170,12 @@
     </Compile>
     <Compile Include="RptFormA.Designer.cs">
       <DependentUpon>RptFormA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RptFormAYear.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RptFormAYear.Designer.cs">
+      <DependentUpon>RptFormAYear.cs</DependentUpon>
     </Compile>
     <Compile Include="RptGeneral7Row.cs">
       <SubType>Component</SubType>
@@ -145,6 +189,19 @@
     <Compile Include="RptMovaled.Designer.cs">
       <DependentUpon>RptMovaled.cs</DependentUpon>
     </Compile>
+    <Compile Include="rptMovaledYear.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="rptMovaledYear.Designer.cs">
+      <DependentUpon>rptMovaledYear.cs</DependentUpon>
+    </Compile>
+    <Compile Include="rptRosterFP.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="rptRosterFP.Designer.cs">
+      <DependentUpon>rptRosterFP.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TrainingCard.cs" />
     <Compile Include="XtraReport1.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -163,8 +220,15 @@
     <Compile Include="RptFlight.Designer.cs">
       <DependentUpon>RptFlight.cs</DependentUpon>
     </Compile>
+    <Compile Include="XtraReport2.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="XtraReport2.Designer.cs">
+      <DependentUpon>XtraReport2.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="fonts\B-NAZANIN.TTF" />
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile1.pubxml" />
@@ -181,6 +245,24 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="rptApt.resx">
+      <DependentUpon>rptApt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rptAptInt.resx">
+      <DependentUpon>rptAptInt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RptAptRange.resx">
+      <DependentUpon>RptAptRange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RptCabinTrainingCard.resx">
+      <DependentUpon>RptCabinTrainingCard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rptDelay.resx">
+      <DependentUpon>rptDelay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rptDelaySub.resx">
+      <DependentUpon>rptDelaySub.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="RptEASAFCLCompliant16X.resx">
       <DependentUpon>RptEASAFCLCompliant16X.cs</DependentUpon>
     </EmbeddedResource>
@@ -190,8 +272,17 @@
     <EmbeddedResource Include="RptFormA.resx">
       <DependentUpon>RptFormA.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="RptFormAYear.resx">
+      <DependentUpon>RptFormAYear.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="RptMovaled.resx">
       <DependentUpon>RptMovaled.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rptMovaledYear.resx">
+      <DependentUpon>rptMovaledYear.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rptRosterFP.resx">
+      <DependentUpon>rptRosterFP.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="XtraReport1.resx">
       <DependentUpon>XtraReport1.cs</DependentUpon>
@@ -201,6 +292,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="RptTwoPageLogBook.resx">
       <DependentUpon>RptTwoPageLogBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="XtraReport2.resx">
+      <DependentUpon>XtraReport2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

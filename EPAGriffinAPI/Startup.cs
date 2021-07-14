@@ -5,6 +5,8 @@ using Microsoft.Owin;
 using Owin;
 using Microsoft.AspNet.OData.Extensions;
 using System.Web.Http;
+using DevExtreme.AspNet.Data.Aggregation;
+using EPAGriffinAPI.Controllers;
 
 [assembly: OwinStartup(typeof(EPAGriffinAPI.Startup))]
 
@@ -14,7 +16,7 @@ namespace EPAGriffinAPI
     {
         public void Configuration(IAppBuilder app)
         {
-           
+            CustomAggregators.RegisterAggregator("avgRPK", typeof(RPKAggregator<>));
             ConfigureAuth(app);
             
             //HttpConfiguration config = new HttpConfiguration();

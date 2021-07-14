@@ -95,6 +95,22 @@ namespace EPAGriffinAPI.DAL
             var dbchapters = await this.context.ViewBookChapters.Where(q =>   _ids.Contains(q.BookId)).ToListAsync();
             return dbchapters;
         }
+        string getTypeByTypeId(int? typeId)
+        {
+            if (typeId == null)
+                return "";
+            switch (typeId)
+            {
+                case -1:
+                    return "";
+                case 1:
+                    return "B737";
+                case 2:
+                    return "MD";
+                default:
+                    return "";
+            }
+        }
         public async Task<ViewModels.Book> GetBookDto(int id)
         {
             var book = new ViewModels.Book();
@@ -145,13 +161,15 @@ namespace EPAGriffinAPI.DAL
             book.BookRelatedGroups = (await (from x in context.BookRelatedGroups
                                              join y in context.ViewJobGroups on x.GroupId equals y.Id
                                              where x.BookId == id
-                                             select y).ToListAsync()).Select(q => new ViewModels.JobGroup()
+                                             select new { y, x.TypeId   }).ToListAsync()).Select(q => new ViewModels./*JobGroup*/BookTypeGroup()
                                              {
-                                                 Title = q.Title,
-                                                 FullCode = q.FullCode,
-                                                 Remark = q.Remark,
-                                                 Parent = q.Parent,
-                                                 Id = q.Id,
+                                                 Title = q.y.Title,
+                                                 FullCode = q.y.FullCode,
+                                                 Remark = q.y.Remark,
+                                                 Parent = q.y.Parent,
+                                                 Id = q.y.Id,
+                                                  TypeId=q.TypeId ?? -1,
+                                                  Type= getTypeByTypeId(q.TypeId)
                                              }).ToList();
             book.BookRelatedStudyFields = (await (from x in context.BookRelatedStudyFields
                                                   join y in context.ViewOptions on x.StudyFieldId equals y.Id
@@ -302,7 +320,7 @@ namespace EPAGriffinAPI.DAL
 
                 });
         }
-
+        //magu3-1
         internal void FillBookRelatedGroups(Models.Book entity, ViewModels.Book dto)
         {
             var existing = this.context.BookRelatedGroups.Where(q => q.BookId == entity.Id).ToList();
@@ -317,8 +335,28 @@ namespace EPAGriffinAPI.DAL
                 {
                     Book = entity,
                     GroupId = x.Id,
+                     TypeId=x.TypeId,
 
                 });
+        }
+
+        internal void FillBookRelatedTypeGroups(Models.Book entity, ViewModels.Book dto)
+        {
+            //var existing = this.context.BookRelatedGroups.Where(q => q.BookId == entity.Id).ToList();
+            //while (existing.Count > 0)
+            //{
+            //    var i = existing.First();
+            //    this.context.BookRelatedGroups.Remove(i);
+            //    existing.Remove(i);
+            //}
+            //foreach (var x in dto.BookRelatedTypeGroups)
+            //    this.context.BookRelatedGroups.Add(new Models.BookRelatedGroup()
+            //    {
+            //        Book = entity,
+            //        GroupId = x.Id,
+            //         TypeId=x.TypeId,
+
+            //    });
         }
 
         internal void FillBookRelatedStudyFields(Models.Book entity, ViewModels.Book dto)
@@ -420,7 +458,7 @@ namespace EPAGriffinAPI.DAL
                 }
             }
         }
-
+        //magu3-1
         public async Task<bool> ExposeBook(ViewModels.BookExpose dto)
         {
             try

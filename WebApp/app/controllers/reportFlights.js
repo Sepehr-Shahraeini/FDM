@@ -127,7 +127,7 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
     /////////////////////////////////////////
     $scope.bind = function () {
         //iruser558387
-        var dts = [];
+        var dts = []; 
         if ($scope.dt_to) {
             var _dt = moment($scope.dt_to).format('YYYY-MM-DDTHH:mm:ss');
             dts.push('dt=' + _dt);
@@ -147,8 +147,35 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
         var url = 'odata/report/flights';//2019-06-06T00:00:00';
         if (prms)
             url += '?' + prms;
+        $scope.loadingVisible = true;
+        flightService.getFlightReport(url).then(function (response) {
+            $scope.loadingVisible = false;
+           
+            $.each(response, function (_i, _d) {
+                var std = (new Date(_d.STDDay));
+                persianDate.toLocale('en');
+                _d.STDDayPersian = new persianDate(std).format("DD-MM-YYYY");
+                _d.FlightTime2 = $scope.formatMinutes(_d.FlightTime);
+                _d.SITATime2 = $scope.formatMinutes(_d.SITATime);
+                _d.FlightTimeActual2 = $scope.formatMinutes(_d.FlightTimeActual);
+                _d.BlockTime2 = $scope.formatMinutes(_d.BlockTime);
 
-        if (!$scope.dg_flight_ds) {
+                _d.JLBlockTime2 = $scope.formatMinutes(_d.JLBlockTime);
+                _d.JLFlightTime2 = $scope.formatMinutes(_d.JLFlightTime);
+
+                _d.TaxiTO = subtractDates(_d.Takeoff, _d.ChocksOut);
+                _d.TaxiLND = subtractDates(_d.ChocksIn, _d.Landing);
+                _d.TaxiTO2 = $scope.formatMinutes(_d.TaxiTO);
+                _d.TaxiLND2 = $scope.formatMinutes(_d.TaxiLND);
+
+                //magu6
+                _d.TotalPaxAll = _d.TotalPax + _d.PaxInfant;
+            });
+            $scope.dg_flight_ds = response;
+
+
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+        /*if (!$scope.dg_flight_ds) {
 
             $scope.dg_flight_ds = {
                 store: {
@@ -177,6 +204,9 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
                             _d.TaxiTO2 = $scope.formatMinutes(_d.TaxiTO);
                             _d.TaxiLND2 = $scope.formatMinutes(_d.TaxiLND);
 
+                            //magu6
+                            _d.TotalPaxAll = _d.TotalPax + _d.PaxInfant;
+
 
                         });
 
@@ -190,11 +220,10 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
                         $rootScope.$broadcast('OnDataLoading', null);
                     },
                 },
-                // filter: [['OfficeCode', 'startswith', $scope.ParentLocation.FullCode]],
-                // sort: ['DatePay', 'Amount'],
+                
 
             };
-        }
+        }*/
 
         if ($scope.doRefresh) {
             //  $scope.filters = $scope.getFilters();
@@ -386,6 +415,8 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
         }
     };
     //////////////////////////////////
+    $scope.dg_flight_columns = [];
+    if ($rootScope.userName.toLowerCase() !='bakhshi')
     $scope.dg_flight_columns = [
 
 
@@ -395,10 +426,11 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
                               .html(options.rowIndex + 1)
                               .appendTo(container);
                       }, name: 'row', caption: '#', width: 70, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
-                  },
-
+        },
+        { dataField: 'RN', caption: '#', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 70, name: 'rn', fixed: true, fixedPosition: 'left', visible:false },
         { dataField: 'STDDay', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 120, format: 'yy-MMM-dd', sortIndex: 0, sortOrder: 'asc', fixed: true, fixedPosition: 'left' },
-        { dataField: 'PDate', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120,   fixed: true, fixedPosition: 'left' },
+        { dataField: 'PDate', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: true, fixedPosition: 'left' },
+        { dataField: 'FlightType', caption: 'Day', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: false, fixedPosition: 'left', fixed: true, fixedPosition: 'left' },
         { dataField: 'FlightNumber', caption: 'Flight No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', fixed: true, fixedPosition: 'left' },
         { dataField: 'FlightStatus', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: false, fixedPosition: 'left', fixed: true, fixedPosition: 'left' },
         { dataField: 'AircraftType', caption: 'Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130, sortIndex: 1, sortOrder: 'asc' },
@@ -415,7 +447,9 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
            { dataField: 'PaxAdult', caption: 'Adult', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100, },
              { dataField: 'PaxChild', caption: 'Child.', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100, },
                { dataField: 'PaxInfant', caption: 'Infant', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100, },
-                 { dataField: 'TotalPax', caption: 'Total Pax', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100, },
+               //magu6
+        { dataField: 'TotalPax', caption: 'Revenued Pax', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100, },
+        { dataField: 'TotalPaxAll', caption: 'Total Pax', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100, },
 
                  // { dataField: 'FuelDeparture', caption: 'UpLift', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100, },
              { dataField: 'CargoCount', caption: 'Cargo', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100, },
@@ -454,7 +488,45 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
 
 
 
-    ];
+        ];
+    else
+        $scope.dg_flight_columns = [
+
+
+            {
+                cellTemplate: function (container, options) {
+                    $("<div style='text-align:center'/>")
+                        .html(options.rowIndex + 1)
+                        .appendTo(container);
+                }, name: 'row', caption: '#', width: 70, fixed: false, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+            },
+            { dataField: 'RN', caption: '#', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 70, name: 'rn', fixed: true, fixedPosition: 'left', visible: false },
+            { dataField: 'STDDay', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 140, format: 'yy-MMM-dd', sortIndex: 0, sortOrder: 'asc', fixed: false, fixedPosition: 'left' },
+            { dataField: 'PDate', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: true, fixedPosition: 'left' },
+            { dataField: 'FlightNumber', caption: 'Flight No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: false, fixedPosition: 'left', fixed: false, fixedPosition: 'left' },
+            { dataField: 'Register', caption: 'Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130, sortIndex: 2, sortOrder: 'asc' },
+
+            
+             
+            { dataField: 'FromAirportIATA', caption: 'From', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+            { dataField: 'ToAirportIATA', caption: 'To', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+            { dataField: 'STDLocal', caption: 'STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
+            { dataField: 'STALocal', caption: 'STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+            { dataField: 'DepartureLocal', caption: 'Dep.', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm', sortIndex: 2, sortOrder: 'asc' },
+            { dataField: 'ArrivalLocal', caption: 'Arr.', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm' },
+
+
+
+            { dataField: 'PaxAdult', caption: 'Adult', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100, },
+            { dataField: 'PaxChild', caption: 'Child.', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100, },
+            { dataField: 'PaxInfant', caption: 'Infant', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100, },
+            //magu6
+            { dataField: 'TotalPax', caption: 'Total Pax', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, },
+            //{ dataField: 'TotalPaxAll', caption: 'Total Pax', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100, },
+
+             
+
+        ];
     //var values = [];
     //var mergeColumns =1;
     $scope.dg_flight_selected = null;
@@ -479,7 +551,7 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
         allowColumnReordering: true,
         allowColumnResizing: true,
         scrolling: { mode: 'infinite' },
-        paging: { pageSize: 100 },
+        paging: { pageSize: 500 },
         showBorders: true,
         selection: { mode: 'single' },
 
@@ -684,7 +756,22 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
                         customizeText: function (data) {
                             return 'Avg: ' + Number(data.value).toFixed(1);
                         }
-                    },
+                },
+                    //magu6
+                {
+                    column: "TotalPaxAll",
+                    summaryType: "sum",
+                    customizeText: function (data) {
+                        return data.value;
+                    }
+                },
+                {
+                    column: "TotalPaxAll",
+                    summaryType: "avg",
+                    customizeText: function (data) {
+                        return 'Avg: ' + Number(data.value).toFixed(1);
+                    }
+                },
                     {
                         column: "CockpitTotal",
                         summaryType: "avg",
@@ -1017,7 +1104,8 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
         "export": {
             enabled: true,
             fileName: "Flights_Report",
-            allowExportSelectedData: false
+            allowExportSelectedData: false,
+            
         },
         onToolbarPreparing: function (e) {
             e.toolbarOptions.items.unshift({
@@ -1034,17 +1122,24 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
         onExporting: function (e) {
             e.component.beginUpdate();
             e.component.columnOption("row", "visible", false);
+            e.component.columnOption("rn", "visible", true);
+           
+            
         },
         onExported: function (e) {
             e.component.columnOption("row", "visible", true);
-            e.component.endUpdate();
+            e.component.columnOption("rn", "visible", false);
+           e.component.endUpdate();
         },
         onRowPrepared: function (e) {
             if (e.data && e.data.IsPositioning)
                 e.rowElement.css('background', '#ffccff');
-
+            
+            if (e.rowType == 'data' && e.data) {
+                e.data['RN'] = e.rowIndex+1;
+            }
         },
-
+         
         onCellPrepared: function (e) {
             if (e.rowType === "data" && e.column.dataField == "FlightStatus"  )
                 e.cellElement.addClass(e.data.FlightStatus.toLowerCase());

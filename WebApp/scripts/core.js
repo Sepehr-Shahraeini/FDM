@@ -374,9 +374,19 @@ function GetTimeStr(minutes) {
     return ans;
 };
 General = {};
-
+//magu3-16
 General.getDayFirstHour = function (d) {
-    return new Date(new Date(d.setHours(0)).setMinutes(0)).setSeconds(0);
+    var dif = 0;
+       dif = -60;
+   
+   // var off = (new Date(d)).getTimezoneOffset();
+   // if (off == -270)
+   //     dif = -60;
+    var result = new Date(new Date(d.setHours(0)).setMinutes(0)).setSeconds(0);
+   // if (dif != 0)
+   //     result = new Date(result).addMinutes(dif);
+   // alert(dif);
+    return result;
 };
 General.getDayLastHour = function (d) {
     return new Date(new Date(d.setHours(23)).setMinutes(59)).setSeconds(59);

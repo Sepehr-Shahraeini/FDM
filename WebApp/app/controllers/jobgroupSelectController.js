@@ -25,9 +25,10 @@ app.controller('jobgroupSelectController', ['$scope', '$location', 'authService'
         }
     };
     $scope.dg_columns = [
-        
-        { dataField: 'TitleFormated', caption: 'Title', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, encodeHtml: false },
-        { dataField: 'FullCode', caption: 'Code', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, encodeHtml: false, width: 200, sortIndex: 0, sortOrder: "asc" },
+        { dataField: 'OrderIndex', caption: 'Order', allowResizing: true, alignment: 'left', dataType: 'number', visible:false, allowEditing: false, encodeHtml: false,   sortIndex: 0, sortOrder: "asc" },
+        { dataField: 'Type', caption: 'Type', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, encodeHtml: false, width: 200,   },
+        { dataField: 'Title', caption: 'Title', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, encodeHtml: false },
+        { dataField: 'FullCode', caption: 'Code', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, encodeHtml: false, width: 200,   },
         
     ];
     $scope.dg_selected = null;
@@ -152,8 +153,9 @@ app.controller('jobgroupSelectController', ['$scope', '$location', 'authService'
             $scope.dg_ds = {
                 store: {
                     type: "odata",
-                    url: $rootScope.serviceUrl + 'odata/base/jobgroups/'+ Config.CustomerId  ,
-                    key: "Id",
+                    //url: $rootScope.serviceUrl + 'odata/base/jobgroups/'+ Config.CustomerId  ,
+                    url: $rootScope.serviceUrl + 'odata/base/jobgroups/type/' + Config.CustomerId,
+                    key: ["Id","Type"],
                     version: 4,
 
                 },

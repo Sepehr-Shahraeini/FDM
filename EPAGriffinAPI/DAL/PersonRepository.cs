@@ -192,6 +192,18 @@ namespace EPAGriffinAPI.DAL
 
         }
 
+
+        internal async Task<bool> UpdateUserId(int id,string userid)
+        {
+            
+            var person = await this.context.People.FirstOrDefaultAsync(q => q.Id == id);
+            person.UserId = userid;
+
+            return true;
+
+
+        }
+
         internal async Task<CustomActionResult> DeleteCertification(int Id)
         {
             var certification = await this.context.Certifications.FirstOrDefaultAsync(q => q.Id == Id);
@@ -871,6 +883,16 @@ namespace EPAGriffinAPI.DAL
                         person.ColdWeatherOperationExpireDate = rec.DateExpire;
                     }
                 }
+                //Re/Annual-Re/Cabin
+                if (rec.MappedTitle == "Re/Annual-Re/Cabin")
+                {
+                    var person = people.FirstOrDefault(q => q.NID == rec.NID);
+                    if (person != null)
+                    {
+                        person.RecurrentIssueDate = rec.DateIssue;
+                        person.RecurrentExpireDate = rec.DateExpire;
+                    }
+                }
 
 
             }
@@ -950,7 +972,38 @@ namespace EPAGriffinAPI.DAL
 
         }
 
-       
+        internal async Task<object> GetTrainingCard(int id)
+        {
+            var crew = await this.context.ViewEmployees.Where(q => q.Id==id).FirstOrDefaultAsync();
+            var card = new ViewModels.TrainingCard()
+            {
+                 BirthDate=crew.DateBirth,
+                   Name=crew.Name,
+                    Rank=crew.JobGroup,
+                     Id=crew.Id,
+                        IdNo=crew.PID,
+                        ImageUrl= "http://fleet.flypersia.aero/airpocket/upload/clientsfiles/"+crew.ImageUrl,
+                         NID=crew.NID,
+
+
+            };
+            if (crew.DateBirth != null)
+            {
+                card.BirthDateStr = ((DateTime)crew.DateBirth).Date.ToString("yyyy-MMM-dd");
+            }
+            card.Items = new List<ViewModels.TrianingCardCourse>();
+            card.Items.Add(new ViewModels.TrianingCardCourse() {  Title="TYPE B737-300",Date2=null });
+            card.Items.Add(new ViewModels.TrianingCardCourse() { Title = "SEPT", Date2 = crew.SEPTExpireDate,Date1=crew.SEPTIssueDate });
+            card.Items.Add(new ViewModels.TrianingCardCourse() { Title = "DG", Date2 = crew.DangerousGoodsExpireDate,Date1=crew.DangerousGoodsIssueDate });
+            card.Items.Add(new ViewModels.TrianingCardCourse() { Title = "SMS", Date2 = crew.SMSExpireDate,Date1=crew.SMSIssueDate });
+            card.Items.Add(new ViewModels.TrianingCardCourse() { Title = "IN-FLT SECURITY", Date2 = crew.AviationSecurityExpireDate,Date1=crew.AviationSecurityIssueDate });
+            card.Items.Add(new ViewModels.TrianingCardCourse() { Title = "CRM", Date2 = crew.UpsetRecoveryTrainingExpireDate ,Date1=crew.UpsetRecoveryTrainingIssueDate});
+            card.Items.Add(new ViewModels.TrianingCardCourse() { Title = "FMT", Date2 = null,Date1=null });
+            card.Items.Add(new ViewModels.TrianingCardCourse() { Title = "FIRST AID", Date2 = crew.FirstAidExpireDate,Date1=crew.FirstAidIssueDate });
+
+
+            return card;
+        }
 
         public virtual CustomActionResult Validate(ViewModels.Employee dto)
         {

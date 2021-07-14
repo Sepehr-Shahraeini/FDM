@@ -749,11 +749,11 @@ app.controller('libraryController', ['$scope', '$location', '$routeParams', '$ro
             },
             fixed: true, fixedPosition: 'left',  sortIndex: 0, sortOrder: "desc"
         },
-
+        { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: true, fixedPosition: 'left',  width:200 },
         { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false,  fixed: true, fixedPosition: 'left', sortIndex: 1, sortOrder: "asc" },
-        { dataField: 'NID', caption: 'National Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130 },
+       
         { dataField: 'Mobile', caption: 'Mobile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
-        { dataField: 'Email', caption: 'Email', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
+        
         { dataField: 'PID', caption: 'Personnel Id', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130 },
         //{ dataField: 'DateJoinCompany', caption: 'Join Company', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 130 },
         //{ dataField: 'CaoCardNumber', caption: 'CAO No.', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130 },
@@ -885,13 +885,13 @@ app.controller('libraryController', ['$scope', '$location', '$routeParams', '$ro
         onShowing: function (e) {
             var size = $rootScope.getWindowSize();
 
-            $scope.pop_width_employees = size.width - 20;
+            $scope.pop_width_employees = size.width - 300;
             //if ($scope.pop_width > 1200)
             //     $scope.pop_width = 1200;
 
             $scope.pop_height_employees = $(window).height() - 30; //630; //size.height;
             $scope.dg_height_full = $scope.pop_height_employees - 133;
-            $scope.dg_employees_height = $scope.dg_height_full - 81;
+            $scope.dg_employees_height = $scope.dg_height_full - 81-30;
             $scope.scroll_height_full = $scope.pop_height_employees - 133;
 
 

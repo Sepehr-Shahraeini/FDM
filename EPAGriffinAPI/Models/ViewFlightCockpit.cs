@@ -57,7 +57,7 @@ namespace EPAGriffinAPI.Models
         public string IPName { get; set; }
         public string CaptainName { get; set; }
         public int IPId { get; set; }
-        public Nullable<int> CaptainId { get; set; }
+        public int CaptainId { get; set; }
         public int FlightStatusID { get; set; }
         public string FlightStatus { get; set; }
         public Nullable<System.DateTime> JLOffBlock { get; set; }

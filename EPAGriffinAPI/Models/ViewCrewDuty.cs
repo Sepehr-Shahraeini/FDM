@@ -70,5 +70,9 @@ namespace EPAGriffinAPI.Models
         public int IsOver { get; set; }
         public Nullable<int> Extension { get; set; }
         public int IsExtension { get; set; }
+        public Nullable<System.DateTime> DateConfirmed { get; set; }
+        public string ConfirmedBy { get; set; }
+        public int IsConfirmed { get; set; }
+        public string UserName { get; set; }
     }
 }

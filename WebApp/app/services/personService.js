@@ -140,6 +140,22 @@ app.factory('personService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
         return deferred.promise;
     };
 
+
+    var _getCrewLight = function (cid,id) {
+
+
+        var deferred = $q.defer();
+        $http.get(serviceBase + 'odata/employees/light/crew/'+cid+'?$filter=Id eq '+id).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    serviceFactory.getCrewLight = _getCrewLight;
+
     serviceFactory.getEmployee = _getEmployee;
     serviceFactory.getEmployeeForView = _getEmployeeForView;
     serviceFactory.getEmployeesByGroupId = _getEmployeesByGroupId;

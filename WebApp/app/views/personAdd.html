@@ -10,6 +10,9 @@
     .padding-7 {
         padding: 5px 5px 2px 5px !important;
     }
+    .dx-state-disabled.dx-widget, .dx-state-disabled .dx-widget {
+        opacity:0.7 !important;
+    }
 </style>
 <div ng-controller="personAddController">
     <div id="popup_add" dx-popup="popup_add" class="no-padding">
@@ -224,14 +227,14 @@
                     <div class="col-lg-2" style="padding:0;width:13%">
                         <div style="margin:2px 0px 0  5px;height:300px;" class="groupbox">
                             <div class="caption">
-                              IP
+                                IP
                                 <!--<a ng-click="doc_click('Aircraft Type')" href=""><i class="icon ion-md-information-circle ion-20 " style="color:deepskyblue"></i></a>-->
                             </div>
                             <div style="padding: 0 5px">
                                 <!--<div class="col-lg-12 col-md-6 col-sm-12 col-12    padding-7" style="padding-bottom:0">
-                                    <label>Type</label>
-                                    <div dx-select-box="sb_AircraftTypeId2" dx-validator="{validationGroup:'aircrafttypeadd',  validationRules: [{ type: 'required'}]}"></div>
-                                </div>-->
+                    <label>Type</label>
+                    <div dx-select-box="sb_AircraftTypeId2" dx-validator="{validationGroup:'aircrafttypeadd',  validationRules: [{ type: 'required'}]}"></div>
+                </div>-->
 
                                 <div class="col-lg-12 col-md-6 col-sm-12 col-12    padding-7" style="padding-bottom:0">
                                     <label>TRI Expire Date</label>
@@ -325,7 +328,7 @@
                     <div class="col-lg-2" style="padding:0;width:16.5%">
                         <div style="margin:5px 5px 0  5px;padding-bottom:5px" class="groupbox">
                             <div class="caption">
-                                SEPT
+                                SEPT-T
                                 <a ng-click="doc_click('SEPT')" href=""><i class="icon ion-md-information-circle ion-20 " style="color:deepskyblue"></i></a>
                             </div>
                             <div style="padding: 0 5px">
@@ -336,6 +339,27 @@
                                 <div class="col-lg-12 col-md-6 col-sm-12 col-12    padding-7" style="padding-bottom:0">
                                     <label>Expire Date</label>
                                     <div dx-date-box="date_SEPTExpireDate" class="center"></div>
+                                </div>
+                                <div style="clear:both"></div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2" style="padding:0;width:16.5%">
+                        <div style="margin:5px 5px 0  5px;padding-bottom:5px" class="groupbox">
+                            <div class="caption">
+                                SEPT-P
+                                <a ng-click="doc_click('SEPTP')" href=""><i class="icon ion-md-information-circle ion-20 " style="color:deepskyblue"></i></a>
+                            </div>
+                            <div style="padding: 0 5px">
+                                <div class="col-lg-12 col-md-6 col-sm-12 col-12    padding-7" style="padding-bottom:0">
+                                    <label>Issue Date</label>
+                                    <div dx-date-box="date_SEPTPIssueDate" class="center"></div>
+                                </div>
+                                <div class="col-lg-12 col-md-6 col-sm-12 col-12    padding-7" style="padding-bottom:0">
+                                    <label>Expire Date</label>
+                                    <div dx-date-box="date_SEPTPExpireDate" class="center"></div>
                                 </div>
                                 <div style="clear:both"></div>
                             </div>
@@ -404,6 +428,8 @@
 
                         </div>
                     </div>
+
+                    <div style="clear:both"></div>
                     <div class="col-lg-2" style="padding:0;width:16.5%">
 
                         <div style="margin:5px 5px 0  5px;padding-bottom:5px" class="groupbox">
@@ -425,8 +451,6 @@
 
                         </div>
                     </div>
-                    <div style="clear:both"></div>
-
 
                     <div class="col-lg-2" style="padding:0;width:16.5%">
                         <div style="margin:5px 5px 0  5px;padding-bottom:5px" class="groupbox">
@@ -512,8 +536,49 @@
                         </div>
                     </div>
 
+                    <div class="col-lg-2" style="padding:0;width:16.5%">
+                        <div style="margin:5px 5px 0  5px;padding-bottom:5px" class="groupbox">
+                            <div class="caption">
+                                Line Check
+                                <a ng-click="doc_click('Line Check')" href=""><i class="icon ion-md-information-circle ion-20 " style="color:deepskyblue"></i></a>
+                            </div>
+                            <div style="padding: 0 5px">
+                                <div class="col-lg-12 col-md-6 col-sm-12 col-12    padding-7" style="padding-bottom:0">
+                                    <label>Issue Date</label>
+                                    <div dx-date-box="date_LineIssueDate" class="center"></div>
+                                </div>
+                                <div class="col-lg-12 col-md-6 col-sm-12 col-12    padding-7">
+                                    <label>Expire Date</label>
+                                    <div dx-date-box="date_LineExpireDate" class="center"></div>
+                                </div>
+                                <div style="clear:both"></div>
+                            </div>
+
+                        </div>
+                    </div>
 
 
+                    <div style="clear:both"></div>
+                    <div class="col-lg-2" style="padding:0;width:16.5%">
+                        <div style="margin:5px 5px 0  5px;padding-bottom:5px" class="groupbox">
+                            <div class="caption">
+                                Recurrent Training
+                                <a ng-click="doc_click('Recurrent Training')" href=""><i class="icon ion-md-information-circle ion-20 " style="color:deepskyblue"></i></a>
+                            </div>
+                            <div style="padding: 0 5px">
+                                <div class="col-lg-12 col-md-6 col-sm-12 col-12    padding-7" style="padding-bottom:0">
+                                    <label>Issue Date</label>
+                                    <div dx-date-box="date_RecurrentIssueDate" class="center"></div>
+                                </div>
+                                <div class="col-lg-12 col-md-6 col-sm-12 col-12    padding-7">
+                                    <label>Expire Date</label>
+                                    <div dx-date-box="date_RecurrentExpireDate" class="center"></div>
+                                </div>
+                                <div style="clear:both"></div>
+                            </div>
+
+                        </div>
+                    </div>
 
                     <div style="clear:both"></div>
                     <div style="margin:5px 10px 0  5px" class="groupbox">
@@ -553,13 +618,13 @@
                             <div dx-text-box="txt_ephone" class="center ltr f16"></div>
                         </div>
                         <!--<div class="col-lg-2 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
-        <label>InActive Begin</label>
-        <div dx-date-box="date_DateInactiveBegin" class="center"></div>
-    </div>
-    <div class="col-lg-2 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
-        <label>InActive End</label>
-        <div dx-date-box="date_DateInactiveEnd" class="center"></div>
-    </div>-->
+            <label>InActive Begin</label>
+            <div dx-date-box="date_DateInactiveBegin" class="center"></div>
+        </div>
+        <div class="col-lg-2 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+            <label>InActive End</label>
+            <div dx-date-box="date_DateInactiveEnd" class="center"></div>
+        </div>-->
                         <div class="col-lg-2 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
                             <label>Home Base</label>
                             <div dx-select-box="sb_Base"></div>
@@ -568,14 +633,14 @@
                             <div>&nbsp;</div>
                             <div dx-check-box="chk_inactive" class="center" style="margin-top:10px;"></div>
                         </div>
-                        
+
 
                         <div style="clear:both"></div>
                     </div>
                     <div style="clear:both"></div>
 
 
-                    
+
 
                 </div>
                 <div style="clear:both"></div>

@@ -1,24 +1,26 @@
 ﻿'use strict';
-app.controller('boardController', ['$scope', '$location', '$routeParams', '$rootScope', '$timeout', 'flightService', 'weatherService', 'aircraftService', 'authService', 'notificationService', '$route','$window', function ($scope, $location, $routeParams, $rootScope, $timeout, flightService, weatherService, aircraftService, authService, notificationService, $route,$window) {
+app.controller('boardController', ['$scope', '$location', '$routeParams', '$rootScope', '$timeout', 'flightService', 'weatherService', 'aircraftService', 'authService', 'notificationService', '$route', '$window', function ($scope, $location, $routeParams, $rootScope, $timeout, flightService, weatherService, aircraftService, authService, notificationService, $route, $window) {
     $scope.prms = $routeParams.prms;
+   
     var hourWidth = 85;
     authService.setModule(3);
     $rootScope.setTheme();
-    
+
     $scope.IsPlanning = $rootScope.HasMenuAccess('flight_planning', 3);
     //flight_planning-edit
-    $scope.IsStaion=$rootScope.roles.indexOf('Station')!=-1;
-     
-    $scope.IsFuelReadOnly=true;
+    $scope.IsStaion = $rootScope.roles.indexOf('Station') != -1;
+
+    $scope.IsFuelReadOnly = false;
     $scope.IsJLAccess = $rootScope.HasMenuAccess('flight_board_jl', 3) || $scope.IsStaion;
     $scope.IsCLAccess = $rootScope.HasMenuAccess('flight_board_jl', 3) || $rootScope.userName.toLowerCase().startsWith('trans.') || $scope.IsStaion;
     //ops.rezabandehlou
     $scope.IsJLOG = false;
-    if ($rootScope.userName.toLowerCase() == 'ops.rezabandehlou' || $rootScope.userName.toLowerCase() == 'demo')
+    if ($rootScope.userName.toLowerCase() == 'ops.rezabandehlou' || $rootScope.userName.toLowerCase() == 'demo' || $rootScope.userName.toLowerCase() == 'razbani')
         $scope.IsJLOG = true;
-    $scope.IsPickup = $rootScope.userName.toLowerCase().startsWith('trans.') || $rootScope.userName.toLowerCase().startsWith('demo');
+    $scope.IsPickup = $rootScope.userName.toLowerCase().startsWith('trans.');//|| $rootScope.userName.toLowerCase().startsWith('demo');
     $scope.IsCrewMobileVisible = $rootScope.userName.toLowerCase().startsWith('dis.') || $rootScope.userName.toLowerCase().startsWith('demo');
-    $scope.IsSMSVisible = $rootScope.userName.toLowerCase().startsWith('dis.') || $rootScope.userName.toLowerCase().startsWith('demo');
+    $scope.IsSMSVisible = $rootScope.userName.toLowerCase().startsWith('dis.') || $rootScope.userName.toLowerCase().startsWith('demo') || $rootScope.userName.toLowerCase().startsWith('ops.soltani') || $rootScope.userName.toLowerCase().startsWith('ops.esmaeili') || $rootScope.userName.toLowerCase().startsWith('razbani');
+    $scope.IsNoCrewVisible = $rootScope.userName.toLowerCase().startsWith('dis.') || $rootScope.userName.toLowerCase().startsWith('demo') || $rootScope.userName.toLowerCase().startsWith('razbani');
     $scope.airport = $routeParams.airport;
     $scope.airportEntity = null;
     $scope.filterVisible = false;
@@ -29,10 +31,16 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.IsArrivalDisabled = true;
     $scope.IsAdmin = true;
 
-    $scope.IsEditable = $rootScope.IsFlightBoardEditable()  ;
-    $scope.NotEditable=!$scope.IsEditable;
+    $scope.IsEditable = $rootScope.IsFlightBoardEditable();
+    $scope.NotEditable = !$scope.IsEditable;
     $scope.IsSTBYVisible = $rootScope.IsFlightBoardEditable() || $rootScope.userName.toLowerCase().startsWith('ops.soltani') || $rootScope.userName.toLowerCase().startsWith('ops.esm');
-    $scope.IsSave=$scope.IsEditable || $scope.IsStaion;
+
+    //2021-1-17
+    $scope.IsRemark = $rootScope.userName.toLowerCase().startsWith('sale.');
+    $scope.IsSave = $scope.IsEditable || $scope.IsStaion || $scope.IsRemark;
+
+    //divargar-ok
+    $scope.IsComm = $rootScope.userName.toLowerCase().startsWith('comm.') || true;
     //alert((new Date()).yyyymmddtime(false));
 
     //  return;
@@ -63,10 +71,10 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.onBlockVisible = false;
     $scope.landingVisible = false;
 
-    
-    
+
+
     $scope.record = null;
-    
+
     $scope.showLog = function (isApply) {
         if ($scope.IsSelectionMode)
             return;
@@ -117,15 +125,81 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         }
     };
     //nook
+
+    //2020-11-22
+    $scope.flightGUID = null;
+    $scope.forceUpdate = function () {
+        var dto = {
+            from: (new Date($scope.datefrom)).toUTCString(),
+            to: (new Date($scope.dateEnd)).toUTCString(),
+            baseDate: $scope.baseDate,
+            airport: $scope.airportEntity ? $scope.airportEntity.Id : -1,
+            customer: Config.CustomerId,
+            tzoffset: -1 * (new Date()).getTimezoneOffset(),
+
+            userid: $rootScope.userId ? $rootScope.userId : -1,
+
+        };
+
+        flightService.getUpdatedFlightsNew(dto).then(function (response) {
+
+            $scope.baseDate = (new Date(Date.now())).toUTCString();
+
+            $.each(response.flights, function (_i, _d) {
+                //_d.STD = moment(_d.STD);
+                //_d.STA = moment(_d.STA);
+                //_d.ChocksIn = moment(_d.ChocksIn);
+                //_d.ChocksOut = moment(_d.ChocksOut);
+                //var _flight = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _d.ID).FirstOrDefault();
+                //if (_flight)
+                //    for (var key in _d) {
+                //        if (_d.hasOwnProperty(key)) {
+                //            _flight[key] = _d[key];
+                //            //console.log(key + " -> " + _d[key]);
+                //        }
+                //    }
+                var _flight = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _d.ID).FirstOrDefault();
+
+                if (_flight) {
+                    var oldresid = _flight.RegisterID;
+                    for (var key of Object.keys(_d)) {
+                        _flight[key] = _d[key];
+
+                    }
+                    $scope.modifyFlightTimes(_flight);
+                    var res = { resourceId: _flight.RegisterID, resourceName: _flight.Register, groupId: _flight.TypeId };
+                    $scope.modifyGantt(_flight, res, oldresid);
+
+                }
+
+
+            });
+            if (response.summary != -1)
+                $scope.baseSum = response.summary;
+            ///////////////////////////////////////////
+            ////////////////////////////////////////////
+            if (response && response.flights && response.flights.length > 0) {
+                var ff = response.flights[0];
+                var time = moment(ff.DateStatus).format("MMMM Do YYYY, h:mm:ss a");
+                var text = ff.FromAirportIATA + "-" + ff.ToAirportIATA + ", " + ff.FlightNumber + ", " + ff.FlightStatus;
+
+            }
+
+            //////////////////////////////////////////
+            $scope.getBoardSummary($scope.selectedDate);
+            ///////////////////////////////////////////
+
+        }, function (err) { });
+    };
     $scope.showLogX = function (isApply) {
-        
+
         //if (!$scope.ati_selectedFlights || $scope.ati_selectedFlights.length == 0) {
         //    General.ShowNotify(Config.Text_NoFlightSelected, 'error');
         //    return;
         //}
 
         //$scope.flight = $scope.ati_selectedFlights[0];
-         
+        //kakal
         if (!$scope.logFlight.FuelUnitID)
             $scope.logFlight.FuelUnitID = 115;
         if (!$scope.logFlight.CargoUnitID)
@@ -148,24 +222,29 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         }
 
-        $scope.flight=$scope.logFlight;
+        $scope.flight = $scope.logFlight;
         //  $scope.popup_log_visible = true;
 
-        $scope.maxDepartureDate= General.getDayLastHour(new Date(new Date($scope.logFlight.STA).addDays(1)));
-       
-        $scope.minDepartureDate=General.getDayFirstHour(new Date(new Date($scope.logFlight.STA).addDays(-1)));
+        $scope.maxDepartureDate = General.getDayLastHour(new Date(new Date($scope.logFlight.STA).addDays(1)));
 
-        if ($(window).width()<1200)
+        $scope.minDepartureDate = General.getDayFirstHour(new Date(new Date($scope.logFlight.STA).addDays(-1)));
+
+        if ($(window).width() < 1200)
             $scope.popup_departure_visible = true;
         else
             $scope.popup_log_visible = true;
+        //2020-11-22
+        $scope.flightGUID = null;
+        flightService.getFlightGUID($scope.logFlight.ID).then(function (response) {
+            $scope.flightGUID = response;
 
-         
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
     };
 
     $scope.btn_log = {
         //text: 'Log',
-        hint:'Flight Log',
+        hint: 'Flight Log',
         type: 'default',
         icon: 'fas fa-info',
         width: '100%',
@@ -180,9 +259,9 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 General.ShowNotify(Config.Text_NoFlightSelected, 'error');
                 return;
             }
-            $scope.ati_flight =Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ $scope.ati_selectedFlights[0].ID).FirstOrDefault();
-            $scope.ati_resid=$scope.ati_flight.RegisterID;
-            $scope.logFlight=JSON.parse(JSON.stringify($scope.ati_flight));
+            $scope.ati_flight = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[0].ID).FirstOrDefault();
+            $scope.ati_resid = $scope.ati_flight.RegisterID;
+            $scope.logFlight = JSON.parse(JSON.stringify($scope.ati_flight));
             $scope.showLogX(false);
 
 
@@ -195,7 +274,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.freeSMS = false;
     $scope.btn_sms = {
         //text: 'SMS',
-        hint:'SMS Panel',
+        hint: 'SMS Panel',
         type: 'default',
         icon: 'fas fa-bell',
         width: '100%',
@@ -313,6 +392,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             value: 'useCrew',
         }
     };
+    //07-10
     $scope.time_ir_start = {
         type: "date",
         width: '100%',
@@ -330,8 +410,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.time_ir_start_hh = {
         type: "time",
         width: '100%',
-        // pickerType: 'calendar',
-        displayFormat: "HH:mm",
+        //divargar-ok
+        displayFormat: "HHmm",
         interval: 15,
         onValueChanged: function (arg) {
 
@@ -361,7 +441,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         type: "time",
         width: '100%',
         // pickerType: 'calendar',
-        displayFormat: "HH:mm",
+        displayFormat: "HHmm",
         interval: 15,
         readOnly: true,
         onValueChanged: function (arg) {
@@ -424,19 +504,34 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         }
     };
-    $scope.getRealMSNs = function (cid) {
-        return new DevExpress.data.DataSource({
-            store:
+    //2020-11-16
+    $scope.realMSNs = [];
 
-                new DevExpress.data.ODataStore({
-                    //url: $rootScope.serviceUrl + 'odata/aircrafts/customer/'+cid+'?$filter=isvirtual%20eq%20false' ,
-                    url: $rootScope.serviceUrl + 'odata/aircrafts/customer/' + cid,
-                    version: 4
-                }),
+    $scope.getRealMSNs = function (cid, callback) {
+        //return new DevExpress.data.DataSource({
+        //    store:
 
-            sort: ['AircraftType', 'Register'],
-        });
+        //        new DevExpress.data.ODataStore({
+        //            //url: $rootScope.serviceUrl + 'odata/aircrafts/customer/'+cid+'?$filter=isvirtual%20eq%20false' ,
+        //            url: $rootScope.serviceUrl + 'odata/aircrafts/customer/' + cid,
+        //             version: 4
+        //        }),
+
+        //    sort: ['AircraftType', 'Register'],
+        //});
+
+        //divargar-ok
+        flightService.getRealRegisters(cid).then(function (response) {
+            $scope.realMSNs = Enumerable.From(response)
+                //.Where('!$.isvirtual')
+                .OrderBy('$.isvirtual')
+                .ThenBy('$.Register').ToArray();
+
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
     };
+    ////////////////////////////////////////////
+    //dools
     $scope.getSbTemplateAircraft = function (data) {
         var tmpl =
             "<div>"
@@ -456,7 +551,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             return $scope.getSbTemplateAircraft(data);
         },
         searchExpr: ['Register', 'MSN'],
-        dataSource: $scope.getRealMSNs(Config.CustomerId),
+        //2020-11-16
+        //dataSource: $scope.getRealMSNs(Config.CustomerId),
         displayExpr: "Register",
         valueExpr: 'ID',
         onSelectionChanged: function (arg) {
@@ -464,8 +560,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         },
         bindingOptions: {
             value: 'linkEntity.RegisterID',
-
-            //dataSource: 'ds_msn',
+            //2020-11-16
+            dataSource: 'realMSNs',
 
 
         }
@@ -529,7 +625,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.btn_free = {
         // text: 'Nonscheduled Flight',
         //text: 'N/S Flight',
-        hint:'New Flight',
+        hint: 'New Flight',
         type: 'default',
         icon: 'fas fa-plus',
         width: '100%',
@@ -540,6 +636,12 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             $scope.linkEntity = { ID: -1, CustomerId: Config.CustomerId };
             var _df = General.getDayFirstHour(new Date($scope.selectedDate));
             $scope.time_ir_std_date = new Date(_df);
+
+            //divargar-ok
+            $scope.time_interval_from_date = new Date($scope.selectedDate);
+            $scope.time_interval_to_date = new Date($scope.selectedDate);
+            $scope.interval_days = [];
+            $scope.interval_days.push((new Date($scope.selectedDate)).getDay());
 
             $scope.popup_free_visible = true;
 
@@ -833,6 +935,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     }
 
     $scope.jl = {};
+    //divargar-ok
     $scope.btn_delete = {
         hint: 'Delete Flight',
         type: 'danger',
@@ -847,26 +950,42 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 General.ShowNotify(Config.Text_NoFlightSelected, 'error');
                 return;
             }
-            $scope.ati_flight =Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ $scope.ati_selectedFlights[0].ID).FirstOrDefault();
-            $scope.ati_resid=$scope.ati_flight.RegisterID;
-            
+            if ($scope.ati_selectedFlights[0].FlightStatusID != 1) {
+                General.ShowNotify("The flight cannot be deleted.", 'error');
+                return;
+            }
+            $scope.ati_flight = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[0].ID).FirstOrDefault();
+            $scope.ati_resid = $scope.ati_flight.RegisterID;
 
-            General.Confirm(Config.Text_DeleteConfirm, function (res) {
-                if (res) {
+            if ($scope.IsComm) {
+                $scope.time_interval_from_date = new Date($scope.ati_flight.STD);
+                $scope.time_interval_to_date = new Date($scope.ati_flight.STD);
+                $scope.interval_days = [];
+                $scope.interval_days.push((new Date($scope.ati_flight.STD)).getDay());
+                $scope.popup_delete_visible = true;
+            }
+            else {
+                General.Confirm(Config.Text_DeleteConfirm, function (res) {
+                    if (res) {
 
-                    var dto = { Id: $scope.ati_flight.ID, };
-                    $scope.loadingVisible = true;
-                    flightService.deleteFlight(dto).then(function (response) {
-                        $scope.loadingVisible = false;
-                        General.ShowNotify(Config.Text_SavedOk, 'success');
-                        //sooks
-                        $scope.removeFromGantt($scope.ati_flight,$scope.ati_resid);
+                        var dto = { Id: $scope.ati_flight.ID, };
+                        $scope.loadingVisible = true;
+                        flightService.deleteFlight(dto).then(function (response) {
+                            $scope.loadingVisible = false;
+                            General.ShowNotify(Config.Text_SavedOk, 'success');
+                            //sooks
+                            $scope.removeFromGantt($scope.ati_flight, $scope.ati_resid);
 
 
-                    }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
-                }
-            });
+
+                    }
+                });
+            }
+
+
+
         }
     };
     //sook
@@ -879,7 +998,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         icon: 'print',
         width: 110,
         onClick: function (e) {
-           
+
             return;
             html2canvas(document.querySelector("#gantt_container_ba")).then(function (canvas) {
                 // document.body.appendChild(canvas);
@@ -893,20 +1012,20 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         }
     };
 
-   
+
     $scope.fuelDepSaved = false;
     $scope.fuelArrSaved = false;
     $scope.$dgrow = null;
-    
+
     $scope.fuelArrSaved = false;
-    
+
 
     $scope.IsCancelVisible = false;
-   
+
 
 
     $scope.IsRedirectVisible = false;
-    
+
 
 
     $scope.getGantt = function () {
@@ -1024,7 +1143,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 $scope.StopUTimer();
                 // $scope.StartNowLineTimerFirst = true;
                 $scope.activatedStbys = null;
-               
+
             }
             else {
                 //  $scope.timeBase = 'LCL';
@@ -1062,7 +1181,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         bindingOptions: {
             value: 'sms_nira',
-            readOnly:true,
+            readOnly: true,
         }
     };
 
@@ -1086,9 +1205,9 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
 
     $scope.midnightLines = [];
-    
+
     $scope.baseDate = null;
-    
+
     $scope.fillFlight = function (data, newData) {
         data.FlightPlanId = newData.FlightPlanId;
         data.BaggageCount = newData.BaggageCount;
@@ -1213,10 +1332,10 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
 
 
-   
+
 
     //////////////////////////////////////
- 
+
 
     $scope.modifyLinkedFlights = function () {
         var linked = $('.linked-flight');
@@ -1241,7 +1360,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             });
         };
     };
-   
+
     var _boffset = -1 * (new Date()).getTimezoneOffset();
 
     var yyyymmddtimenow2 = function (dt) {
@@ -1282,7 +1401,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
 
 
-   
+
 
     //////////////////////////////////////////
     $scope.boardSummary = {
@@ -1484,6 +1603,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
 
     $scope.checkConflict = function (flights) {
+
         var hasConflict = false;
         $.each(flights, function (_i, _d) {
             _d.Route = _d.FromAirportIATA + '-' + _d.ToAirportIATA;
@@ -1492,7 +1612,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     (new Date(x.STD) >= new Date(_d.STD) && new Date(x.STD) <= new Date(_d.STA))
                     ||
                     (new Date(x.STA) >= new Date(_d.STD) && new Date(x.STA) <= new Date(_d.STA))
-                  );
+                );
             }).FirstOrDefault();
             if (f)
                 hasConflict = true;
@@ -1585,7 +1705,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     ////////////////////////////////////////////
 
 
-                    
+
                     //sool
                     $scope.getDaySTBYs($scope.multiSelectedFlights[0], function (result) {
                         $scope.crew_stby_ds = result;
@@ -1706,7 +1826,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
     $scope.ganttview = true;
     $scope.gridview = true;
-    
+
     /////////Planning ////////////////////
 
     $scope.btn_plan_new = {
@@ -1756,7 +1876,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     flightService.deletePlanItem(dto).then(function (response) {
                         $scope.loadingVisible = false;
                         General.ShowNotify(Config.Text_SavedOk, 'success');
-                       
+
 
 
                     }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
@@ -1780,16 +1900,25 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         onClick: function (e) {
 
-
+            //divargar-ok
 
             if (!$scope.ati_selectedFlights || $scope.ati_selectedFlights.length == 0) {
                 General.ShowNotify(Config.Text_NoFlightSelected, 'error');
                 return;
             }
-            $scope.ati_flight =Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ $scope.ati_selectedFlights[0].ID).FirstOrDefault();
-            $scope.ati_resid=$scope.ati_flight.RegisterID;
+            if ($scope.ati_selectedFlights[0].FlightStatusID != 1) {
+                General.ShowNotify("The flight cannot be deleted.", 'error');
+                return;
+            }
 
-            if ($scope.ati_flight.FlightPlanId) {
+            //FlightStatusID
+
+            $scope.ati_flight = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[0].ID).FirstOrDefault();
+
+            $scope.ati_resid = $scope.ati_flight.RegisterID;
+
+
+            if ($scope.ati_flight.FlightPlanId && 1 == 2) {
 
                 $scope.selectedPlanItemId = $scope.ati_flight.FlightPlanId;
                 var offset = -1 * (new Date()).getTimezoneOffset();
@@ -1801,7 +1930,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     $scope.loadingVisible = false;
                     $scope.IsNew = false;
                     $scope.tempData = response;
-                    
+
                     $scope.doRefresh = false;
                     $scope.doGetPlanItems = false;
 
@@ -1814,7 +1943,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             }
             else {
                 $scope.linkEntity = { ID: $scope.ati_flight.ID, CustomerId: Config.CustomerId };
-               
+
                 //var _df = General.getDayFirstHour(new Date($scope.selectedDate));
                 //$scope.time_ir_std_date = new Date(_df);
                 $scope.doIrRoute = false;
@@ -1829,6 +1958,12 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 $scope.time_ir_std_time = new Date($scope.ati_flight.STD);
                 $scope.time_ir_sta_date = new Date($scope.ati_flight.STD);
                 $scope.time_ir_sta_time = new Date($scope.ati_flight.STA);
+
+                //divargar-ok
+                $scope.time_interval_from_date = new Date($scope.ati_flight.STD);
+                $scope.time_interval_to_date = new Date($scope.ati_flight.STD);
+                $scope.interval_days = [];
+                $scope.interval_days.push((new Date($scope.ati_flight.STD)).getDay());
                 //$scope.linkEntity.LinkedRemark = $scope.flight.LinkedRemark;
                 $scope.doIrRoute = true;
                 //hoda
@@ -1854,6 +1989,33 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         width: '100%',
 
         onClick: function (e) {
+           
+
+            
+
+            if (!$scope.ati_selectedFlights || $scope.ati_selectedFlights.length == 0) {
+                General.ShowNotify(Config.Text_NoFlightSelected, 'error');
+                return;
+            }
+            //  $scope.ati_flight =Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ $scope.ati_selectedFlights[0].ID).FirstOrDefault();
+            //  $scope.ati_resid=$scope.ati_flight.RegisterID;
+            $scope.popup_shift_visible = true;
+
+
+
+        }
+    };
+
+
+    //magu2-23
+    $scope.btn_addemp = {
+        hint: 'Add Employees',
+        type: 'default',
+        icon: 'far fa-id-badge',
+        width: '100%',
+
+        onClick: function (e) {
+
 
 
 
@@ -1861,15 +2023,16 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 General.ShowNotify(Config.Text_NoFlightSelected, 'error');
                 return;
             }
-          //  $scope.ati_flight =Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ $scope.ati_selectedFlights[0].ID).FirstOrDefault();
+            //  $scope.ati_flight =Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ $scope.ati_selectedFlights[0].ID).FirstOrDefault();
             //  $scope.ati_resid=$scope.ati_flight.RegisterID;
-            $scope.popup_shift_visible=true;
+            $scope.addCrewGroup();
 
-           
+
 
         }
     };
 
+    //magu2-16
     $scope.btn_creg = {
         hint: 'Change Register',
         type: 'default',
@@ -1884,33 +2047,52 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 General.ShowNotify(Config.Text_NoFlightSelected, 'error');
                 return;
             }
-            //$scope.ati_flight =Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ $scope.ati_selectedFlights[0].ID).FirstOrDefault();
+            var ati_flight1 = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[0].ID).FirstOrDefault();
+            var ati_flight2 = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[$scope.ati_selectedFlights.length-1].ID).FirstOrDefault();
             //$scope.ati_resid=$scope.ati_flight.RegisterID;
+            if ($scope.IsComm) {
+                $scope.time_interval_from_date = new Date(ati_flight1.STD);
+                $scope.time_interval_to_date = new Date(ati_flight2.STD);
+                $scope.interval_days = [];
+                $scope.interval_days.push((new Date( ati_flight1.STD)).getDay());
+                $scope.interval_days.push((new Date( ati_flight2.STD)).getDay());
+                
+            }
+            $scope.popup_creg_visible = true;
 
-            $scope.popup_creg_visible=true;
 
-           
 
         }
     };
-
+    //magu2-16
+    //divargar-ok
     $scope.btn_cnl = {
         hint: 'Cancel Flight(s)',
-        type: 'default',
-        icon: 'fas fa-ban',
+        type: 'danger',
+        icon: 'fas fa-toggle-off',
         width: '100%',
 
         onClick: function (e) {
-             if (!$scope.ati_selectedFlights || $scope.ati_selectedFlights.length == 0) {
+            if (!$scope.ati_selectedFlights || $scope.ati_selectedFlights.length == 0) {
                 General.ShowNotify(Config.Text_NoFlightSelected, 'error');
                 return;
             }
             //$scope.ati_flight =Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ $scope.ati_selectedFlights[0].ID).FirstOrDefault();
             //$scope.ati_resid=$scope.ati_flight.RegisterID;
+            var ati_flight1 = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[0].ID).FirstOrDefault();
+            var ati_flight2 = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[$scope.ati_selectedFlights.length - 1].ID).FirstOrDefault();
+            //$scope.ati_resid=$scope.ati_flight.RegisterID;
+            if ($scope.IsComm) {
+                $scope.time_interval_from_date = new Date(ati_flight1.STD);
+                $scope.time_interval_to_date = new Date(ati_flight2.STD);
+                $scope.interval_days = [];
+                $scope.interval_days.push((new Date(ati_flight1.STD)).getDay());
+                $scope.interval_days.push((new Date(ati_flight2.STD)).getDay());
 
-            $scope.popup_cnl_visible=true;
+            }
+            $scope.popup_cnl_visible = true;
 
-           
+
 
         }
     };
@@ -1930,7 +2112,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             }
             var offset = -1 * (new Date()).getTimezoneOffset();
             var flight = $scope.selectedFlights[0];
-           
+
             $scope.plan_dg2_keys = [];
 
 
@@ -2094,7 +2276,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             $scope.plan_dg2_keys = [];
             $scope.plan_dg2_instance.refresh();
             $scope.popup_plan_add_visible = false;
-            
+
 
         },
         bindingOptions: {
@@ -2142,7 +2324,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                         $scope.planEntity.DateFrom = new Date($scope.planEntity.iDateFrom).ToUTC();
                         $scope.planEntity.DateTo = new Date($scope.planEntity.iDateTo).ToUTC();
                         // $scope.entity.DateFirst = new Date($scope.data[0].startDate).ToUTC();
-                       
+
                         $scope.planEntity.STD = (new Date($scope.planEntity.STD)).toUTCString();
 
                         $scope.planEntity.STA = (new Date($scope.planEntity.STA)).toUTCString();
@@ -2189,13 +2371,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                             ///////////////////////////////////
                             for (var key of Object.keys(response.flight)) {
-                                
-                                
-                                $scope.ati_flight[key]=response.flight[key];
-                            // console.log(key+'    '+response[key]+'     '+$scope.ati_flight[key]);
+
+
+                                $scope.ati_flight[key] = response.flight[key];
+                                // console.log(key+'    '+response[key]+'     '+$scope.ati_flight[key]);
                             }
                             $scope.modifyFlightTimes($scope.ati_flight);
-                            $scope.modifyGantt ($scope.ati_flight,response.ressq[0]);
+                            $scope.modifyGantt($scope.ati_flight, response.ressq[0]);
                             ////////////////////////////////////
 
                             $scope.popup_planitem_visible = false;
@@ -2235,8 +2417,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             //$scope.plan_dg2_ds = [];
             //$scope.plan_dg2_instance.refresh();
             $scope.popup_planitem_visible = false;
-            
-            
+
+
 
         },
         bindingOptions: {
@@ -2330,7 +2512,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
 
             $scope.popup_interval_visible = false;
-         
+
 
         },
         bindingOptions: {
@@ -2389,7 +2571,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
     $scope.intervalTypes = [{ Id: 1, Title: 'Daily' }
         //, { Id: 2, Title: 'Weekly' }, { Id: 3, Title: 'Every 10 days' }, { Id: 4, Title: 'Every 14 days' }, { Id: 5, Title: 'Every 15 days' }, { Id: 100, Title: 'Custom' },
-       // { Id: 101, Title: 'Once' }
+        // { Id: 101, Title: 'Once' }
     ];
     $scope.sb_interval2 = {
 
@@ -3218,7 +3400,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.dateEnd = null;
     $scope.tabsdatevisible = false;
     //doolrahm
-   
+
 
 
 
@@ -3309,6 +3491,44 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     j = cockpit.length;
                 if (8 > j) j = 8;
                 $scope.jl.crews = [];
+                //bahrami-6-2
+                $scope.jl.crewscockpit = [];
+                $scope.jl.crewscabin = [];
+                console.log(cockpit);
+                $.each(cockpit, function (_i, co) {
+                    if (co.Position == "Captain")
+                        co.Position = "CPT";
+                    if (co.IsPositioning)
+                        co.Position = 'DH';
+                    $scope.jl.crewscockpit.push(co);
+
+                });
+                $.each(cabin, function (_i, co) {
+                    if (co.IsPositioning)
+                        co.Position = 'DH';
+                    if (co.Position && co.Position == 'Purser')
+                        co.Position = 'SCCM';
+                    if (co.Position && co.Position == 'FA')
+                        co.Position = 'CCM';
+                    if (co.JobGroup == "ISCCM")
+                        co.Position = "ISCCM";
+                    $scope.jl.crewscabin.push(co);
+                });
+
+                if ($scope.jl.crewscockpit.length <  7)
+                    for (var i = $scope.jl.crewscockpit.length; i <  7; i++) {
+                        $scope.jl.crewscockpit.push({ Position: ' ', Name: ' ' });
+                        
+                    }
+               
+
+                if ($scope.jl.crewscabin.length < 7)
+                    for (var i = $scope.jl.crewscabin.length; i < 7; i++) {
+                        $scope.jl.crewscabin.push({ Position: ' ', Name: ' ' });
+                    }
+
+
+                ///////////////////////////
                 for (var i = 0; i < j; i++) {
                     var ca = {};
                     if (cabin.length > i)
@@ -3321,9 +3541,9 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     //////////////////////////////////
                     if (co.Position == "Captain")
                         co.Position = "CPT";
-                    if (co.JobGroup == "TRE" || co.JobGroup == "TRI" || co.JobGroup == "LTC")
-                        //co.Position = co.JobGroup;
-                        co.Position = 'IP';
+                    // if (co.JobGroup == "TRE" || co.JobGroup == "TRI" || co.JobGroup == "LTC")
+
+                    // co.Position = 'IP';
                     if (co.IsPositioning)
                         co.Position = 'DH';
                     //////////////////////////////////
@@ -3338,6 +3558,10 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                     if (ca.IsPositioning)
                         ca.Position = 'DH';
+
+                    // bahrami-6-2
+                    if (!ca.Name) { ca.Name = ''; ca.Position = ''; }
+                    if (!co.Name) { co.Name = ''; co.Position = ''; }
                     $scope.jl.crews.push({ cabin: ca, cockpit: co });
 
 
@@ -3365,6 +3589,96 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     };
     //dooltala
+
+    //kabiri-ok
+    $scope.OrderGD = ['IP', 'CPT', 'FO', 'SO', 'CHK(CO)', 'OBS(CO)', 'DH(CO)', 'FD', 'GE', 'FSO','ISCCM','SCCM','CCM','CHK(CA)','OBS(CA)','DH(CA)'];
+    
+    $scope.generateGDTables = function (cds) {
+        $scope.cl.crewsAll = Enumerable.From(cds).OrderBy('$.IsPositioning')
+            //.ThenBy('$.GroupOrder').ThenBy('$.Name')
+            .ThenBy('$.GroupOrder').ThenBy('$.PositionId').ThenBy('$.Name')
+            .ToArray();
+         
+        $.each($scope.cl.crewsAll, function (_i, _d) {
+            if (!_d.Position)
+                _d.Position = " ";
+            if (!_d.Name)
+                _d.Name = " ";
+            _d.Position = _d.Position.trim().toUpperCase();
+            _d.Name = _d.Name.trim().toUpperCase();
+
+            if (_d.Position == "IP" || _d.Position == "TRE" || _d.Position == "TRI")
+                _d.Position = "IP";
+            if (_d.Position == "Captain")
+                _d.Position = "CPT";
+            if (_d.Position == "Purser")
+                _d.Position = "SCCM";
+            if (_d.Position == "FA")
+                _d.Position = "CCM";
+            if (_d.JobGroup == "ISCCM")
+                _d.Position = "ISCCM";
+               if (_d.IsPositioning)
+                _d.Position = 'DH';
+
+            if (_d.Position == "CHECK" && ['IP', 'TRE', 'TRI', 'LTC', 'P1', 'P2'].indexOf(_d.JobGroup) != -1)
+                _d.Position = "CHK(CO)";
+            if (_d.Position == "OBS" && ['IP', 'TRE', 'TRI', 'LTC', 'P1', 'P2'].indexOf(_d.JobGroup) != -1)
+                _d.Position = "OBS(CO)";
+            if (_d.Position == "DH" && ['IP', 'TRE', 'TRI', 'LTC', 'P1', 'P2'].indexOf(_d.JobGroup) != -1)
+                _d.Position = "DH(CO)";
+            if (_d.Position == "CHECK" && ['ISCCM','SCCM','CCM'].indexOf(_d.JobGroup) != -1)
+                _d.Position = "CHK(CA)";
+            if (_d.Position == "OBS" && ['ISCCM', 'SCCM', 'CCM'].indexOf(_d.JobGroup) != -1)
+                _d.Position = "OBS(CA)";
+            if (_d.Position == "DH" && ['ISCCM', 'SCCM', 'CCM'].indexOf(_d.JobGroup) != -1)
+                _d.Position = "DH(CA)";
+        });
+
+        $scope.cl.crewsAll = Enumerable.From($scope.cl.crewsAll).OrderBy(function (x) { var idx = $scope.OrderGD.indexOf(x.Position); return idx == -1 ? 1000 : idx; })
+            //.ThenBy('$.GroupOrder').ThenBy('$.Name')
+            .ThenBy('$.PositionId').ThenBy('$.Name')
+            .ToArray();
+
+        $scope.cl.crews = Enumerable.From(cds).Where('$.Position.trim()!="ACM" && $.Position.trim()!="FSO"')
+            //.OrderBy('$.IsPositioning')
+            //.ThenBy('$.GroupOrder').ThenBy('$.Name')
+            //.ThenBy('$.GroupOrder')
+            .OrderBy(function (x) { var idx = $scope.OrderGD.indexOf(x.Position); return idx == -1 ? 1000 : idx; })
+            .ThenBy('$.PositionId').ThenBy('$.Name')
+            .ToArray();
+        
+         
+        $.each($scope.cl.crews, function (_i, _d) {
+           
+            
+           // if (_d.IsPositioning)
+           //     _d.Position = 'DH';
+
+        });
+
+        if ($scope.cl.crews.length < 18)
+            for (var i = $scope.cl.crews.length; i < 18; i++) {
+                $scope.cl.crews.push({ Position: ' ', Name: ' ' });
+            }
+
+        //kabiri
+        ////////////////////////////////////
+        $scope.cl.crewsfso = Enumerable.From(cds).Where('$.Position.trim()=="ACM" || $.Position.trim()=="FSO"')
+            .OrderBy('$.PositionId')
+          
+            //.ThenBy('$.GroupOrder').ThenBy('$.PositionId')
+            .ThenBy('$.Name')
+            .ToArray();
+        $.each($scope.cl.crewsfso, function (_i, _d) {
+
+            _d.Position = 'FSO';
+
+        });
+        if ($scope.cl.crewsfso.length < 10)
+            for (var i = $scope.cl.crewsfso.length; i < 10; i++) {
+                $scope.cl.crewsfso.push({ Position: ' ', Name: ' ' });
+            }
+    };
     $scope.clShow = false;
     $scope.btn_fill2 = {
         text: 'Fill',
@@ -3439,30 +3753,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
 
                 //$scope.cl.crews = Enumerable.From(response.crew).OrderBy('$.GroupOrder').ThenBy('$.Name').ToArray();
-                $scope.cl.crews = Enumerable.From(response.crew).OrderBy('$.IsPositioning').ThenBy('$.GroupOrder').ThenBy('$.Name').ToArray();
-                $.each($scope.cl.crews, function (_i, _d) {
-                    if (_d.Position == "Captain")
-                        _d.Position = "CPT";
-                    if (_d.Position == "Purser")
-                        _d.Position = "SCCM";
-                    if (_d.Position == "FA")
-                        _d.Position = "CCM";
-                    if (_d.JobGroup == "ISCCM")
-                        _d.Position = "ISCCM";
-                    if (_d.JobGroup == "TRE" || _d.JobGroup == "TRI" || _d.JobGroup == "LTC")
-                        _d.Position = "IP";// _d.JobGroup;
-                    if (_d.IsPositioning)
-                        _d.Position = 'DH';
-
-                });
-
-                if ($scope.cl.crews.length < 18)
-                    for (var i = $scope.cl.crews.length; i < 18; i++) {
-                        $scope.cl.crews.push({ Position: ' ', Name: ' ' });
-                    }
-
-
-
+                //kabiri-ok
+                $scope.generateGDTables(response.crew);
 
                 $scope.clShow = true;
 
@@ -3525,7 +3817,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         }
 
     };
-  
+
 
 
     $scope.date_to = {
@@ -3705,7 +3997,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
     //jooj
     $scope.calculateTotalDelay = function () {
-         
+
         if (!$scope.logFlight.ChocksOut) {
             $scope.logFlight.TotalDelayHH = null;
             $scope.logFlight.TotalDelayMM = null;
@@ -3784,7 +4076,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.depReadOnly = true;
     $scope.flightOffBlock2 = null;
     $scope.time_offblock2 = {
-        
+
         type: "date",
         width: '100%',
         onValueChanged: function (arg) {
@@ -4077,7 +4369,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         valueExpr: 'Id',
         bindingOptions: {
             value: 'logFlight.JLBLHH',
-            readOnly:'NotEditable'
+            readOnly: 'NotEditable'
 
         }
     };
@@ -4137,7 +4429,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         min: 0,
         bindingOptions: {
             value: 'logFlight.CargoCount',
-             
+
         }
     };
     $scope.cargo_weight = {
@@ -4145,20 +4437,20 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         min: 0,
         bindingOptions: {
             value: 'logFlight.CargoWeight',
-            
+
         }
     };
     $scope.cargo_excess = {
         readOnly: false,
         min: 0,
-         
+
     };
     $scope.bag_piece = {
         readOnly: false,
         min: 0,
         bindingOptions: {
             value: 'logFlight.BaggageCount',
-             
+
         }
     };
     $scope.bag_weight = {
@@ -4166,7 +4458,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         min: 0,
         bindingOptions: {
             value: 'logFlight.BaggageWeight',
-             
+
         }
     };
     $scope.bag_excess = {
@@ -4179,41 +4471,41 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     //var _oof=(new Date(2020,8,1,10,0,0,0)).getTimezoneOffset();
     // alert(_oof);
     //ati log
-    var getOffset=function(dt){
-        var _oof=(new Date(dt)).getTimezoneOffset();
+    var getOffset = function (dt) {
+        var _oof = (new Date(dt)).getTimezoneOffset();
         return _oof;
     };
-    var getUtcDate=function(dt){
+    var getUtcDate = function (dt) {
         return (new Date(dt)).addMinutes(getOffset(dt));
     };
-    var getLocalDate=function(dt){
+    var getLocalDate = function (dt) {
         return (new Date(dt)).addMinutes(-getOffset(dt));
     };
-    var getOffsetDate=function(dt,m){
-        return (new Date(dt)).addMinutes(m*getOffset(dt));
+    var getOffsetDate = function (dt, m) {
+        return (new Date(dt)).addMinutes(m * getOffset(dt));
     };
     $scope.convertToUTC = function () {
         //dool
-        $scope.logFlight.ChocksOut=getUtcDate($scope.logFlight.ChocksOut);
-        $scope.logFlight.ChocksIn=getUtcDate($scope.logFlight.ChocksIn);
-        $scope.logFlight.Takeoff=getUtcDate($scope.logFlight.Takeoff);
-        $scope.logFlight.Landing=getUtcDate($scope.logFlight.Landing);
-        $scope.logFlight.STA2=getUtcDate($scope.logFlight.STA2);
-        $scope.logFlight.STD2=getUtcDate($scope.logFlight.STD2);
-        
+        $scope.logFlight.ChocksOut = getUtcDate($scope.logFlight.ChocksOut);
+        $scope.logFlight.ChocksIn = getUtcDate($scope.logFlight.ChocksIn);
+        $scope.logFlight.Takeoff = getUtcDate($scope.logFlight.Takeoff);
+        $scope.logFlight.Landing = getUtcDate($scope.logFlight.Landing);
+        $scope.logFlight.STA2 = getUtcDate($scope.logFlight.STA2);
+        $scope.logFlight.STD2 = getUtcDate($scope.logFlight.STD2);
+
 
         $scope.time_status_value = getUtcDate($scope.time_status_value);
 
     };
     $scope.convertToLCL = function () {
-        $scope.logFlight.ChocksOut=getLocalDate($scope.logFlight.ChocksOut);
-        $scope.logFlight.ChocksIn=getLocalDate($scope.logFlight.ChocksIn);
-        $scope.logFlight.Takeoff=getLocalDate($scope.logFlight.Takeoff);
-        $scope.logFlight.Landing=getLocalDate($scope.logFlight.Landing);
-        $scope.logFlight.STA2=getLocalDate($scope.logFlight.STA2);
-        $scope.logFlight.STD2=getLocalDate($scope.logFlight.STD2);
+        $scope.logFlight.ChocksOut = getLocalDate($scope.logFlight.ChocksOut);
+        $scope.logFlight.ChocksIn = getLocalDate($scope.logFlight.ChocksIn);
+        $scope.logFlight.Takeoff = getLocalDate($scope.logFlight.Takeoff);
+        $scope.logFlight.Landing = getLocalDate($scope.logFlight.Landing);
+        $scope.logFlight.STA2 = getLocalDate($scope.logFlight.STA2);
+        $scope.logFlight.STD2 = getLocalDate($scope.logFlight.STD2);
 
-        $scope.time_status_value = getLocalDate($scope.time_status_value); 
+        $scope.time_status_value = getLocalDate($scope.time_status_value);
     };
     $scope.otimes = null;
     $scope.timeBase = 'LCB';
@@ -4239,11 +4531,12 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         }
     };
     $scope.remark_status_height = 80;
+    $scope.isRemarkNotEditable = !($scope.IsEditable || $scope.IsRemark);
     $scope.remark_status = {
         bindingOptions: {
             value: 'logFlight.DepartureRemark',
             height: 'remark_status_height',
-            readOnly:'NotEditable'
+            readOnly: 'isRemarkNotEditable'
         }
     };
 
@@ -4279,7 +4572,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         },
         bindingOptions: {
             value: 'time_redirect_value',
-            readOnly:'NotEditable'
+            readOnly: 'NotEditable'
 
         }
     };
@@ -4288,7 +4581,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         bindingOptions: {
             value: 'logFlight.RedirectRemark',
             height: '40',
-            readOnly:'NotEditable'
+            readOnly: 'NotEditable'
         }
     };
 
@@ -4306,7 +4599,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         },
         bindingOptions: {
             value: 'time_ramp_value',
-            readOnly:'NotEditable'
+            readOnly: 'NotEditable'
 
         }
     };
@@ -4315,7 +4608,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         bindingOptions: {
             value: 'logFlight.RampRemark',
             height: '40',
-            readOnly:'NotEditable'
+            readOnly: 'NotEditable'
         }
     };
 
@@ -4460,7 +4753,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 General.ShowNotify(Config.Text_NoRowSelected, 'error');
                 return;
             }
-          
+
 
             var ds = Enumerable.From($scope.dg_delay_ds).Where('$.Id!=' + $scope.dg_delay_selected.Id).ToArray();
             $scope.dg_delay_ds = ds;
@@ -4478,40 +4771,40 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.isRedirectReasonVisible = true;
     $scope.isRampReasonVisible = true;
     $scope.stationDs = [
-    
 
 
 
 
-  
-    { id: 22, title: 'Boarding', bgcolor: '#ff66ff', color: '#fff', class: 'boarding', selectable: true },
-    
-
-     { id: 23, title: 'Gate Closed', bgcolor: '#cc33ff', color: '#fff', class: 'gateclosed', selectable: true },
-      
-      
 
 
-     { id: 14, title: 'Off Block', bgcolor: '#80ffff', color: '#fff', class: 'offblock', selectable: true },
-    { id: 21, title: 'Taxi', bgcolor: '#00b3b3', color: '#fff', class: 'taxi', selectable: true },
+        { id: 22, title: 'Boarding', bgcolor: '#ff66ff', color: '#fff', class: 'boarding', selectable: true },
 
 
-  //  { id: 14, title: 'Off Block', bgcolor: '#00cc66', color: '#fff', class: 'offblock',selectable:true },
-    { id: 2, title: 'Take Off', bgcolor: '#00ff00', color: '#000', class: 'takeoff', selectable: true },
-    { id: 3, title: 'Landed', bgcolor: '#99ccff', color: '#000', class: 'landing', selectable: true },
-    { id: 15, title: 'On Block', bgcolor: '#66b3ff', color: '#000', class: 'onblock', selectable: true },
-    
+        { id: 23, title: 'Gate Closed', bgcolor: '#cc33ff', color: '#fff', class: 'gateclosed', selectable: true },
+
+
+
+
+        { id: 14, title: 'Off Block', bgcolor: '#80ffff', color: '#fff', class: 'offblock', selectable: true },
+        { id: 21, title: 'Taxi', bgcolor: '#00b3b3', color: '#fff', class: 'taxi', selectable: true },
+
+
+        //  { id: 14, title: 'Off Block', bgcolor: '#00cc66', color: '#fff', class: 'offblock',selectable:true },
+        { id: 2, title: 'Take Off', bgcolor: '#00ff00', color: '#000', class: 'takeoff', selectable: true },
+        { id: 3, title: 'Landed', bgcolor: '#99ccff', color: '#000', class: 'landing', selectable: true },
+        { id: 15, title: 'On Block', bgcolor: '#66b3ff', color: '#000', class: 'onblock', selectable: true },
+
 
 
 
     ];
-    $scope.statusDs=$scope.IsStaion?$scope.stationDs:Enumerable.From(Flight.statusDataSource).Where('$.selectable').ToArray();
+    $scope.statusDs = $scope.IsStaion ? $scope.stationDs : Enumerable.From(Flight.statusDataSource).Where('$.selectable').ToArray();
     $scope.sb_status = {
         showClearButton: false,
         searchEnabled: true,
-        dataSource:$scope.statusDs ,
+        dataSource: $scope.statusDs,
         onSelectionChanged: function (e) {
-            
+
             /////////////////////////////
             var bg = 'rgb(238, 238, 238)';
             var color = '#000';
@@ -4521,30 +4814,31 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             }
             // $('#status_caption').css('color', color).css('background', bg);
 
-            $scope.remark_status_height = 54;
+            $scope.remark_status_height = 54 + 96;
             $scope.isTimeStatusVisible = false;
             $scope.isCancelReasonVisible = false;
             // $scope.isRampReasonVisible = false;
             // $scope.isRedirectReasonVisible = false;
             if (e.selectedItem.id == 4) {
                 $scope.isCancelReasonVisible = true;
-                $scope.remark_status_height = 54;
+                $scope.remark_status_height = 54 + 96;
                 $scope.isTimeStatusVisible = true;
                 $scope.time_status_value = $scope.logFlight.CancelDate ? new Date($scope.logFlight.CancelDate) : new Date();
-                if (!$scope.logFlight.CancelReasonId )
-                    $scope.logFlight.CancelReasonId=10004;
+                if (!$scope.logFlight.CancelReasonId)
+                    $scope.logFlight.CancelReasonId = 10004;
             }
             //ramp
             if (e.selectedItem.id == 9) {
                 // $scope.isRampReasonVisible = true;
-                $scope.remark_status_height = 54;
+                $scope.remark_status_height = 54 + 96;
                 $scope.isTimeStatusVisible = false;
                 $scope.time_status_value = $scope.logFlight.RampDate ? new Date($scope.logFlight.RampDate) : new Date();
             }
             //redirect
+            //2021-1-17
             if (e.selectedItem.id == 17) {
                 // $scope.isRedirectReasonVisible = true;
-                $scope.remark_status_height = 30;
+                $scope.remark_status_height = 54;
                 // $scope.isTimeStatusVisible = true;
                 //$scope.time_status_value = $scope.flight.RedirectDate? new Date($scope.flight.RedirectDate):null;
                 //$scope.entity_redirect.AirportId = $scope.flight.ToAirport? $scope.flight.ToAirport:null;
@@ -4592,10 +4886,10 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         }
     };
     $scope.dsFlightType = [
-     { Id: 109, Title: 'Schedule', ParentId: 108, IsSystem: 1, OrderIndex: 1, Parent: 'Flight Types' },
-     { Id: 1112, Title: 'Charter', ParentId: 108, IsSystem: 1, OrderIndex: 4, Parent: 'Flight Typest' },
-      { Id: 1113, Title: 'Free Flight', ParentId: 108, IsSystem: 1, OrderIndex: 5, Parent: 'Flight Types' },
-         { Id: 1114, Title: 'Position', ParentId: 108, IsSystem: 1, OrderIndex: 6, Parent: 'Flight Types' }
+        { Id: 109, Title: 'Schedule', ParentId: 108, IsSystem: 1, OrderIndex: 1, Parent: 'Flight Types' },
+        { Id: 1112, Title: 'Charter', ParentId: 108, IsSystem: 1, OrderIndex: 4, Parent: 'Flight Typest' },
+        { Id: 1113, Title: 'Free Flight', ParentId: 108, IsSystem: 1, OrderIndex: 5, Parent: 'Flight Types' },
+        { Id: 1114, Title: 'Position', ParentId: 108, IsSystem: 1, OrderIndex: 6, Parent: 'Flight Types' }
     ];
     $scope.sb_flighttype = {
         readOnly: true,
@@ -4615,9 +4909,9 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         { Id: 112, Title: 'Lbs', ParentId: 110, IsSystem: 1, OrderIndex: 2, Parent: 'Mass Unit' }
     ];
     $scope.dsVolumeUnit = [
-      { Id: 114, Title: 'Ltr', ParentId: 113, IsSystem: 1, OrderIndex: 1, Parent: 'Volume Unit' },
-      { Id: 115, Title: 'Kgs', ParentId: 113, IsSystem: 1, OrderIndex: 2, Parent: 'Volume Unit' },
-       { Id: 5002, Title: 'Lbs', ParentId: 113, IsSystem: 1, OrderIndex: 3, Parent: 'Volume Unit' }
+        { Id: 114, Title: 'Ltr', ParentId: 113, IsSystem: 1, OrderIndex: 1, Parent: 'Volume Unit' },
+        { Id: 115, Title: 'Kgs', ParentId: 113, IsSystem: 1, OrderIndex: 2, Parent: 'Volume Unit' },
+        { Id: 5002, Title: 'Lbs', ParentId: 113, IsSystem: 1, OrderIndex: 3, Parent: 'Volume Unit' }
     ];
     $scope.sb_massunit = {
         showClearButton: false,
@@ -4628,7 +4922,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         bindingOptions: {
             dataSource: 'dsMassUnit',
             value: 'logFlight.CargoUnitID',
-             
+
         }
     };
     $scope.sb_volumeunit = {
@@ -4705,7 +4999,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         valueExpr: 'Id',
         bindingOptions: {
             value: 'logFlight.CancelReasonId',
-            readOnly:'NotEditable'
+            readOnly: 'NotEditable'
             // visible:'isCancelReasonVisible'
         }
     };
@@ -4717,7 +5011,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         valueExpr: 'Id',
         bindingOptions: {
             value: 'logFlight.RedirectReasonId',
-            readOnly:'NotEditable'
+            readOnly: 'NotEditable'
         }
     };
     $scope.sb_ramp_reason = {
@@ -4728,21 +5022,21 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         valueExpr: 'Id',
         bindingOptions: {
             value: 'logFlight.RampReasonId',
-            readOnly:'NotEditable'
+            readOnly: 'NotEditable'
         }
     };
     $scope.num_fphh = {
         max: 99, min: 0, width: 50, showSpinButtons: true,
         bindingOptions: {
             value: 'logFlight.FPFlightHH',
-            readOnly:'NotEditable'
+            readOnly: 'NotEditable'
         }
     };
     $scope.num_fpmm = {
         max: 59, min: 0, width: 50, showSpinButtons: true,
         bindingOptions: {
             value: 'logFlight.FPFlightMM',
-            readOnly:'NotEditable'
+            readOnly: 'NotEditable'
         }
     };
     //parisa
@@ -4767,6 +5061,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         }
     };
+
     $scope.sb_pflr = {
         showClearButton: true,
         searchEnabled: false,
@@ -4867,7 +5162,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         bindingOptions: {
             value: 'entity_redirect.AirportId',
             selectedItem: 'entity_redirect.Airport',
-            readOnly:'NotEditable'
+            readOnly: 'NotEditable'
         }
     };
     ///popups//////////////////////////
@@ -4889,7 +5184,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         var status = Enumerable.From(Flight.statusDataSource).Where('$.id==' + filght.status).FirstOrDefault();
         return "col-lg-2 col-md-3 col-sm-3 col-xs-3 font-inherit " + status.class;
     };
-    
+
 
     $scope.scroll_1 = {
         scrollByContent: true,
@@ -4954,7 +5249,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             });
 
             $scope.dg_instance.repaint();
-            
+
 
             //var myVar = setInterval(function () {
 
@@ -5030,22 +5325,22 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
 
 
- 
+
     ///////////////////////////////
-    
+
 
     $scope.fuelDepInit = {};
-    
+
     /////////////////////////////////
-    
+
     $scope.fuelArrInit = {};
-    
+
 
     ///////////////////////////////
-    
+
     $scope.paxSaved = false;
     $scope.paxInit = {};
-   
+
     ///////////////////////////////////
 
     $scope.popup_link_visible = false;
@@ -5104,7 +5399,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                             $scope.loadingVisible = false;
 
                             $scope.popup_link_visible = false;
-                           
+
                             // $rootScope.$broadcast('onFlightSaved', null);
 
                         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
@@ -5160,18 +5455,695 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     };
     //////////////////////////////////////
+    //divargar-ok
+    $scope.popup_delete_visible = false;
+    $scope.popup_delete_title = 'Delete Flight(s)';
+
+    $scope.popup_delete = {
+
+        shading: true,
+        //position: { my: 'right', at: 'right', of: window, offset: '-15 0' },
+
+        height: 500,
+        width: 400,
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+        toolbarItems: [
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Save', icon: 'check', validationGroup: 'fbdelete', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
+
+
+                        var result = arg.validationGroup.validate();
+                        if (!result.isValid) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+
+                        General.Confirm(Config.Text_DeleteConfirm, function (res) {
+                            if (res) {
+
+                                var _flight = { Id: $scope.ati_flight.ID };
+
+                                _flight.UserName = $rootScope.userName;
+
+                                //divargar3
+                                //07-10
+                                _flight.Days = $scope.interval_days.join('_');
+                                var _zoffset = (new Date($scope.ati_flight.STD)).getTimezoneOffset();
+                                var stdOffset = (new Date($scope.ati_flight.STD)).addMinutes(_zoffset);
+
+
+                                var interval_from_dates = (new Date($scope.time_interval_from_date)).getDatePartArray();
+                                var intervalFrom = new Date(interval_from_dates[0], interval_from_dates[1], interval_from_dates[2], 12, 0, 0, 0);
+                                var interval_to_dates = (new Date($scope.time_interval_to_date)).getDatePartArray();
+                                var intervalTo = new Date(interval_to_dates[0], interval_to_dates[1], interval_to_dates[2], 12, 0, 0, 0);
+                                //07-10
+                                if (stdOffset.getDate() != (new Date($scope.ati_flight.STD)).getDate()) {
+                                    intervalFrom = (new Date(intervalFrom)).addDays(-1);
+                                    intervalTo = (new Date(intervalTo)).addDays(-1);
+                                    var _Days = [];
+                                    $.each($scope.interval_days, function (_q, _y) {
+                                        var _nd = _y - 1;
+                                        if (_nd == -1)
+                                            _nd = 6;
+                                       _Days.push(_nd);
+
+                                    });
+                                    _flight.Days = _Days.join('_');
+                                   
+                                }
+
+
+                                _flight.IntervalFrom = (new Date(intervalFrom)).toUTCString();
+                                _flight.IntervalTo = (new Date(intervalTo)).toUTCString();
+                                _flight.Interval = 2;
+                                //_flight.Days = $scope.interval_days.join('_');
+                                _flight.CheckTime = $scope.interval_checktime ? 1 : 0;
+
+
+                                $scope.loadingVisible = true;
+                                flightService.deleteFlightGroup(_flight).then(function (response) {
+
+                                    General.ShowNotify(Config.Text_SavedOk, 'success');
+
+                                    $scope.loadingVisible = false;
+                                    var dels = Enumerable.From($scope.ganttData.flights).Where(function (x) { return response.indexOf(x.ID) != -1 }).ToArray();
+                                    $.each(dels, function (_j, _flt) {
+                                        $scope.removeFromGantt(_flt, _flt.RegisterID);
+                                    });
+                                    $scope.popup_delete_visible = false;
+
+
+
+
+                                }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+
+                            }
+                        });
+
+
+
+
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+
+        onShowing: function (e) {
+
+
+
+
+        },
+        onShown: function (e) {
+
+            $scope.interval_checktime = true;
+        },
+        onHiding: function () {
+
+            // if ($scope.freeSaved)
+            //    $scope.BeginSearch();
+
+            $scope.sms_nira_nsf = true;
+
+            $scope.popup_delete_visible = false;
+
+        },
+        bindingOptions: {
+            visible: 'popup_delete_visible',
+            height: 'popup_delete_height',
+            title: 'popup_delete_title',
+
+        }
+    };
+
+    //close button
+    $scope.popup_delete.toolbarItems[1].options.onClick = function (e) {
+
+        $scope.popup_delete_visible = false;
+
+    };
+
+    $scope.time_interval_from_date = null;
+    $scope.time_interval_to_date = null;
+    $scope.time_interval_from = {
+        type: "date",
+        width: '100%',
+
+
+        readOnly: true,
+        bindingOptions: {
+            value: 'time_interval_from_date',
+
+        }
+    };
+    $scope.time_interval_to = {
+        type: "date",
+        width: '100%',
+
+        bindingOptions: {
+            value: 'time_interval_to_date',
+
+        }
+    };
+
+    $scope.interval_checktime = true;
+    $scope.check_interval_checktime = {
+        width: '100%',
+        text: "Check Departure / Arrival",
+
+        bindingOptions: {
+            value: 'interval_checktime',
+        }
+    };
+
+    $scope.interval_days = [];
+    $scope.tag_days_instance = null;
+    $scope.tag_days = {
+        dataSource: General.WeekDayDataSource,
+        searchEnabled: true,
+        hideSelectedItems: true,
+        displayExpr: "Title",
+        valueExpr: 'Id',
+        onContentReady: function (e) {
+            if (!$scope.tag_days_instance)
+                $scope.tag_days_instance = e.component;
+        },
+        onSelectionChanged: function (arg) {
+
+        },
+        bindingOptions: {
+
+            value: "interval_days"
+        },
+
+    };
+
+    $scope.actv_reg = null;
+    $scope.sb_actv_msn = {
+
+        showClearButton: true,
+        width: '100%',
+        searchEnabled: true,
+        itemTemplate: function (data) {
+            return $scope.getSbTemplateAircraft(data);
+        },
+        searchExpr: ['Register', 'MSN'],
+
+        displayExpr: "Register",
+        valueExpr: 'ID',
+        onSelectionChanged: function (arg) {
+
+        },
+        bindingOptions: {
+            value: 'actv_reg',
+            //2020-11-16
+            dataSource: 'realMSNs',
+
+
+        }
+    };
+    $scope.actv_remark = "";
+    $scope.txt_actv_remark = {
+        height: 100,
+        bindingOptions: {
+            value: 'actv_remark',
+
+        }
+    };
+    //magu38
+    $scope.btn_actv = {
+        hint: 'Activate Flight(s)',
+        type: 'success',
+        icon: 'fas fa-toggle-on',
+        width: '100%',
+
+        onClick: function (e) {
+            if (!$scope.ati_selectedFlights || $scope.ati_selectedFlights.length == 0) {
+                General.ShowNotify(Config.Text_NoFlightSelected, 'error');
+                return;
+            }
+
+            var ati_flight1 = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[0].ID).FirstOrDefault();
+            var ati_flight2 = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[$scope.ati_selectedFlights.length - 1].ID).FirstOrDefault();
+            if ($scope.IsComm) {
+                $scope.time_interval_from_date = new Date(ati_flight1.STD);
+                $scope.time_interval_to_date = new Date(ati_flight2.STD);
+                $scope.interval_days = [];
+                $scope.interval_days.push((new Date(ati_flight1.STD)).getDay());
+                $scope.interval_days.push((new Date(ati_flight2.STD)).getDay());
+
+            }
+
+            $scope.popup_actv_visible = true;
+
+
+
+        }
+    };
+
+    //magu38
+    $scope.popup_actv_visible = false;
+    $scope.popup_actv_title = 'Activate Flight(s)';
+
+    $scope.popup_actv = {
+        elementAttr: {
+            //  id: "elementId",
+            class: "popup_actv"
+        },
+        shading: true,
+        //position: { my: 'left', at: 'left', of: window, offset: '5 0' },
+        height: 550,
+        width: 400,
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+        toolbarItems: [
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Save', icon: 'check', validationGroup: 'fbactv', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
+
+                        var result = arg.validationGroup.validate();
+                        if (!result.isValid) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+                        var _utcFlights = [];
+                        var _nflights = [];
+                        $.each($scope.ati_selectedFlights, function (_q, _w) {
+                            var _zoffset = (new Date(_w.STD)).getTimezoneOffset();
+                            var _b1 = (new Date(_w.STD)).getDate();
+                            var _b2 = (new Date(_w.STD)).addMinutes(_zoffset).getDate();
+
+
+                            if (_b1 == _b2)
+                                _nflights.push(_w);
+                            else
+                                _utcFlights.push(_w);
+
+                        });
+
+                        var allflights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
+                        var flights = Enumerable.From(_nflights).Select('$.ID').ToArray();
+                        var utcflights = Enumerable.From(_utcFlights).Select('$.ID').ToArray();
+                       // var flights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
+                        var entity = {
+
+
+                            userId: $rootScope.userId,
+                            userName: $rootScope.userName,
+                            reason: 0,
+
+                            fids: $scope.IsComm ? flights : allflights,
+                            //2020-11-24
+                            remark: $scope.actv_remark,
+                            reg: $scope.actv_reg
+
+
+                        };
+                        var uentity = {
+
+
+                            userId: $rootScope.userId,
+                            userName: $rootScope.userName,
+                            reason: 0,
+
+                            fids: utcflights,
+                            //2020-11-24
+                            remark: $scope.actv_remark,
+                            reg: $scope.actv_reg
+
+
+                        };
+
+                        if ($scope.IsComm) {
+                            var interval_from_dates = (new Date($scope.time_interval_from_date)).getDatePartArray();
+                            var intervalFrom = new Date(interval_from_dates[0], interval_from_dates[1], interval_from_dates[2], 12, 0, 0, 0);
+                            var interval_to_dates = (new Date($scope.time_interval_to_date)).getDatePartArray();
+                            var intervalTo = new Date(interval_to_dates[0], interval_to_dates[1], interval_to_dates[2], 12, 0, 0, 0);
+                            entity.intervalFrom = (new Date(intervalFrom)).toUTCString();
+                            entity.intervalTo = (new Date(intervalTo)).toUTCString();
+                            entity.interval = 2;
+                            entity.days = $scope.interval_days;
+                            var ref_dates = (new Date($scope._datefrom)).getDatePartArray();
+                            var ref = new Date(ref_dates[0], ref_dates[1], ref_dates[2], 12, 0, 0, 0);
+                            entity.RefDate = (new Date(ref)).toUTCString();
+                            entity.RefDays = $scope.days_count;
+                            ///////////////////////////////
+
+                            var uinterval_from_dates = (new Date($scope.time_interval_from_date)).getDatePartArray();
+                            var uintervalFrom = new Date(uinterval_from_dates[0], uinterval_from_dates[1], uinterval_from_dates[2], 12, 0, 0, 0);
+                            var uinterval_to_dates = (new Date($scope.time_interval_to_date)).getDatePartArray();
+                            var uintervalTo = new Date(uinterval_to_dates[0], uinterval_to_dates[1], uinterval_to_dates[2], 12, 0, 0, 0);
+                            uentity.intervalFrom = (new Date(uintervalFrom)).addDays(-1).toUTCString();
+                            uentity.intervalTo = (new Date(uintervalTo)).addDays(-1).toUTCString();
+                            uentity.interval = 2;
+                            uentity.days = [];
+                            $.each($scope.interval_days, function (_q, _y) {
+                                var _nd = _y - 1;
+                                if (_nd == -1)
+                                    _nd = 6;
+                                uentity.days.push(_nd);
+
+                            });
+                            var uref_dates = (new Date($scope._datefrom)).addDays(-1).getDatePartArray();
+                            var uref = new Date(uref_dates[0], uref_dates[1], uref_dates[2], 12, 0, 0, 0);
+                            uentity.RefDate = (new Date(uref)).toUTCString();
+                            uentity.RefDays = $scope.days_count;
+                            //////////////////////////////////
+                            $scope.loadingVisible = true;
+                            flightService.activeFlightsGroup(entity).then(function (response) {
+                                General.ShowNotify(Config.Text_SavedOk, 'success');
+                                $scope.loadingVisible = false;
+                                $.each(response.flights, function (_i, _flt) {
+                                    var aflt = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _flt.ID).FirstOrDefault();
+                                    if (aflt) {
+                                        var oldResId = aflt.RegisterID;
+                                        for (var key of Object.keys(_flt)) {
+
+
+                                            aflt[key] = _flt[key];
+
+                                        }
+                                        $scope.modifyFlightTimes(aflt);
+
+                                        var _ressq = Enumerable.From(response.ressq).Where('$.resourceId==' + aflt.RegisterID).FirstOrDefault();
+                                        $scope.modifyGantt(aflt, _ressq, oldResId);
+                                    }
+
+                                });
+                                if (_utcFlights.length > 1) {
+
+                                    $scope.loadingVisible = true;
+                                    flightService.activeFlightsGroup(uentity).then(function (response) {
+
+                                        $scope.loadingVisible = false;
+                                        $.each(response.flights, function (_i, _flt) {
+                                            var aflt = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _flt.ID).FirstOrDefault();
+                                            if (aflt) {
+                                                var oldResId = aflt.RegisterID;
+                                                for (var key of Object.keys(_flt)) {
+
+
+                                                    aflt[key] = _flt[key];
+
+                                                }
+                                                $scope.modifyFlightTimes(aflt);
+
+                                                var _ressq = Enumerable.From(response.ressq).Where('$.resourceId==' + aflt.RegisterID).FirstOrDefault();
+                                                $scope.modifyGantt(aflt, _ressq, oldResId);
+                                            }
+
+                                        });
+
+                                        $scope.popup_actv_visible = false;
+
+                                    }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                                }
+                                else
+                                    $scope.popup_actv_visible = false;
+                                
+
+                            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                        }
+                        else {
+                            $scope.loadingVisible = true;
+                            flightService.activeFlights(entity).then(function (response) {
+                                General.ShowNotify(Config.Text_SavedOk, 'success');
+                                $scope.loadingVisible = false;
+                                $.each(response.flights, function (_i, _flt) {
+                                    var aflt = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _flt.ID).FirstOrDefault();
+                                    var oldResId = aflt.RegisterID;
+                                    for (var key of Object.keys(_flt)) {
+
+
+                                        aflt[key] = _flt[key];
+
+                                    }
+                                    $scope.modifyFlightTimes(aflt);
+
+                                    var _ressq = Enumerable.From(response.ressq).Where('$.resourceId==' + aflt.RegisterID).FirstOrDefault();
+                                    $scope.modifyGantt(aflt, _ressq, oldResId);
+                                });
+
+                                $scope.popup_actv_visible = false;
+
+                            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                        }
+                  
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onTitleRendered: function (e) {
+
+        },
+        onShowing: function (e) {
+
+        },
+        onShown: function (e) {
+
+
+        },
+        onHiding: function () {
+
+
+            $scope.popup_actv_visible = false;
+
+        },
+        bindingOptions: {
+            visible: 'popup_actv_visible',
+
+            title: 'popup_actv_title',
+
+        }
+    };
+
+    //close button
+    $scope.popup_actv.toolbarItems[1].options.onClick = function (e) {
+
+        $scope.popup_actv_visible = false;
+
+    };
+    //////////////////////////////////////
+    $scope.saveFree = function () {
+        //07-10
+       
+
+        var std_dates = (new Date($scope.time_ir_std_date)).getDatePartArray();
+        var std_times = (new Date($scope.time_ir_std_time)).getTimePartArray();
+        var std = new Date(std_dates[0], std_dates[1], std_dates[2], std_times[0], std_times[1], 0, 0);
+
+        
+        var sta_dates = (new Date($scope.time_ir_sta_date)).getDatePartArray();
+        var sta_times = (new Date($scope.time_ir_sta_time)).getTimePartArray();
+        var sta = new Date(sta_dates[0], sta_dates[1], sta_dates[2], sta_times[0], sta_times[1], 0, 0);
+
+        var _flight = JSON.parse(JSON.stringify($scope.linkEntity));
+
+        _flight.FlightStatusID = 1;
+        _flight.STD = (new Date(std)).toUTCString();
+         
+        _flight.STA = (new Date(sta)).toUTCString();
+        _flight.SMSNira = $scope.sms_nira_nsf ? 1 : 0;
+        _flight.UserName = $rootScope.userName;
+
+        //divargar-ok3
+        var interval_from_dates = (new Date($scope.time_interval_from_date)).getDatePartArray();
+        var intervalFrom = new Date(interval_from_dates[0], interval_from_dates[1], interval_from_dates[2], 12, 0, 0, 0);
+        var interval_to_dates = (new Date($scope.time_interval_to_date)).getDatePartArray();
+        var intervalTo = new Date(interval_to_dates[0], interval_to_dates[1], interval_to_dates[2], 12, 0, 0, 0);
+
+        //07-10
+        _flight.Days = $scope.interval_days;
+         var ref_dates = (new Date($scope._datefrom)).getDatePartArray();
+        var ref = new Date(ref_dates[0], ref_dates[1], ref_dates[2], 12, 0, 0, 0);
+        _flight.RefDate = (new Date(ref)).toUTCString();
+       _flight.RefDays = $scope.days_count;
+
+        var _zoffset = (new Date($scope.time_ir_std_date)).getTimezoneOffset();
+        var stdOffset = (new Date(std)).addMinutes(_zoffset);
+
+        if (stdOffset.getDate() != std.getDate()) {
+            intervalFrom = (new Date(intervalFrom)).addDays(-1);
+            intervalTo = (new Date(intervalTo)).addDays(-1);
+            _flight.Days = [];
+            $.each($scope.interval_days, function (_q, _y) {
+                var _nd = _y - 1;
+                if (_nd == -1)
+                    _nd = 6;
+                _flight.Days.push(_nd);
+
+            });
+            _flight.RefDate = (new Date(ref)).addDays(-1).toUTCString();
+        }
+       
+
+        _flight.IntervalFrom = (new Date(intervalFrom)).toUTCString();
+        _flight.IntervalTo = (new Date(intervalTo)).toUTCString();
+        _flight.Interval = 2;
+        //_flight.Days = $scope.interval_days;
+
+        //07-10
+        //var ref_dates = (new Date($scope._datefrom)).getDatePartArray();
+        //var ref = new Date(ref_dates[0], ref_dates[1], ref_dates[2], 12, 0, 0, 0);
+        //_flight.RefDate = (new Date(ref)).toUTCString();
+       // _flight.RefDays = $scope.days_count;
+
+        //magu2-16
+        _flight.DepartureRemark = $scope.dep_remark_edit;
+
+
+
+        $scope.loadingVisible = true;
+        if (!$scope.IsComm) {
+            flightService.saveFlight(_flight).then(function (response) {
+
+
+
+
+                General.ShowNotify(Config.Text_SavedOk, 'success');
+                 
+                $scope.linkEntity.FlightNumber = null;
+                $scope.linkEntity.FromAirportId = $scope.linkEntity.ToAirportId;
+                $scope.linkEntity.ToAirportId = null;
+                $scope.linkEntity.FlightH = null;
+                $scope.linkEntity.FlightM = null;
+
+                $scope.time_ir_std_date = General.getDayFirstHour(new Date($scope.time_ir_sta_date));
+                $scope.time_ir_std_time = (new Date($scope.time_ir_sta_time)).addMinutes(60);
+                $scope.time_ir_sta_date = null;
+                $scope.time_ir_sta_time = null;
+                $scope.loadingVisible = false;
+                $scope.freeSaved = true;
+
+
+
+
+                if ($scope.linkEntity.ID != -1) {
+                    for (var key of Object.keys(response.flight)) {
+
+
+                        $scope.ati_flight[key] = response.flight[key];
+
+                    }
+                    $scope.modifyFlightTimes($scope.ati_flight);
+                    $scope.modifyGantt($scope.ati_flight, response.ressq[0]);
+                }
+                else {
+                    $scope.modifyFlightTimes(response.flight);
+                    $scope.addToGantt(response.flight, response.ressq[0]);
+                }
+
+                if ($scope.linkEntity.ID != -1)
+                    $scope.popup_free_visible = false;
+
+
+
+
+            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+        }
+        else {
+            if ($scope.linkEntity.ID == -1)
+                _flight.CheckTime = 0;
+            else
+                _flight.CheckTime = $scope.interval_checktime ? 1 : 0;
+            flightService.saveFlightGroup(_flight).then(function (response) {
+
+
+
+
+                General.ShowNotify(Config.Text_SavedOk, 'success');
+                
+                $scope.linkEntity.FlightNumber = null;
+                $scope.linkEntity.FromAirportId = $scope.linkEntity.ToAirportId;
+                $scope.linkEntity.ToAirportId = null;
+                $scope.linkEntity.FlightH = null;
+                $scope.linkEntity.FlightM = null;
+
+                $scope.time_ir_std_date = General.getDayFirstHour(new Date($scope.time_ir_sta_date));
+                $scope.time_ir_std_time = (new Date($scope.time_ir_sta_time)).addMinutes(60);
+                $scope.time_ir_sta_date = null;
+                $scope.time_ir_sta_time = null;
+                $scope.loadingVisible = false;
+                $scope.freeSaved = true;
+
+
+
+                //kakoli3
+                if ($scope.linkEntity.ID != -1 && response.flight) {
+                    var _ids = Enumerable.From(response.flights).Select('$.ID').ToArray();
+                    var _flts = Enumerable.From($scope.ganttData.flights).Where(
+                        function (x) {
+                            return _ids.indexOf(x.ID) != -1;
+                        }
+                    ).ToArray();
+                    $.each(_flts, function (_z, _f) {
+                        var resFlt = Enumerable.From(response.flights).Where('$.ID==' + _f.ID).FirstOrDefault();
+                        if (resFlt) {
+                            for (var key of Object.keys(resFlt)) {
+
+
+                                _f[key] = resFlt[key];
+
+                            }
+                            $scope.modifyFlightTimes(_f);
+                            $scope.modifyGantt(_f, response.ressq[0]);
+                        }
+                    });
+
+                }
+                else {
+                    $.each(response.flights, function (_z, _f) {
+                        $scope.modifyFlightTimes(_f);
+                        $scope.addToGantt(_f, response.ressq[0]);
+                    });
+
+                }
+
+                if ($scope.linkEntity.ID != -1)
+                    $scope.popup_free_visible = false;
+
+
+
+
+            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+        }
+
+    };
     $scope.popup_free_visible = false;
-    $scope.popup_free_title = 'Nonscheduled Flight';
+    $scope.popup_free_title = 'Flight';
     $scope.freeSaved = false;
+    $scope.popup_free_height = $scope.IsComm ? 790 : 580;
     $scope.popup_free = {
         elementAttr: {
             //  id: "elementId",
             class: "popup_free"
         },
         shading: true,
-        //position: { my: 'left', at: 'left', of: window, offset: '5 0' },
-        height: 350,
-        width: 750,
+        position: { my: 'right', at: 'right', of: window, offset: '-15 0' },
+        //divargar-ok
+
+        width: 490,
         fullScreen: false,
         showTitle: true,
         dragEnabled: true,
@@ -5187,77 +6159,19 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                             General.ShowNotify(Config.Text_FillRequired, 'error');
                             return;
                         }
-                        //$scope.time_ir_std_date
-                        //$scope.time_ir_std_time
-                        var std_dates = (new Date($scope.time_ir_std_date)).getDatePartArray();
-                        var std_times = (new Date($scope.time_ir_std_time)).getTimePartArray();
-                        var std = new Date(std_dates[0], std_dates[1], std_dates[2], std_times[0], std_times[1], 0, 0);
+                        if ($scope.sms_nira_nsf)
+                            $scope.saveFree();
+                        else {
+                            General.Confirm('"NOTIFY NIRA" is not checked. Are sure?', function (res) {
+                                if (res) {
 
-                        var sta_dates = (new Date($scope.time_ir_sta_date)).getDatePartArray();
-                        var sta_times = (new Date($scope.time_ir_sta_time)).getTimePartArray();
-                        var sta = new Date(sta_dates[0], sta_dates[1], sta_dates[2], sta_times[0], sta_times[1], 0, 0);
-
-                        var _flight = JSON.parse(JSON.stringify($scope.linkEntity));
-
-                        _flight.FlightStatusID = 1;
-                        _flight.STD = (new Date(std)).toUTCString();
-                        _flight.STA = (new Date(sta)).toUTCString();
-                        _flight.SMSNira = $scope.sms_nira_nsf ? 1 : 0;
-                        _flight.UserName = $rootScope.userName;
-                        //doog
-                        // _flight.LinkedReason = 1133;
-                        //_flight.BoxId = $scope.flight.BoxId;
-                        //if (!$scope.useCrew)
-                        //  _flight.BoxId = -1;
-                        //kook
-                        
-                        $scope.loadingVisible = true;
-                        flightService.saveFlight(_flight).then(function (response) {
-
-                            //$scope.clearEntity();
-
-
-                            General.ShowNotify(Config.Text_SavedOk, 'success');
-                            $scope.sms_nira_nsf = false;
-                            $scope.linkEntity.FlightNumber = null;
-                            $scope.linkEntity.FromAirportId = $scope.linkEntity.ToAirportId;
-                            $scope.linkEntity.ToAirportId = null;
-                            $scope.linkEntity.FlightH = null;
-                            $scope.linkEntity.FlightM = null;
-                            //var _df = General.getDayFirstHour(new Date($scope.selectedDate));
-                            $scope.time_ir_std_date = General.getDayFirstHour(new Date($scope.time_ir_sta_date));
-                            $scope.time_ir_std_time = (new Date($scope.time_ir_sta_time)).addMinutes(60);
-                            $scope.time_ir_sta_date = null;
-                            $scope.time_ir_sta_time = null;
-                            $scope.loadingVisible = false;
-                            $scope.freeSaved = true;
-
-
-                            //magu
-                            
-                            if ($scope.linkEntity.ID != -1){
-                                for (var key of Object.keys(response.flight)) {
-                                
-                                
-                                    $scope.ati_flight[key]=response.flight[key];
-                                // console.log(key+'    '+response[key]+'     '+$scope.ati_flight[key]);
+                                    $scope.saveFree();
                                 }
-                                $scope.modifyFlightTimes($scope.ati_flight);
-                                $scope.modifyGantt ($scope.ati_flight,response.ressq[0]);
-                            }
-                            else
-                            {
-                                $scope.modifyFlightTimes(response.flight);
-                                $scope.addToGantt (response.flight,response.ressq[0]);
-                            }
-
-                            if ($scope.linkEntity.ID != -1)
-                                $scope.popup_free_visible = false;
-
-
-                           
-
-                        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                            });
+                        }
+                        
+                        
+                        
 
 
                     }
@@ -5282,7 +6196,9 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         },
         onShown: function (e) {
             // $scope.getCrewAbs2($scope.flight.ID);
+            //magu2-17
             $scope.sms_nira_nsf = true;
+            $scope.interval_checktime = true;
         },
         onHiding: function () {
 
@@ -5302,7 +6218,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         },
         bindingOptions: {
             visible: 'popup_free_visible',
-
+            height: 'popup_free_height',
             title: 'popup_free_title',
 
         }
@@ -5330,19 +6246,19 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
     $scope.num_shift_mm = {
         min: 0,
-        max:59,
+        max: 59,
         showSpinButtons: true,
         bindingOptions: {
             value: 'shift_mm',
 
         }
     };
-    $scope.shift_forward='Forward(+)';
+    $scope.shift_forward = 'Forward(+)';
     $scope.sb_forward = {
-         
+
         showClearButton: false,
         searchEnabled: false,
-        dataSource: ['Forward(+)','Backward(-)'],
+        dataSource: ['Forward(+)', 'Backward(-)'],
 
         onSelectionChanged: function (arg) {
 
@@ -5365,8 +6281,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
     $scope.popup_shift_visible = false;
     $scope.popup_shift_title = 'Shift STD';
-   
-    $scope.popup_shift = {
+
+    $scope.popup_shift = { 
         elementAttr: {
             //  id: "elementId",
             class: "popup_shift"
@@ -5382,20 +6298,20 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', validationGroup: 'fbshift', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
-                       
+
                         var result = arg.validationGroup.validate();
                         if (!result.isValid) {
                             General.ShowNotify(Config.Text_FillRequired, 'error');
                             return;
                         }
                         //  $scope.ati_flight =Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ $scope.ati_selectedFlights[0].ID).FirstOrDefault();
-                        var dto={
-                            ids:Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray(),
-                            hour:$scope.shift_hh,
-                            minute:$scope.shift_mm,
-                            userName:$rootScope.userName,
-                            nira:$scope.sms_nira_shift?1:0,
-                            sign:$scope.shift_forward=='Forward(+)'?1:-1,
+                        var dto = {
+                            ids: Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray(),
+                            hour: $scope.shift_hh,
+                            minute: $scope.shift_mm,
+                            userName: $rootScope.userName,
+                            nira: $scope.sms_nira_shift ? 1 : 0,
+                            sign: $scope.shift_forward == 'Forward(+)' ? 1 : -1,
                         };
                         $scope.loadingVisible = true;
                         flightService.shiftFlight(dto).then(function (response) {
@@ -5405,28 +6321,28 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                             General.ShowNotify(Config.Text_SavedOk, 'success');
                             $scope.loadingVisible = false;
-                             
+
                             $scope.sms_nira_shift = true;
-                             
+
                             //$scope.ati_flight =Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ $scope.ati_selectedFlights[0].ID).FirstOrDefault();
                             //$scope.ati_resid=$scope.ati_flight.RegisterID;
-                            $.each(response.flights,function(_i,_flt){
-                                var aflt=Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ _flt.ID).FirstOrDefault();
-                                var oldResId=aflt.RegisterID;
+                            $.each(response.flights, function (_i, _flt) {
+                                var aflt = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _flt.ID).FirstOrDefault();
+                                var oldResId = aflt.RegisterID;
                                 for (var key of Object.keys(_flt)) {
-                                
-                                
-                                    aflt[key]=_flt[key];
-                                // console.log(key+'    '+response[key]+'     '+$scope.ati_flight[key]);
+
+
+                                    aflt[key] = _flt[key];
+                                    // console.log(key+'    '+response[key]+'     '+$scope.ati_flight[key]);
                                 }
                                 $scope.modifyFlightTimes(aflt);
                                 //pants
-                                var _ressq=Enumerable.From(response.ressq).Where('$.resourceId=='+aflt.RegisterID).FirstOrDefault();
-                                $scope.modifyGantt (aflt,_ressq,oldResId);
+                                var _ressq = Enumerable.From(response.ressq).Where('$.resourceId==' + aflt.RegisterID).FirstOrDefault();
+                                $scope.modifyGantt(aflt, _ressq, oldResId);
                             });
                             ///////////////////////////////////
-                           
-                           
+
+
                             $scope.popup_shift_visible = false;
 
 
@@ -5447,18 +6363,18 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         closeOnOutsideClick: false,
         onTitleRendered: function (e) {
-           
+
         },
         onShowing: function (e) {
- 
+
         },
         onShown: function (e) {
-           
+
             $scope.sms_nira_shift = true;
         },
         onHiding: function () {
 
-          
+
             $scope.popup_shift_visible = false;
 
         },
@@ -5477,15 +6393,15 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     };
     /////////////////////////////////////
-    $scope.cnl_remark="";
+    $scope.cnl_remark = "";
     $scope.txt_cnl_remark = {
-        height:100,
+        height: 100,
         bindingOptions: {
             value: 'cnl_remark',
-             
+
         }
     };
-    $scope.cnl_reason=null;
+    $scope.cnl_reason = null;
     $scope.sb_cnl_reason = {
         showClearButton: false,
         searchEnabled: false,
@@ -5494,12 +6410,19 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         valueExpr: 'Id',
         bindingOptions: {
             value: 'cnl_reason',
-            
+
         }
     };
     $scope.popup_cnl_visible = false;
     $scope.popup_cnl_title = 'Cancel Flight(s)';
-   
+    //magu2-16
+    $scope.dep_remark_edit = null;
+    $scope.remark_dep_edit = {
+        bindingOptions: {
+            value: 'dep_remark_edit',
+            height: '50',
+        }
+    };
     $scope.popup_cnl = {
         elementAttr: {
             //  id: "elementId",
@@ -5516,46 +6439,179 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', validationGroup: 'fbcnl', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
-                       
+
                         var result = arg.validationGroup.validate();
                         if (!result.isValid) {
                             General.ShowNotify(Config.Text_FillRequired, 'error');
                             return;
                         }
-                        var flights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
+                        //07-10
+                        var _utcFlights = [];
+                        var _nflights = [];
+                        $.each($scope.ati_selectedFlights, function (_q, _w) {
+                            var _zoffset = (new Date(_w.STD)).getTimezoneOffset();
+                            var _b1 = (new Date(_w.STD)).getDate();
+                            var _b2 = (new Date(_w.STD)).addMinutes(_zoffset).getDate();
+                             
+
+                            if (_b1 == _b2)
+                                _nflights.push(_w);
+                            else
+                                _utcFlights.push(_w);
+
+                        });
+
+                        var allflights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
+                        var flights = Enumerable.From(_nflights).Select('$.ID').ToArray();
+                        var utcflights = Enumerable.From(_utcFlights).Select('$.ID').ToArray();
+                        
+                        
                         var entity = {
 
-                             
+
                             userId: $rootScope.userId,
                             userName: $rootScope.userName,
-                            reason: -1,
-                             
-                            fids: flights,
-                             
-                            
-                        };
-                        $scope.loadingVisible = true;
-                        flightService.cancelFlights(entity).then(function (response) {
-                            General.ShowNotify(Config.Text_SavedOk, 'success');
-                            $scope.loadingVisible = false;
-                            $.each(response.flights,function(_i,_flt){
-                                var aflt=Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ _flt.ID).FirstOrDefault();
-                                var oldResId=aflt.RegisterID;
-                                for (var key of Object.keys(_flt)) {
-                                
-                                
-                                    aflt[key]=_flt[key];
-                                 
-                                }
-                                $scope.modifyFlightTimes(aflt);
-                                
-                                var _ressq=Enumerable.From(response.ressq).Where('$.resourceId=='+aflt.RegisterID).FirstOrDefault();
-                                $scope.modifyGantt (aflt,_ressq,oldResId);
-                            });
-                             
-                            $scope.popup_cnl_visible = false;
+                            reason: $scope.cnl_reason,
 
-                        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                            fids: $scope.IsComm ? flights : allflights,
+                            //2020-11-24
+                            remark: $scope.cnl_remark,
+
+
+                        };
+
+                        var uentity = {
+
+
+                            userId: $rootScope.userId,
+                            userName: $rootScope.userName,
+                            reason: $scope.cnl_reason,
+
+                            fids: utcflights,
+                            //2020-11-24
+                            remark: $scope.cnl_remark,
+
+
+                        };
+
+                        if (_utcFlights && _utcFlights.length > 0) {
+                        }
+
+                        if ($scope.IsComm) {
+                            var interval_from_dates = (new Date($scope.time_interval_from_date)).getDatePartArray();
+                            var intervalFrom = new Date(interval_from_dates[0], interval_from_dates[1], interval_from_dates[2], 12, 0, 0, 0);
+                            var interval_to_dates = (new Date($scope.time_interval_to_date)).getDatePartArray();
+                            var intervalTo = new Date(interval_to_dates[0], interval_to_dates[1], interval_to_dates[2], 12, 0, 0, 0);
+                            entity.intervalFrom = (new Date(intervalFrom)).toUTCString();
+                            entity.intervalTo = (new Date(intervalTo)).toUTCString();
+                            entity.interval = 2;
+                            entity.days = $scope.interval_days;
+                            var ref_dates = (new Date($scope._datefrom)).getDatePartArray();
+                            var ref = new Date(ref_dates[0], ref_dates[1], ref_dates[2], 12, 0, 0, 0);
+                            entity.RefDate = (new Date(ref)).toUTCString();
+                            entity.RefDays = $scope.days_count;
+                            ///////////////////////////////
+
+                            var uinterval_from_dates = (new Date($scope.time_interval_from_date)).getDatePartArray();
+                            var uintervalFrom = new Date(uinterval_from_dates[0], uinterval_from_dates[1], uinterval_from_dates[2], 12, 0, 0, 0);
+                            var uinterval_to_dates = (new Date($scope.time_interval_to_date)).getDatePartArray();
+                            var uintervalTo = new Date(uinterval_to_dates[0], uinterval_to_dates[1], uinterval_to_dates[2], 12, 0, 0, 0);
+                            uentity.intervalFrom = (new Date(uintervalFrom)).addDays(-1).toUTCString();
+                            uentity.intervalTo = (new Date(uintervalTo)).addDays(-1).toUTCString();
+                            uentity.interval = 2;
+                            uentity.days = [];
+                            $.each($scope.interval_days, function (_q, _y) {
+                                var _nd = _y - 1;
+                                if (_nd == -1)
+                                    _nd = 6;
+                                uentity.days.push(_nd);
+
+                            });
+                            var uref_dates = (new Date($scope._datefrom)).addDays(-1).getDatePartArray();
+                            var uref = new Date(uref_dates[0], uref_dates[1], uref_dates[2], 12, 0, 0, 0);
+                            uentity.RefDate = (new Date(uref)).toUTCString();
+                            uentity.RefDays = $scope.days_count;
+                            //////////////////////////////////
+
+                            $scope.loadingVisible = true;
+                            flightService.cancelFlightsGroup(entity).then(function (response) {
+                                General.ShowNotify(Config.Text_SavedOk, 'success');
+                                $scope.loadingVisible = false;
+                                $.each(response.flights, function (_i, _flt) {
+                                    var aflt = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _flt.ID).FirstOrDefault();
+                                    if (aflt) {
+                                        var oldResId = aflt.RegisterID;
+                                        for (var key of Object.keys(_flt)) {
+
+
+                                            aflt[key] = _flt[key];
+
+                                        }
+                                        $scope.modifyFlightTimes(aflt);
+
+                                        var _ressq = Enumerable.From(response.ressq).Where('$.resourceId==' + aflt.RegisterID).FirstOrDefault();
+                                        $scope.modifyGantt(aflt, _ressq, oldResId);
+                                    }
+                                   
+                                });
+                                if (_utcFlights.length > 1) {
+
+                                    $scope.loadingVisible = true;
+                                    flightService.cancelFlightsGroup(uentity).then(function (response) {
+                                        
+                                        $scope.loadingVisible = false;
+                                        $.each(response.flights, function (_i, _flt) {
+                                            var aflt = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _flt.ID).FirstOrDefault();
+                                            if (aflt) {
+                                                var oldResId = aflt.RegisterID;
+                                                for (var key of Object.keys(_flt)) {
+
+
+                                                    aflt[key] = _flt[key];
+
+                                                }
+                                                $scope.modifyFlightTimes(aflt);
+
+                                                var _ressq = Enumerable.From(response.ressq).Where('$.resourceId==' + aflt.RegisterID).FirstOrDefault();
+                                                $scope.modifyGantt(aflt, _ressq, oldResId);
+                                            }
+
+                                        });
+
+                                        $scope.popup_cnl_visible = false;
+
+                                    }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                                }
+                                else
+                                    $scope.popup_cnl_visible = false;
+
+                            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                        }
+                        else {
+                            $scope.loadingVisible = true;
+                            flightService.cancelFlights(entity).then(function (response) {
+                                General.ShowNotify(Config.Text_SavedOk, 'success');
+                                $scope.loadingVisible = false;
+                                $.each(response.flights, function (_i, _flt) {
+                                    var aflt = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _flt.ID).FirstOrDefault();
+                                    var oldResId = aflt.RegisterID;
+                                    for (var key of Object.keys(_flt)) {
+
+
+                                        aflt[key] = _flt[key];
+
+                                    }
+                                    $scope.modifyFlightTimes(aflt);
+
+                                    var _ressq = Enumerable.From(response.ressq).Where('$.resourceId==' + aflt.RegisterID).FirstOrDefault();
+                                    $scope.modifyGantt(aflt, _ressq, oldResId);
+                                });
+
+                                $scope.popup_cnl_visible = false;
+
+                            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                        }
+                       
 
 
                     }
@@ -5569,24 +6625,24 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         closeOnOutsideClick: false,
         onTitleRendered: function (e) {
-           
+
         },
         onShowing: function (e) {
- 
+
         },
         onShown: function (e) {
-           
-            
+
+
         },
         onHiding: function () {
 
-          
+
             $scope.popup_cnl_visible = false;
 
         },
         bindingOptions: {
             visible: 'popup_cnl_visible',
-
+            height: 'cregHeight',
             title: 'popup_cnl_title',
 
         }
@@ -5599,7 +6655,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     };
     ////////////////////////////////////////
-    $scope.creg_msn=null;
+    $scope.creg_msn = null;
     $scope.sb_creg_msn = {
 
         showClearButton: true,
@@ -5609,7 +6665,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             return $scope.getSbTemplateAircraft(data);
         },
         searchExpr: ['Register', 'MSN'],
-        dataSource: $scope.getRealMSNs(Config.CustomerId),
+        //2020-11-16
+        //dataSource: $scope.getRealMSNs(Config.CustomerId),
         displayExpr: "Register",
         valueExpr: 'ID',
         onSelectionChanged: function (arg) {
@@ -5617,20 +6674,24 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         },
         bindingOptions: {
             value: 'creg_msn',
-             
+            //2020-11-16
+            dataSource: 'realMSNs',
+
         }
     };
-    $scope.creg_remark="";
+    $scope.creg_remark = "";
     $scope.txt_creg_remark = {
-        height:100,
+        height: 100,
         bindingOptions: {
             value: 'creg_remark',
-             
+
         }
     };
     $scope.popup_creg_visible = false;
     $scope.popup_creg_title = 'Chenge Register';
-   
+    //magu2-16
+     
+    $scope.cregHeight = $scope.IsComm ? 540 : 400;
     $scope.popup_creg = {
         elementAttr: {
             //  id: "elementId",
@@ -5647,14 +6708,36 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', validationGroup: 'fbcreg', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
-                       
+
                         var result = arg.validationGroup.validate();
                         if (!result.isValid) {
                             General.ShowNotify(Config.Text_FillRequired, 'error');
                             return;
                         }
-                        
-                        var flights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
+                        //07-10
+                        var _utcFlights = [];
+                        var _nflights = [];
+                        $.each($scope.ati_selectedFlights, function (_q, _w) {
+                            var _zoffset = (new Date(_w.STD)).getTimezoneOffset();
+                            var _b1 = (new Date(_w.STD)).getDate();
+                            var _b2 = (new Date(_w.STD)).addMinutes(_zoffset).getDate();
+
+
+                            if (_b1 == _b2)
+                                _nflights.push(_w);
+                            else
+                                _utcFlights.push(_w);
+
+                        });
+
+                        var allflights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
+                        var flights = Enumerable.From(_nflights).Select('$.ID').ToArray();
+                        var utcflights = Enumerable.From(_utcFlights).Select('$.ID').ToArray();
+
+                        console.log('utc',utcflights);
+                        console.log('normal', flights);
+                         
+                        //var flights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
                         var entity = {
 
                             NewRegisterId: $scope.creg_msn,
@@ -5662,33 +6745,142 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                             UserName: $rootScope.userName,
                             ReasonId: -1,
                             Remark: $scope.creg_remark,
-                            Flights: flights,
+                            Flights: $scope.IsComm ? flights : allflights,
                             From: (new Date()).toUTCDateTimeDigits(),
                             To: (new Date()).toUTCDateTimeDigits(),
-                            
-                        };
-                        $scope.loadingVisible = true;
-                        flightService.saveFlightRegisterChange2(entity).then(function (response) {
-                            General.ShowNotify(Config.Text_SavedOk, 'success');
-                            $scope.loadingVisible = false;
-                            $.each(response.flights,function(_i,_flt){
-                                var aflt=Enumerable.From($scope.ganttData.flights).Where('$.ID=='+ _flt.ID).FirstOrDefault();
-                                var oldResId=aflt.RegisterID;
-                                for (var key of Object.keys(_flt)) {
-                                
-                                
-                                    aflt[key]=_flt[key];
-                                 
-                                }
-                                $scope.modifyFlightTimes(aflt);
-                                
-                                var _ressq=Enumerable.From(response.ressq).Where('$.resourceId=='+aflt.RegisterID).FirstOrDefault();
-                                $scope.modifyGantt (aflt,_ressq,oldResId);
-                            });
-                             
-                            $scope.popup_creg_visible = false;
+                            //2020-11-24
 
-                        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                        };
+                        var uentity = {
+
+
+                            NewRegisterId: $scope.creg_msn,
+                            UserId: $rootScope.userId,
+                            UserName: $rootScope.userName,
+                            ReasonId: -1,
+                            Remark: $scope.creg_remark,
+                            Flights: utcflights,
+                            From: (new Date()).toUTCDateTimeDigits(),
+                            To: (new Date()).toUTCDateTimeDigits(),
+
+
+                        };
+                        if ($scope.IsComm) {
+                            var interval_from_dates = (new Date($scope.time_interval_from_date)).getDatePartArray();
+                            var intervalFrom = new Date(interval_from_dates[0], interval_from_dates[1], interval_from_dates[2], 12, 0, 0, 0);
+                            var interval_to_dates = (new Date($scope.time_interval_to_date)).getDatePartArray();
+                            var intervalTo = new Date(interval_to_dates[0], interval_to_dates[1], interval_to_dates[2], 12, 0, 0, 0);
+                            entity.intervalFrom = (new Date(intervalFrom)).toUTCString();
+                            entity.intervalTo = (new Date(intervalTo)).toUTCString();
+                            entity.interval = 2;
+                            entity.days = $scope.interval_days;
+                            var ref_dates = (new Date($scope._datefrom)).getDatePartArray();
+                            var ref = new Date(ref_dates[0], ref_dates[1], ref_dates[2], 12, 0, 0, 0);
+                            entity.RefDate = (new Date(ref)).toUTCString();
+                            entity.RefDays = $scope.days_count;
+                            ///////////////////////////////
+
+                            var uinterval_from_dates = (new Date($scope.time_interval_from_date)).getDatePartArray();
+                            var uintervalFrom = new Date(uinterval_from_dates[0], uinterval_from_dates[1], uinterval_from_dates[2], 12, 0, 0, 0);
+                            var uinterval_to_dates = (new Date($scope.time_interval_to_date)).getDatePartArray();
+                            var uintervalTo = new Date(uinterval_to_dates[0], uinterval_to_dates[1], uinterval_to_dates[2], 12, 0, 0, 0);
+                            uentity.intervalFrom = (new Date(uintervalFrom)).addDays(-1).toUTCString();
+                            uentity.intervalTo = (new Date(uintervalTo)).addDays(-1).toUTCString();
+                            uentity.interval = 2;
+                            uentity.days = [];
+                            $.each($scope.interval_days, function (_q, _y) {
+                                var _nd = _y - 1;
+                                if (_nd == -1)
+                                    _nd = 6;
+                                uentity.days.push(_nd);
+
+                            });
+                            var uref_dates = (new Date($scope._datefrom)).addDays(-1).getDatePartArray();
+                            var uref = new Date(uref_dates[0], uref_dates[1], uref_dates[2], 12, 0, 0, 0);
+                            uentity.RefDate = (new Date(uref)).toUTCString();
+                            uentity.RefDays = $scope.days_count;
+                            //////////////////////////////////
+                            $scope.loadingVisible = true;
+                            flightService.saveFlightRegisterChangeGroup(entity).then(function (response) {
+                                General.ShowNotify(Config.Text_SavedOk, 'success');
+                                $scope.loadingVisible = false;
+                                $.each(response.flights, function (_i, _flt) {
+                                    var aflt = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _flt.ID).FirstOrDefault();
+                                    if (aflt) {
+                                        var oldResId = aflt.RegisterID;
+                                        for (var key of Object.keys(_flt)) {
+
+
+                                            aflt[key] = _flt[key];
+
+                                        }
+                                        $scope.modifyFlightTimes(aflt);
+
+                                        var _ressq = Enumerable.From(response.ressq).Where('$.resourceId==' + aflt.RegisterID).FirstOrDefault();
+                                        $scope.modifyGantt(aflt, _ressq, oldResId);
+                                    }
+                                    
+                                });
+                                
+                                if (_utcFlights.length >= 1) {
+                                   
+                                    $scope.loadingVisible = true;
+                                    flightService.saveFlightRegisterChangeGroup(uentity).then(function (response) {
+
+                                        $scope.loadingVisible = false;
+                                        $.each(response.flights, function (_i, _flt) {
+                                            var aflt = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _flt.ID).FirstOrDefault();
+                                            if (aflt) {
+                                                var oldResId = aflt.RegisterID;
+                                                for (var key of Object.keys(_flt)) {
+
+
+                                                    aflt[key] = _flt[key];
+
+                                                }
+                                                $scope.modifyFlightTimes(aflt);
+
+                                                var _ressq = Enumerable.From(response.ressq).Where('$.resourceId==' + aflt.RegisterID).FirstOrDefault();
+                                                $scope.modifyGantt(aflt, _ressq, oldResId);
+                                            }
+
+                                        });
+
+                                        $scope.popup_creg_visible = false;
+
+                                    }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                                }
+                                else
+                                    $scope.popup_creg_visible = false;
+                               
+                            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                        }
+                        else {
+                            $scope.loadingVisible = true;
+                            flightService.saveFlightRegisterChange2(entity).then(function (response) {
+                                General.ShowNotify(Config.Text_SavedOk, 'success');
+                                $scope.loadingVisible = false;
+                                $.each(response.flights, function (_i, _flt) {
+                                    var aflt = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _flt.ID).FirstOrDefault();
+                                    var oldResId = aflt.RegisterID;
+                                    for (var key of Object.keys(_flt)) {
+
+
+                                        aflt[key] = _flt[key];
+
+                                    }
+                                    $scope.modifyFlightTimes(aflt);
+
+                                    var _ressq = Enumerable.From(response.ressq).Where('$.resourceId==' + aflt.RegisterID).FirstOrDefault();
+                                    $scope.modifyGantt(aflt, _ressq, oldResId);
+                                });
+
+                                $scope.popup_creg_visible = false;
+
+                            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                        }
+
+                        
 
                         /////////////////////////////////////////////
                     }
@@ -5702,24 +6894,24 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         closeOnOutsideClick: false,
         onTitleRendered: function (e) {
-           
+
         },
         onShowing: function (e) {
- 
+
         },
         onShown: function (e) {
-           
-            
+
+
         },
         onHiding: function () {
 
-          
+
             $scope.popup_creg_visible = false;
 
         },
         bindingOptions: {
             visible: 'popup_creg_visible',
-
+            height:'cregHeight',
             title: 'popup_creg_title',
 
         }
@@ -5807,48 +6999,48 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.dg_roster_columns = [
 
 
-             // { dataField: 'IsPositioning', caption: 'DH', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width: 60 },
-              { dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90 },
-            // { dataField: 'Code', caption: 'Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90, fixed: true, fixedPosition: 'left' },
-            // { dataField: 'ScName', caption: 'Schedule Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 150, fixed: true, fixedPosition: 'left' },
-             { dataField: 'ScheduleName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
+        // { dataField: 'IsPositioning', caption: 'DH', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width: 60 },
+        { dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90 },
+        // { dataField: 'Code', caption: 'Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90, fixed: true, fixedPosition: 'left' },
+        // { dataField: 'ScName', caption: 'Schedule Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 150, fixed: true, fixedPosition: 'left' },
+        { dataField: 'ScheduleName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
 
-              {
-                  dataField: "CrewId", caption: 'Flights',
-                  alignment: 'left',
-                  allowFiltering: false,
-                  allowSorting: false,
-                  cellTemplate: 'rosterFlightTemplate',
+        {
+            dataField: "CrewId", caption: 'Flights',
+            alignment: 'left',
+            allowFiltering: false,
+            allowSorting: false,
+            cellTemplate: 'rosterFlightTemplate',
 
-              },
+        },
 
-               {
-                   dataField: "CrewId", caption: '',
-                   alignment: 'center',
-                   allowFiltering: false,
-                   allowSorting: false,
-                   cellTemplate: 'rosterOffTemplate',
-                   width: 300,
+        {
+            dataField: "CrewId", caption: '',
+            alignment: 'center',
+            allowFiltering: false,
+            allowSorting: false,
+            cellTemplate: 'rosterOffTemplate',
+            width: 300,
 
-               },
-                //{
-                //    dataField: "CrewId", caption: '',
-                //    alignment: 'center',
-                //    allowFiltering: false,
-                //    allowSorting: false,
-                //    cellTemplate: 'rosterReplaceTemplate',
-                //    width: 100,
+        },
+        //{
+        //    dataField: "CrewId", caption: '',
+        //    alignment: 'center',
+        //    allowFiltering: false,
+        //    allowSorting: false,
+        //    cellTemplate: 'rosterReplaceTemplate',
+        //    width: 100,
 
-                //},
-                // {
-                //     dataField: "CrewId", caption: '',
-                //     alignment: 'center',
-                //     allowFiltering: false,
-                //     allowSorting: false,
-                //     cellTemplate: 'rosterRefuseTemplate',
-                //     width: 100,
+        //},
+        // {
+        //     dataField: "CrewId", caption: '',
+        //     alignment: 'center',
+        //     allowFiltering: false,
+        //     allowSorting: false,
+        //     cellTemplate: 'rosterRefuseTemplate',
+        //     width: 100,
 
-                // },
+        // },
 
 
 
@@ -5915,20 +7107,20 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.dg_codes_columns = [
 
         { dataField: 'Code', caption: 'Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, },
-           { dataField: 'Category', caption: 'Category', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200, },
-               { dataField: 'Title', caption: 'Title', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100, },
+        { dataField: 'Category', caption: 'Category', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200, },
+        { dataField: 'Title', caption: 'Title', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100, },
 
-                    { dataField: 'Remark', caption: 'Remark', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, },
+        { dataField: 'Remark', caption: 'Remark', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, },
 
-             {
-                 dataField: "Id", caption: '',
-                 alignment: 'center',
-                 allowFiltering: false,
-                 allowSorting: false,
-                 cellTemplate: 'codeSelectTemplate',
-                 width: 100,
+        {
+            dataField: "Id", caption: '',
+            alignment: 'center',
+            allowFiltering: false,
+            allowSorting: false,
+            cellTemplate: 'codeSelectTemplate',
+            width: 100,
 
-             },
+        },
 
 
 
@@ -6138,18 +7330,18 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     $scope.dg_msf_columns = [
 
-            // { dataField: 'STDDay', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 70, format: 'MM-dd', sortIndex: 0, sortOrder: "asc" },
+        // { dataField: 'STDDay', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 70, format: 'MM-dd', sortIndex: 0, sortOrder: "asc" },
 
-             //{ dataField: 'AircraftType', caption: 'AC Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90, fixed: false, fixedPosition: 'left' },
+        //{ dataField: 'AircraftType', caption: 'AC Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90, fixed: false, fixedPosition: 'left' },
 
-              { dataField: 'FlightNumber', caption: 'No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 65, fixed: false, fixedPosition: 'left' },
-             { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'FlightNumber', caption: 'No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 65, fixed: false, fixedPosition: 'left' },
+        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
 
-             { dataField: 'STD', caption: 'STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 78, format: 'HH:mm', sortIndex: 1, sortOrder: "asc" },
-             { dataField: 'STA', caption: 'STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 78, format: 'HH:mm' },
+        { dataField: 'STD', caption: 'STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 78, format: 'HH:mm', sortIndex: 1, sortOrder: "asc" },
+        { dataField: 'STA', caption: 'STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 78, format: 'HH:mm' },
 
-             // { dataField: 'Duration', caption: 'DUR', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
-               { dataField: 'Register', caption: 'Reg.', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', sortIndex: 2, sortOrder: "asc" },
+        // { dataField: 'Duration', caption: 'DUR', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+        { dataField: 'Register', caption: 'Reg.', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', sortIndex: 2, sortOrder: "asc" },
 
     ];
     $scope.dg_msf_selected = null;
@@ -6215,8 +7407,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.dg_columns3 = [
 
 
-              { dataField: 'Title', caption: 'No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 140, fixed: false, fixedPosition: 'left' },
-             { dataField: 'Value', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, },
+        { dataField: 'Title', caption: 'No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 140, fixed: false, fixedPosition: 'left' },
+        { dataField: 'Value', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, },
 
 
 
@@ -6290,26 +7482,26 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     ///////////////////////////////////
     $scope.dg_crew_stby_columns = [
 
-            { dataField: 'JobGroup', caption: 'RNK', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 85, },
-              { dataField: 'ScheduleName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left' },
-              { dataField: 'LastLocation', caption: 'Apt', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90, },
+        { dataField: 'JobGroup', caption: 'RNK', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 85, },
+        { dataField: 'ScheduleName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left' },
+        { dataField: 'LastLocation', caption: 'Apt', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90, },
 
-              {
-                  dataField: "Id", caption: '',
-                  width: 90,
-                  allowFiltering: false,
-                  allowSorting: false,
-                  cellTemplate: 'activeSTBYTemplate',
+        {
+            dataField: "Id", caption: '',
+            width: 90,
+            allowFiltering: false,
+            allowSorting: false,
+            cellTemplate: 'activeSTBYTemplate',
 
-              },
-              // {
-              //     dataField: "Id", caption: '',
-              //     width: 70,
-              //     allowFiltering: false,
-              //     allowSorting: false,
-              //     cellTemplate: 'addStbyPMTemplate',
+        },
+        // {
+        //     dataField: "Id", caption: '',
+        //     width: 70,
+        //     allowFiltering: false,
+        //     allowSorting: false,
+        //     cellTemplate: 'addStbyPMTemplate',
 
-              // },
+        // },
 
     ];
     $scope.dg_crew_stby_selected = null;
@@ -6472,7 +7664,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         $scope.loadingVisible = true;
         flightService.checkStbyActivation(($scope.STBYFDPStat.Extended > 0 ? 1 : 0), crew.FDPId, flts[0].ID, $scope.STBYFDPStat.Duty, $scope.STBYFDPStat.MaxFDPExtended).then(function (response) {
             $scope.loadingVisible = false;
-          
+
             if (response.maxFDPError) {
                 General.ShowNotify('ERROR MAX FDP DUE TO STBY REDUCTION', 'error');
                 return;
@@ -6481,7 +7673,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 General.ShowNotify('ERROR TOTAL DURATION 18 HOURS', 'error');
                 return;
             }
-          
+
 
             var dto = {
                 crewId: crew.CrewId,
@@ -6708,13 +7900,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         });
 
     };
-
+    //5-13
     $scope.fillLog = function (entity) {
-        if ($scope.timeBase=='UTC')
+        if ($scope.timeBase == 'UTC')
             $scope.convertToLCL();
         if ($scope.logFlight.ChocksOut)
             entity.ChocksOut = (new Date($scope.logFlight.ChocksOut)).toUTCString();
-         
+
         if ($scope.logFlight.Takeoff)
             entity.Takeoff = (new Date($scope.logFlight.Takeoff)).toUTCString();
         entity.DepartureRemark = $scope.logFlight.DepartureRemark;
@@ -6786,7 +7978,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         entity.EstimatedDelays = [];
         //var estimatedDelaysFlights = Enumerable.From($scope.dataSource).Where('$.EstimatedDelayChanged && $.EstimatedDelayChanged==true && $.EstimatedDelay>0 && $.status==1 && $.startDate.getDatePart()==' + $scope.flight.startDate.getDatePart() + ' && $.startDate.getTime() > ' + $scope.flight.startDate.getTime() + '  && $.RegisterID==' + $scope.flight.RegisterID).OrderBy('$.startDate').ToArray();
-        
+
         //$.each(estimatedDelaysFlights, function (_i, _d) {
         //    entity.EstimatedDelays.push({
         //        FlightId: _d.ID,
@@ -6841,16 +8033,16 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     };
 
-    
+
 
     ///////////////////////////////////
-   
+
     $scope.tabsdatefirst = true;
-   
+
     ///////////////////////////////////////
     $scope.popup_mlog_visible = false;
     $scope.popup_mlog_title = 'Log';
-    $scope.popup_mlog_instance=null;
+    $scope.popup_mlog_instance = null;
     $scope.popup_mlog = {
         elementAttr: {
             //  id: "elementId",
@@ -6867,30 +8059,33 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', validationGroup: 'fblink', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
-                       
+
 
                     }
                 }, toolbar: 'bottom'
             },
 
-            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', onClick:function(e){
-                $scope.popup_mlog_visible = false;
-            }}, toolbar: 'bottom' }
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) {
+                        $scope.popup_mlog_visible = false;
+                    }
+                }, toolbar: 'bottom'
+            }
         ],
 
         visible: false,
 
         closeOnOutsideClick: false,
-        
+
         onShowing: function (e) {
-            $scope.IsSave=$scope.IsEditable || $scope.IsStaion;
-            if ($scope.IsStaion)
-            {
-               
-                $scope.IsSave=$scope.logFlight.FromAirportIATA==$rootScope.Station || $scope.logFlight.ToAirportIATA==$rootScope.Station;
+            $scope.IsSave = $scope.IsEditable || $scope.IsStaion || $scope.IsRemark;
+            if ($scope.IsStaion) {
+
+                $scope.IsSave = $scope.logFlight.FromAirportIATA == $rootScope.Station || $scope.logFlight.ToAirportIATA == $rootScope.Station;
             }
             $scope.popup_mlog_instance.repaint();
-            
+
             if ($scope.logFlight.FlightStatusID == 4) {
                 $scope.time_status_value = new Date($scope.logFlight.CancelDate);
             }
@@ -6898,24 +8093,24 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 if ($scope.logFlight.FlightStatusID == 9) {
                     $scope.time_status_value = new Date($scope.logFlight.RampDate);
                 }
-             
+
             if ($scope.logFlight.RedirectReasonId) {
 
                 $scope.time_redirect_value = new Date($scope.logFlight.RedirectDate);
                 $scope.entity_redirect.AirportId = $scope.logFlight.ToAirport;
-                 
+
             }
             //hook
 
             $scope.depReadOnly = false;
-             
+
 
         },
         onShown: function (e) {
             $scope.loadingVisible = true;
             flightService.getFlightDelays($scope.logFlight.ID).then(function (response) {
                 $scope.loadingVisible = false;
-                 
+
                 $.each(response, function (_i, _d) {
 
                     var dc = {
@@ -6935,10 +8130,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 });
 
                 $scope.convertUTCEnabled = true;
-                if ($scope.doUTC)
-                { $scope.timeBase = 'UTC'; }
-                else
-                { $scope.timeBase = 'LCB'; }
+                if ($scope.doUTC) { $scope.timeBase = 'UTC'; }
+                else { $scope.timeBase = 'LCB'; }
 
                 //sooki
 
@@ -6961,7 +8154,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             if (!$scope.doUTC)
                 $scope.timeBase = 'LCB';
 
-             
+
 
             $scope.dg_delay_ds = [];
             $scope.flightTakeOff2 = null;
@@ -6977,7 +8170,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         onContentReady: function (e) {
             if (!$scope.popup_mlog_instance)
                 $scope.popup_mlog_instance = e.component;
-             
+
         },
         bindingOptions: {
             visible: 'popup_mlog_visible',
@@ -6995,7 +8188,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             var selectedTab = $scope.tabs_header[newValue];
             $('.dep_tab').hide();
             if (selectedTab)
-                $('.' +  selectedTab.id).fadeIn(100, function (){});
+                $('.' + selectedTab.id).fadeIn(100, function () { });
         }
         catch (e) {
             alert(e);
@@ -7003,14 +8196,14 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     });
     $scope.tabs_header = [
-          { text: "Status", id: 'dep_status' },
-         { text: "Pax", id: 'dep_pax' },
-          { text: "Crew", id: 'dep_crew' },
-           // { text: "Delay", id: 'dep_delay' },
-           //   { text: "Diversion/Ramp", id: 'dep_ramp' },
-          
+        { text: "Status", id: 'dep_status' },
+        { text: "Pax", id: 'dep_pax' },
+        { text: "Crew", id: 'dep_crew' },
+        // { text: "Delay", id: 'dep_delay' },
+        //   { text: "Diversion/Ramp", id: 'dep_ramp' },
 
-         
+
+
 
     ];
     $scope.tabs_header_options = {
@@ -7032,7 +8225,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         },
         bindingOptions: {
-             
+
             dataSource: { dataPath: "tabs_header", deep: true },
             selectedIndex: 'selectedTabHeaderIndex'
         }
@@ -7045,8 +8238,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         scrollByThumb: true,
         //bindingOptions: { height: 'scroll_height', }
         // height: function () { return $(window).height() - 195 },
-        bindingOptions:{
-            height:'scroll_dep_height',
+        bindingOptions: {
+            height: 'scroll_dep_height',
         }
         //height: 571,
     };
@@ -7056,8 +8249,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         scrollByThumb: true,
         //bindingOptions: { height: 'scroll_height', }
         // height: function () { return $(window).height() - 195 },
-        bindingOptions:{
-            height:'scroll_dep_height',
+        bindingOptions: {
+            height: 'scroll_dep_height',
         }
     };
     $scope.scroll_dep_crew = {
@@ -7065,8 +8258,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         scrollByThumb: true,
         //bindingOptions: { height: 'scroll_height', }
         // height: function () { return $(window).height() - 195 },
-        bindingOptions:{
-            height:'scroll_dep_height',
+        bindingOptions: {
+            height: 'scroll_dep_height',
         }
     };
     $scope.scroll_dep_delay = {
@@ -7074,8 +8267,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         scrollByThumb: true,
         //bindingOptions: { height: 'scroll_height', }
         // height: function () { return $(window).height() - 195 },
-        bindingOptions:{
-            height:'scroll_dep_height',
+        bindingOptions: {
+            height: 'scroll_dep_height',
         }
     };
     $scope.scroll_dep_ramp = {
@@ -7083,13 +8276,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         scrollByThumb: true,
         //bindingOptions: { height: 'scroll_height', }
         //height: function () { return $(window).height() - 195 },
-        bindingOptions:{
-            height:'scroll_dep_height',
+        bindingOptions: {
+            height: 'scroll_dep_height',
         }
     };
     ////////////////////////////////
-    $scope.maxDepartureDate=new Date();
-    $scope.minDepartureDate=new Date();
+    $scope.maxDepartureDate = new Date();
+    $scope.minDepartureDate = new Date();
     $scope.dep_offblock = {
         pickerType: "rollers",
         type: "date",
@@ -7104,8 +8297,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             // min: 'flight.baseStartDate',
             readOnly: 'IsOffBlockReadOnly',
             disabled: 'IsOffBlockReadOnly',
-            max:'maxDepartureDate',
-            min:'minDepartureDate',
+            max: 'maxDepartureDate',
+            min: 'minDepartureDate',
         }
     };
     $scope.dep_offblock_hh = {
@@ -7139,8 +8332,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             //    min: 'flight.baseStartDate',
             readOnly: 'IsTakeOffReadOnly',
             disabled: 'IsTakeOffReadOnly',
-            max:'maxDepartureDate',
-            min:'minDepartureDate',
+            max: 'maxDepartureDate',
+            min: 'minDepartureDate',
         }
     };
     $scope.dep_takeoff_hh = {
@@ -7158,8 +8351,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             //  min: 'flight.baseStartDate',
             readOnly: 'IsTakeOffReadOnly',
             disabled: 'IsTakeOffReadOnly',
-            max:'maxDepartureDate',
-            min:'minDepartureDate',
+            max: 'maxDepartureDate',
+            min: 'minDepartureDate',
         }
     };
     ///
@@ -7169,7 +8362,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         width: '100%',
         onValueChanged: function (arg) {
 
-             
+
         },
         interval: 5,
         bindingOptions: {
@@ -7177,8 +8370,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             // min: 'flight.baseStartDate',
             readOnly: 'IsOnBlockReadOnly',
             disabled: 'IsOnBlockReadOnly',
-            max:'maxDepartureDate',
-            min:'minDepartureDate',
+            max: 'maxDepartureDate',
+            min: 'minDepartureDate',
         }
     };
     $scope.dep_onblock_hh = {
@@ -7189,7 +8382,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         interval: 15,
         onValueChanged: function (arg) {
 
-             
+
         },
         bindingOptions: {
             value: 'logFlight.ChocksIn',
@@ -7212,8 +8405,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             //    min: 'flight.baseStartDate',
             readOnly: 'IsLandingReadOnly',
             disabled: 'IsLandingReadOnly',
-            max:'maxDepartureDate',
-            min:'minDepartureDate',
+            max: 'maxDepartureDate',
+            min: 'minDepartureDate',
         }
     };
     $scope.dep_landing_hh = {
@@ -7231,8 +8424,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             //  min: 'flight.baseStartDate',
             readOnly: 'IsLandingReadOnly',
             disabled: 'IsLandingReadOnly',
-            max:'maxDepartureDate',
-            min:'minDepartureDate',
+            max: 'maxDepartureDate',
+            min: 'minDepartureDate',
         }
     };
     $scope.dep_adult = {
@@ -7274,7 +8467,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     ////////////////////////////////
     $scope.popup_departure_visible = false;
     $scope.popup_departure_title = 'Flight Log';
-    $scope.popup_departure_instance=null;
+    $scope.popup_departure_instance = null;
     $scope.popup_departure = {
         elementAttr: {
             //  id: "elementId",
@@ -7282,17 +8475,17 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         },
         shading: true,
         //position: { my: 'left', at: 'left', of: window, offset: '5 0' },
-        height: function() {
-            var wh=$(window).height();
-            if (wh>700)
-                wh=700;
+        height: function () {
+            var wh = $(window).height();
+            if (wh > 700)
+                wh = 700;
             return wh;
         },
-        width:function() {
-            var ww=$(window).width();
+        width: function () {
+            var ww = $(window).width();
             alert(ww);
-            if (ww>500)
-                ww=500;
+            if (ww > 500)
+                ww = 500;
             return 500;
         },
         fullScreen: true,
@@ -7302,161 +8495,176 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', validationGroup: 'deplog', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
-                        if (!$scope.logFlight.ChocksOut && ($scope.logFlight.FlightStatusID == 2 || $scope.logFlight.FlightStatusID == 3 || $scope.logFlight.FlightStatusID == 7 || $scope.logFlight.FlightStatusID == 9 || $scope.logFlight.FlightStatusID == 14 || $scope.logFlight.FlightStatusID == 15 || $scope.logFlight.FlightStatusID == 17)) {
-                            General.ShowNotify(Config.Text_OffBlock, 'error');
-                            return;
-                        }
-                        if (!$scope.logFlight.Takeoff && ($scope.logFlight.FlightStatusID == 2 || $scope.logFlight.FlightStatusID == 3 || $scope.logFlight.FlightStatusID == 7 || $scope.logFlight.FlightStatusID == 15 || $scope.logFlight.FlightStatusID == 17)) {
-                            General.ShowNotify(Config.Text_TakeOff, 'error');
-                            return;
-                        }
-                        if (!$scope.logFlight.Landing && ($scope.logFlight.FlightStatusID == 3 || $scope.logFlight.FlightStatusID == 15)) {
-                            General.ShowNotify(Config.Text_Landing, 'error');
-                            return;
-                        }
-                        if (!$scope.logFlight.ChocksIn && ($scope.logFlight.FlightStatusID == 15)) {
-                            General.ShowNotify(Config.Text_OnBlock, 'error');
-                            return;
-                        }
+                        //2020-11-22
+                        flightService.getFlightGUID($scope.logFlight.ID).then(function (response) {
+
+                            if ($scope.flightGUID != response) {
+                                General.ShowNotify('Your session expired. The Flight data changed by another user. please close this window and open again.', 'error');
+                                $scope.forceUpdate();
+                                return;
+                            }
+
+                            if (!$scope.logFlight.ChocksOut && ($scope.logFlight.FlightStatusID == 2 || $scope.logFlight.FlightStatusID == 3 || $scope.logFlight.FlightStatusID == 7 || $scope.logFlight.FlightStatusID == 9 || $scope.logFlight.FlightStatusID == 14 || $scope.logFlight.FlightStatusID == 15 || $scope.logFlight.FlightStatusID == 17)) {
+                                General.ShowNotify(Config.Text_OffBlock, 'error');
+                                return;
+                            }
+                            if (!$scope.logFlight.Takeoff && ($scope.logFlight.FlightStatusID == 2 || $scope.logFlight.FlightStatusID == 3 || $scope.logFlight.FlightStatusID == 7 || $scope.logFlight.FlightStatusID == 15 || $scope.logFlight.FlightStatusID == 17)) {
+                                General.ShowNotify(Config.Text_TakeOff, 'error');
+                                return;
+                            }
+                            if (!$scope.logFlight.Landing && ($scope.logFlight.FlightStatusID == 3 || $scope.logFlight.FlightStatusID == 15)) {
+                                General.ShowNotify(Config.Text_Landing, 'error');
+                                return;
+                            }
+                            if (!$scope.logFlight.ChocksIn && ($scope.logFlight.FlightStatusID == 15)) {
+                                General.ShowNotify(Config.Text_OnBlock, 'error');
+                                return;
+                            }
 
 
 
-                        if (!$scope.logFlight.ChocksOut && ($scope.logFlight.Takeoff || $scope.logFlight.Landing || $scope.logFlight.ChocksIn)) {
-                            General.ShowNotify(Config.Text_OffBlock, 'error');
-                            return;
-                        }
-                        if (!$scope.logFlight.ChocksOut && ($scope.logFlight.Landing || $scope.logFlight.ChocksIn)) {
-                            General.ShowNotify(Config.Text_TakeOff, 'error');
-                            return;
-                        }
-                        if (!$scope.logFlight.Landing && ($scope.logFlight.ChocksIn)) {
-                            General.ShowNotify(Config.Text_Landing, 'error');
-                            return;
-                        }
+                            if (!$scope.logFlight.ChocksOut && ($scope.logFlight.Takeoff || $scope.logFlight.Landing || $scope.logFlight.ChocksIn)) {
+                                General.ShowNotify(Config.Text_OffBlock, 'error');
+                                return;
+                            }
+                            if (!$scope.logFlight.ChocksOut && ($scope.logFlight.Landing || $scope.logFlight.ChocksIn)) {
+                                General.ShowNotify(Config.Text_TakeOff, 'error');
+                                return;
+                            }
+                            if (!$scope.logFlight.Landing && ($scope.logFlight.ChocksIn)) {
+                                General.ShowNotify(Config.Text_Landing, 'error');
+                                return;
+                            }
 
 
-                        if ($scope.logFlight.Takeoff && new Date($scope.logFlight.Takeoff) < new Date($scope.logFlight.ChocksOut)) {
-                            General.ShowNotify(Config.Text_TakeOff, 'error');
-                            return;
-                        }
-                        if ($scope.logFlight.Landing && new Date($scope.logFlight.Landing) < new Date($scope.logFlight.Takeoff)) {
-                            General.ShowNotify(Config.Text_Landing, 'error');
-                            return;
-                        }
-                        if ($scope.logFlight.ChocksIn && new Date($scope.logFlight.ChocksIn) < new Date($scope.logFlight.Landing)) {
-                            General.ShowNotify(Config.Text_OnBlock, 'error');
-                            return;
-                        }
-                        if ($scope.logFlight.FlightStatusID == 4 && !$scope.logFlight.CancelReasonId) {
-                            General.ShowNotify(Config.Text_CancelReason, 'error');
-                            return;
-                        }
-                         
+                            if ($scope.logFlight.Takeoff && new Date($scope.logFlight.Takeoff) < new Date($scope.logFlight.ChocksOut)) {
+                                General.ShowNotify(Config.Text_TakeOff, 'error');
+                                return;
+                            }
+                            if ($scope.logFlight.Landing && new Date($scope.logFlight.Landing) < new Date($scope.logFlight.Takeoff)) {
+                                General.ShowNotify(Config.Text_Landing, 'error');
+                                return;
+                            }
+                            if ($scope.logFlight.ChocksIn && new Date($scope.logFlight.ChocksIn) < new Date($scope.logFlight.Landing)) {
+                                General.ShowNotify(Config.Text_OnBlock, 'error');
+                                return;
+                            }
+                            if ($scope.logFlight.FlightStatusID == 4 && !$scope.logFlight.CancelReasonId) {
+                                General.ShowNotify(Config.Text_CancelReason, 'error');
+                                return;
+                            }
 
 
-                        //////////////////////////////
-                        ///////////////////////////////
-                        var sumTotalDelayCodesAmount = 0;
-                        if (!$scope.dg_delay_ds)
-                            $scope.dg_delay_ds = [];
-                        //sati new
-                        sumTotalDelayCodesAmount = Enumerable.From($scope.dg_delay_ds).Select('$.Total').Sum();
-                        if (!$scope.logFlight.TotalDelayTotalMM)
-                            $scope.logFlight.TotalDelayTotalMM = 0;
 
-                        if ($scope.logFlight.TotalDelayTotalMM > 5 && $scope.dg_delay_ds.length == 0) {
-                            // General.ShowNotify(Config.Text_DelayCodesNETotalDelay, 'error');
-                            // return;
-                        }
-
-                        if ($scope.dg_delay_ds) {
+                            //////////////////////////////
+                            ///////////////////////////////
+                            var sumTotalDelayCodesAmount = 0;
+                            if (!$scope.dg_delay_ds)
+                                $scope.dg_delay_ds = [];
+                            //sati new
+                            sumTotalDelayCodesAmount = Enumerable.From($scope.dg_delay_ds).Select('$.Total').Sum();
                             if (!$scope.logFlight.TotalDelayTotalMM)
                                 $scope.logFlight.TotalDelayTotalMM = 0;
-                            sumTotalDelayCodesAmount = Enumerable.From($scope.dg_delay_ds).Select('$.Total').Sum();
-                            if ($scope.logFlight.FlightStatusID != 5 && (sumTotalDelayCodesAmount > 5 && sumTotalDelayCodesAmount != $scope.logFlight.TotalDelayTotalMM) && $scope.logFlight.ChocksOut) {
-                                //  General.ShowNotify(Config.Text_DelayCodesNETotalDelay, 'error');
-                                //  return;
+
+                            if ($scope.logFlight.TotalDelayTotalMM > 5 && $scope.dg_delay_ds.length == 0) {
+                                // General.ShowNotify(Config.Text_DelayCodesNETotalDelay, 'error');
+                                // return;
                             }
-                        }
 
-                        
-                        var dto = {
-                            StatusLog: [],
-                        };
-
-                         
-                         
-                       
-                        $scope.fillDto(dto);
-                        $scope.fillLog(dto);
-                        
-                        dto.NightTime = $scope.logFlight.NightTime;
-                        dto.JLBLHH = $scope.logFlight.JLBLHH;
-                        dto.SendDelaySMS = $scope.sms_delay ? 1 : 0;
-                        dto.SendCancelSMS = $scope.sms_cancel ? 1 : 0;
-                        dto.SendNiraSMS = $scope.sms_nira ? 1 : 0;
-
-
-                        
-                        $scope.loadingVisible = true;
-                        flightService.saveFlightLog(dto).then(function (response) {
-                            
-                            for (var key of Object.keys(response.flight)) {
-                                
-                                
-                                $scope.ati_flight[key]=response.flight[key];
-                            
+                            if ($scope.dg_delay_ds) {
+                                if (!$scope.logFlight.TotalDelayTotalMM)
+                                    $scope.logFlight.TotalDelayTotalMM = 0;
+                                sumTotalDelayCodesAmount = Enumerable.From($scope.dg_delay_ds).Select('$.Total').Sum();
+                                if ($scope.logFlight.FlightStatusID != 5 && (sumTotalDelayCodesAmount > 5 && sumTotalDelayCodesAmount != $scope.logFlight.TotalDelayTotalMM) && $scope.logFlight.ChocksOut) {
+                                    //  General.ShowNotify(Config.Text_DelayCodesNETotalDelay, 'error');
+                                    //  return;
+                                }
                             }
-                            $scope.modifyFlightTimes($scope.ati_flight);
-                            $scope.modifyGantt ($scope.ati_flight,response.ressq[0]);
-                            
 
 
-                          
-                            $scope.getBoardSummary($scope.selectedDate);
-                            // $scope.before_refreshed_flight = null;
-                            $scope.loadingVisible = false;
-                            $scope.sms_delay = false;
-                            $scope.sms_cancel = false;
-                            $scope.sms_nira = false;
-                            $scope.popup_departure_visible = false;
+                            var dto = {
+                                StatusLog: [],
+                            };
 
-                            //$scope.calculateSummary();
 
+
+
+                            $scope.fillDto(dto);
+                            $scope.fillLog(dto);
+
+                            dto.NightTime = $scope.logFlight.NightTime;
+                            dto.JLBLHH = $scope.logFlight.JLBLHH;
+                            dto.SendDelaySMS = $scope.sms_delay ? 1 : 0;
+                            dto.SendCancelSMS = $scope.sms_cancel ? 1 : 0;
+                            dto.SendNiraSMS = $scope.sms_nira ? 1 : 0;
+
+
+
+                            $scope.loadingVisible = true;
+                            flightService.saveFlightLog(dto).then(function (response) {
+
+                                for (var key of Object.keys(response.flight)) {
+
+
+                                    $scope.ati_flight[key] = response.flight[key];
+
+                                }
+                                $scope.modifyFlightTimes($scope.ati_flight);
+                                $scope.modifyGantt($scope.ati_flight, response.ressq[0]);
+
+
+
+
+                                $scope.getBoardSummary($scope.selectedDate);
+                                // $scope.before_refreshed_flight = null;
+                                $scope.loadingVisible = false;
+                                $scope.sms_delay = false;
+                                $scope.sms_cancel = false;
+                                $scope.sms_nira = false;
+                                $scope.popup_departure_visible = false;
+
+                                //$scope.calculateSummary();
+
+                            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+
+
+
+
+                            /////////////////////////////////////
                         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
 
-
-                       
-
-                        /////////////////////////////////////
 
                     }
                 }, toolbar: 'bottom'
             },
 
-            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', onClick:function(e){
-                $scope.popup_departure_visible = false;
-            }}, toolbar: 'bottom' }
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) {
+                        $scope.popup_departure_visible = false;
+                    }
+                }, toolbar: 'bottom'
+            }
         ],
 
         visible: false,
 
         closeOnOutsideClick: false,
-        
-        
+
+
 
 
         onShowing: function (e) {
             $scope.selectedTabIndex = -1;
-            $scope.IsSave=$scope.IsEditable || $scope.IsStaion;
-            if ($scope.IsStaion)
-            {
-               
-                $scope.IsSave=$scope.logFlight.FromAirportIATA==$rootScope.Station || $scope.logFlight.ToAirportIATA==$rootScope.Station;
+            $scope.IsSave = $scope.IsEditable || $scope.IsStaion;
+            if ($scope.IsStaion) {
+
+                $scope.IsSave = $scope.logFlight.FromAirportIATA == $rootScope.Station || $scope.logFlight.ToAirportIATA == $rootScope.Station;
             }
             $scope.popup_departure_instance.repaint();
-            
+
             if ($scope.logFlight.FlightStatusID == 4) {
                 $scope.time_status_value = new Date($scope.logFlight.CancelDate);
             }
@@ -7464,17 +8672,17 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 if ($scope.logFlight.FlightStatusID == 9) {
                     $scope.time_status_value = new Date($scope.logFlight.RampDate);
                 }
-             
+
             if ($scope.logFlight.RedirectReasonId) {
 
                 $scope.time_redirect_value = new Date($scope.logFlight.RedirectDate);
                 $scope.entity_redirect.AirportId = $scope.logFlight.ToAirport;
-                 
+
             }
             //hook
 
             $scope.depReadOnly = false;
-             
+
 
         },
         onShown: function (e) {
@@ -7482,7 +8690,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             $scope.loadingVisible = true;
             flightService.getFlightDelays($scope.logFlight.ID).then(function (response) {
                 $scope.loadingVisible = false;
-                 
+
                 $.each(response, function (_i, _d) {
 
                     var dc = {
@@ -7502,10 +8710,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 });
 
                 $scope.convertUTCEnabled = true;
-                if ($scope.doUTC)
-                { $scope.timeBase = 'UTC'; }
-                else
-                { $scope.timeBase = 'LCB'; }
+                if ($scope.doUTC) { $scope.timeBase = 'UTC'; }
+                else { $scope.timeBase = 'LCB'; }
 
                 //sooki
 
@@ -7528,7 +8734,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             if (!$scope.doUTC)
                 $scope.timeBase = 'LCB';
 
-             
+
 
             $scope.dg_delay_ds = [];
             $scope.flightTakeOff2 = null;
@@ -7547,13 +8753,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         onContentReady: function (e) {
             if (!$scope.popup_departure_instance)
                 $scope.popup_departure_instance = e.component;
-            if (e.component){
-                 
-                var contentElement = e.component.content();  
-               
-                contentElement[0].style.padding = '0px !important'; 
+            if (e.component) {
+
+                var contentElement = e.component.content();
+
+                contentElement[0].style.padding = '0px !important';
             }
-        
+
 
         },
         bindingOptions: {
@@ -7565,10 +8771,28 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         }
     };
 
-     //look
+    //look
 
 
     /////////////////////////////////////////
+    //2020-1-17
+    $scope.saveRemark = function () {
+        var entity = {};
+        entity.ID = $scope.logFlight.ID;
+        entity.DepartureRemark = $scope.logFlight.DepartureRemark;
+        entity.UserName = $rootScope.userName;
+        $scope.loadingVisible = true;
+        flightService.saveRemrak(entity).then(function (response) {
+
+            $scope.loadingVisible = false;
+            $scope.ati_flight.DepartureRemark = entity.DepartureRemark;
+            $scope.popup_log_visible = false;
+
+
+
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+    };
+    ////////////////////////////////////////////
     $scope.popup_log_instance = null;
     $scope.popup_log_visible = false;
     $scope.popup_log_title = 'Log';
@@ -7586,440 +8810,479 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         showTitle: true,
         dragEnabled: true,
         toolbarItems: [
-             {
-                 widget: 'dxButton', location: 'before', options: {
-                     type: 'default', text: 'Journey Log', icon: '', onClick: function (e) {
-                         $scope.line = [];
-                         $scope.jlShow = false;
-
-                         $scope.leg1Text = "";
-                         $scope.leg1Visible = false;
-                         $scope.leg1Value = false;
-
-                         $scope.leg2Text = "";
-                         $scope.leg2Visible = false;
-                         $scope.leg2Value = false;
-
-                         $scope.leg3Text = "";
-                         $scope.leg3Visible = false;
-                         $scope.leg3Value = false;
-
-                         $scope.leg4Text = "";
-                         $scope.leg4Visible = false;
-                         $scope.leg4Value = false;
-
-                         $scope.leg5Text = "";
-                         $scope.leg5Visible = false;
-                         $scope.leg5Value = false;
-
-                         $scope.leg6Text = "";
-                         $scope.leg6Visible = false;
-                         $scope.leg6Value = false;
-
-                         $scope.leg7Text = "";
-                         $scope.leg7Visible = false;
-                         $scope.leg7Value = false;
-
-                         $scope.leg8Text = "";
-                         $scope.leg8Visible = false;
-                         $scope.leg8Value = false;
-
-                         $scope.loadingVisible = true;
-                         flightService.getFlightsLine($scope.flight.ID).then(function (response) {
-                             $scope.loadingVisible = false;
-                             $.each(response, function (_i, _d) {
-                                 $scope.line.push(_d);
-                                 switch (_i) {
-                                     case 0:
-                                         $scope.leg1Text = _d.FlightNumber;
-                                         $scope.leg1Visible = true;
-                                         $scope.leg1Value = true;
-                                         break;
-                                     case 1:
-                                         $scope.leg2Text = _d.FlightNumber;
-                                         $scope.leg2Visible = true;
-                                         $scope.leg2Value = true;
-                                         break;
-                                     case 2:
-                                         $scope.leg3Text = _d.FlightNumber;
-                                         $scope.leg3Visible = true;
-                                         $scope.leg3Value = true;
-                                         break;
-                                     case 3:
-                                         $scope.leg4Text = _d.FlightNumber;
-                                         $scope.leg4Visible = true;
-                                         $scope.leg4Value = true;
-                                         break;
-                                     case 4:
-                                         $scope.leg5Text = _d.FlightNumber;
-                                         $scope.leg5Visible = true;
-                                         $scope.leg5Value = true;
-                                         break;
-                                     case 5:
-                                         $scope.leg6Text = _d.FlightNumber;
-                                         $scope.leg6Visible = true;
-                                         $scope.leg6Value = true;
-                                         break;
-                                     case 6:
-                                         $scope.leg7Text = _d.FlightNumber;
-                                         $scope.leg7Visible = true;
-                                         $scope.leg7Value = true;
-                                         break;
-                                     case 7:
-                                         $scope.leg8Text = _d.FlightNumber;
-                                         $scope.leg8Visible = true;
-                                         $scope.leg8Value = true;
-                                         break;
-                                     default:
-                                         break;
-                                 }
-                                 $scope.popup_jl_visible = true;
-                             });
-
-                         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
-
-
-
-
-                     }
-                 }, toolbar: 'bottom'
-             }
-             ,
-
-               {
-                   widget: 'dxButton', location: 'before', options: {
-                       type: 'default', text: 'Crew List', icon: '', onClick: function (e) {
-
-                           //tootnew 
-                           $scope.line = [];
-                           $scope.clShow = false;
-
-                           $scope.leg1Text = "";
-                           $scope.leg1Visible = false;
-                           $scope.leg1Value = false;
-
-                           $scope.leg2Text = "";
-                           $scope.leg2Visible = false;
-                           $scope.leg2Value = false;
-
-                           $scope.leg3Text = "";
-                           $scope.leg3Visible = false;
-                           $scope.leg3Value = false;
-
-                           $scope.leg4Text = "";
-                           $scope.leg4Visible = false;
-                           $scope.leg4Value = false;
-
-                           $scope.leg5Text = "";
-                           $scope.leg5Visible = false;
-                           $scope.leg5Value = false;
-
-                           $scope.leg6Text = "";
-                           $scope.leg6Visible = false;
-                           $scope.leg6Value = false;
-
-                           $scope.leg7Text = "";
-                           $scope.leg7Visible = false;
-                           $scope.leg7Value = false;
-
-                           $scope.leg8Text = "";
-                           $scope.leg8Visible = false;
-                           $scope.leg8Value = false;
-
-                           $scope.loadingVisible = true;
-                           flightService.getFlightsLine($scope.flight.ID).then(function (response) {
-                               $scope.loadingVisible = false;
-                               $.each(response, function (_i, _d) {
-                                   $scope.line.push(_d);
-                                   switch (_i) {
-                                       case 0:
-                                           $scope.leg1Text = _d.FlightNumber;
-                                           $scope.leg1Visible = true;
-                                           $scope.leg1Value = true;
-                                           break;
-                                       case 1:
-                                           $scope.leg2Text = _d.FlightNumber;
-                                           $scope.leg2Visible = true;
-                                           $scope.leg2Value = true;
-                                           break;
-                                       case 2:
-                                           $scope.leg3Text = _d.FlightNumber;
-                                           $scope.leg3Visible = true;
-                                           $scope.leg3Value = true;
-                                           break;
-                                       case 3:
-                                           $scope.leg4Text = _d.FlightNumber;
-                                           $scope.leg4Visible = true;
-                                           $scope.leg4Value = true;
-                                           break;
-                                       case 4:
-                                           $scope.leg5Text = _d.FlightNumber;
-                                           $scope.leg5Visible = true;
-                                           $scope.leg5Value = true;
-                                           break;
-                                       case 5:
-                                           $scope.leg6Text = _d.FlightNumber;
-                                           $scope.leg6Visible = true;
-                                           $scope.leg6Value = true;
-                                           break;
-                                       case 6:
-                                           $scope.leg7Text = _d.FlightNumber;
-                                           $scope.leg7Visible = true;
-                                           $scope.leg7Value = true;
-                                           break;
-                                       case 7:
-                                           $scope.leg8Text = _d.FlightNumber;
-                                           $scope.leg8Visible = true;
-                                           $scope.leg8Value = true;
-                                           break;
-                                       default:
-                                           break;
-                                   }
-                                   //doolzad
-                                   if ($scope.IsPickup)
-                                       $scope.popup_cltrans_visible = true;
-                                   else
-                                       $scope.popup_cl_visible = true;
-                               });
-
-                           }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
-
-
-
-                       }
-                   }, toolbar: 'bottom'
-               },
-               {
-                   widget: 'dxButton', location: 'after', options: {
-                       type: 'default', text: 'History', bindingOptions: { disabled: 'IsApproved' }, visible: true, onClick: function (arg) {
-
-
-                           $scope.popup_history_visible = true;
-                           /////////////////////////////////////
-                       }
-                   }, toolbar: 'bottom'
-               },
- {
-     widget: 'dxButton', location: 'after', options: {
-         type: 'default', text: 'Notify Pickup', bindingOptions: { disabled: 'IsApproved' }, visible: true, onClick: function (arg) {
-
-
-             $scope.popup_notify_visible = true;
-             /////////////////////////////////////
-         }
-     }, toolbar: 'bottom'
- },
- {
-     widget: 'dxButton', location: 'after', options: {
-         type: 'default', text: 'Notify Crew', bindingOptions: { disabled: 'IsApproved' }, visible: true, onClick: function (arg) {
-
-
-             $scope.popup_notify2_visible = true;
-             /////////////////////////////////////
-         }
-     }, toolbar: 'bottom'
- },
-               {
-                   widget: 'dxButton', location: 'after', options: {
-                       type: 'default', text: 'Reporting Time', icon: 'clock', bindingOptions: { disabled: 'IsApproved' }, visible: true, onClick: function (arg) {
-
-
-                           $scope.popup_crew_visible = true;
-                           /////////////////////////////////////
-                       }
-                   }, toolbar: 'bottom'
-               },
             {
-                widget: 'dxButton', location: 'after', options: {
-                    type: 'success', text: 'Save', icon: 'check', validationGroup: 'fbaclog', bindingOptions: { disabled: 'IsApproved' }, visible: true, onClick: function (arg) {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Journey Log', icon: '', onClick: function (e) {
+                        $scope.line = [];
+                        $scope.jlShow = false;
 
-                        
-                        if (!$scope.logFlight.ChocksOut && ($scope.logFlight.FlightStatusID == 2 || $scope.logFlight.FlightStatusID == 3 || $scope.logFlight.FlightStatusID == 7 || $scope.logFlight.FlightStatusID == 9 || $scope.logFlight.FlightStatusID == 14 || $scope.logFlight.FlightStatusID == 15 || $scope.logFlight.FlightStatusID == 17)) {
-                            General.ShowNotify(Config.Text_OffBlock, 'error');
-                            return;
-                        }
-                        if (!$scope.logFlight.Takeoff && ($scope.logFlight.FlightStatusID == 2 || $scope.logFlight.FlightStatusID == 3 || $scope.logFlight.FlightStatusID == 7 || $scope.logFlight.FlightStatusID == 15 || $scope.logFlight.FlightStatusID == 17)) {
-                            General.ShowNotify(Config.Text_TakeOff, 'error');
-                            return;
-                        }
-                        if (!$scope.logFlight.Landing && ($scope.logFlight.FlightStatusID == 3 || $scope.logFlight.FlightStatusID == 15)) {
-                            General.ShowNotify(Config.Text_Landing, 'error');
-                            return;
-                        }
-                        if (!$scope.logFlight.ChocksIn && ($scope.logFlight.FlightStatusID == 15)) {
-                            General.ShowNotify(Config.Text_OnBlock, 'error');
-                            return;
-                        }
+                        $scope.leg1Text = "";
+                        $scope.leg1Visible = false;
+                        $scope.leg1Value = false;
 
+                        $scope.leg2Text = "";
+                        $scope.leg2Visible = false;
+                        $scope.leg2Value = false;
 
+                        $scope.leg3Text = "";
+                        $scope.leg3Visible = false;
+                        $scope.leg3Value = false;
 
-                        if (!$scope.logFlight.ChocksOut && ($scope.logFlight.Takeoff || $scope.logFlight.Landing || $scope.logFlight.ChocksIn)) {
-                            General.ShowNotify(Config.Text_OffBlock, 'error');
-                            return;
-                        }
-                        if (!$scope.logFlight.ChocksOut && ($scope.logFlight.Landing || $scope.logFlight.ChocksIn)) {
-                            General.ShowNotify(Config.Text_TakeOff, 'error');
-                            return;
-                        }
-                        if (!$scope.logFlight.Landing && ($scope.logFlight.ChocksIn)) {
-                            General.ShowNotify(Config.Text_Landing, 'error');
-                            return;
-                        }
+                        $scope.leg4Text = "";
+                        $scope.leg4Visible = false;
+                        $scope.leg4Value = false;
 
+                        $scope.leg5Text = "";
+                        $scope.leg5Visible = false;
+                        $scope.leg5Value = false;
 
-                        if ($scope.logFlight.Takeoff && new Date($scope.logFlight.Takeoff) < new Date($scope.logFlight.ChocksOut)) {
-                            General.ShowNotify(Config.Text_TakeOff, 'error');
-                            return;
-                        }
-                        if ($scope.logFlight.Landing && new Date($scope.logFlight.Landing) < new Date($scope.logFlight.Takeoff)) {
-                            General.ShowNotify(Config.Text_Landing, 'error');
-                            return;
-                        }
-                        if ($scope.logFlight.ChocksIn && new Date($scope.logFlight.ChocksIn) < new Date($scope.logFlight.Landing)) {
-                            General.ShowNotify(Config.Text_OnBlock, 'error');
-                            return;
-                        }
-                        if ($scope.logFlight.FlightStatusID == 4 && !$scope.logFlight.CancelReasonId) {
-                            General.ShowNotify(Config.Text_CancelReason, 'error');
-                            return;
-                        }
-                         
+                        $scope.leg6Text = "";
+                        $scope.leg6Visible = false;
+                        $scope.leg6Value = false;
 
+                        $scope.leg7Text = "";
+                        $scope.leg7Visible = false;
+                        $scope.leg7Value = false;
 
-                        //////////////////////////////
-                        ///////////////////////////////
-                        var sumTotalDelayCodesAmount = 0;
-                        if (!$scope.dg_delay_ds)
-                            $scope.dg_delay_ds = [];
-                        //sati new
-                        sumTotalDelayCodesAmount = Enumerable.From($scope.dg_delay_ds).Select('$.Total').Sum();
-                        if (!$scope.logFlight.TotalDelayTotalMM)
-                            $scope.logFlight.TotalDelayTotalMM = 0;
+                        $scope.leg8Text = "";
+                        $scope.leg8Visible = false;
+                        $scope.leg8Value = false;
 
-                        if ($scope.logFlight.TotalDelayTotalMM > 5 && $scope.dg_delay_ds.length == 0) {
-                            // General.ShowNotify(Config.Text_DelayCodesNETotalDelay, 'error');
-                            // return;
-                        }
-
-                        if ($scope.dg_delay_ds) {
-                            if (!$scope.logFlight.TotalDelayTotalMM)
-                                $scope.logFlight.TotalDelayTotalMM = 0;
-                            sumTotalDelayCodesAmount = Enumerable.From($scope.dg_delay_ds).Select('$.Total').Sum();
-                            if ($scope.logFlight.FlightStatusID != 5 && (sumTotalDelayCodesAmount > 5 && sumTotalDelayCodesAmount != $scope.logFlight.TotalDelayTotalMM) && $scope.logFlight.ChocksOut) {
-                                //  General.ShowNotify(Config.Text_DelayCodesNETotalDelay, 'error');
-                                //  return;
-                            }
-                        }
-
-                        
-                        var dto = {
-                            StatusLog: [],
-                        };
-
-                         
-                        
-
-                        //if ($scope.timeBase == 'UTC') {
-                        //    var offset = -1 * (new Date()).getTimezoneOffset();
-
-                            
-
-                        //    $scope.flight.ChocksOut = (new Date($scope.flight.ChocksOut)).addMinutes(offset);
-                            
-                        //    $scope.flight.Takeoff = (new Date($scope.flight.Takeoff)).addMinutes(offset);
-                        //    $scope.flight.Landing = (new Date($scope.flight.Landing)).addMinutes(offset);
-                        //    $scope.flight.ChocksIn = (new Date($scope.flight.ChocksIn)).addMinutes(offset);
-
-                            
-                        //    if ($scope.time_redirect_value)
-                        //        $scope.time_redirect_value = (new Date($scope.time_redirect_value)).addMinutes(offset);
-                        //    if ($scope.time_ramp_value)
-                        //        $scope.time_ramp_value = (new Date($scope.time_ramp_value)).addMinutes(offset);
-
-                        //}
-
-
-                       
-                       
-                        //gabi
-                       
-                        $scope.fillDto(dto);
-                        $scope.fillLog(dto);
-                        
-                        dto.NightTime = $scope.logFlight.NightTime;
-                        dto.JLBLHH = $scope.logFlight.JLBLHH;
-                        dto.SendDelaySMS = $scope.sms_delay ? 1 : 0;
-                        dto.SendCancelSMS = $scope.sms_cancel ? 1 : 0;
-                        dto.SendNiraSMS = $scope.sms_nira ? 1 : 0;
-
-
-                        
                         $scope.loadingVisible = true;
-                        flightService.saveFlightLog(dto).then(function (response) {
-                            //doolkala
-                            //console.log('update log result');
-                             
-                            for (var key of Object.keys(response.flight)) {
-                                
-                                
-                                $scope.ati_flight[key]=response.flight[key];
-                            //console.log(key+'    '+response[key]+'     '+$scope.ati_flight[key]);
-                            }
-                            $scope.modifyFlightTimes($scope.ati_flight);
-                            $scope.modifyGantt ($scope.ati_flight,response.ressq[0]);
-                            //console.log($scope.ati_flight);
-                            //////////////////////////////////////////////////////////
-                            //if ($scope.timeBase == 'UTC' && $scope.doUTC) {
-
-                            //    var offset = -1 * (new Date()).getTimezoneOffset();
-
-                                 
-                            //    $scope.flight.ChocksOut = (new Date($scope.flight.ChocksOut)).addMinutes(-offset);
-
-                            //    $scope.flight.Takeoff = (new Date($scope.flight.Takeoff)).addMinutes(-offset);
-                            //    $scope.flight.Landing = (new Date($scope.flight.Landing)).addMinutes(-offset);
-                            //    $scope.flight.ChocksIn = (new Date($scope.flight.ChocksIn)).addMinutes(-offset);
-
-                                 
-                            //    if ($scope.time_redirect_value)
-                            //        $scope.time_redirect_value = (new Date($scope.time_redirect_value)).addMinutes(-offset);
-                            //    if ($scope.time_ramp_value)
-                            //        $scope.time_ramp_value = (new Date($scope.time_ramp_value)).addMinutes(-offset);
-
-
-
-                            //    if ($scope.flight.ChocksIn) {
-                            //        Flight.calculateDelayLandingOnBlock($scope.flight);
-                            //    }
-                            //    if ($scope.flight.ChocksOut)
-                            //        Flight.XcalculateDelayOffBlock($scope.flight);
-                            //    if ($scope.flight.ChocksIn)
-                            //        Flight.XcalculateDelayLandingOnBlock($scope.flight);
-                                 
-                            //    $scope.flight.EstimatedDelay = sumTotalDelayCodesAmount;
-
-                            //}
-                            ///////////////////////////////////////////////////////////
-
-
-                          
-                            $scope.getBoardSummary($scope.selectedDate);
-                            // $scope.before_refreshed_flight = null;
+                        flightService.getFlightsLine($scope.flight.ID).then(function (response) {
                             $scope.loadingVisible = false;
-                            $scope.sms_delay = false;
-                            $scope.sms_cancel = false;
-                            $scope.sms_nira = false;
-                            $scope.popup_log_visible = false;
-
-                            //$scope.calculateSummary();
+                            $.each(response, function (_i, _d) {
+                                $scope.line.push(_d);
+                                switch (_i) {
+                                    case 0:
+                                        $scope.leg1Text = _d.FlightNumber;
+                                        $scope.leg1Visible = true;
+                                        $scope.leg1Value = true;
+                                        break;
+                                    case 1:
+                                        $scope.leg2Text = _d.FlightNumber;
+                                        $scope.leg2Visible = true;
+                                        $scope.leg2Value = true;
+                                        break;
+                                    case 2:
+                                        $scope.leg3Text = _d.FlightNumber;
+                                        $scope.leg3Visible = true;
+                                        $scope.leg3Value = true;
+                                        break;
+                                    case 3:
+                                        $scope.leg4Text = _d.FlightNumber;
+                                        $scope.leg4Visible = true;
+                                        $scope.leg4Value = true;
+                                        break;
+                                    case 4:
+                                        $scope.leg5Text = _d.FlightNumber;
+                                        $scope.leg5Visible = true;
+                                        $scope.leg5Value = true;
+                                        break;
+                                    case 5:
+                                        $scope.leg6Text = _d.FlightNumber;
+                                        $scope.leg6Visible = true;
+                                        $scope.leg6Value = true;
+                                        break;
+                                    case 6:
+                                        $scope.leg7Text = _d.FlightNumber;
+                                        $scope.leg7Visible = true;
+                                        $scope.leg7Value = true;
+                                        break;
+                                    case 7:
+                                        $scope.leg8Text = _d.FlightNumber;
+                                        $scope.leg8Visible = true;
+                                        $scope.leg8Value = true;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                $scope.popup_jl_visible = true;
+                            });
 
                         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
 
 
-                        //  ganttObj.updateRecordByTaskId($scope.flight);
 
+                    }
+                }, toolbar: 'bottom'
+            }
+            ,
+
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Crew List', icon: '', onClick: function (e) {
+
+                        //tootnew 
+                        $scope.line = [];
+                        $scope.clShow = false;
+
+                        $scope.leg1Text = "";
+                        $scope.leg1Visible = false;
+                        $scope.leg1Value = false;
+
+                        $scope.leg2Text = "";
+                        $scope.leg2Visible = false;
+                        $scope.leg2Value = false;
+
+                        $scope.leg3Text = "";
+                        $scope.leg3Visible = false;
+                        $scope.leg3Value = false;
+
+                        $scope.leg4Text = "";
+                        $scope.leg4Visible = false;
+                        $scope.leg4Value = false;
+
+                        $scope.leg5Text = "";
+                        $scope.leg5Visible = false;
+                        $scope.leg5Value = false;
+
+                        $scope.leg6Text = "";
+                        $scope.leg6Visible = false;
+                        $scope.leg6Value = false;
+
+                        $scope.leg7Text = "";
+                        $scope.leg7Visible = false;
+                        $scope.leg7Value = false;
+
+                        $scope.leg8Text = "";
+                        $scope.leg8Visible = false;
+                        $scope.leg8Value = false;
+
+                        $scope.loadingVisible = true;
+                        flightService.getFlightsLine($scope.flight.ID).then(function (response) {
+                            $scope.loadingVisible = false;
+                            $.each(response, function (_i, _d) {
+                                $scope.line.push(_d);
+                                switch (_i) {
+                                    case 0:
+                                        $scope.leg1Text = _d.FlightNumber;
+                                        $scope.leg1Visible = true;
+                                        $scope.leg1Value = true;
+                                        break;
+                                    case 1:
+                                        $scope.leg2Text = _d.FlightNumber;
+                                        $scope.leg2Visible = true;
+                                        $scope.leg2Value = true;
+                                        break;
+                                    case 2:
+                                        $scope.leg3Text = _d.FlightNumber;
+                                        $scope.leg3Visible = true;
+                                        $scope.leg3Value = true;
+                                        break;
+                                    case 3:
+                                        $scope.leg4Text = _d.FlightNumber;
+                                        $scope.leg4Visible = true;
+                                        $scope.leg4Value = true;
+                                        break;
+                                    case 4:
+                                        $scope.leg5Text = _d.FlightNumber;
+                                        $scope.leg5Visible = true;
+                                        $scope.leg5Value = true;
+                                        break;
+                                    case 5:
+                                        $scope.leg6Text = _d.FlightNumber;
+                                        $scope.leg6Visible = true;
+                                        $scope.leg6Value = true;
+                                        break;
+                                    case 6:
+                                        $scope.leg7Text = _d.FlightNumber;
+                                        $scope.leg7Visible = true;
+                                        $scope.leg7Value = true;
+                                        break;
+                                    case 7:
+                                        $scope.leg8Text = _d.FlightNumber;
+                                        $scope.leg8Visible = true;
+                                        $scope.leg8Value = true;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                //doolzad
+                                if ($scope.IsPickup)
+                                    $scope.popup_cltrans_visible = true;
+                                else
+                                    //$scope.popup_cl_visible = true;
+                                    $scope.popup_clnew_visible = true;
+                            });
+
+                        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'History', bindingOptions: { disabled: 'IsApproved' }, visible: true, onClick: function (arg) {
+
+
+                        $scope.popup_history_visible = true;
                         /////////////////////////////////////
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Notify Pickup', bindingOptions: { disabled: 'IsApproved' }, visible: true, onClick: function (arg) {
+
+
+                        $scope.popup_notify_visible = true;
+                        /////////////////////////////////////
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Notify Crew', bindingOptions: { disabled: 'IsApproved' }, visible: true, onClick: function (arg) {
+
+
+                        $scope.popup_notify2_visible = true;
+                        /////////////////////////////////////
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Reporting Time', icon: 'clock', bindingOptions: { disabled: 'IsApproved' }, visible: true, onClick: function (arg) {
+
+
+                        $scope.popup_crew_visible = true;
+                        /////////////////////////////////////
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Save', icon: 'check', validationGroup: 'fbaclog', bindingOptions: { disabled: 'IsApproved' }, visible: true, onClick: function (arg) {
+
+                        //2020-11-22
+
+                        flightService.getFlightGUID($scope.logFlight.ID).then(function (response) {
+
+                            if ($scope.flightGUID != response) {
+                                General.ShowNotify('Your session expired. The Flight data changed by another user. please close this window and open again.', 'error');
+                                $scope.forceUpdate();
+                                return;
+                            }
+
+                            //2021-1-17
+
+                            if ($scope.IsRemark) {
+                                $scope.saveRemark();
+                                return;
+                            }
+                            ////////////////////////////
+                            //save method
+                            if (!$scope.logFlight.ChocksOut && ($scope.logFlight.FlightStatusID == 2 || $scope.logFlight.FlightStatusID == 3 || $scope.logFlight.FlightStatusID == 7 || $scope.logFlight.FlightStatusID == 9 || $scope.logFlight.FlightStatusID == 14 || $scope.logFlight.FlightStatusID == 15 || $scope.logFlight.FlightStatusID == 17)) {
+                                General.ShowNotify(Config.Text_OffBlock, 'error');
+                                return;
+                            }
+                            if (!$scope.logFlight.Takeoff && ($scope.logFlight.FlightStatusID == 2 || $scope.logFlight.FlightStatusID == 3 || $scope.logFlight.FlightStatusID == 7 || $scope.logFlight.FlightStatusID == 15 || $scope.logFlight.FlightStatusID == 17)) {
+                                General.ShowNotify(Config.Text_TakeOff, 'error');
+                                return;
+                            }
+                            if (!$scope.logFlight.Landing && ($scope.logFlight.FlightStatusID == 3 || $scope.logFlight.FlightStatusID == 15)) {
+                                General.ShowNotify(Config.Text_Landing, 'error');
+                                return;
+                            }
+                            if (!$scope.logFlight.ChocksIn && ($scope.logFlight.FlightStatusID == 15)) {
+                                General.ShowNotify(Config.Text_OnBlock, 'error');
+                                return;
+                            }
+
+
+
+                            if (!$scope.logFlight.ChocksOut && ($scope.logFlight.Takeoff || $scope.logFlight.Landing || $scope.logFlight.ChocksIn)) {
+                                General.ShowNotify(Config.Text_OffBlock, 'error');
+                                return;
+                            }
+                            if (!$scope.logFlight.ChocksOut && ($scope.logFlight.Landing || $scope.logFlight.ChocksIn)) {
+                                General.ShowNotify(Config.Text_TakeOff, 'error');
+                                return;
+                            }
+                            if (!$scope.logFlight.Landing && ($scope.logFlight.ChocksIn)) {
+                                General.ShowNotify(Config.Text_Landing, 'error');
+                                return;
+                            }
+
+
+                            if ($scope.logFlight.Takeoff && new Date($scope.logFlight.Takeoff) < new Date($scope.logFlight.ChocksOut)) {
+                                General.ShowNotify(Config.Text_TakeOff, 'error');
+                                return;
+                            }
+                            if ($scope.logFlight.Landing && new Date($scope.logFlight.Landing) < new Date($scope.logFlight.Takeoff)) {
+                                General.ShowNotify(Config.Text_Landing, 'error');
+                                return;
+                            }
+                            if ($scope.logFlight.ChocksIn && new Date($scope.logFlight.ChocksIn) < new Date($scope.logFlight.Landing)) {
+                                General.ShowNotify(Config.Text_OnBlock, 'error');
+                                return;
+                            }
+                            if ($scope.logFlight.FlightStatusID == 4 && !$scope.logFlight.CancelReasonId) {
+                                General.ShowNotify(Config.Text_CancelReason, 'error');
+                                return;
+                            }
+
+
+
+                            //////////////////////////////
+                            ///////////////////////////////
+                            var sumTotalDelayCodesAmount = 0;
+                            if (!$scope.dg_delay_ds)
+                                $scope.dg_delay_ds = [];
+                            //sati new
+                            sumTotalDelayCodesAmount = Enumerable.From($scope.dg_delay_ds).Select('$.Total').Sum();
+                            if (!$scope.logFlight.TotalDelayTotalMM)
+                                $scope.logFlight.TotalDelayTotalMM = 0;
+
+                            if ($scope.logFlight.TotalDelayTotalMM > 5 && $scope.dg_delay_ds.length == 0) {
+                                // General.ShowNotify(Config.Text_DelayCodesNETotalDelay, 'error');
+                                // return;
+                            }
+
+                            if ($scope.dg_delay_ds) {
+                                if (!$scope.logFlight.TotalDelayTotalMM)
+                                    $scope.logFlight.TotalDelayTotalMM = 0;
+                                sumTotalDelayCodesAmount = Enumerable.From($scope.dg_delay_ds).Select('$.Total').Sum();
+                                if ($scope.logFlight.FlightStatusID != 5 && (sumTotalDelayCodesAmount > 5 && sumTotalDelayCodesAmount != $scope.logFlight.TotalDelayTotalMM) && $scope.logFlight.ChocksOut) {
+                                    //  General.ShowNotify(Config.Text_DelayCodesNETotalDelay, 'error');
+                                    //  return;
+                                }
+                            }
+
+
+                            var dto = {
+                                StatusLog: [],
+                            };
+
+
+
+
+                            //if ($scope.timeBase == 'UTC') {
+                            //    var offset = -1 * (new Date()).getTimezoneOffset();
+
+
+
+                            //    $scope.flight.ChocksOut = (new Date($scope.flight.ChocksOut)).addMinutes(offset);
+
+                            //    $scope.flight.Takeoff = (new Date($scope.flight.Takeoff)).addMinutes(offset);
+                            //    $scope.flight.Landing = (new Date($scope.flight.Landing)).addMinutes(offset);
+                            //    $scope.flight.ChocksIn = (new Date($scope.flight.ChocksIn)).addMinutes(offset);
+
+
+                            //    if ($scope.time_redirect_value)
+                            //        $scope.time_redirect_value = (new Date($scope.time_redirect_value)).addMinutes(offset);
+                            //    if ($scope.time_ramp_value)
+                            //        $scope.time_ramp_value = (new Date($scope.time_ramp_value)).addMinutes(offset);
+
+                            //}
+
+
+
+
+                            //gabi
+
+                            $scope.fillDto(dto);
+                            $scope.fillLog(dto);
+
+                            dto.NightTime = $scope.logFlight.NightTime;
+                            dto.JLBLHH = $scope.logFlight.JLBLHH;
+                            dto.SendDelaySMS = $scope.sms_delay ? 1 : 0;
+                            dto.SendCancelSMS = $scope.sms_cancel ? 1 : 0;
+                            dto.SendNiraSMS = $scope.sms_nira ? 1 : 0;
+
+
+
+                            $scope.loadingVisible = true;
+                            flightService.saveFlightLog(dto).then(function (response) {
+                                //doolkala
+                                //console.log('update log result');
+
+                                for (var key of Object.keys(response.flight)) {
+
+
+                                    $scope.ati_flight[key] = response.flight[key];
+                                    //console.log(key+'    '+response[key]+'     '+$scope.ati_flight[key]);
+                                }
+                                $scope.modifyFlightTimes($scope.ati_flight);
+                                $scope.modifyGantt($scope.ati_flight, response.ressq[0]);
+                                //console.log($scope.ati_flight);
+                                //////////////////////////////////////////////////////////
+                                //if ($scope.timeBase == 'UTC' && $scope.doUTC) {
+
+                                //    var offset = -1 * (new Date()).getTimezoneOffset();
+
+
+                                //    $scope.flight.ChocksOut = (new Date($scope.flight.ChocksOut)).addMinutes(-offset);
+
+                                //    $scope.flight.Takeoff = (new Date($scope.flight.Takeoff)).addMinutes(-offset);
+                                //    $scope.flight.Landing = (new Date($scope.flight.Landing)).addMinutes(-offset);
+                                //    $scope.flight.ChocksIn = (new Date($scope.flight.ChocksIn)).addMinutes(-offset);
+
+
+                                //    if ($scope.time_redirect_value)
+                                //        $scope.time_redirect_value = (new Date($scope.time_redirect_value)).addMinutes(-offset);
+                                //    if ($scope.time_ramp_value)
+                                //        $scope.time_ramp_value = (new Date($scope.time_ramp_value)).addMinutes(-offset);
+
+
+
+                                //    if ($scope.flight.ChocksIn) {
+                                //        Flight.calculateDelayLandingOnBlock($scope.flight);
+                                //    }
+                                //    if ($scope.flight.ChocksOut)
+                                //        Flight.XcalculateDelayOffBlock($scope.flight);
+                                //    if ($scope.flight.ChocksIn)
+                                //        Flight.XcalculateDelayLandingOnBlock($scope.flight);
+
+                                //    $scope.flight.EstimatedDelay = sumTotalDelayCodesAmount;
+
+                                //}
+                                ///////////////////////////////////////////////////////////
+
+
+
+                                $scope.getBoardSummary($scope.selectedDate);
+                                // $scope.before_refreshed_flight = null;
+                                $scope.loadingVisible = false;
+                                $scope.sms_delay = false;
+                                $scope.sms_cancel = false;
+                                $scope.sms_nira = false;
+                                //razbani
+                                //flightService.notifyDelay2($scope.ati_flight.ID).then(function (response) {
+
+
+                                //}, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                                ///////////////////////
+                                //2021-06-28 2021-06-29 MVT
+                                //UserName
+                                flightService.sendMVT($scope.ati_flight.ID, dto.UserName).then(function (response) {
+
+
+                                }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                                //////////////////////////
+                                $scope.popup_log_visible = false;
+
+                                //$scope.calculateSummary();
+
+                            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+
+
+                            //  ganttObj.updateRecordByTaskId($scope.flight);
+
+                            /////////////////////////////////////
+                            ///////////////////////////////
+                            ///////////////////////////////
+
+                        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+
+
+
                     }
                 }, toolbar: 'bottom'
             },
@@ -8048,35 +9311,12 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         },
         onShowing: function (e) {
-            $scope.IsSave=$scope.IsEditable || $scope.IsStaion;
-            if ($scope.IsStaion)
-            {
-               
-                $scope.IsSave=$scope.logFlight.FromAirportIATA==$rootScope.Station || $scope.logFlight.ToAirportIATA==$rootScope.Station;
+            $scope.IsSave = $scope.IsEditable || $scope.IsStaion;
+            if ($scope.IsStaion) {
+
+                $scope.IsSave = $scope.logFlight.FromAirportIATA == $rootScope.Station || $scope.logFlight.ToAirportIATA == $rootScope.Station;
             }
             $scope.popup_log_instance.repaint();
-            //sepehr
-            //if ($scope.logFlight.ChocksOut)
-            //    $scope.flightOffBlock2 = $scope.logFlight.ChocksOut;
-            //if (!$scope.flightOffBlock2) {
-
-            //    $scope.flightOffBlock2 = $scope.logFlight.STD;
-            //}
-
-             
-
-            //$scope.flightTakeOff2 = $scope.logFlight.Takeoff;
-            //if (!$scope.flightTakeOff2)
-            //    $scope.flightTakeOff2 = $scope.logFlight.STD;
-            //$scope.flightOnBlock2 = $scope.logFlight.ChocksIn;
-            //if (!$scope.flightOnBlock2)
-            //    $scope.flightOnBlock2 = $scope.logFlight.STA;
-
-
-            //$scope.flightLanding2 = $scope.logFlight.Landing;
-            //if (!$scope.flightLanding2)
-            //    $scope.flightLanding2 = $scope.logFlight.STA;
-
 
 
             if ($scope.logFlight.FlightStatusID == 4) {
@@ -8086,24 +9326,24 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 if ($scope.logFlight.FlightStatusID == 9) {
                     $scope.time_status_value = new Date($scope.logFlight.RampDate);
                 }
-             
+
             if ($scope.logFlight.RedirectReasonId) {
 
                 $scope.time_redirect_value = new Date($scope.logFlight.RedirectDate);
                 $scope.entity_redirect.AirportId = $scope.logFlight.ToAirport;
-                 
+
             }
             //hook
 
             $scope.depReadOnly = false;
-             
+
 
         },
         onShown: function (e) {
             $scope.loadingVisible = true;
             flightService.getFlightDelays($scope.logFlight.ID).then(function (response) {
                 $scope.loadingVisible = false;
-                 
+
                 $.each(response, function (_i, _d) {
 
                     var dc = {
@@ -8123,10 +9363,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 });
 
                 $scope.convertUTCEnabled = true;
-                if ($scope.doUTC)
-                { $scope.timeBase = 'UTC'; }
-                else
-                { $scope.timeBase = 'LCB'; }
+                if ($scope.doUTC) { $scope.timeBase = 'UTC'; }
+                else { $scope.timeBase = 'LCB'; }
 
                 //sooki
 
@@ -8185,6 +9423,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             'toolbarItems[5].visible': 'IsEditable',
             'toolbarItems[6].visible': 'IsSave',
 
+
         }
     };
 
@@ -8193,7 +9432,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     ///////////////////////////////////
 
 
- 
+
     //*********************************8/////
     $scope.dg_selected = null;
     $scope.dg_columns = [
@@ -8430,13 +9669,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
 
     //////////////////////////////////////////
-    //2020-10-27
+    //2020-10-27 1 s
     $scope.dg_crew_abs_columns = [
         //{
         //    caption: 'Crew', columns: [
         //         { dataField: 'IsPositioning', caption: 'DH', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width: 55 },
         //        { dataField: 'Position', caption: 'Pos.', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 75, fixed: true, fixedPosition: 'left' },
-               
+
         //        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
         //         { dataField: 'Mobile', caption: 'Mobile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, visible: $scope.IsCrewMobileVisible },
         //           {
@@ -8449,16 +9688,16 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         //    ]
         //}
-                  { dataField: 'IsPositioning', caption: 'DH', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width: 55 },
-                { dataField: 'Position', caption: 'Pos.', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 75, fixed: true, fixedPosition: 'left' },
-               
-                { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
-                 { dataField: 'Mobile', caption: 'Mobile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, visible: $scope.IsCrewMobileVisible },
-                   {
-                       dataField: 'RP', caption: 'Pickup', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: true, width: 120, editorOptions: {
-                           type: "time"
-                       }, format: "HH:mm"
-                   },
+        { dataField: 'IsPositioning', caption: 'DH', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width: 55 },
+        { dataField: 'Position', caption: 'Pos.', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 75, fixed: true, fixedPosition: 'left' },
+
+        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Mobile', caption: 'Mobile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, visible: $scope.IsCrewMobileVisible },
+        {
+            dataField: 'RP', caption: 'Pickup', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: true, width: 120, editorOptions: {
+                type: "time"
+            }, format: "HH:mm"
+        },
     ];
     $scope.dg_crew_abs_selected = null;
     $scope.dg_crew_abs_instance = null;
@@ -8485,7 +9724,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         selection: { mode: 'single' },
 
         columnAutoWidth: false,
-        //2020-10-27
+        //2020-10-27 1 s
         height: 234,// $(window).height() - 250,// 490 
 
         columns: $scope.dg_crew_abs_columns,
@@ -8598,7 +9837,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 //  { dataField: 'HH', caption: 'Hour(s)', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: true, width: 80 },
                 { dataField: 'Amount', caption: 'Amount', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 80 },
 
-      //  { dataField: 'Remark', caption: 'Remark', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, },
+                //  { dataField: 'Remark', caption: 'Remark', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, },
 
             ]
         }
@@ -8871,7 +10110,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     };
     ////////////////////////////////////////////////////
-    
+
     //jooj
     $scope.getReporting = function (fid) {
 
@@ -8920,8 +10159,11 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
     };
     $scope.getCrewAbs = function (fid) {
-       
-
+        //5-8
+        if (!$rootScope.HasAccessToCrewList()) {
+            $scope.dg_crew_abs_ds = [];
+            return;
+        }
         var archived_crews = 0;
         if (new Date($scope.logFlight.Date) < new Date(2020, 6, 1, 0, 0, 0, 0))
             archived_crews = 1;
@@ -8939,7 +10181,10 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
     };
     $scope.getCrewAbs2 = function (fid) {
-
+        if (!$rootScope.HasAccessToCrewList()) {
+            $scope.dg_crew_abs2_ds = [];
+            return;
+        }
 
         $scope.loadingVisible = true;
         flightService.getFlightCrew2(fid).then(function (response) {
@@ -8984,7 +10229,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
     $scope.dg_crew_columns = [
 
-         { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130, },
+        { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130, },
         { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, },
         //{ dataField: 'PID', caption: 'PID', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80, fixed: true, fixedPosition: 'left' },
 
@@ -9250,31 +10495,31 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
     $scope.dg_chistory_columns = [
 
-      { dataField: 'Date', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 150, format: 'yy-MMM-dd HH:mm', sortIndex: 0, sortOrder: 'asc', fixed: false, fixedPosition: 'left' },
-       { dataField: 'User', caption: 'User', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
-      { dataField: 'NewFlightNumber', caption: 'Flight No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80, },
+        { dataField: 'Date', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 150, format: 'yy-MMM-dd HH:mm', sortIndex: 0, sortOrder: 'asc', fixed: false, fixedPosition: 'left' },
+        { dataField: 'User', caption: 'User', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
+        { dataField: 'NewFlightNumber', caption: 'Flight No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80, },
         { dataField: 'NewFromAirport', caption: 'From', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
         { dataField: 'NewToAirport', caption: 'To', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
         { dataField: 'OldRegister', caption: 'Old Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
-         { dataField: 'NewRegister', caption: 'New Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
-           { dataField: 'OldSTD', caption: 'Old STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
-         { dataField: 'NewSTD', caption: 'New STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
-          { dataField: 'OldSTA', caption: 'Old STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
-         { dataField: 'NewSTA', caption: 'New STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
-          { dataField: 'OldStatus', caption: 'Old Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, },
+        { dataField: 'NewRegister', caption: 'New Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
+        { dataField: 'OldSTD', caption: 'Old STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
+        { dataField: 'NewSTD', caption: 'New STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+        { dataField: 'OldSTA', caption: 'Old STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
+        { dataField: 'NewSTA', caption: 'New STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+        { dataField: 'OldStatus', caption: 'Old Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, },
         { dataField: 'NewStatus', caption: 'New Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, },
 
-           { dataField: 'OldOffBlock', caption: 'Old OffBlock', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
-         { dataField: 'NewOffBlock', caption: 'New OffBlock', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+        { dataField: 'OldOffBlock', caption: 'Old OffBlock', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
+        { dataField: 'NewOffBlock', caption: 'New OffBlock', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
 
-            { dataField: 'OldTakeOff', caption: 'Old TakeOff', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
-         { dataField: 'NewTakeOff', caption: 'New TakeOff', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+        { dataField: 'OldTakeOff', caption: 'Old TakeOff', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
+        { dataField: 'NewTakeOff', caption: 'New TakeOff', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
 
-            { dataField: 'OldLanding', caption: 'Old Landing', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
-         { dataField: 'NewLanding', caption: 'New Landing', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+        { dataField: 'OldLanding', caption: 'Old Landing', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
+        { dataField: 'NewLanding', caption: 'New Landing', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
 
-            { dataField: 'OldOnBlock', caption: 'Old OnBlock', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
-         { dataField: 'NewOnBlock', caption: 'New OnBlock', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+        { dataField: 'OldOnBlock', caption: 'Old OnBlock', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
+        { dataField: 'NewOnBlock', caption: 'New OnBlock', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
 
 
         { dataField: 'OldFlightNumber', caption: 'Old Flight No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80, },
@@ -9618,18 +10863,20 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         toolbarItems: [
 
 
-             {
-                 widget: 'dxButton', location: 'after', options: {
-                     type: 'default', text: 'Update', icon: 'save', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Update', icon: 'save', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
 
 
-                         printElem($('#jl'));
+                        //printElem($('#jl'));
+                        //bahrami-6-2
+                        $scope.popup_jledit_visible = true;
 
-                     }
+                    }
 
 
-                 }, toolbar: 'bottom'
-             },
+                }, toolbar: 'bottom'
+            },
 
             {
                 widget: 'dxButton', location: 'after', options: {
@@ -9638,7 +10885,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                         printElem($('#jl'));
                         //var jsPDF = window.jspdf.jsPDF;
-                         
+
 
                         //var doc = new jsPDF();
 
@@ -9718,20 +10965,22 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         toolbarItems: [
 
 
-             {
-                 widget: 'dxButton', location: 'after', options: {
-                     type: 'default', text: 'Edit', icon: 'edit', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Edit', icon: 'edit', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
 
-                         if ($scope.cl && $scope.cl.crews && $scope.cl.crews.length > 0) {
-                             $scope.popup_cledit_visible = true;
-                         }
+                        if ($scope.cl && $scope.cl.crews && $scope.cl.crews.length > 0) {
+                           
+
+                            $scope.popup_cledit_visible = true;
+                        }
 
 
-                     }
+                    }
 
 
-                 }, toolbar: 'bottom'
-             },
+                }, toolbar: 'bottom'
+            },
 
             {
                 widget: 'dxButton', location: 'after', options: {
@@ -9762,7 +11011,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         },
         onHiding: function () {
-
+           
 
             $scope.popup_cl_visible = false;
 
@@ -9771,6 +11020,82 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             visible: 'popup_cl_visible',
 
             title: 'popup_cl_title',
+            'toolbarItems[0].visible': 'IsEditable',
+            //'toolbarItems[1].visible': 'IsEditable',
+
+        }
+    };
+    ////////////////////////////////
+    $scope.popup_clnew_visible = false;
+    $scope.popup_clnew_title = 'Crew List';
+    $scope.popup_clnew = {
+        shading: true,
+        width: 820,
+        height: function () { return $(window).height() * 1 },
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+        toolbarItems: [
+
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Edit', icon: 'edit', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
+
+                        if ($scope.cl && $scope.cl.crews && $scope.cl.crews.length > 0) {
+                            //kabiri
+                            if ($scope.cl.crewsAll.length < 23)
+                                for (var i = $scope.cl.crewsAll.length; i < 23; i++) {
+                                    $scope.cl.crewsAll.push({ Position: ' ', Name: ' ' });
+                                }
+                            $scope.popup_cledit_visible = true;
+                        }
+
+
+                    }
+
+
+                }, toolbar: 'bottom'
+            },
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Print', icon: 'print', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
+
+
+                        printElem($('#clnew'));
+
+                    }
+
+
+                }, toolbar: 'bottom'
+            },
+
+
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) { $scope.popup_clnew_visible = false; } }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onShowing: function (e) {
+            $scope.scroll_cl_height = $(window).height() - 10 - 110;
+
+        },
+        onShown: function (e) {
+
+
+        },
+        onHiding: function () {
+
+
+            $scope.popup_clnew_visible = false;
+
+        },
+        bindingOptions: {
+            visible: 'popup_clnew_visible',
+
+            title: 'popup_clnew_title',
             'toolbarItems[0].visible': 'IsEditable',
             //'toolbarItems[1].visible': 'IsEditable',
 
@@ -9789,20 +11114,20 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         toolbarItems: [
 
 
-             {
-                 widget: 'dxButton', location: 'after', options: {
-                     type: 'default', text: 'Edit', icon: 'edit', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Edit', icon: 'edit', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
 
-                         if ($scope.cl && $scope.cl.crews && $scope.cl.crews.length > 0) {
-                             $scope.popup_cledit_visible = true;
-                         }
-
-
-                     }
+                        if ($scope.cl && $scope.cl.crews && $scope.cl.crews.length > 0) {
+                            $scope.popup_cledit_visible = true;
+                        }
 
 
-                 }, toolbar: 'bottom'
-             },
+                    }
+
+
+                }, toolbar: 'bottom'
+            },
 
             {
                 widget: 'dxButton', location: 'after', options: {
@@ -9877,23 +11202,31 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             value: 'cl.actype'
         }
     };
-
+    //kabiri
+    $scope.gd_remark = {
+        height:60,
+        bindingOptions: {
+            value: 'cl.remark'
+        }
+    };
+    $scope.gd_user = {
+        
+        bindingOptions: {
+            value: 'cl.user'
+        }
+    };
     $scope.popup_cledit_visible = false;
-    $scope.popup_cledit_title = 'Crew List';
+    $scope.popup_cledit_title = 'GD';
     $scope.popup_cledit = {
         shading: true,
         width: 700,
-        height: 700,
+        //kabiri
+        height: 770,
         fullScreen: false,
         showTitle: true,
         dragEnabled: true,
         toolbarItems: [
-
-
-
-
-
-
+ 
 
             { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) { $scope.popup_cledit_visible = false; } }, toolbar: 'bottom' }
         ],
@@ -9911,7 +11244,11 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         },
         onHiding: function () {
 
-
+            //kabiri
+           
+            $scope.cl.crewsAll = Enumerable.From($scope.cl.crewsAll).Where('$.Position.trim()').ToArray();
+             
+            $scope.generateGDTables($scope.cl.crewsAll);
             $scope.popup_cledit_visible = false;
 
         },
@@ -9923,12 +11260,20 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         }
     };
-
+    //kabiri
     $scope.dg_cledit_columns = [
 
-                 { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: true, },
-                { dataField: 'Position', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 75, },
-                { dataField: 'PID', caption: 'ID No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 120, },
+        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: true, },
+        { dataField: 'PositionId', caption: 'Pos', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: true, width: 100, },
+        {
+            dataField: 'Position', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 140,
+            lookup: {
+                dataSource: $scope.OrderGD,
+
+            }
+        },
+        { dataField: 'PID', caption: 'ID No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 120, },
+       
 
     ];
     $scope.dg_cledit_selected = null;
@@ -9985,7 +11330,304 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
 
         bindingOptions: {
-            dataSource: 'cl.crews',
+            //kabiri
+            dataSource: 'cl.crewsAll',
+
+        }
+    };
+    ////////////////////////////////
+    //bahrami-6-2
+    $scope.popup_jledit_visible = false;
+    $scope.popup_jledit_title = 'Crew List';
+    $scope.popup_jledit = {
+        shading: true,
+        width: 700,
+        height: 700,
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+        toolbarItems: [
+
+
+
+
+
+
+
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) { $scope.popup_jledit_visible = false; } }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onShowing: function (e) {
+            // $scope.scroll_cl_height = $(window).height() - 10 - 110;
+
+        },
+        onShown: function (e) {
+            $scope.dg_jledit_instance.refresh();
+
+        },
+        onHiding: function () {
+
+
+            $scope.popup_jledit_visible = false;
+
+        },
+        bindingOptions: {
+            visible: 'popup_jledit_visible',
+
+            title: 'popup_jledit_title',
+
+
+        }
+    };
+
+
+    $scope.OrderCockpit = ['IP', 'CPT', 'FO', 'SO', 'CHECK', 'OBS', 'DH'];
+    $scope.OrderCabin = ['ISCCM', 'SCCM', 'CCM',  'CHECK', 'OBS', 'DH'];
+    $scope.refreshJlCrews = function () {
+        var cockpit = [];
+        var cabin = [];
+        $.each($scope.jl.crews, function (_i, _d) {
+            if (_d.cockpit.Name)
+                cockpit.push(JSON.parse( JSON.stringify( _d.cockpit)));
+            if (_d.cabin.Name)
+                cabin.push(JSON.parse(JSON.stringify(_d.cabin)));
+
+        });
+        cockpit = Enumerable.From(cockpit).OrderBy(function (x) { var idx = $scope.OrderCockpit.indexOf(x.Position); return idx == -1 ? 1000 : idx; }).ToArray();
+        cabin = Enumerable.From(cabin).OrderBy(function (x) { var idx = $scope.OrderCabin.indexOf(x.Position); return idx == -1 ? 1000 : idx; }).ToArray();
+        $scope.jl.crews = [];
+        var j = 8;
+        for (var i = 0; i < j; i++) {
+            var ca = {};
+            if (cabin.length > i)
+                ca = cabin[i];
+
+            var co = {};
+            if (cockpit.length > i)
+                co = cockpit[i];
+
+            //////////////////////////////////
+            if (co.Position == "Captain")
+                co.Position = "CPT";
+            // if (co.JobGroup == "TRE" || co.JobGroup == "TRI" || co.JobGroup == "LTC")
+
+            // co.Position = 'IP';
+            if (co.IsPositioning)
+                co.Position = 'DH';
+            //////////////////////////////////
+
+
+            if (ca.Position && ca.Position == 'Purser')
+                ca.Position = 'SCCM';
+            if (ca.Position && ca.Position == 'FA')
+                ca.Position = 'CCM';
+            if (ca.JobGroup == "ISCCM")
+                ca.Position = "ISCCM";
+
+            if (ca.IsPositioning)
+                ca.Position = 'DH';
+
+            // bahrami-6-2
+            if (!ca.Name) { ca.Name = ''; ca.Position = ''; }
+            if (!co.Name) { co.Name = ''; co.Position = ''; }
+            $scope.jl.crews.push({ cabin: ca, cockpit: co });
+
+
+        }
+    };
+    $scope.dg_jledit_columns = [
+
+        { dataField: 'Name', caption: 'Cockpit', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: true, },
+        {
+            dataField: 'Position', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 135,
+            lookup: {
+                dataSource: ['IP','CPT','FO','SO','CHECK','OBS','DH'],
+               
+            }
+        },
+       // { dataField: 'PID', caption: 'ID No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 120, },
+
+    ];
+    $scope.dg_jledit_selected = null;
+    $scope.dg_jledit_instance = null;
+    $scope.dg_jledit_ds = null;
+    $scope.dg_jledit = {
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: false,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+        editing: {
+            allowAdding: false,
+            allowDeleting: true,
+            allowUpdating: true,
+            confirmDelete: true,
+            mode: 'row',
+        },
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: 270,// $(window).height() - 250,// 490 
+
+        columns: $scope.dg_jledit_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_jledit_instance)
+                $scope.dg_jledit_instance = e.component;
+
+        },
+        onSelectionChanged: function (e) {
+            var data = e.selectedRowsData[0];
+
+            if (!data) {
+                $scope.dg_jledit_selected = null;
+
+            }
+            else {
+                $scope.dg_jledit_selected = data;
+
+            }
+        },
+        onRowRemoved: function (e) {
+             
+            var rowcockpit = Enumerable.From($scope.jl.crews).Where(function (x) { return x.cockpit.Name == e.data.Name && x.cockpit.Position == e.data.Position }).FirstOrDefault();
+            if (rowcockpit) {
+                 
+                rowcockpit.cockpit.Name = ''; rowcockpit.cockpit.Position = '';
+            }
+            $scope.refreshJlCrews();
+
+        },
+        onRowUpdating: function (e) {
+            
+            var rowcockpit = Enumerable.From($scope.jl.crews).Where(function (x) { return x.cockpit.Name == e.oldData.Name && x.cockpit.Position == e.oldData.Position }).FirstOrDefault();
+            if (!rowcockpit) {
+
+                rowcockpit = Enumerable.From($scope.jl.crews).Where(function (x) { return x.cockpit.Name == '' && x.cockpit.Position == '' }).FirstOrDefault();
+                rowcockpit.cockpit = { Name: e.newData.Name, Position: e.newData.Position };
+               
+                
+            }
+            else {
+                rowcockpit.cockpit.Name = e.newData.Name ? e.newData.Name : rowcockpit.cockpit.Name;
+                rowcockpit.cockpit.Position = e.newData.Position ? e.newData.Position : rowcockpit.cockpit.Position;
+            }
+            $scope.refreshJlCrews();
+        },
+
+        bindingOptions: {
+            dataSource: 'jl.crewscockpit',
+
+        }
+    };
+
+    $scope.dg_jledit_columns2 = [
+
+        { dataField: 'Name', caption: 'Cabin', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: true, },
+        {
+            dataField: 'Position', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 135,
+            lookup: {
+                dataSource: ['ISCCM', 'SCCM', 'CCM',  'CHECK', 'OBS', 'DH'],
+
+            }
+        },
+        // { dataField: 'PID', caption: 'ID No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 120, },
+
+    ];
+    $scope.dg_jledit_selected2 = null;
+    $scope.dg_jledit_instance2 = null;
+    $scope.dg_jledit_ds2 = null;
+    $scope.dg_jledit2 = {
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: false,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+        editing: {
+            allowAdding: false,
+            allowDeleting: true,
+            allowUpdating: true,
+            confirmDelete: true,
+            mode: 'row',
+        },
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: 270,// $(window).height() - 250,// 490 
+
+        columns: $scope.dg_jledit_columns2,
+        onContentReady: function (e) {
+            if (!$scope.dg_jledit_instance2)
+                $scope.dg_jledit_instance2 = e.component;
+
+        },
+        onSelectionChanged: function (e) {
+            var data = e.selectedRowsData[0];
+
+            if (!data) {
+                $scope.dg_jledit_selected2 = null;
+
+            }
+            else {
+                $scope.dg_jledit_selected2 = data;
+
+            }
+        },
+        onRowRemoved: function (e) {
+
+            var rowcockpit = Enumerable.From($scope.jl.crews).Where(function (x) { return x.cabin.Name == e.data.Name && x.cabin.Position == e.data.Position }).FirstOrDefault();
+            if (rowcockpit) {
+
+                rowcockpit.cabin.Name = ''; rowcockpit.cabin.Position = '';
+            }
+            $scope.refreshJlCrews();
+
+        },
+        onRowUpdating: function (e) {
+
+            var rowcockpit = Enumerable.From($scope.jl.crews).Where(function (x) { return x.cabin.Name == e.oldData.Name && x.cabin.Position == e.oldData.Position }).FirstOrDefault();
+            if (!rowcockpit) {
+
+                rowcockpit = Enumerable.From($scope.jl.crews).Where(function (x) { return x.cabin.Name == '' && x.cabin.Position == '' }).FirstOrDefault();
+                rowcockpit.cabin = { Name: e.newData.Name, Position: e.newData.Position };
+
+
+            }
+            else {
+                rowcockpit.cabin.Name = e.newData.Name ? e.newData.Name : rowcockpit.cabin.Name;
+                rowcockpit.cabin.Position = e.newData.Position ? e.newData.Position : rowcockpit.cabin.Position;
+            }
+            $scope.refreshJlCrews();
+        },
+
+        bindingOptions: {
+            dataSource: 'jl.crewscabin',
 
         }
     };
@@ -10097,7 +11739,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
 
 
-    
+
     //////////////////////////////////
     $scope.loadingVisible = false;
     $scope.loadPanel = {
@@ -10230,12 +11872,12 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.showButtons = function (item) {
         $scope.IsDepartureDisabled = false;
         $scope.IsArrivalDisabled = false;
-     
+
     };
     $scope.showButtons2 = function (item) {
         $scope.IsDepartureDisabled = false;
         $scope.IsArrivalDisabled = false;
-       
+
 
     };
     $scope.weatherUpdateTime = null;
@@ -10379,7 +12021,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 $scope.setWeather();
 
             $scope.doGridSelectedChanged = false;
-           
+
 
             $scope.showLog(true);
         }
@@ -10558,7 +12200,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
             if (/*!$scope.IsUTC*/$scope.doUTC)
                 sech = getLocalHour($dhour);
-                //sech = getUTCHour($dhour);
+            //sech = getUTCHour($dhour);
             else
                 sech = getUTCHour($dhour);
             var newc = "<span style='font-size:10px;display:block;color:gray;text-align:left;padding-left:" + tleft + "px'>" + sech + "</span>" + "<span style='font-size:13px;display:block;position:relative;top:-5px'>" + oldc + "</span>";
@@ -10578,7 +12220,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.firstCreate = true;
 
 
-   
+
 
 
     //////////////////////////////////////////
@@ -10595,8 +12237,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     });
 
 
-   
-    
+
+
 
     ////////////////////////////////////////
     //atinote
@@ -10605,14 +12247,14 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.dsNotificationType = [
         { Id: 10010, Title: 'Pickup Time Notification' },
         { Id: 10011, Title: 'New Pickup Time Notification' },
-         { Id: 10012, Title: 'Pickup Stand by Notification' },
-          { Id: 10013, Title: 'اعلام تاخیر' },
-           { Id: 10017, Title: 'اعلام حضور' },
+        { Id: 10012, Title: 'Pickup Stand by Notification' },
+        { Id: 10013, Title: 'اعلام تاخیر' },
+        { Id: 10017, Title: 'اعلام حضور' },
     ];
 
     $scope.dsNotificationType2 = [
-       { Id: 10014, Title: 'Cancelling Notification' },
-       { Id: 10015, Title: 'Delay Notification' },
+        { Id: 10014, Title: 'Cancelling Notification' },
+        { Id: 10015, Title: 'Delay Notification' },
         { Id: 10016, Title: 'Operation Notification' },
 
     ];
@@ -10659,12 +12301,12 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                 //$scope.Notify.Message = "با سلام و احترام، به استحضار می رساند پرواز شماره (" + $scope.flight.FlightNumber + ") به مقصد (" + $scope.flight.ToAirportIATA + ")  تا اطلاع بعدی تاخیر دارد لطفاً تا دریافت تایم جدید تامل فرمایید . با تشکر واحد ترانسپورت";
                 $scope.Notify.Message = "با سلام و احترام، کرو پرواز شماره "
-                + $scope.flight.FlightNumber
-                + " "
-                + "زمان حضور شما در ترمینال ساعت "
-                + "#Time"
-                + " "
-                +"می باشد";
+                    + $scope.flight.FlightNumber
+                    + " "
+                    + "زمان حضور شما در ترمینال ساعت "
+                    + "#Time"
+                    + " "
+                    + "می باشد";
                 break;
             default: break;
 
@@ -10759,7 +12401,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                                 });
                                 //$scop.dg_emp_instance.refresh();
-                              
+
                                 General.ShowNotify(Config.Text_SavedOk, 'success');
 
                                 //$scope.Notify = {
@@ -10787,7 +12429,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 $scope.start();
                                 //***************************
                             });
-                        
+
 
 
 
@@ -10885,7 +12527,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             visible: 'popup_notify_visible',
 
             title: 'popup_notify_title',
-            
+
 
         }
     };
@@ -10903,11 +12545,11 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                 $scope.Notify2.Message = "Dear #Crew,\n" + "The flight " + $scope.flight.FlightNumber + " " + $scope.flight.FromAirportIATA + "-" + $scope.flight.ToAirportIATA + " is canceled.\n" + $rootScope.userName;
                 break;
-                //delay
+            //delay
             case 10015:
 
                 $scope.Notify2.Message = "Dear #Crew,\n" + "The flight " + $scope.flight.FlightNumber + " " + $scope.flight.FromAirportIATA + "-" + $scope.flight.ToAirportIATA + " is delayed.\n"
-                + "New Dep:" + $scope.momenttime($scope.flightOffBlock2) + "\n" + $rootScope.userName;
+                    + "New Dep:" + $scope.momenttime($scope.flightOffBlock2) + "\n" + $rootScope.userName;
                 break;
             case 10016:
 
@@ -10938,8 +12580,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     };
     $scope.dsNotificationType2 = [
-       { Id: 10014, Title: 'Cancelling Notification' },
-       { Id: 10015, Title: 'Delay Notification' },
+        { Id: 10014, Title: 'Cancelling Notification' },
+        { Id: 10015, Title: 'Delay Notification' },
         { Id: 10016, Title: 'Operation Notification' },
 
     ];
@@ -10974,33 +12616,34 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.dg_emp2_columns = [
 
         { dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, },
-          { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', },
+        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', },
         //  { dataField: 'Mobile', caption: 'Monile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
 
 
     ];
     $scope.dg_emp3_columns = [
 
-       { dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, },
-         { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', },
-       //  { dataField: 'Mobile', caption: 'Monile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
+        { dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, },
+        { dataField: 'Mobile', caption: 'Mobile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, },
+        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 250 },
+
 
 
     ];
     $scope.dg_history_columns = [
 
         //{ dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, },
-          { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 200 },
+        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 200 },
         //  { dataField: 'Mobile', caption: 'Monile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
 
 
-       { dataField: 'Status', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
-         { dataField: 'TypeStr', caption: 'Type', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
-           { dataField: 'Message', caption: 'Message', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 500 },
+        { dataField: 'Status', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'TypeStr', caption: 'Type', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Message', caption: 'Message', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 500 },
 
         { dataField: 'RefId', caption: 'Ref', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
         { dataField: 'DateSent', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 120, /*format: 'EEE MM-dd'*/ format: 'MM-dd HH:mm', sortIndex: 0, sortOrder: "desc" },
-         { dataField: 'Sender', caption: 'Sender', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 200 },
+        { dataField: 'Sender', caption: 'Sender', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 200 },
 
     ];
 
@@ -11242,7 +12885,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 //kiro
 
                             });
-                           
+
 
 
                             $scope.Notify2.SenderName = $rootScope.userName;
@@ -11261,8 +12904,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                                 ///7-20//////////////
                                 $scope.Notify2.Names2 = [],
-                                $scope.Notify2.Mobiles2 = [],
-                                $scope.Notify2.Messages2 = [];
+                                    $scope.Notify2.Mobiles2 = [],
+                                    $scope.Notify2.Messages2 = [];
                                 //////////////////////
 
                                 $scope.Notify2.Message = null;
@@ -11327,7 +12970,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 //kiro
 
                             });
-                           
+
                             $scope.Notify2.SenderName = $rootScope.userName;
                             $scope.loadingVisible = true;
                             notificationService.notifyFlight($scope.Notify2).then(function (response) {
@@ -11343,8 +12986,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 $scope.Notify2.FDPs = [];
                                 ///7-20//////////////
                                 $scope.Notify2.Names2 = [],
-                                $scope.Notify2.Mobiles2 = [],
-                                $scope.Notify2.Messages2 = [];
+                                    $scope.Notify2.Mobiles2 = [],
+                                    $scope.Notify2.Messages2 = [];
                                 //////////////////////
                                 $scope.Notify2.Message = null;
                                 if (!$scope.freeSMS)
@@ -11409,7 +13052,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 $scope.Notify2.TypeId = 10016;
                 if (!$scope.dg_emp3_ds) {
                     //Config.CustomerId
-                    flightService.getViewCrew(Config.CustomerId).then(function (response) {
+                    flightService.getDispatchSmsEmployees(Config.CustomerId).then(function (response) {
 
                         $scope.dg_emp3_ds = response;
 
@@ -11478,7 +13121,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.countdown = function () {
         $scope.countDownVisible = true;
         stopped = $timeout(function () {
-            
+
             $scope.counter--;
             if ($scope.counter > 0)
                 $scope.countdown();
@@ -11605,20 +13248,20 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     $scope.dg_emp_columns = [
 
-          { dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, },
-            { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 200 },
-          //  { dataField: 'Mobile', caption: 'Monile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
-          {
-              dataField: 'RP', caption: 'Time', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: true, width: 120, editorOptions: {
-                  type: "time"
-              }, format: "HH:mm"
-          },
+        { dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, },
+        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 200 },
+        //  { dataField: 'Mobile', caption: 'Monile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
+        {
+            dataField: 'RP', caption: 'Time', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: true, width: 120, editorOptions: {
+                type: "time"
+            }, format: "HH:mm"
+        },
 
-         { dataField: 'Status', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
-           { dataField: 'TypeStr', caption: 'Type', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
-             { dataField: 'Message', caption: 'Message', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 500 },
+        { dataField: 'Status', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'TypeStr', caption: 'Type', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Message', caption: 'Message', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 500 },
 
-          { dataField: 'RefId', caption: 'Ref', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'RefId', caption: 'Ref', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
 
     ];
     $scope.dg_emp_selected = null;
@@ -11631,9 +13274,9 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         //alert($scope.selectedEmps);
         $scope.recs = Enumerable.From($scope.dg_crew_abs_ds).Where(function (x) { return $scope.selectedEmps.indexOf(x.CrewId) != -1; }).OrderBy('$.Name').ToArray();
     };
-     
+
     $scope.dg_emp = {
-      
+
         headerFilter: {
             visible: false
         },
@@ -11706,12 +13349,12 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.btn_jlog = {
         hint: 'Fuel & Journey Log',
         type: 'default',
-        icon:'fas fa-gas-pump',
+        icon: 'fas fa-gas-pump',
         width: '100%',
 
         onClick: function (e) {
-         
-            
+
+
             $scope.dg_fuelflt_ds = null;
             $scope.jlogEntity = {
                 OffBlock: null,
@@ -11737,7 +13380,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             $scope.flight = $scope.selectedFlights[0];
 
             flightService.getLeg($scope.flight.ID).then(function (leg) {
-                
+
                 //dooltopol
                 $scope.jlogEntity = {
                     OffBlock: leg.JLOffBlock ? leg.JLOffBlock : leg.ChocksOut,
@@ -11788,10 +13431,11 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         }
     };
+    //2020-11-30
     $scope.sb_jlpflr = {
         showClearButton: true,
         searchEnabled: false,
-        dataSource: [{ Id: 0, Title: 'Left' }, { Id: 1, Title: 'Right' }],
+        dataSource: [{ Id: 1, Title: 'Left' }, { Id: 2, Title: 'Right' }],
         displayExpr: "Title",
         valueExpr: 'Id',
         bindingOptions: {
@@ -11963,13 +13607,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     //7-29
     //malakh
     $scope.dg_fuelflt_columns = [
-         { dataField: 'Date', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 120, format: 'yy-MMM-dd', sortIndex: 0, sortOrder: 'asc' },
-     { dataField: 'Register', caption: 'Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 120, sortIndex: 1, sortOrder: 'asc' },
-      { dataField: 'STD', caption: 'STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 120, format: 'yy-MMM-dd', sortIndex: 2, sortOrder: 'asc', visible: false },
+        { dataField: 'Date', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 120, format: 'yy-MMM-dd', sortIndex: 0, sortOrder: 'asc' },
+        { dataField: 'Register', caption: 'Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 120, sortIndex: 1, sortOrder: 'asc' },
+        { dataField: 'STD', caption: 'STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 120, format: 'yy-MMM-dd', sortIndex: 2, sortOrder: 'asc', visible: false },
         { dataField: 'FlightNumber', caption: 'No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, },
 
-      { dataField: 'FromAirportIATA', caption: 'From', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 120 },
-      { dataField: 'ToAirportIATA', caption: 'To', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 120 },
+        { dataField: 'FromAirportIATA', caption: 'From', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 120 },
+        { dataField: 'ToAirportIATA', caption: 'To', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 120 },
     ];
     $scope.dg_fuelflt_selected = null;
     $scope.fuelflt = null;
@@ -12096,6 +13740,15 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         }
     };
+    //2020-12-01
+    $scope.jl_fuel_fp = {
+        min: 0,
+        bindingOptions: {
+            value: 'jlogEntity.FPFuel',
+
+        }
+    };
+
     //end of 7-29
 
     Date.prototype.yyyymmddtimestring = function (utc) {
@@ -12112,7 +13765,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             var mi = this.getMinutes();
             var ss = this.getSeconds();
             result += "" //+ this.toLocaleTimeString();
-              + ((hh > 9 ? '' : '0') + hh) + "" + ((mi > 9 ? '' : '0') + mi);
+                + ((hh > 9 ? '' : '0') + hh) + "" + ((mi > 9 ? '' : '0') + mi);
 
         }
 
@@ -12167,6 +13820,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                             FuelArrival: $scope.jlogEntity.FuelArrival,
                             FuelDeparture: $scope.jlogEntity.FuelDeparture,
                             UsedFuel: $scope.jlogEntity.UsedFuel,
+                            FPFuel: $scope.jlogEntity.FPFuel,
 
                         };
 
@@ -12206,7 +13860,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 //.ThenBy(function (x) { return x.RegisterID})
                 //.ThenBy(function (x) { return new Date(x.STD); })
                 .ToArray();
-            
+
             if (!$scope.dg_fuelflt_instance)
                 $scope.dg_fuelflt_instance.refresh();
         },
@@ -12241,18 +13895,18 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     //New View///////////////////////////
     $scope.regs = ['CAR', 'KPA', 'KPB', 'CPD', 'CAS', 'CPV', 'FPA', 'FPC', 'CPQ', 'KPC', 'KPD', 'KPE', 'CNL'];
     /////config/////////////////
-   
-    
+
+
     ///////////////////////////
 
     $scope.refreshHeights = function () {
 
-        var days_count=$scope.days_count+$scope.nextDay;
-        days_count=days_count+$scope.preDay;
+        var days_count = $scope.days_count + $scope.nextDay;
+        days_count = days_count + $scope.preDay;
         //  $('.cell-hour').width(hourWidth);
         $('.cell-day').width((hourWidth + 1) * 24 - 1);
-        $('.timeline').width((hourWidth + 1) *  days_count * 24+2);
-        $('.flights').width((hourWidth + 1) *  days_count * 24+2);
+        $('.timeline').width((hourWidth + 1) * days_count * 24 + 2);
+        $('.flights').width((hourWidth + 1) * days_count * 24 + 2);
 
 
 
@@ -12278,6 +13932,37 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     };
     var stopped;
+    //magu 3-17
+    $scope.drawNowLine = function () {
+         
+        var nowDate = new Date();
+        if ($scope.timeType == 1) {
+            var offset = getOffset(new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 1, 0, 0, 0));
+            nowDate = (new Date()).addMinutes(offset)
+        }
+        /////////////////////////
+        var std = new Date(nowDate);
+        var datefromOffset = (new Date($scope.datefrom)).getTimezoneOffset();
+        var stdOffset = (new Date(std)).getTimezoneOffset();
+        var dfirst = new Date($scope.datefrom);
+        var mm = (new Date($scope.datefrom)).getMonth();
+        var dd = (new Date($scope.datefrom)).getDate();
+
+
+        if (stdOffset < datefromOffset || (mm == 2 && dd == 22))
+            dfirst = (new Date($scope.datefrom)).addMinutes(-60);
+        if (stdOffset > datefromOffset)
+            dfirst = (new Date($scope.datefrom)).addMinutes(60);
+        
+        var time = moment(/*new Date()*/nowDate).format('HH:mm');
+        var _left = $scope.getDuration(new Date(/*$scope.datefrom*/dfirst), /*new Date()*/nowDate);
+        //////////////////////////////////////
+        var nowleft = (_left * (hourWidth + 1)) - 1;
+        $('.now-line').css('left', nowleft + 'px');
+        $('#nowTime').css('left', (nowleft + 5) + 'px');
+        $('#nowTime').html(time);
+    };
+    ///////////////////
     $scope.countdown = function () {
         //var _left = $scope.getDuration(new Date($scope.datefrom), new Date());
         //var nowleft = (_left * (hourWidth + 1));
@@ -12285,13 +13970,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         //var nowTime = "<span style='display:inline-block;font-size:11px;position:absolute;top:2px;left:" + (nowleft + 5) + "px' id='nowTime'>" + moment(new Date()).format('HH:mm') + "</span>";
         stopped = $timeout(function () {
 
-            var time = moment(new Date()).format('HH:mm');
-            var _left = $scope.getDuration(new Date($scope.datefrom), new Date());
-            var nowleft = (_left * (hourWidth + 1)) - 1;
-            $('.now-line').css('left', nowleft + 'px');
-            $('#nowTime').css('left', (nowleft + 5) + 'px');
-            $('#nowTime').html(time);
-
+            //var time = moment(new Date()).format('HH:mm');
+            //var _left = $scope.getDuration(new Date($scope.datefrom), new Date());
+            //var nowleft = (_left * (hourWidth + 1)) - 1;
+            //$('.now-line').css('left', nowleft + 'px');
+            //$('#nowTime').css('left', (nowleft + 5) + 'px');
+            //$('#nowTime').html(time);
+            $scope.drawNowLine();
             $scope.countdown();
 
         }, 10000);
@@ -12319,19 +14004,45 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     }
 
     persianDate.toLocale('en');
+    //magu utc 
+   
     $scope.getDep = function (flt) {
+      
+        var dt = flt.ChocksOut;
         if (flt.ChocksOut)
-            return moment(flt.ChocksOut).format('HHmm');
+            dt = flt.ChocksOut;
         else
-            return moment(flt.STD).format('HHmm');
+            dt = flt.STD;
+        if ($scope.timeType == 1) {
+            var offset = getOffset(new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 1, 0, 0, 0));
+            dt = (new Date(dt)).addMinutes(offset)
+        }
+        if ($scope.timeType == 2) {
+            var offset = getOffset(new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 1, 0, 0, 0));
+            offset += flt.GWLand;
+            dt = (new Date(dt)).addMinutes(offset)
+        }
+        return moment(dt).format('HHmm');
     };
     $scope.getArr = function (flt) {
-
+        var dt = flt.ChocksIn;
         if (flt.ChocksIn)
-            return moment(flt.ChocksIn).format('HHmm');
+            dt = flt.ChocksIn;
         else
-            return moment(flt.STA).format('HHmm');
+            dt = flt.STA;
+        if ($scope.timeType == 1) {
+            var offset = getOffset(new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 1, 0, 0, 0));
+            dt = (new Date(dt)).addMinutes(offset)
+        }
+        if ($scope.timeType == 2) {
+            
+            var offset = getOffset(new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 1, 0, 0, 0));
+            offset += flt.GWTO;
+            dt = (new Date(dt)).addMinutes(offset)
+        }
+        return moment(dt).format('HHmm');
     };
+    //////////////////////////
     $scope.getFlightClass = function (flt) {
         return flt.FlightStatus.toLowerCase();
     }
@@ -12342,7 +14053,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     }
 
     $scope._getFlightWidth = function (flt) {
-        var duration = $scope.getDuration(new Date(flt.ChocksIn ? flt.ChocksIn : flt.STA), new Date(flt.ChocksOut ? flt.ChocksOut:flt.STD));
+        var duration = $scope.getDuration(new Date(flt.ChocksIn ? flt.ChocksIn : flt.STA), new Date(flt.ChocksOut ? flt.ChocksOut : flt.STD));
         var w = duration * hourWidth;
         return w + "px";
     }
@@ -12366,6 +14077,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         return duration != 0 ? duration : "";
     };
     $scope.hasConflict = function (f1, f2) {
+
         if ((f1.STD >= f2.STD && f1.STD <= f2.STA) || (f1.STA >= f2.STD && f1.STA <= f2.STA))
             return true;
         if ((f2.STD >= f1.STD && f2.STD <= f1.STA) || (f2.STA >= f1.STD && f2.STA <= f1.STA))
@@ -12390,13 +14102,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         return false;
     };
     $scope._getFlightStyle = function (f, index, res) {
-        
+
         var style = {};
         style.width = $scope.getFlightWidth(f);
         var left = $scope.getDuration(new Date($scope.datefrom), new Date(f.STD));
         style.left = (left * (hourWidth + 1)) + "px";
         var top = f.top;
-       
+
         //console.log(index);
         //console.log(res);
 
@@ -12404,33 +14116,55 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         return style;
     }
 
-    //fjk
-    $scope.getFlightStyle = function (f, index, res) {
-        
+    //3-16
+    $scope.getFlightStyle = function (f, index, res) { 
+
         var style = {};
         style.width = $scope.getFlightWidth(f);
+
+        var std = f.STD;
+        if ($scope.timeType == 1) {
+            var offset = getOffset(new Date(std.getFullYear(), std.getMonth(), std.getDate(), 1, 0, 0, 0));
+            std = (new Date(std)).addMinutes(offset)
+            
+        }
+
+        var datefromOffset = (new Date($scope.datefrom)).getTimezoneOffset();
+        var stdOffset = (new Date(std)).getTimezoneOffset();
+        var dfirst = new Date($scope.datefrom);
+        var mm=(new Date($scope.datefrom)).getMonth();
+		var dd= (new Date($scope.datefrom)).getDate();
+	  
+		
+        if (stdOffset < datefromOffset || (mm==2 && dd==22))
+            dfirst = (new Date($scope.datefrom)).addMinutes(-60);
+        if (stdOffset > datefromOffset)
+            dfirst = (new Date($scope.datefrom)).addMinutes(60);
+
+
+        var left = $scope.getDuration(new Date(dfirst), /*new Date(f.ChocksOut?f.ChocksOut: f.STD)*/new Date(std));
         
-        var left = $scope.getDuration(new Date($scope.datefrom), /*new Date(f.ChocksOut?f.ChocksOut: f.STD)*/new Date(f.STD));
-        if (new Date(f.STD)<new Date($scope.datefrom))
-            left=-1*left;
-        style.left = (left * (hourWidth + 1)) + "px";
+        if (new Date(std) < new Date($scope.datefrom))
+            left = -1 * left;
+        style.left =  (left * (hourWidth + 1))  + "px";
         var top = f.top;
-        if (f.FlightStatusID==4)
-            top+=30;
-        //console.log(index);
+        if (f.FlightStatusID == 4)
+            top += 30;
+        //console.log(index); 
         //console.log(res);
 
         style.top = top + 'px';
         return style;
     }
+    ///////////////////////////////////
     //fjk
     $scope.getResStyle = function (res) {
-      
-        var ext=0;
+
+        var ext = 0;
         if (res.resourceName.includes('CNL'))
-            ext=30;
+            ext = 30;
         return {
-            minHeight: (res.maxTop + 50+ext) + 'px'
+            minHeight: (res.maxTop + 50 + ext) + 'px'
         };
     };
     $scope.getResCaptionStyle = function (res) {
@@ -12457,152 +14191,177 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         else
             return reg;
     };
-
-    $scope.getResOrderIndex=function(reg){
-        try{
+    //5-17
+    $scope.getResOrderIndex = function (reg) {
+        try {
             var str = "";
-        
+
             if (reg.includes("CNL"))
                 str = "ZZZZZZ";
             else
-            
-                if (reg.includes("."))
-                {
-                    str = "ZZZZ" + reg.charAt(reg.length - 2) ;
-                
+
+                if (reg.includes(".")) {
+                    str = "ZZZZ" + reg.charAt(reg.length - 2);
+
                 }
-                
+
                 else
-                    str = reg.charAt(reg.length - 1);
+                   // str = reg.charAt(reg.length - 1);
+                    str = reg.substring(0, 2)+ reg.charAt(reg.length - 1);
 
             return str;
         }
-        catch(ee){
-           
+        catch (ee) {
+
             return "";
         }
-        
-    }
-    $scope.removeFromGantt=function(flt,res){
-        var gres=Enumerable.From($scope.ganttData.resources).Where('$.resourceId=='+res).FirstOrDefault();
-         
 
-       
-        gres.flights=Enumerable.From(gres.flights).Where('$.ID!='+flt.ID)
+    }
+    $scope.removeFromGantt = function (flt, res) {
+        var gres = Enumerable.From($scope.ganttData.resources).Where('$.resourceId==' + res).FirstOrDefault();
+
+
+
+        gres.flights = Enumerable.From(gres.flights).Where('$.ID!=' + flt.ID)
             .OrderBy(function (x) { return moment(x.STD).format('YYYYDDMMHHmm') }).ThenBy('Number($.ID)')
-                        .ToArray();
-        if (gres.flights.length>0){
-            $.each(gres.flights,function(_j,_f){
-                _f.top=null;
+            .ToArray();
+        if (gres.flights.length > 0) {
+            $.each(gres.flights, function (_j, _f) {
+                _f.top = null;
             });
             $scope.setTop(gres.flights);
             gres.maxTop = Enumerable.From(gres.flights).Select('Number($.top)').Max();
         }
-        else
-        {
-            $scope.ganttData.resources= Enumerable.From($scope.ganttData.resources).Where('$.resourceId!='+res).ToArray();
+        else {
+            $scope.ganttData.resources = Enumerable.From($scope.ganttData.resources).Where('$.resourceId!=' + res).ToArray();
         }
-       
+
     }
-    $scope.addToGantt=function(flt,res){
-        var gres=Enumerable.From($scope.ganttData.resources).Where('$.resourceId=='+res.resourceId).FirstOrDefault();
-        if (!gres){
-            gres=res;
+    $scope.addToGantt = function (flt, res) {
+        var gres = Enumerable.From($scope.ganttData.resources).Where('$.resourceId==' + res.resourceId).FirstOrDefault();
+        if (!gres) {
+            gres = res;
             $scope.ganttData.resources.push(gres);
-            $scope.ganttData.resources=Enumerable.From($scope.ganttData.resources).OrderBy(function(x){
+            $scope.ganttData.resources = Enumerable.From($scope.ganttData.resources).OrderBy(function (x) {
                 return $scope.getResOrderIndex(x.resourceName);
             }).ToArray();
 
         }
 
         if (!gres.flights)
-            gres.flights=[];
-        var gflt=Enumerable.From(gres.flights).Where('$.ID=='+flt.ID).FirstOrDefault();
-        if (!gflt){
+            gres.flights = [];
+        var gflt = Enumerable.From(gres.flights).Where('$.ID==' + flt.ID).FirstOrDefault();
+        if (!gflt) {
             gres.flights.push(flt);
         }
-        gres.flights=Enumerable.From(gres.flights)
+        gres.flights = Enumerable.From(gres.flights)
             .OrderBy(function (x) { return moment(x.STD).format('YYYYDDMMHHmm') }).ThenBy('Number($.ID)')
-                        .ToArray();
-         
+            .ToArray();
 
-        $.each(gres.flights,function(_j,_f){
-            _f.top=null;
+
+        $.each(gres.flights, function (_j, _f) {
+            _f.top = null;
         });
         $scope.setTop(gres.flights);
         gres.maxTop = Enumerable.From(gres.flights).Select('Number($.top)').Max();
     }
-    $scope.modifyGantt=function(flt,res,oldResId){
+    $scope.modifyGantt = function (flt, res, oldResId) {
         if (!oldResId)
-            oldResId=$scope.ati_resid;
+            oldResId = $scope.ati_resid;
 
-        if (oldResId!=flt.RegisterID){
-            var oldres=Enumerable.From($scope.ganttData.resources).Where('$.resourceId=='+oldResId).FirstOrDefault();
-            oldres.flights=Enumerable.From(oldres.flights).Where('$.ID!='+flt.ID).ToArray();
-            if (oldres.flights.length>0){
-                $.each(oldres.flights,function(_j,_f){
-                    _f.top=null;
+        if (oldResId != flt.RegisterID) {
+            var oldres = Enumerable.From($scope.ganttData.resources).Where('$.resourceId==' + oldResId).FirstOrDefault();
+            oldres.flights = Enumerable.From(oldres.flights).Where('$.ID!=' + flt.ID).ToArray();
+            if (oldres.flights.length > 0) {
+                $.each(oldres.flights, function (_j, _f) {
+                    _f.top = null;
                 });
                 $scope.setTop(oldres.flights);
                 oldres.maxTop = Enumerable.From(oldres.flights).Select('Number($.top)').Max();
             }
-            else
-            {
-                $scope.ganttData.resources= Enumerable.From($scope.ganttData.resources).Where('$.resourceId!='+oldres.resourceId).ToArray();
+            else {
+                $scope.ganttData.resources = Enumerable.From($scope.ganttData.resources).Where('$.resourceId!=' + oldres.resourceId).ToArray();
             }
         }
 
 
-        var gres=Enumerable.From($scope.ganttData.resources).Where('$.resourceId=='+res.resourceId).FirstOrDefault();
-        if (!gres){
-            gres=res;
+        var gres = Enumerable.From($scope.ganttData.resources).Where('$.resourceId==' + res.resourceId).FirstOrDefault();
+        if (!gres) {
+            gres = res;
             $scope.ganttData.resources.push(gres);
-            $scope.ganttData.resources=Enumerable.From($scope.ganttData.resources).OrderBy(function(x){
+            $scope.ganttData.resources = Enumerable.From($scope.ganttData.resources).OrderBy(function (x) {
                 return $scope.getResOrderIndex(x.resourceName);
             }).ToArray();
 
         }
 
         if (!gres.flights)
-            gres.flights=[];
-        var gflt=Enumerable.From(gres.flights).Where('$.ID=='+flt.ID).FirstOrDefault();
-        if (!gflt){
+            gres.flights = [];
+        var gflt = Enumerable.From(gres.flights).Where('$.ID==' + flt.ID).FirstOrDefault();
+        if (!gflt) {
             gres.flights.push(flt);
         }
-        gres.flights=Enumerable.From(gres.flights)
+        gres.flights = Enumerable.From(gres.flights)
             .OrderBy(function (x) { return moment(x.STD).format('YYYYDDMMHHmm') }).ThenBy('Number($.ID)')
-                        .ToArray();
-        $.each(gres.flights,function(_j,_f){
-            _f.top=null;
+            .ToArray();
+        $.each(gres.flights, function (_j, _f) {
+            _f.top = null;
         });
         $scope.setTop(gres.flights);
         gres.maxTop = Enumerable.From(gres.flights).Select('Number($.top)').Max();
 
-       
+
     };
 
-    $scope.nextDay=0;
-    $scope.preDay=0;
+    $scope.nextDay = 0;
+    $scope.preDay = 0;
+    $scope.timeType = 0;
+    $scope.timeTypeChanged = function () {
+        if ($scope.timeType == 1) {
+             
+            $('.second-time').hide();
+            $('.second-time-right').show();
+        }
+        else {
+            
+            $('.second-time').show();
+            $('.second-time-right').hide();
+        }
+        $scope.drawNowLine();
+    };
+    $scope.sb_timetype = {
+        showClearButton: false,
+        searchEnabled: false,
+        dataSource: [{ id: 0, title: 'LCB' }, { id: 1, title: 'UTC' }, { id: 2, title: 'LCL' },],
+        displayExpr: 'title',
+        valueExpr:'id',
+        onValueChanged: function (e) {
+            $scope.timeTypeChanged();
+        },
+        bindingOptions: {
+            value: 'timeType',
+             
+        }
+    };
     $scope.createGantt = function () {
-        if ($(window).width()<1200)
-        {
+        if ($(window).width() < 1200) {
             $('.large-gantt').remove();
             hourWidth = 69;
         }
         else
             $('.small-gantt').remove();
-        $scope.nextDay=0;
-        var lastDay=(new Date($scope.dateEnd)).getDate();
+        $scope.nextDay = 0;
+        var lastDay = (new Date($scope.dateEnd)).getDate();
         // alert(lastDay);
-        var nxtdy=Enumerable.From($scope.ganttData.flights).Where(function(x){
-          
-            return x.ChocksOut.getDate()>lastDay || x.Takeoff.getDate()>lastDay || x.Landing.getDate()>lastDay || x.ChocksIn.getDate()>lastDay || x.STA.getDate()>lastDay;
+        var nxtdy = Enumerable.From($scope.ganttData.flights).Where(function (x) {
+
+            return x.ChocksOut.getDate() > lastDay || x.Takeoff.getDate() > lastDay || x.Landing.getDate() > lastDay || x.ChocksIn.getDate() > lastDay || x.STA.getDate() > lastDay;
         }).ToArray();
-        if (nxtdy && nxtdy.length>0)
-            $scope.nextDay=1;
+        if (nxtdy && nxtdy.length > 0)
+            $scope.nextDay = 1;
 
 
-      
+
         var $timeBar = $('.header-time');
         var $dayBar = $('.header-date');
         var $flightArea = $('.flights');
@@ -12610,7 +14369,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         $dayBar.empty();
         //$flightArea.empty();
         $('.reg-row').remove();
-        $('.hour-line').remove();
+        $('.hour-line').remove(); 
         $('.halfhour-line').remove();
         $('.mid-line').remove();
         $('.now-line').remove();
@@ -12620,21 +14379,42 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         $('.flights').off('scroll');
         var c = 1;
-        var cf=0.5;
-        $scope.preDay=0;
-        var days_count=$scope.days_count+$scope.nextDay;
-        var tempDate = (new Date(dfrom)).addDays(-1*$scope.preDay);
-        days_count=days_count+$scope.preDay;
+        var cf = 0.5;
+        $scope.preDay = 0;
+        var days_count = $scope.days_count + $scope.nextDay;
+        var tempDate = (new Date(dfrom)).addDays(-1 * $scope.preDay);
+        days_count = days_count + $scope.preDay;
 
-        //sepehr2
+
+        //magu utc
+        var floatTime = 'left';
+
+        //var secondTimeClass = 'second-time';
+        //if ($scope.timeType == 1) {
+        //    floatTime = 'left';
+        //    secondTimeClass = 'second-time-right';
+        //}
+        /////////////////////////////
         for (var i = 1; i <= days_count; i++) {
             for (var j = 0; j < 24; j++) {
-                var offset=getOffset(new Date(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate(), j, 0, 0, 0));
+                var offset = getOffset(new Date(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate(), j, 0, 0, 0));
+                ////magu utc
+                //if ($scope.timeType == 1)
+                //    offset = -1 * offset;
+                /////////////
                 var secondDate = (new Date(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate(), j, 0, 0, 0)).addMinutes(offset);
+                var secondDate2 = (new Date(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate(), j, 0, 0, 0)).addMinutes(-offset);
+                var secondDateStyle = 'display:initial';
+                var secondDate2Style = 'display:none';
+                if ($scope.timeType == 1) {
+                    secondDateStyle = 'display:none';
+                    secondDate2Style = 'display:initial';
+                }
 
-                var hourElem = "<div class='cell-hour' style='display:inline-block;float:left;'>" + _gpad2(j) + "<span class='second-time'>" + moment(secondDate).format('HHmm') + "</span></div>";
+
+                var hourElem = "<div class='cell-hour' style='display:inline-block;float:left;'>" + _gpad2(j) + "<span class='second-time' style='" + secondDateStyle + "'>" + moment(secondDate).format('HHmm') + "</span><span class='second-time-right' style='" + secondDate2Style + "'>" + moment(secondDate2).format('HHmm') + "</span></div>";
                 $timeBar.append(hourElem);
-                if (c < 24 *days_count) {
+                if (c < 24 * days_count) {
                     var hleft = c * (hourWidth + 1) - 0.8;
                     var hline = "<div class='hour-line' style='top:0px;left:" + hleft + "px'></div>";
                     $flightArea.append(hline);
@@ -12643,13 +14423,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     var hline2 = "<div class='halfhour-line' style='top:0px;left:" + hleft2 + "px'></div>";
                     $flightArea.append(hline2);
                 }
-                cf=cf+1;
+                cf = cf + 1;
                 c++;
             }
-            
+
             var tbl = "<table style='padding:0;width:95%'><tr>"
                 + "<td style='font-size:14px;' class='qdate'>" + moment(tempDate).format('dd DD-MMM-YYYY') + " (" + new persianDate(tempDate).format("DD-MM-YYYY") + ")" + "</td>"
-                 + ($(window).width()<1200?"<td style='font-size:14px;' class='qdate'>" + moment(tempDate).format('dd DD-MMM-YYYY') + " (" + new persianDate(tempDate).format("DD-MM-YYYY") + ")" + "</td>":"")
+                + ($(window).width() < 1200 ? "<td style='font-size:14px;' class='qdate'>" + moment(tempDate).format('dd DD-MMM-YYYY') + " (" + new persianDate(tempDate).format("DD-MM-YYYY") + ")" + "</td>" : "")
                 + "<td style='font-size:14px;' class='qdate'>" + moment(tempDate).format('dd DD-MMM-YYYY') + " (" + new persianDate(tempDate).format("DD-MM-YYYY") + ")" + "</td>"
                 + "<td style='font-size:14px;' class='qdate'>" + moment(tempDate).format('dd DD-MMM-YYYY') + " (" + new persianDate(tempDate).format("DD-MM-YYYY") + ")" + "</td>"
 
@@ -12667,10 +14447,33 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             tempDate = tempDate.addDays(1);
         }
         if ($scope.IsNowLine) {
-            var _left = $scope.getDuration(new Date($scope.datefrom), new Date());
+            //magu utc
+            var nowDate = new Date();
+            if ($scope.timeType == 1) {
+                var offset = getOffset(new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 1, 0, 0, 0));
+                nowDate = (new Date()).addMinutes(offset)
+            }
+            /////////////////
+            //3-17
+            var std = new Date(nowDate);
+            var datefromOffset = (new Date($scope.datefrom)).getTimezoneOffset();
+            var stdOffset = (new Date(std)).getTimezoneOffset();
+            var dfirst = new Date($scope.datefrom);
+            var mm = (new Date($scope.datefrom)).getMonth();
+            var dd = (new Date($scope.datefrom)).getDate();
+
+
+            if (stdOffset < datefromOffset || (mm == 2 && dd == 22))
+                dfirst = (new Date($scope.datefrom)).addMinutes(-60);
+            if (stdOffset > datefromOffset)
+                dfirst = (new Date($scope.datefrom)).addMinutes(60);
+            ////////////////////
+            var _left = $scope.getDuration(new Date(/*$scope.datefrom*/dfirst), /*new Date()*/nowDate);
             var nowleft = (_left * (hourWidth + 1));
+
+
             var nowline = "<div class='now-line' style='top:0px;left:" + nowleft + "px'></div>";
-            var nowTime = "<span style='display:inline-block;font-size:11px;position:absolute;top:2px;left:" + (nowleft + 5) + "px' id='nowTime'>" + moment(new Date()).format('HH:mm') + "</span>";
+            var nowTime = "<span style='display:inline-block;font-size:11px;position:absolute;top:2px;left:" + (nowleft + 5) + "px' id='nowTime'>" + moment(/*new Date()*/nowDate).format('HH:mm') + "</span>";
             $flightArea.append(nowline);
             $flightArea.append(nowTime);
         }
@@ -12686,6 +14489,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.ganttData = null;
 
     $scope.checkConflict = function (flights) {
+
         var hasConflict = false;
         $.each(flights, function (_i, _d) {
             _d.Route = _d.FromAirportIATA + '-' + _d.ToAirportIATA;
@@ -12694,7 +14498,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     (new Date(x.STD) >= new Date(_d.STD) && new Date(x.STD) <= new Date(_d.STA))
                     ||
                     (new Date(x.STA) >= new Date(_d.STD) && new Date(x.STA) <= new Date(_d.STA))
-                  );
+                );
             }).ToArray();
 
         });
@@ -12718,42 +14522,45 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     }
     $scope.IsConflict = function (flt, x) {
-
+        //2020-11-16
         var fltDep = getMinDate(new Date(flt.STD), new Date(flt.ChocksOut));
         var xDep = getMinDate(new Date(x.STD), new Date(x.ChocksOut));
 
         var fltArr = getMaxDate(new Date(flt.STA), new Date(flt.ChocksIn));
         var xArr = getMaxDate(new Date(x.STA), new Date(x.ChocksIn));
 
+        var result = (fltDep > xDep && fltDep < xArr) || (fltArr > xDep && fltArr < xArr)
+            || (xDep > fltDep && xDep < fltArr) || (xArr > fltDep && xArr < fltArr)
+            || (moment(xDep).format('YYYYDDMMHHmm') == moment(fltDep).format('YYYYDDMMHHmm') && moment(xArr).format('YYYYDDMMHHmm') == moment(fltArr).format('YYYYDDMMHHmm'))
+            ;
+
+        return result;
 
 
-        return (fltDep > xDep && fltDep < xArr) || (fltArr > xDep && fltArr < xArr)
-        || (xDep > fltDep && xDep < fltArr) || (xArr > fltDep && xArr < fltArr);
 
-
-         
     }
     $scope.findConflict = function (flt, flights) {
+
         //var query = Enumerable.From(flights).Where(function (x) {
         //    return new Date(x.STD) <= new Date(flt.STD) && x.ID != flt.ID
 
         //}).OrderByDescending(function (x) { return moment(x.STD).format('YYYYDDMMHHmm') }).ThenByDescending('$.ID').ToArray();
         var cnflt = Enumerable.From(flights).Where(function (x) {
             return new Date(x.STD) <= new Date(flt.STD) && x.ID != flt.ID
-            && (
-                (new Date(flt.STD) >= new Date(x.STD) && new Date(flt.STD) < new Date(x.STA))
-                || (new Date(flt.STA) > new Date(x.STD) && new Date(flt.STA) < new Date(x.STA))
+                && (
+                    (new Date(flt.STD) >= new Date(x.STD) && new Date(flt.STD) < new Date(x.STA))
+                    || (new Date(flt.STA) > new Date(x.STD) && new Date(flt.STA) < new Date(x.STA))
 
-                || (new Date(flt.ChocksOut) >= new Date(x.STD) && new Date(flt.ChocksOut) < new Date(x.STA))
-                || (new Date(flt.ChocksIn) > new Date(x.STD) && new Date(flt.ChocksIn) < new Date(x.STA))
-
-
-                 || (new Date(flt.ChocksOut) >= new Date(x.ChocksOut) && new Date(flt.ChocksOut) < new Date(x.ChocksIn))
-                || (new Date(flt.ChocksIn) > new Date(x.ChocksOut) && new Date(flt.ChocksIn) < new Date(x.ChocksIn))
+                    || (new Date(flt.ChocksOut) >= new Date(x.STD) && new Date(flt.ChocksOut) < new Date(x.STA))
+                    || (new Date(flt.ChocksIn) > new Date(x.STD) && new Date(flt.ChocksIn) < new Date(x.STA))
 
 
-               // || (new Date(flt.STD) == new Date(x.STD) && new Date(flt.STA) == new Date(x.STA))
-                //|| (moment(flt.STD).format('YYYYDDMMHHmm') == moment(x.STD).format('YYYYDDMMHHmm'))
+                    || (new Date(flt.ChocksOut) >= new Date(x.ChocksOut) && new Date(flt.ChocksOut) < new Date(x.ChocksIn))
+                    || (new Date(flt.ChocksIn) > new Date(x.ChocksOut) && new Date(flt.ChocksIn) < new Date(x.ChocksIn))
+
+
+                    // || (new Date(flt.STD) == new Date(x.STD) && new Date(flt.STA) == new Date(x.STA))
+                    //|| (moment(flt.STD).format('YYYYDDMMHHmm') == moment(x.STD).format('YYYYDDMMHHmm'))
                 );
         }).OrderByDescending(function (x) { return moment(x.STD).format('YYYYDDMMHHmm') }).ThenByDescending('$.ID').FirstOrDefault();
         return cnflt;
@@ -12772,56 +14579,54 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             for (var i = 0; i < _flights.length; i++) {
                 var cf = _flights[i];
                 //cf.top = null;
-                if (i == 0)
-                { cf.top = j; last = cf; }
-                else
-                {
-                    if (!$scope.IsConflict(cf, last))
-                    { cf.top = j; last = cf; }
+                if (i == 0) { cf.top = j; last = cf; }
+                else {
+                    if (!$scope.IsConflict(cf, last)) { cf.top = j; last = cf; }
                 }
 
             }
             _flights = Enumerable.From(_flights).Where('$.top==null').ToArray();
-            
+
             j = j + 50;
         }
     }
-    $scope.modifyFlightTimes=function(flt,utc){
+    $scope.modifyFlightTimes = function (flt, utc) {
         //$scope.dateEnd
-      
-        var m=-1;
-         
+
+        var m = -1;
+
         flt.STD = moment(flt.STD);
         flt.STA = moment(flt.STA);
-        
+
 
         if (flt.ChocksIn)
             flt.ChocksIn = moment(flt.ChocksIn);
         if (flt.ChocksOut)
             flt.ChocksOut = moment(flt.ChocksOut);
-         
-        flt.ChocksOut=getOffsetDate(flt.ChocksOut,m);
-        flt.ChocksIn=getOffsetDate(flt.ChocksIn,m);
-        flt.Takeoff=getOffsetDate(flt.Takeoff,m);
-        flt.Landing=getOffsetDate(flt.Landing,m);
-        flt.STA=getOffsetDate(flt.STA,m);
-        flt.STD=getOffsetDate(flt.STD,m);
-        flt.STA2=getOffsetDate(flt.STA2,m);
-        flt.STD2=getOffsetDate(flt.STD2,m);
+
+        flt.ChocksOut = getOffsetDate(flt.ChocksOut, m);
+        flt.ChocksIn = getOffsetDate(flt.ChocksIn, m);
+        flt.Takeoff = getOffsetDate(flt.Takeoff, m);
+        flt.Landing = getOffsetDate(flt.Landing, m);
+        flt.STA = getOffsetDate(flt.STA, m);
+        flt.STD = getOffsetDate(flt.STD, m);
+        flt.STA2 = getOffsetDate(flt.STA2, m);
+        flt.STD2 = getOffsetDate(flt.STD2, m);
         if (flt.CancelDate)
-            flt.CancelDate=getOffsetDate(flt.CancelDate,m);
+            flt.CancelDate = getOffsetDate(flt.CancelDate, m);
         if (flt.RampDate)
-            flt.RampDate=getOffsetDate(flt.RampDate,m);
+            flt.RampDate = getOffsetDate(flt.RampDate, m);
         //  console.log('$scope.modifyFlightTimes=function(flt,utc){');
         //   console.log(flt);
-         
+
     };
-    $scope.grounds=[];
+    $scope.grounds = [];
     $scope.bindFlights = function (callback) {
         $scope.baseDate = (new Date(Date.now())).toUTCString();
         dfrom = $scope._datefrom;
         $scope.datefrom = General.getDayFirstHour(new Date(dfrom));
         $scope.dateEnd = General.getDayLastHour(new Date(new Date(dfrom).addDays($scope.days_count - 1)));
+        
         var now = new Date();
         if (now >= $scope.datefrom && now <= $scope.dateEnd)
             $scope.IsNowLine = true;
@@ -12853,10 +14658,12 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         $scope.loadingVisible = true;
         var ed = (new Date($scope.dateEnd)).toUTCDateTimeDigits(); //(new Date($scope.dateto)).toUTCDateTimeDigits();
         //flightService.getFlightsGantt(Config.CustomerId, (new Date($scope.datefrom)).toUTCDateTimeDigits(), ed, offset, /*($scope.IsAdmin ? null : $scope.airportEntity.Id)*/-1, 0, filter).then(function (response) {
-        flightService.getFlightsGanttUTC(Config.CustomerId, (new Date($scope.datefrom)).toUTCDateTimeDigits(), ed, /*offset*/0, null,1, filter).then(function (response) {
+        //5-17
+        flightService.getFlightsGanttUTC(Config.CustomerId, (new Date($scope.datefrom)).toUTCDateTimeDigits(), ed, /*offset*/0, null, 1, filter).then(function (response) {
             try {
-                
-                 
+                //2020-11-25
+                $scope.baseDate = (new Date(response.baseDate)).toUTCString();
+                //alert($scope.baseDate);
                 $scope.loadingVisible = false;
                 $scope.tabsdatefirst = true;
                 $scope.tabs_date = [];
@@ -12869,7 +14676,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                 }
                 $scope.tabsdatevisible = true;
-                $scope.grounds=response.grounds;
+                $scope.grounds = response.grounds;
                 // var nextdayFlight = Enumerable.From(response.flights).Where(function (x) { return new Date(x.STA) > $scope.dateEnd || (!x.ChocksIn ? false : new Date(x.ChocksIn) > $scope.dateEnd); }).FirstOrDefault();
                 // if (nextdayFlight)
                 //    $scope.days_count++;
@@ -12882,18 +14689,22 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                     $.each(flights, function (_j, _q) {
 
-                        
+
                         $scope.modifyFlightTimes(_q);
-                         
-                         
+
+
                     });
                     $scope.setTop(flights);
                     _d.maxTop = Enumerable.From(flights).Select('Number($.top)').Max();
                     $scope.totalHeight += _d.maxTop;
                     _d.flights = flights;
                 });
+
+                //5-17
+                response.resources = Enumerable.From(response.resources).OrderBy(function (x) { return $scope.getResOrderIndex($scope.getRegStr(x.resourceName)); }).ToArray();
+
                 $scope.ganttData = response;
-               
+
                 callback();
             }
             catch (ex) {
@@ -12910,11 +14721,11 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.baseDate = null;
     $scope.StartUTimer = function () {
         // return;
-        //tooki
+        //2020-11-25
         $scope.utimer = setTimeout(function () {
             //'info' | 'warning' | 'error' | 'success' | 'custom'
-           
 
+            //2020-11-24-2
             //////////////////////////
             var dto = {
                 from: (new Date($scope.datefrom)).toUTCString(),
@@ -12929,9 +14740,12 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             };
             //noosk
             flightService.getUpdatedFlightsNew(dto).then(function (response) {
-             
-                $scope.baseDate = (new Date(Date.now())).toUTCString();
 
+                //$scope.baseDate = (new Date(Date.now())).toUTCString();
+                //2020-11-25
+                $scope.baseDate = (new Date(response.baseDate)).toUTCString();
+                console.log('===== BASE DATE =====================');
+                console.log($scope.baseDate);
                 $.each(response.flights, function (_i, _d) {
                     //_d.STD = moment(_d.STD);
                     //_d.STA = moment(_d.STA);
@@ -12946,20 +14760,20 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     //        }
                     //    }
                     var _flight = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _d.ID).FirstOrDefault();
-                    
-                    if (_flight){
-                        var oldresid=_flight.RegisterID;
+
+                    if (_flight) {
+                        var oldresid = _flight.RegisterID;
                         for (var key of Object.keys(_d)) {
-                            _flight[key]=_d[key];
-                    
+                            _flight[key] = _d[key];
+
                         }
                         $scope.modifyFlightTimes(_flight);
-                        var res={resourceId:_flight.RegisterID,resourceName:_flight.Register,groupId:_flight.TypeId };
-                        $scope.modifyGantt(_flight,res,oldresid);
-                          
+                        var res = { resourceId: _flight.RegisterID, resourceName: _flight.Register, groupId: _flight.TypeId };
+                        $scope.modifyGantt(_flight, res, oldresid);
+
                     }
-                   
-                    
+
+
                 });
                 if (response.summary != -1)
                     $scope.baseSum = response.summary;
@@ -12969,7 +14783,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     var ff = response.flights[0];
                     var time = moment(ff.DateStatus).format("MMMM Do YYYY, h:mm:ss a");
                     var text = ff.FromAirportIATA + "-" + ff.ToAirportIATA + ", " + ff.FlightNumber + ", " + ff.FlightStatus;
-                   
+
                 }
 
                 //////////////////////////////////////////
@@ -12990,19 +14804,19 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.finished = function () {
         $scope.flightsRendered++;
         if ($scope.flightsRendered == $scope.ganttData.flights.length) {
-           
+
             $scope.refreshHeights();
             if ($scope.IsNowLine) {
                 $scope.autoUpdate = true;
                 $scope.StartUTimer();
 
             }
-            
+
             $scope.selectedTabDateIndex = 0;
             setTimeout(function () {
                 $scope.refreshHeights();
             }, 500);
-           
+
         }
 
         //$scope.scrollFirstFlight();
@@ -13041,66 +14855,85 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     }
     ////////////////////////////////////
-    $scope.logFlight=null;
-    $scope.ati_flight=null;
-    $scope.ati_resid=null;
-    $scope.flightClicked=function(flt){
+    $scope.logFlight = null;
+    $scope.ati_flight = null;
+    $scope.ati_resid = null;
+    $scope.flightClicked = function (flt) {
         //zool
         // flt.ChocksOut=(new Date(flt.ChocksOut)).addMinutes(35);
         // alert('click');
         //$scope.showLogX(false);
-        $scope.ati_flight=flt;
-        $scope.ati_resid=flt.RegisterID;
-        $scope.logFlight=JSON.parse(JSON.stringify(flt));
-        
+        $scope.ati_flight = flt;
+        $scope.ati_resid = flt.RegisterID;
+        $scope.logFlight = JSON.parse(JSON.stringify(flt));
+
         $scope.showLogX(false);
-        
-       
+
+
     };
-    $scope.flightSingleClickedMain=function(flt){
-       // alert('x');
-        $scope.ati_flight=flt;
-        console.log($scope.ati_flight);
-       
+    //2020-12-29
+    function getMinutesBetweenDates(startDate, endDate) {
+        var diff = endDate.getTime() - startDate.getTime();
+        return (diff / 60000);
+    }
+    $scope.bl = '';
+    $scope.fl = '';
+    $scope.flightSingleClickedMain = function (flt) {
+        // alert('x');
+        $scope.ati_flight = flt;
+        console.log('$scope.ati_flight');
+        var offblock = !flt.ChocksOut ? flt.STD : flt.ChocksOut;
+        var onblock = !flt.ChocksIn ? flt.STA : flt.ChocksIn;
+
+        var takeoff = !flt.Takeoff ? flt.STD : flt.Takeoff;
+        var landing = !flt.Landing ? flt.STA : flt.Landing;
+
+        var mins = getMinutesBetweenDates(new Date(offblock), new Date(onblock));
+        var mins2 = getMinutesBetweenDates(new Date(takeoff), new Date(landing));
+        $scope.bl = pad(Math.floor(mins / 60).toString()) + ':' + pad(Math.floor(mins % 60).toString());
+        $scope.fl = pad(Math.floor(mins2 / 60).toString()) + ':' + pad(Math.floor(mins2 % 60).toString());
+
+
+
     };
-    $scope.flightSingleClicked=function(flt,$event){
+    $scope.flightSingleClicked = function (flt, $event) {
         $('.flightareasmall').removeClass('selected');
         $($event.currentTarget).addClass('selected');
-        $scope.ati_flight=flt;
-        $scope.ati_resid=flt.RegisterID;
-        $scope.logFlight=JSON.parse(JSON.stringify(flt));
-        
+        $scope.ati_flight = flt;
+        $scope.ati_resid = flt.RegisterID;
+        $scope.logFlight = JSON.parse(JSON.stringify(flt));
+
         $scope.showLogX(false);
     }
     ///////////////////////////////////////
-    $scope.ati_selectedFlights=[];
-    $scope.selectionElement=null;
+    $scope.ati_selectedFlights = [];
+    $scope.selectionElement = null;
     $scope.initSelection = function () {
         /////////////////////////////////
-        if ($(window).width()<1200)
-			return;
-        
+        if ($(window).width() < 1200)
+            return;
+
         // Initialize selectionjs
         //const selection 
-        $scope.selectionElement  = Selection.create({
+        $scope.selectionElement = Selection.create({
 
             // Class for the selection-area
             class: 'selection',
-           
+
             // All elements in this container can be selected
             selectables: ['.box-wrap1 > .flightarea'],
 
             // The container is also the boundary in this case
             boundaries: ['.mainselection']
         }).on('beforestart', evt => {
-    
-            
+
+
             return true; //evt.oe.target.tagName !== 'SPAN';
-            
-        }).on('start', ({inst, selected, oe}) => {
-             
+
+        }).on('start', ({ inst, selected, oe }) => {
+
             // Remove class if the user isn't pressing the control key or ⌘ key
-            if ( !oe.ctrlKey && !oe.metaKey) {
+            if (!oe.ctrlKey && !oe.metaKey) {
 
                 // Unselect all elements
                 for (const el of selected) {
@@ -13112,9 +14945,9 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 inst.clearSelection();
 
             }
-            
 
-        }).on('move', ({changed: {removed, added}}) => {
+
+        }).on('move', ({ changed: { removed, added } }) => {
 
             // Add a custom class to the elements that where selected.
             for (const el of added) {
@@ -13127,41 +14960,41 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 el.classList.remove('selected');
             }
 
-        }).on('stop', ({inst,selected}) => {
-           
+        }).on('stop', ({ inst, selected }) => {
+
             inst.keepSelection();
-            $scope.ati_selectedFlights=[];
+            $scope.ati_selectedFlights = [];
             //$scope.ati_selectedTypes=[];
             //alert('stop');
 
-            
-            
-            $.each(selected,function(_i,_d){
-                 
-                var $d=$(_d);
+
+
+            $.each(selected, function (_i, _d) {
+
+                var $d = $(_d);
                 $scope.ati_selectedFlights.push($d.data('flight'));
                 // $scope.ati_selectedTypes.push($d.data('type'));
-               
-                
+
+
             });
             //$scope.ati_selectedTypes=Enumerable.From($scope.ati_selectedTypes).Distinct().ToArray();
 
-            
+
         });
 
         ///////////////////////////////////
     };
 
     ///////////////////////////////////////
-    $scope.absHeight=60;
+    $scope.absHeight = 60;
     $scope.search = function () {
         $scope.stop();
         $scope.StopUTimer();
         $scope.bindFlights(function () {
             $scope.createGantt();
             $scope.initSelection();
-            if ($(window).width()>=1200)
-                $('.gantt-main-container').height($(window).height() - 155- $scope.absHeight);
+            if ($(window).width() >= 1200)
+                $('.gantt-main-container').height($(window).height() - 155 - $scope.absHeight);
             else
                 $('.gantt-main-container').height($(window).height() - 145);
         });
@@ -13180,23 +15013,22 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 General.ShowNotify(Config.Text_FillRequired, 'error');
                 return;
             }
-            $scope.ati_selectedFlights=[];
-            $scope.ati_flight=null;
-            $scope.ati_resid=null;
+            $scope.ati_selectedFlights = [];
+            $scope.ati_flight = null;
+            $scope.ati_resid = null;
             $scope.search();
 
         }
 
     };
     ///////////////////////////////////////
-    //2020-10-27
+    //2020-10-27 1 s
     $scope.getNoCrew = function () {
-        if ($scope.dg_nocrew_ds==null)
-        {
+        if ($scope.dg_nocrew_ds == null) {
             $scope.loadingVisible = true;
             flightService.getNoCrews().then(function (response) {
                 $scope.loadingVisible = false;
-            
+
                 $scope.dg_nocrew_ds = response;
 
 
@@ -13205,40 +15037,48 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         else
             $scope.dg_nocrew_instance.refresh();
     };
-    $scope.addCrew=function(){
-        $scope.popup_nocrew_visible=true;
+
+    //magu2-23
+    $scope.noCrewGroup = false;
+    $scope.addCrew = function () {
+        $scope.noCrewGroup = false;
+        $scope.popup_nocrew_visible = true;
     };
-    $scope.removeCrew=function(){
+    $scope.addCrewGroup = function () {
+        $scope.noCrewGroup = true;
+        $scope.popup_nocrew_visible = true;
+    };
+    //////////
+    $scope.removeCrew = function () {
         $scope.dg_crew_abs_selected = $rootScope.getSelectedRow($scope.dg_crew_abs_instance);
         if (!$scope.dg_crew_abs_selected) {
             General.ShowNotify(Config.Text_NoRowSelected, 'error');
             return;
         }
-        if ($scope.dg_crew_abs_selected.JobGroupCode.startsWith('00101') || $scope.dg_crew_abs_selected.JobGroupCode.startsWith('00102'))
-        {
+        if ($scope.dg_crew_abs_selected.JobGroupCode.startsWith('00101') || $scope.dg_crew_abs_selected.JobGroupCode.startsWith('00102')) {
             General.ShowNotify('The flight crew can not be removed', 'error');
             return;
         }
-        var entity={userId:$scope.dg_crew_abs_selected.CrewId, flightId:$scope.flight.ID};
+        var entity = { userId: $scope.dg_crew_abs_selected.CrewId, flightId: $scope.flight.ID };
         $scope.loadingVisible = true;
         flightService.deleteNoCrewFDP(entity).then(function (response) {
             $scope.loadingVisible = false;
             $scope.getCrewAbs($scope.logFlight.ID);
-             
+
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
-         
+
 
     };
-    $scope.bind_nocrew=function(){
+    $scope.bind_nocrew = function () {
 
     };
     $scope.dg_nocrew_columns = [
 
 
-    { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, sortIndex: 0, sortOrder: 'asc',width:150 },
-    { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, sortIndex: 1, sortOrder: 'asc',  },
-    { dataField: 'Mobile', caption: 'Mobile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width:150,   },
-     
+        { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, sortIndex: 0, sortOrder: 'asc', width: 150 },
+        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, sortIndex: 1, sortOrder: 'asc', },
+        { dataField: 'Mobile', caption: 'Mobile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
+
 
     ];
     $scope.dg_nocrew_selected = null;
@@ -13266,7 +15106,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         paging: { pageSize: 100 },
         showBorders: true,
         selection: { mode: 'single' },
-        height:480,
+        height: 480,
         columnAutoWidth: false,
 
 
@@ -13287,7 +15127,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
 
         },
-       
+
         onRowPrepared: function (e) {
             //if (e.data && e.data.IsPositioning)
             //    e.rowElement.css('background', '#ffccff');
@@ -13297,7 +15137,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         bindingOptions: {
             dataSource: 'dg_nocrew_ds',
-             
+
         },
         columnChooser: {
             enabled: false
@@ -13322,46 +15162,65 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         dragEnabled: true,
 
         toolbarItems: [
-             {
-                 widget: 'dxButton', location: 'after', options: {
-                     type: 'default', text: 'Add', icon: '', onClick: function (e) {
-                         $scope.dg_nocrew_selected = $rootScope.getSelectedRow($scope.dg_nocrew_instance);
-                         if (!$scope.dg_nocrew_selected) {
-                             General.ShowNotify(Config.Text_NoRowSelected, 'error');
-                             return;
-                         }
-
-                         var exist=Enumerable.From($scope.dg_crew_abs_ds).Where('$.CrewId=='+$scope.dg_nocrew_selected.Id).FirstOrDefault();
-                         if (exist){
-                             General.ShowNotify('The selected employee already assigned', 'error');
-                             return;
-                         }
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Add', icon: '', onClick: function (e) {
 
 
-                         var entity={userId:$scope.dg_nocrew_selected.Id, code:$scope.dg_nocrew_selected.JobGroupCode,flightId:$scope.flight.ID};
-                         $scope.loadingVisible = true;
-                         flightService.saveNoCrewFDP(entity).then(function (response) {
-                             $scope.loadingVisible = false;
-            
-                              
+
+                        $scope.dg_nocrew_selected = $rootScope.getSelectedRow($scope.dg_nocrew_instance);
+                        if (!$scope.dg_nocrew_selected) {
+                            General.ShowNotify(Config.Text_NoRowSelected, 'error');
+                            return;
+                        }
+
+                        if (!$scope.noCrewGroup) {
+                            var exist = Enumerable.From($scope.dg_crew_abs_ds).Where('$.CrewId==' + $scope.dg_nocrew_selected.Id).FirstOrDefault();
+                            if (exist) {
+                                General.ShowNotify('The selected employee already assigned', 'error');
+                                return;
+                            }
 
 
-                         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                            var entity = { userId: $scope.dg_nocrew_selected.Id, code: $scope.dg_nocrew_selected.JobGroupCode, flightId: $scope.flight.ID };
+                            $scope.loadingVisible = true;
+                            flightService.saveNoCrewFDP(entity).then(function (response) {
+                                $scope.loadingVisible = false;
+                                General.ShowNotify(Config.Text_SavedOk, 'success');
 
 
-                     }
-                 }, toolbar: 'bottom'
-             },
- 
-          {
-              widget: 'dxButton', location: 'after', options: {
-                  type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
 
-                      $scope.popup_nocrew_visible = false;
+                            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                        }
+                        else {
+                            var entity = { userId: $scope.dg_nocrew_selected.Id, code: $scope.dg_nocrew_selected.JobGroupCode, };
+                            entity.flightIds = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray().join('_');
+                            $scope.loadingVisible = true;
+                            flightService.saveNoCrewFDPGroup(entity).then(function (response) {
+                                $scope.loadingVisible = false;
+                                General.ShowNotify(Config.Text_SavedOk, 'success');
 
-                  }
-              }, toolbar: 'bottom'
-          }
+
+
+                            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                        }
+
+                        
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
+
+                        $scope.popup_nocrew_visible = false;
+
+                    }
+                }, toolbar: 'bottom'
+            }
         ],
         visible: false,
 
@@ -13383,7 +15242,10 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 $scope.dg_nocrew_instance.refresh();
         },
         onHiding: function () {
-            $scope.getCrewAbs($scope.logFlight.ID);
+            if (!$scope.noCrewGroup) {
+                $scope.getCrewAbs($scope.logFlight.ID);
+            }
+            
             $scope.popup_nocrew_visible = false;
 
         },
@@ -13394,17 +15256,300 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         }
     };
+    //2021-06-16
+    $scope.btn_aptrpt = {
+        //text: 'Log',
+        hint: 'Airport Daily Report',
+        type: 'default',
+        icon: 'fas fa-print',
+        width: '100%',
+       
+        onClick: function (e) {
+            $scope.popup_aptrpt_visible = true;
+        }
 
+    };
+    $scope.popup_aptrpt_visible = false;
+    $scope.popup_aptrpt_title = 'Daily Report';
+    $scope.popup_aptrpt = {
+        elementAttr: {
+            //  id: "elementId",
+            class: "popup_aptrpt"
+        },
+        shading: true,
+        //position: { my: 'left', at: 'left', of: window, offset: '5 0' },
+        height: 350,
+        width: 400,
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+        toolbarItems: [
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Form 1', icon: 'print', validationGroup: 'fbaptrpt',  onClick: function (arg) {
+
+                        var result = arg.validationGroup.validate();
+                        if (!result.isValid) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+
+                        $window.open($rootScope.reportServer + '?type=8&apt=' + $scope.aptrpt + '&airline=FlyPersia&dt=' + moment(new Date($scope.selectedDate)).format('YYYY-MM-DD')
+                            + (  '&user=' + $scope.aptrpt_user  ) + ( '&phone=' + $scope.aptrpt_phone ), '_blank');
+                         
+
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Form 2', icon: 'print', validationGroup: 'fbaptrpt', onClick: function (arg) {
+
+                        var result = arg.validationGroup.validate();
+                        if (!result.isValid) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+
+                        $window.open($rootScope.reportServer + '?type=9&apt=' + $scope.aptrpt + '&airline=FlyPersia&dt=' + moment(new Date($scope.selectedDate)).format('YYYY-MM-DD')
+                            + ('&user=' + $scope.aptrpt_user) + ('&phone=' + $scope.aptrpt_phone), '_blank');
+
+
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onTitleRendered: function (e) {
+
+        },
+        onShowing: function (e) {
+
+        },
+        onShown: function (e) {
+
+            $scope.loadingVisible = true;
+            flightService.getDayApts(new Date($scope.selectedDate)).then(function (response) {
+                $scope.loadingVisible = false;
+                $scope.ds_aptrpt =response;
+                 
+            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+        },
+        onHiding: function () {
+            $scope.ds_aptrpt = [];
+
+            $scope.popup_aptrpt_visible = false;
+
+        },
+        bindingOptions: {
+            visible: 'popup_aptrpt_visible',
+            
+            title: 'popup_aptrpt_title',
+
+        }
+    };
+
+    //close button
+    $scope.popup_aptrpt.toolbarItems[2].options.onClick = function (e) {
+
+        $scope.popup_aptrpt_visible = false;
+
+    };
+    $scope.aptrpt = null;
+    $scope.ds_aptrpt = [];
+    $scope.sb_aptrpt = {
+
+        showClearButton: true,
+        width: '100%',
+        searchEnabled: true,
+         
+        onSelectionChanged: function (arg) {
+
+        },
+        bindingOptions: {
+            value: 'aptrpt',
+            //2020-11-16
+            dataSource: 'ds_aptrpt',
+
+        }
+    };
+    $scope.aptrpt_user = "";
+    $scope.txt_aptuser = {
+         
+        bindingOptions: {
+            value: 'aptrpt_user',
+
+        }
+    };
+    $scope.aptrpt_phone = "";
+    $scope.txt_aptphone = {
+
+        bindingOptions: {
+            value: 'aptrpt_phone',
+
+        }
+    };
     //////////////////////////////////////
-    $scope.IsGNTVisible=false;
+    //aptrange
+    $scope.IsAptRangeVisible = $rootScope.userName.toLowerCase().startsWith('comm.') || $rootScope.userName.toLowerCase().startsWith('dis.')
+        || $rootScope.userName.toLowerCase().startsWith('demo')
+        || $rootScope.userName.toLowerCase().includes('razbani');
+    $scope.btn_aptrptrange = {
+        //text: 'Log',
+        hint: 'Airport Weekly Report',
+        type: 'default',
+        icon: 'fas fa-print',
+        width: '100%',
+
+        onClick: function (e) {
+            $scope.popup_aptrptrange_visible = true;
+        }
+
+    };
+    $scope.aptrptrange = 'THR';
+    $scope.aptrangefrom = null;
+    $scope.aptrangeto = null;
+
+    $scope.date_fromaptrange = {
+        type: "date",
+        placeholder: 'From',
+        width: '100%',
+        displayFormat: "yyyy-MM-dd",
+        onValueChanged: function (e) {
+            if (!e.value)
+                return;
+            $scope.aptrangeto = (new Date(e.value)).addDays(6);
+        },
+        bindingOptions: {
+            value: 'aptrangefrom',
+
+        }
+    };
+    $scope.date_toaptrange = {
+        type: "date",
+        placeholder: 'To',
+        width: '100%',
+        displayFormat: "yyyy-MM-dd",
+        bindingOptions: {
+            value: 'aptrangeto',
+
+        }
+    };
+    $scope.sb_aptrptrange = {
+        showClearButton: true,
+        searchEnabled: true,
+        dataSource: $rootScope.getDatasourceAirport(),
+         
+        searchExpr: ["IATA", "Country", "SortName", "City"],
+        displayExpr: "IATA",
+        valueExpr: 'IATA',
+        bindingOptions: {
+            value: 'aptrptrange',
+
+
+        }
+    };
+    $scope.popup_aptrptrange_visible = false;
+    $scope.popup_aptrptrange_title = 'Weekly Report';
+    $scope.popup_aptrptrange = {
+        elementAttr: {
+            //  id: "elementId",
+            class: "popup_aptrptrange"
+        },
+        shading: true,
+        //position: { my: 'left', at: 'left', of: window, offset: '5 0' },
+        height: 350,
+        width: 400,
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+        toolbarItems: [
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'View', icon: 'print', validationGroup: 'fbaptrptrange', onClick: function (arg) {
+
+                        var result = arg.validationGroup.validate();
+                        if (!result.isValid) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+
+                        $window.open($rootScope.reportServer + '?type=10&apt=' + $scope.aptrptrange
+                            + '&airline=CASPIAN&dtfrom=' + moment(new Date($scope.aptrangefrom)).format('YYYY-MM-DD')
+                            + '&dtto=' + moment(new Date($scope.aptrangeto)).format('YYYY-MM-DD') , '_blank');
+
+
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+             
+
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onTitleRendered: function (e) {
+
+        },
+        onShowing: function (e) {
+
+        },
+        onShown: function (e) {
+
+            $scope.aptrangefrom = new Date($scope.selectedDate);
+           
+            //flightService.getDayApts(new Date($scope.selectedDate)).then(function (response) {
+            //    $scope.loadingVisible = false;
+            //    $scope.ds_aptrpt = response;
+
+            //}, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+        },
+        onHiding: function () {
+            
+
+            $scope.popup_aptrptrange_visible = false;
+
+        },
+        bindingOptions: {
+            visible: 'popup_aptrptrange_visible',
+
+            title: 'popup_aptrptrange_title',
+
+        }
+    };
+
+    //close button
+    $scope.popup_aptrptrange.toolbarItems[1].options.onClick = function (e) {
+
+        $scope.popup_aptrptrange_visible = false;
+
+    };
+    ///////////////////////
+    $scope.IsGNTVisible = false;
     $scope.delayCodes = null;
     $scope.$on('$viewContentLoaded', function () {
-        $scope.scroll_dep_height=$(window).height() - 195;
+        //2020-11-16
+        $scope.getRealMSNs(Config.CustomerId, function () { });
+        ////////////////////////////////
+        $scope.scroll_dep_height = $(window).height() - 195;
         $scope.scroll2_height = $(window).height() - 266.5 + 87;
         $('.right-col-bottom').height(198);
-        $('.right-col').height($(window).height()-398);
+        $('.right-col').height($(window).height() - 398);
         $('.board').fadeIn(400, function () {
-            
+
 
             $scope.loadingVisible = true;
             flightService.getDelayCodes().then(function (response) {
@@ -13415,11 +15560,11 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                 });
                 $scope.delayCodes = response;
- 
+
                 setTimeout(function () {
-                   
+
                     $scope.search();
-                    $scope.IsGNTVisible=true;
+                    $scope.IsGNTVisible = true;
                 }, 1500);
 
             }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
@@ -13427,7 +15572,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         });
 
 
-       
+
 
     });
     $scope.$on("$destroy", function (event) {
@@ -13436,18 +15581,18 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         //$timeout.cancel(mytimeout);
     });
     $rootScope.$broadcast('FlightBoardLoaded', null);
-    $scope.scroll_dep_height=$(window).height() - 195;
+    $scope.scroll_dep_height = $(window).height() - 195;
     var appWindow = angular.element($window);
     appWindow.bind('resize', function () {
         $scope.refreshHeights();
-        
-        if ($(window).width()>=1200)
-            $('.gantt-main-container').height($(window).height() - 145- $scope.absHeight);
+
+        if ($(window).width() >= 1200)
+            $('.gantt-main-container').height($(window).height() - 145 - $scope.absHeight);
         else
             $('.gantt-main-container').height($(window).height() - 145);
         $scope.$apply(function () {
 
-            $scope.scroll_dep_height=$(window).height() - 195;
+            $scope.scroll_dep_height = $(window).height() - 195;
 
         });
         //if ($(window).width() > $(window).height()) {
@@ -13461,7 +15606,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
 
         //} else {
-            
+
         //    $scope.$apply(function () {
 
         //        $scope.footerfilter = true;
@@ -13472,7 +15617,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         //}
 
     });
-    
-     
+
+
 
 }]);

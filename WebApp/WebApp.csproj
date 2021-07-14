@@ -88,6 +88,7 @@
     <Content Include="app\controllers\certificateAddController.js" />
     <Content Include="app\controllers\changeFlightRegisterController.js" />
     <Content Include="app\controllers\citypair.js" />
+    <Content Include="app\controllers\citypairyearly.js" />
     <Content Include="app\controllers\courseAddController.js" />
     <Content Include="app\controllers\courseController.js" />
     <Content Include="app\controllers\coursepersonController.js" />
@@ -102,6 +103,9 @@
     <Content Include="app\controllers\crewtest.js" />
     <Content Include="app\controllers\crewtimereport.js" />
     <Content Include="app\controllers\dailyRoster2Controller.js" />
+    <Content Include="app\controllers\delayAirportReport.js" />
+    <Content Include="app\controllers\delaybidaily.js" />
+    <Content Include="app\controllers\delaybiKPI.js" />
     <Content Include="app\controllers\delayCodesController.js" />
     <Content Include="app\controllers\delayReport.js" />
     <Content Include="app\controllers\documentAddController.js" />
@@ -133,8 +137,11 @@
     <Content Include="app\controllers\flightReportSecurityController.js" />
     <Content Include="app\controllers\flightsMonthly.js" />
     <Content Include="app\controllers\forma.js" />
+    <Content Include="app\controllers\formayearly.js" />
     <Content Include="app\controllers\formmovaled.js" />
+    <Content Include="app\controllers\formmovaledyearly.js" />
     <Content Include="app\controllers\fuelbi.js" />
+    <Content Include="app\controllers\fuelbiKPI.js" />
     <Content Include="app\controllers\fuelbiRoute.js" />
     <Content Include="app\controllers\fuelReport.js" />
     <Content Include="app\controllers\gnt.js" />
@@ -145,6 +152,21 @@
     <Content Include="app\controllers\jobgroupSelectController.js" />
     <Content Include="app\controllers\journalAddController.js" />
     <Content Include="app\controllers\journalController.js" />
+    <Content Include="app\controllers\kpiDelay.js" />
+    <Content Include="app\controllers\kpiDelayAirport.js" />
+    <Content Include="app\controllers\kpiDelayCat.js" />
+    <Content Include="app\controllers\kpiDelayTech.js" />
+    <Content Include="app\controllers\kpiFBL.js" />
+    <Content Include="app\controllers\kpiFC.js" />
+    <Content Include="app\controllers\kpiFP.js" />
+    <Content Include="app\controllers\kpiFRP.js" />
+    <Content Include="app\controllers\kpiFTK.js" />
+    <Content Include="app\controllers\kpiFU.js" />
+    <Content Include="app\controllers\kpiRPB.js" />
+    <Content Include="app\controllers\kpiRPK.js" />
+    <Content Include="app\controllers\kpiRPKAC.js" />
+    <Content Include="app\controllers\kpiRPKReg.js" />
+    <Content Include="app\controllers\kpiRPKRoute.js" />
     <Content Include="app\controllers\libraryAddController.js" />
     <Content Include="app\controllers\libraryController.js" />
     <Content Include="app\controllers\locationAddController.js" />
@@ -179,11 +201,19 @@
     <Content Include="app\controllers\routeController.js" />
     <Content Include="app\controllers\statDelayController.js" />
     <Content Include="app\controllers\studyFieldSelectController.js" />
+    <Content Include="app\controllers\tblDelay.js" />
+    <Content Include="app\controllers\tblDelayAirport.js" />
+    <Content Include="app\controllers\tblDelayCat.js" />
+    <Content Include="app\controllers\tblDelayedFlights.js" />
+    <Content Include="app\controllers\tblDelayItems.js" />
+    <Content Include="app\controllers\tblDelayTech.js" />
+    <Content Include="app\controllers\training.js" />
     <Content Include="app\controllers\usersController.js" />
     <Content Include="app\controllers\verify.js" />
     <Content Include="app\services\activityService.js" />
     <Content Include="app\services\aircraftService.js" />
     <Content Include="app\services\airportService.js" />
+    <Content Include="app\services\biService.js" />
     <Content Include="app\services\courseService.js" />
     <Content Include="app\services\flightService.js" />
     <Content Include="app\services\generalService.js" />
@@ -206,6 +236,7 @@
     <Content Include="app\views\certificateAdd.html" />
     <Content Include="app\views\changeflightregister.html" />
     <Content Include="app\views\citypair.html" />
+    <Content Include="app\views\citypairyearly.html" />
     <Content Include="app\views\course.html" />
     <Content Include="app\views\courseAdd.html" />
     <Content Include="app\views\courseperson.html" />
@@ -222,6 +253,12 @@
     <Content Include="app\views\dailyRoster2.html" />
     <Content Include="app\views\dashboard.html" />
     <Content Include="app\views\DatePicker.html" />
+    <Content Include="app\views\delayAirportReport.html" />
+    <Content Include="app\views\delaybidaily.html" />
+    <Content Include="app\views\delaybiKPI.html" />
+    <Content Include="app\views\formayearly.html" />
+    <Content Include="app\views\formmovaledyearly.html" />
+    <Content Include="app\views\kpiDelayCat.html" />
     <Content Include="app\views\delayCodes.html" />
     <Content Include="app\views\delayReport.html" />
     <Content Include="app\views\Document.html" />
@@ -257,6 +294,7 @@
     <Content Include="app\views\forma.html" />
     <Content Include="app\views\formmovaled.html" />
     <Content Include="app\views\fuelbi.html" />
+    <Content Include="app\views\fuelbiKPI.html" />
     <Content Include="app\views\fuelbiRoute.html" />
     <Content Include="app\views\fuelReport.html" />
     <Content Include="app\views\gnt.html" />
@@ -269,6 +307,20 @@
     <Content Include="app\views\jobgroupSelect.html" />
     <Content Include="app\views\journal.html" />
     <Content Include="app\views\journalAdd.html" />
+    <Content Include="app\views\kpiDelay.html" />
+    <Content Include="app\views\kpiDelayAirport.html" />
+    <Content Include="app\views\kpiDelayTech.html" />
+    <Content Include="app\views\kpiFBL.html" />
+    <Content Include="app\views\kpiFC.html" />
+    <Content Include="app\views\kpiFP.html" />
+    <Content Include="app\views\kpiFRP.html" />
+    <Content Include="app\views\kpiFTK.html" />
+    <Content Include="app\views\kpiFU.html" />
+    <Content Include="app\views\kpiRPB.html" />
+    <Content Include="app\views\kpiRPK.html" />
+    <Content Include="app\views\kpiRPKAC.html" />
+    <Content Include="app\views\kpiRPKReg.html" />
+    <Content Include="app\views\kpiRPKRoute.html" />
     <Content Include="app\views\library.html" />
     <Content Include="app\views\libraryAdd.html" />
     <Content Include="app\views\location.html" />
@@ -303,7 +355,14 @@
     <Content Include="app\views\routeAdd.html" />
     <Content Include="app\views\statDelay.html" />
     <Content Include="app\views\studyFieldSelect.html" />
+    <Content Include="app\views\tblDelay.html" />
+    <Content Include="app\views\tblDelayAirport.html" />
+    <Content Include="app\views\tblDelayCat.html" />
+    <Content Include="app\views\tblDelayedFlight.html" />
+    <Content Include="app\views\tblDelayItems.html" />
+    <Content Include="app\views\tblDelayTech.html" />
     <Content Include="app\views\templates.html" />
+    <Content Include="app\views\training.html" />
     <Content Include="app\views\users.html" />
     <Content Include="app\views\verify.html" />
     <Content Include="content\css\bootstrap-4.min.css" />
@@ -1724,7 +1783,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>30273</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:30273/</IISUrl>
+          <IISUrl>http://localhost:30000/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

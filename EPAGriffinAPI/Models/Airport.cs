@@ -19,10 +19,10 @@ namespace EPAGriffinAPI.Models
         {
             this.FlightPlanItems = new HashSet<FlightPlanItem>();
             this.FlightPlanItems1 = new HashSet<FlightPlanItem>();
-            this.FlightInformations = new HashSet<FlightInformation>();
-            this.FlightInformations1 = new HashSet<FlightInformation>();
             this.Employees = new HashSet<Employee>();
             this.Employees1 = new HashSet<Employee>();
+            this.FlightInformations = new HashSet<FlightInformation>();
+            this.FlightInformations1 = new HashSet<FlightInformation>();
         }
     
         public int Id { get; set; }
@@ -42,12 +42,12 @@ namespace EPAGriffinAPI.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<FlightPlanItem> FlightPlanItems1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<FlightInformation> FlightInformations { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<FlightInformation> FlightInformations1 { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Employee> Employees { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Employee> Employees1 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<FlightInformation> FlightInformations { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<FlightInformation> FlightInformations1 { get; set; }
     }
 }

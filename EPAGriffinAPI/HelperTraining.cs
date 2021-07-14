@@ -135,6 +135,8 @@ namespace EPAGriffinAPI
                         Id=Guid.NewGuid(),
 
                     };
+                    if (dbrec.CourseCode == "Re/Annual-Re/Cabin")
+                        dbrec.DateIssue = dbrec.DateStart;
                     context.Ideas.Add(dbrec);
                 }
 
@@ -152,7 +154,7 @@ namespace EPAGriffinAPI
             IdeaServiceRef.TrainingWSSoapClient client = new IdeaServiceRef.TrainingWSSoapClient();
             try
             {
-                var obj = client.GetPersonnelDataByDate("passcourse", "20200101", "20210616", "");
+                var obj = client.GetPersonnelDataByDate("passcourse", "20210401", "20210501", "");
                 var records = new List<IdeaRecord2>();
                 var list = obj.Tables[0].Rows[0];
                 for (int i = 0; i < list.Table.Rows.Count - 1; i++)
@@ -236,7 +238,8 @@ namespace EPAGriffinAPI
             IdeaServiceRef.TrainingWSSoapClient client = new IdeaServiceRef.TrainingWSSoapClient();
             try
             {
-                var obj = client.GetPersonnelDataByDate("passcourse", "20180101", "20210616", "");
+                
+                var obj = client.GetPersonnelDataByDate("passcourse", "20210401", "20210501", "");
                 var records = new List<IdeaRecord2>();
                 var list = obj.Tables[0].Rows[0];
                 
@@ -253,6 +256,32 @@ namespace EPAGriffinAPI
 
            
         }
+
+        //public static object GetIdeaAll4()
+        //{
+        //    ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+        //    IdeaServiceRef.TrainingWSSoapClient client = new IdeaServiceRef.TrainingWSSoapClient();
+        //    try
+        //    {
+
+        //        //var obj = client.GetPersonnelDataByDate("passcourse", "20210401", "20210501", "");
+        //        var obj = client.GetTrainingDurationSum("passcourse","","2020");
+        //        var records = new List<IdeaRecord2>();
+        //        var list = obj.Tables[0].Rows[0];
+
+
+        //        return list.Table.Rows;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ex.Message + "   Inner:   " + (ex.InnerException != null ? ex.InnerException.Message : "-");
+        //    }
+
+
+
+
+
+        //}
 
 
 

@@ -20,24 +20,42 @@ namespace EPAGriffinAPI.Models
         public string ArgStr { get; set; }
         public Nullable<int> ArgNum { get; set; }
         public Nullable<int> Legs { get; set; }
+        public int PreLegs { get; set; }
+        public Nullable<decimal> LegsDiff { get; set; }
         public decimal Uplift { get; set; }
         public decimal Used { get; set; }
         public decimal FPFuel { get; set; }
         public decimal PreUsed { get; set; }
+        public Nullable<decimal> UsedKiloDiff { get; set; }
+        public Nullable<decimal> UsedPerUpLift { get; set; }
+        public decimal PreUsedPerUpLift { get; set; }
+        public Nullable<decimal> UsedPerUpLiftDiff { get; set; }
+        public Nullable<decimal> UsedPerFPFuel { get; set; }
+        public decimal PreUsedPerFPFuel { get; set; }
+        public Nullable<decimal> UsedPerFPFuelDiff { get; set; }
         public Nullable<decimal> UpliftKilo { get; set; }
         public Nullable<decimal> UsedKilo { get; set; }
+        public decimal PreUsedKilo { get; set; }
         public Nullable<decimal> FPFuelKilo { get; set; }
         public Nullable<decimal> UpliftPerLeg { get; set; }
         public Nullable<decimal> UsedPerLeg { get; set; }
+        public decimal PreUsedPerLeg { get; set; }
+        public Nullable<decimal> UsedDiffPerLeg { get; set; }
         public Nullable<decimal> FPFuelPerLeg { get; set; }
         public Nullable<decimal> UpliftKiloPerLeg { get; set; }
         public Nullable<decimal> UsedKiloPerLeg { get; set; }
         public int TotalPax { get; set; }
+        public int PreTotalPax { get; set; }
+        public Nullable<decimal> TotalPaxDiff { get; set; }
         public int TotalPaxAll { get; set; }
         public double Distance { get; set; }
+        public double PreDistance { get; set; }
+        public Nullable<double> DistanceDiff { get; set; }
         public double DistanceKM { get; set; }
         public int Weight { get; set; }
         public decimal WeightTone { get; set; }
+        public decimal PreWeightTone { get; set; }
+        public Nullable<decimal> WeightToneDiff { get; set; }
         public int PaxWeight { get; set; }
         public decimal PaxWeightTone { get; set; }
         public double WeightDistance { get; set; }
@@ -51,20 +69,22 @@ namespace EPAGriffinAPI.Models
         public Nullable<double> UpliftPerWeightDistance { get; set; }
         public Nullable<double> UpliftPerWeightDistanceKM { get; set; }
         public Nullable<decimal> UsedPerPax { get; set; }
+        public decimal PreUsedPerPax { get; set; }
+        public Nullable<decimal> UsedPerPaxDiff { get; set; }
         public Nullable<decimal> FPFuelPerPax { get; set; }
         public Nullable<decimal> UsedPerWeight { get; set; }
         public Nullable<double> UsedPerDistance { get; set; }
         public Nullable<double> UsedPerDistanceKM { get; set; }
         public Nullable<double> UsedPerWeightDistance { get; set; }
         public Nullable<double> UsedPerWeightDistanceKM { get; set; }
+        public double PreUsedPerWeightDistanceKM { get; set; }
+        public Nullable<double> UsedPerWeightDistanceDiff { get; set; }
         public Nullable<decimal> UsedDiff { get; set; }
-        public Nullable<decimal> UsedDiffPerLeg { get; set; }
         public Nullable<decimal> UsedDiffPerPax { get; set; }
         public Nullable<decimal> UsedDiffPerWeight { get; set; }
         public Nullable<double> UsedDiffPerDistance { get; set; }
         public Nullable<double> UsedDiffPerWeightDistance { get; set; }
         public Nullable<decimal> UsedDiffPercent { get; set; }
-        public Nullable<decimal> UsedDiffPerLegPercent { get; set; }
         public Nullable<decimal> UsedDiffPerPaxPercent { get; set; }
         public Nullable<decimal> UsedDiffPerWeightPercent { get; set; }
         public Nullable<double> UsedDiffPerDistancePercent { get; set; }
@@ -75,12 +95,34 @@ namespace EPAGriffinAPI.Models
         public Nullable<decimal> FPFuelPerWeightTone { get; set; }
         public int FlightTime { get; set; }
         public int BlockTime { get; set; }
+        public int PreBlockTime { get; set; }
+        public Nullable<decimal> BlockTimeDiff { get; set; }
         public Nullable<decimal> UsedPerFlightTime { get; set; }
         public Nullable<decimal> UsedPerBlockTime { get; set; }
+        public decimal PreUsedPerBlockTime { get; set; }
+        public Nullable<decimal> UsedPerBlockTimeDiff { get; set; }
         public Nullable<decimal> FPFuelPerFlightTime { get; set; }
         public Nullable<decimal> FPFuelPerBlockTime { get; set; }
         public Nullable<decimal> MaxUsed { get; set; }
         public Nullable<decimal> MinUsed { get; set; }
         public Nullable<decimal> AvgUsed { get; set; }
+        public double SeatDistanceKM { get; set; }
+        public double SeatKiloDistanceKM { get; set; }
+        public Nullable<double> UsedPerSeatDistanceKM { get; set; }
+        public Nullable<double> UsedPerSeatKiloDistanceKM { get; set; }
+        public double PaxDistanceKM { get; set; }
+        public double PaxKiloDistanceKM { get; set; }
+        public Nullable<double> UsedPerPaxDistanceKM { get; set; }
+        public Nullable<double> UsedPerPaxKiloDistanceKM { get; set; }
+        public double PreUsedPerPaxKiloDistanceKM { get; set; }
+        public Nullable<double> UsedPerPaxKiloDistanceKMAvg { get; set; }
+        public Nullable<double> UsedPerPaxKiloDistanceKMDiff { get; set; }
+        public Nullable<int> TotalSeat { get; set; }
+        public Nullable<decimal> UsedPerPaxBlockTime { get; set; }
+        public decimal PreUsedPerPaxBlockTime { get; set; }
+        public Nullable<decimal> UsedPerSeatBlockTime { get; set; }
+        public Nullable<decimal> UsedPerPaxBlockTimeAvg { get; set; }
+        public Nullable<decimal> UsedPerSeatBlockTimeAvg { get; set; }
+        public Nullable<decimal> UsedPerPaxBlockTimeDiff { get; set; }
     }
 }

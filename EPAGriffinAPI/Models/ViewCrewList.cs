@@ -23,12 +23,14 @@ namespace EPAGriffinAPI.Models
         public int RosterPositionId { get; set; }
         public string Position { get; set; }
         public string Name { get; set; }
+        public string ScheduleName { get; set; }
+        public Nullable<int> Seniority { get; set; }
         public Nullable<int> GroupId { get; set; }
         public string JobGroup { get; set; }
         public string JobGroupCode { get; set; }
         public int SexId { get; set; }
         public string Sex { get; set; }
-        public int GroupOrder { get; set; }
+        public Nullable<int> GroupOrder { get; set; }
         public string FDPTitle { get; set; }
         public int IsCockpit { get; set; }
         public string PID { get; set; }

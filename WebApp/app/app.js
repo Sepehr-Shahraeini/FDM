@@ -523,6 +523,50 @@ app.config(function ($routeProvider) {
         templateUrl: "/app/views/fuelbi.html",
         reloadOnSearch: false
     });
+    $routeProvider.when("/fuel/main", {
+        controller: "fuelkpiController",
+        templateUrl: "/app/views/fuelbikpi.html",
+        reloadOnSearch: false
+    });
+    $routeProvider.when("/delay/main", {
+        controller: "delaykpiController",
+        templateUrl: "/app/views/delaybikpi.html",
+        reloadOnSearch: false
+    });
+
+    $routeProvider.when("/delay/daily", {
+        controller: "delaybidailyController",
+        templateUrl: "/app/views/delaybidaily.html",
+        reloadOnSearch: false
+    });
+
+
+
+    $routeProvider.when("/formmovaled/yearly", {
+        controller: "formmovaledYearlyController",
+        templateUrl: "/app/views/formmovaledyearly.html"
+    });
+
+    $routeProvider.when("/citypair/yearly", {
+        controller: "citypairYearlyController",
+        templateUrl: "/app/views/citypairyearly.html"
+    });
+
+    $routeProvider.when("/forma/yearly", {
+        controller: "formaYearlyController",
+        templateUrl: "/app/views/formayearly.html"
+    });
+
+    $routeProvider.when("/delays/airports", {
+        controller: "delayAirportReportController",
+        templateUrl: "/app/views/delayairportreport.html"
+    });
+
+    $routeProvider.when("/training", {
+        controller: "trainingController",
+        templateUrl: "/app/views/training.html"
+    });
+
     $routeProvider.otherwise({ redirectTo: "/home" });
 
 });   
@@ -539,7 +583,7 @@ else {
    // var serviceBase = 'http://fleet.caspianairlines.com/api/';
     var webBase = 'http://localhost:30273/';
 }
-
+var serviceBaseAPI = 'http://localhost:12271/';
 //var serviceBase =  'http://localhost:58908/';
  //var webBase = 'http://localhost:30273/';
 
@@ -572,14 +616,155 @@ app.directive('ngRightClick', function ($parse) {
         });
     };
 });
- 
+app.directive('ngRepeatEndWatch', function () {
+    return {
+        restrict: 'A',
+        scope: {},
+        link: function (scope, element, attrs) {
+            if (attrs.ngRepeat) {
+                if (scope.$parent.$last) {
+                    if (attrs.ngRepeatEndWatch !== '') {
+                        if (typeof scope.$parent.$parent[attrs.ngRepeatEndWatch] === 'function') {
+                            // Executes defined function
+                            scope.$parent.$parent[attrs.ngRepeatEndWatch]();
+                        } else {
+                            // For watcher, if you prefer
+                            scope.$parent.$parent[attrs.ngRepeatEndWatch] = true;
+                        }
+                    } else {
+                        // If no value was provided than we will provide one on you controller scope, that you can watch
+                        // WARNING: Multiple instances of this directive could yeild unwanted results.
+                        scope.$parent.$parent.ngRepeatEnd = true;
+                    }
+                }
+            } else {
+                throw 'ngRepeatEndWatch: `ngRepeat` Directive required to use this Directive';
+            }
+        }
+    };
+});
+
+app.directive(
+    "repeatComplete",
+    function ($rootScope) {
+
+        // Because we can have multiple ng-repeat directives in
+        // the same container, we need a way to differentiate
+        // the different sets of elements. We'll add a unique ID
+        // to each set.
+        var uuid = 0;
+
+
+        // I compile the DOM node before it is linked by the
+        // ng-repeat directive.
+        function compile(tElement, tAttributes) {
+
+            // Get the unique ID that we'll be using for this
+            // particular instance of the directive.
+            var id = ++uuid;
+
+            // Add the unique ID so we know how to query for
+            // DOM elements during the digests.
+            tElement.attr("repeat-complete-id", id);
+
+            // Since this directive doesn't have a linking phase,
+            // remove it from the DOM node.
+            tElement.removeAttr("repeat-complete");
+
+            // Keep track of the expression we're going to
+            // invoke once the ng-repeat has finished
+            // rendering.
+            var completeExpression = tAttributes.repeatComplete;
+
+            // Get the element that contains the list. We'll
+            // use this element as the launch point for our
+            // DOM search query.
+            var parent = tElement.parent();
+
+            // Get the scope associated with the parent - we
+            // want to get as close to the ngRepeat so that our
+            // watcher will automatically unbind as soon as the
+            // parent scope is destroyed.
+            var parentScope = (parent.scope() || $rootScope);
+
+            // Since we are outside of the ng-repeat directive,
+            // we'll have to check the state of the DOM during
+            // each $digest phase; BUT, we only need to do this
+            // once, so save a referene to the un-watcher.
+            var unbindWatcher = parentScope.$watch(
+                function () {
+
+                    console.info("Digest running.");
+
+                    // Now that we're in a digest, check to see
+                    // if there are any ngRepeat items being
+                    // rendered. Since we want to know when the
+                    // list has completed, we only need the last
+                    // one we can find.
+                    var lastItem = parent.children("*[ repeat-complete-id = '" + id + "' ]:last");
+
+                    // If no items have been rendered yet, stop.
+                    if (!lastItem.length) {
+
+                        return;
+
+                    }
+
+                    // Get the local ng-repeat scope for the item.
+                    var itemScope = lastItem.scope();
+
+                    // If the item is the "last" item as defined
+                    // by the ng-repeat directive, then we know
+                    // that the ng-repeat directive has finished
+                    // rendering its list (for the first time).
+                    if (itemScope.$last) {
+
+                        // Stop watching for changes - we only
+                        // care about the first complete rendering.
+                        unbindWatcher();
+
+                        // Invoke the callback.
+                        itemScope.$eval(completeExpression);
+
+                    }
+
+                }
+            );
+
+        }
+
+        // Return the directive configuration. It's important
+        // that this compiles before the ngRepeat directive
+        // compiles the DOM node.
+        return ({
+            compile: compile,
+            priority: 1001,
+            restrict: "A"
+        });
+
+    }
+);
+
+app.directive('onFinishRender', function ($timeout) {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attr) {
+            if (scope.$last === true) {
+                $timeout(function () {
+                    scope.$emit(attr.onFinishRender);
+                });
+            }
+        }
+    }
+});
+
 app.run(['authService', 'activityService', '$rootScope', '$location', '$templateCache', function (authService, activityService, $rootScope, $location, $templateCache) {
     //alert($location.absUrl());
     // Config.CustomerId = 4;
     $rootScope.CustomerName = 'Caspian';
     $rootScope.CustomerPhone = '+982148063000';
     $rootScope.CustomerEmail = 'OpsEng@Caspian.aero';
-    Config.CustomerId = 1;
+    Config.CustomerId = 4;
     if ($location.absUrl().indexOf('fleet.flypersia.aero') != -1) {
         webBase = 'http://fleet.flypersia.aero/airpocket/';
         serviceBase = 'http://fleet.flypersia.aero/api.airpocket/';
@@ -587,6 +772,8 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
     ////////////////////////////////
     $rootScope.reportServer = "https://localhost:44350/frmreportview.aspx";
     
+    ////////////////////////////////
+    $rootScope.startingBIYear = 1398;
     ////////////////////////////////
     persianDate.toLocale('en');
    
@@ -617,6 +804,13 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
     $rootScope.employeeId = null;
     //vahid
     $rootScope.roles = null;
+    $rootScope.HasAccessToCrewList = function () {
+
+        var role = Enumerable.From($rootScope.roles).Where('$=="Flight Crew List"').FirstOrDefault();
+        if (role)
+            return true;
+        return false;
+    };
     //ati12
     $rootScope.logOut = function () {
 
@@ -1333,9 +1527,351 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
     $rootScope.goProfile = function () {
         $rootScope.navigatefirstlogin();
     }
+    ////////////////////////////////////////////////
+    $rootScope.colorSet1 = [
+        '#ff7b25',
+        '#80ced6',
+        '#eca1a6',
+        '#6b5b95',
+        '#e3eaa7',
+        '#86af49',
+        '#ffff4d',
+        '#3399ff',
+        
+        '#feb236',
+        '#b5e7a0',
+        '#d64161',
+        '#00ff00',
+       
 
+       
+
+        '#bdcebe',
+       
+        '#c1946a',
+        '#034f84',
+        '#c94c4c',
+        '#92a8d1',
+        '#50394c',
+        
+        '#4040a1',
+        '#622569',
+        '#eeac99',
+        '#588c7e',
+        '#ffcc5c',
+        '#a2836e',
+        '#87bdd8',
+        '#CC00CC',
+        '#00FF00',
+        '#03A9F4',
+        '#607D8B',
+        '#9966FF',
+        '#00FF99',
+        '#0099CC',
+        '#AD1457',
+    ];
+
+    $rootScope.colorSet2 = [
+        '#0099cc',
+       // '#66b3ff',
+       
+        '#00cc99',
+        '#cc0052',
+        '#cc7a00',
+
+        '#9900cc',
+        '#558000',
+        '#996633',
+        '#00cccc',
+
+
+
+    ];
+    $rootScope.colorSetLight = [
+        '#d9d9d9',
+        '#ffe6cc',
+        '#e0e0d1',
+        '#d1e0e0',
+        '#d1d1e0',
+        '#f2d9e6',
+
+    ];
+    $rootScope.colorSet3 = [
+        '#00ace6',
+        '#339966',
+
+        '#ff0066',
+        '#ff9900',
+
+        '#bf00ff',
+        '#77b300',
+        '#bf8040',
+        '#00ffff',
+
+
+
+    ];
+
+    $rootScope.colorSetChart = [
+        '#ffcccc',
+        '#d9d9d9',
+
+        '#4dd2ff',
+        '#66ff99',
+
+        '#ff99ff',
+        '#66ffe0',
+         
+    ];
+    $rootScope.colorSetChart2 = [
+        '#4dffd2',
+        '#cccccc',
+
+        '#b3ccff',
+        '#ffd699',
+
+        '#ff99ff',
+        '#66ffe0',
+
+    ];
+
+
+    $rootScope.getColorFromSet = function (n) {
+        //0 based
+        if (n > $rootScope.colorSet1.length - 1)
+            n = n % ($rootScope.colorSet1.length - 1);
+        return $rootScope.colorSet1[n];
+    };
+    $rootScope.getColorFromSet1 = function (n) {
+        //0 based
+        if (n > $rootScope.colorSet1.length - 1)
+            n = n % ($rootScope.colorSet1.length - 1);
+        return $rootScope.colorSet1[n];
+    };
+    $rootScope.getColorFromSet2 = function (n) {
+        //0 based
+        if (n > $rootScope.colorSet2.length - 1)
+            n = n % ($rootScope.colorSet2.length - 1);
+        return $rootScope.colorSet2[n];
+    };
+    $rootScope.getColorFromSetLight = function (n) {
+        //0 based
+        if (n > $rootScope.colorSetLight.length - 1)
+            n = n % ($rootScope.colorSetLight.length - 1);
+        return $rootScope.colorSetLight[n];
+    };
+    $rootScope.getColorFromSet3 = function (n) {
+        //0 based
+        if (n > $rootScope.colorSet3.length - 1)
+            n = n % ($rootScope.colorSet3.length - 1);
+        return $rootScope.colorSet3[n];
+    };
+
+
+    $rootScope.colorSetRed = [
+        '#ff3300',
+        
+
+        '#e68a00',
+        
+
+
+        '#ff33cc',
+       
+
+        '#802000',
+        
+
+        '#e6e600',
+        '#800060',
+
+    ];
+    $rootScope.colorSetGreen = [
+        '#00cc00', 
+        '#339966',
+         
+        
+        '#00cca3',
+
+        
+        '#006666',
+
+       
+        '#00ccff',
+
+
+
+
+
+    ];
+    $rootScope.colorSetGray = [
+        '#b3b3b3',
+        '#b3b3cc',
+        '#b3cccc',
+        '#666666',
+        
+
+    ];
+    $rootScope.getColorFromSetRed  = function (n) {
+        //0 based
+        if (n > $rootScope.colorSetRed .length - 1)
+            n = n % ($rootScope.colorSetRed .length - 1);
+        return $rootScope.colorSetRed [n];
+    };
+    $rootScope.getColorFromSetGreen = function (n) {
+        //0 based
+        if (n > $rootScope.colorSetGreen.length - 1)
+            n = n % ($rootScope.colorSetGreen.length - 1);
+        return $rootScope.colorSetGreen[n];
+    };
+    $rootScope.getColorFromSetGray = function (n) {
+        //0 based
+        if (n > $rootScope.colorSetGray.length - 1)
+            n = n % ($rootScope.colorSetGray.length - 1);
+        return $rootScope.colorSetGray[n];
+    };
     ////////////////////////////////////////////////
 }]);
+
+
+
+(function (global) {
+    var MONTHS = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
+    ];
+
+    var COLORS = [
+        '#4dc9f6',
+        '#f67019',
+        '#f53794',
+        '#537bc4',
+        '#acc236',
+        '#166a8f',
+        '#00a950',
+        '#58595b',
+        '#8549ba'
+    ];
+
+    var Samples = global.Samples || (global.Samples = {});
+    var Color = global.Color;
+
+    Samples.utils = {
+        // Adapted from http://indiegamr.com/generate-repeatable-random-numbers-in-js/
+        srand: function (seed) {
+            this._seed = seed;
+        },
+
+        rand: function (min, max) {
+            var seed = this._seed;
+            min = min === undefined ? 0 : min;
+            max = max === undefined ? 1 : max;
+            this._seed = (seed * 9301 + 49297) % 233280;
+            return min + (this._seed / 233280) * (max - min);
+        },
+
+        numbers: function (config) {
+            var cfg = config || {};
+            var min = cfg.min || 0;
+            var max = cfg.max || 1;
+            var from = cfg.from || [];
+            var count = cfg.count || 8;
+            var decimals = cfg.decimals || 8;
+            var continuity = cfg.continuity || 1;
+            var dfactor = Math.pow(10, decimals) || 0;
+            var data = [];
+            var i, value;
+
+            for (i = 0; i < count; ++i) {
+                value = (from[i] || 0) + this.rand(min, max);
+                if (this.rand() <= continuity) {
+                    data.push(Math.round(dfactor * value) / dfactor);
+                } else {
+                    data.push(null);
+                }
+            }
+
+            return data;
+        },
+
+        labels: function (config) {
+            var cfg = config || {};
+            var min = cfg.min || 0;
+            var max = cfg.max || 100;
+            var count = cfg.count || 8;
+            var step = (max - min) / count;
+            var decimals = cfg.decimals || 8;
+            var dfactor = Math.pow(10, decimals) || 0;
+            var prefix = cfg.prefix || '';
+            var values = [];
+            var i;
+
+            for (i = min; i < max; i += step) {
+                values.push(prefix + Math.round(dfactor * i) / dfactor);
+            }
+
+            return values;
+        },
+
+        months: function (config) {
+            var cfg = config || {};
+            var count = cfg.count || 12;
+            var section = cfg.section;
+            var values = [];
+            var i, value;
+
+            for (i = 0; i < count; ++i) {
+                value = MONTHS[Math.ceil(i) % 12];
+                values.push(value.substring(0, section));
+            }
+
+            return values;
+        },
+
+        color: function (index) {
+            return COLORS[index % COLORS.length];
+        },
+
+        transparentize: function (color, opacity) {
+            var alpha = opacity === undefined ? 0.5 : 1 - opacity;
+            return Color(color).alpha(alpha).rgbString();
+        }
+    };
+
+    // DEPRECATED
+    window.randomScalingFactor = function () {
+        return Math.round(Samples.utils.rand(-100, 100));
+    };
+
+    // INITIALIZATION
+
+    Samples.utils.srand(Date.now());
+
+    // Google Analytics
+    /* eslint-disable */
+    if (document.location.hostname.match(/^(www\.)?chartjs\.org$/)) {
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-28909194-3', 'auto');
+        ga('send', 'pageview');
+    }
+    /* eslint-enable */
+
+}(this));
  
  
  

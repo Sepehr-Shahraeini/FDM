@@ -19,10 +19,14 @@ namespace EPAGriffinAPI.Models
         public string MonthName { get; set; }
         public string DayName { get; set; }
         public string YearName { get; set; }
+        public string PYearMonth { get; set; }
         public string PDate { get; set; }
         public string PYearName { get; set; }
-        public string PMonthName { get; set; }
         public string PDayName { get; set; }
+        public string PMonthName { get; set; }
+        public Nullable<int> PYear { get; set; }
+        public Nullable<int> PMonth { get; set; }
+        public Nullable<int> PDay { get; set; }
         public int FlightId { get; set; }
         public int DelayCodeId { get; set; }
         public Nullable<int> DelayHH { get; set; }
@@ -78,13 +82,13 @@ namespace EPAGriffinAPI.Models
         public string BaseIATA { get; set; }
         public string BaseName { get; set; }
         public string Route { get; set; }
-        public Nullable<int> PassedDay { get; set; }
-        public Nullable<int> PassedWeek { get; set; }
-        public Nullable<int> PassedMonth { get; set; }
-        public Nullable<int> PassedYear { get; set; }
-        public Nullable<int> DayOfWeek { get; set; }
-        public Nullable<int> WeekOfMonth { get; set; }
-        public Nullable<int> MonthOfYear { get; set; }
+        public int PassedDay { get; set; }
+        public int PassedWeek { get; set; }
+        public int PassedMonth { get; set; }
+        public int PassedYear { get; set; }
+        public int DayOfWeek { get; set; }
+        public int WeekOfMonth { get; set; }
+        public int MonthOfYear { get; set; }
         public Nullable<System.DateTime> STDLocal { get; set; }
         public Nullable<System.DateTime> STALocal { get; set; }
         public Nullable<System.DateTime> DepartureLocal { get; set; }
@@ -93,5 +97,7 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> FlightTime { get; set; }
         public Nullable<System.DateTime> TakeOffLocal { get; set; }
         public Nullable<System.DateTime> LandingLocal { get; set; }
+        public string MapTitle { get; set; }
+        public string MapTitle2 { get; set; }
     }
 }

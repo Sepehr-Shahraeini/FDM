@@ -20,6 +20,8 @@ using EPAGriffinAPI.ViewModels;
 using RestSharp;
 using RestSharp.Authenticators;
 using static EPAGriffinAPI.DAL.FlightRepository;
+using System.IO;
+using System.Web;
 
 namespace EPAGriffinAPI.Controllers
 {
@@ -28,18 +30,28 @@ namespace EPAGriffinAPI.Controllers
     public class FlightController : ApiController
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
+        [Route("odata/fdp/log")]
+        [EnableQuery]
+        // [Authorize]
+        public IQueryable<ViewFDPLog> GetViewFDPLog()
+        {
 
+            //return unitOfWork.FlightRepository.GetViewFlightCrewNews().Where(q => q.FlightId == id).OrderBy(q => q.IsPositioning).ThenBy(q => q.GroupOrder);
+            return unitOfWork.FlightRepository.GetViewFDPLog();
+
+
+        }
 
         [Route("odata/flight/crews/{id}")]
         [EnableQuery]
         // [Authorize]
         public IQueryable<ViewFlightCrewNewX> GetViewFlightCrews(int id)
         {
-            
-                //return unitOfWork.FlightRepository.GetViewFlightCrewNews().Where(q => q.FlightId == id).OrderBy(q => q.IsPositioning).ThenBy(q => q.GroupOrder);
-                return unitOfWork.FlightRepository.GetViewFlightCrewNewXs().Where(q => q.FlightId == id).OrderBy(q => q.IsPositioning).ThenBy(q => q.GroupOrder);
-            
-                
+
+            //return unitOfWork.FlightRepository.GetViewFlightCrewNews().Where(q => q.FlightId == id).OrderBy(q => q.IsPositioning).ThenBy(q => q.GroupOrder);
+            return unitOfWork.FlightRepository.GetViewFlightCrewNewXs().Where(q => q.FlightId == id).OrderBy(q => q.IsPositioning).ThenBy(q => q.GroupOrder);
+
+
         }
         [Route("odata/coords")]
         [EnableQuery]
@@ -64,7 +76,7 @@ namespace EPAGriffinAPI.Controllers
 
 
         }
-        
+
 
         [Route("odata/routes")]
         [EnableQuery]
@@ -73,7 +85,7 @@ namespace EPAGriffinAPI.Controllers
         {
 
             //return unitOfWork.FlightRepository.GetViewFlightCrewNews().Where(q => q.FlightId == id).OrderBy(q => q.IsPositioning).ThenBy(q => q.GroupOrder);
-            var result= unitOfWork.FlightRepository.GetViewRoute().OrderBy(q=>q.FromAirportIATA).ToList();
+            var result = unitOfWork.FlightRepository.GetViewRoute().OrderBy(q => q.FromAirportIATA).ToList();
             return result.AsQueryable();
 
 
@@ -82,7 +94,7 @@ namespace EPAGriffinAPI.Controllers
         [Route("odata/flight/crews/archive/{id}")]
         [EnableQuery]
         // [Authorize]
-        public IQueryable<ViewFlightCrewArchive> GetViewFlightCrewsArchive(int id )
+        public IQueryable<ViewFlightCrewArchive> GetViewFlightCrewsArchive(int id)
         {
             return unitOfWork.FlightRepository.GetViewFlightCrewArchives().Where(q => q.FlightId == id).OrderBy(q => q.GroupOrder);
         }
@@ -90,12 +102,12 @@ namespace EPAGriffinAPI.Controllers
         [Route("odata/fdr/report")]
         [EnableQuery]
         // [Authorize]
-        public IQueryable<ViewFDRReport> GetViewFDRReport(DateTime df, DateTime dt,int? from=null,int? to=null, string ip="", string cpt="", string fo="",string regs="",string types="")
+        public IQueryable<ViewFDRReport> GetViewFDRReport(DateTime df, DateTime dt, int? from = null, int? to = null, string ip = "", string cpt = "", string fo = "", string regs = "", string types = "")
         {
             var _df = df.Date;
             var _dt = dt.Date;//.AddHours(24);
             var query = from x in unitOfWork.FlightRepository.GetViewFDRReport()
-                        where x.STDDay>=_df && x.STDDay<=_dt
+                        where x.STDDay >= _df && x.STDDay <= _dt
                         select x;
             if (from != null)
             {
@@ -107,7 +119,7 @@ namespace EPAGriffinAPI.Controllers
             }
             if (!string.IsNullOrEmpty(ip))
             {
-                var ipids = ip.Split('_').Select(q =>(Nullable<int>) Convert.ToInt32(q)).ToList();
+                var ipids = ip.Split('_').Select(q => (Nullable<int>)Convert.ToInt32(q)).ToList();
                 query = query.Where(q => ipids.Contains(q.IPId));
             }
 
@@ -144,21 +156,21 @@ namespace EPAGriffinAPI.Controllers
         [Route("odata/fin/daily/report")]
         [EnableQuery]
         // [Authorize]
-        public IQueryable<ViewFin> GetFinDailyReport(DateTime df, DateTime dt,   string route = "",  string regs = "", string types = "")
+        public IQueryable<ViewFin> GetFinDailyReport(DateTime df, DateTime dt, string route = "", string regs = "", string types = "")
         {
             var _df = df.Date;
             var _dt = dt.Date;//.AddHours(24);
             var query = from x in unitOfWork.FlightRepository.GetViewFin()
                         where x.STDDay >= _df && x.STDDay <= _dt
                         select x;
-             
+
             if (!string.IsNullOrEmpty(route))
             {
                 var rids = route.Split('_').ToList();
                 query = query.Where(q => rids.Contains(q.Route));
             }
 
-            
+
 
             if (!string.IsNullOrEmpty(regs))
             {
@@ -179,9 +191,9 @@ namespace EPAGriffinAPI.Controllers
 
 
         [Route("odata/fin/monthly/report/{yf}/{yt}")]
-        
+
         // [Authorize]
-        public async Task<IHttpActionResult> GetFinMonthlyReport(int yf,int yt)
+        public async Task<IHttpActionResult> GetFinMonthlyReport(int yf, int yt)
         {
             var result = await unitOfWork.FlightRepository.GetFinMonthlyReport(yf, yt);
             return new CustomActionResult(HttpStatusCode.OK, result);
@@ -190,9 +202,9 @@ namespace EPAGriffinAPI.Controllers
         [Route("odata/reg/flights/monthly/report/{year}/{month}/{fleet}")]
 
         // [Authorize]
-        public async Task<IHttpActionResult> GetRegFlightsMonthlyReport(int year, int month,string fleet)
+        public async Task<IHttpActionResult> GetRegFlightsMonthlyReport(int year, int month, string fleet)
         {
-            var result = await unitOfWork.FlightRepository.GetRegFlightMonthlyReport(year, month,fleet);
+            var result = await unitOfWork.FlightRepository.GetRegFlightMonthlyReport(year, month, fleet);
             return new CustomActionResult(HttpStatusCode.OK, result);
         }
 
@@ -271,8 +283,8 @@ namespace EPAGriffinAPI.Controllers
             var userName = Convert.ToString(dto.userName);
 
 
-            var result = await unitOfWork.FlightRepository.saveFixTime(route,hh,mm,userName,edit);
-             
+            var result = await unitOfWork.FlightRepository.saveFixTime(route, hh, mm, userName, edit);
+
             return Ok(result);
         }
 
@@ -285,8 +297,8 @@ namespace EPAGriffinAPI.Controllers
             var route = Convert.ToString(dto.route);
             var userName = Convert.ToString(dto.userName);
 
-            var result =  await unitOfWork.FlightRepository.deleteFixTime(route, userName);
-             
+            var result = await unitOfWork.FlightRepository.deleteFixTime(route, userName);
+
             return Ok(result);
         }
 
@@ -315,21 +327,55 @@ namespace EPAGriffinAPI.Controllers
         // [Authorize]
         public async Task<IHttpActionResult> GetFormAReportMonth(int year, int month)
         {
-            var result = await unitOfWork.FlightRepository.GetFormAReportMonth(year,month);
+            var result = await unitOfWork.FlightRepository.GetFormAReportMonth(year, month);
             return new CustomActionResult(HttpStatusCode.OK, result);
         }
 
+
+
+        [Route("odata/forma/yearly/{yf}/{yt}")]
+
+        // [Authorize]
+        public async Task<IHttpActionResult> GetFormAYearlyReport(int yf, int yt)
+        {
+            var result = await unitOfWork.FlightRepository.GetFormAYearlyReport(yf, yt);
+            return new CustomActionResult(HttpStatusCode.OK, result);
+        }
+
+        [Route("odata/forma/year/{year}")]
+
+        // [Authorize]
+        public async Task<IHttpActionResult> GetFormAReportYear(int year )
+        {
+            var result = await unitOfWork.FlightRepository.GetFormAReportYear(year );
+            return new CustomActionResult(HttpStatusCode.OK, result);
+        }
+
+        //magu5
+        [Route("odata/delays/flight/summary")]
+        [EnableQuery]
+        // [Authorize]
+        public async Task<IHttpActionResult> GetDelaysFlightSummary(DateTime df, DateTime dt)
+        {
+
+            var result = await unitOfWork.FlightRepository.GetRptDelayReportFlightSummary(dt, df);
+            return new CustomActionResult(HttpStatusCode.OK, result);
+        }
         [Route("odata/delays/report")]
         [EnableQuery]
         // [Authorize]
-        public IQueryable<ViewFlightDelay> GetDelaysReport(DateTime df, DateTime dt, string route = "", string regs = "", string types = "",string flts="")
+        public IQueryable<ViewFlightDelay> GetDelaysReport(DateTime df, DateTime dt, string route = "", string regs = "", string types = "", string flts = "", string cats = "", int range = 1)
         {
             var _df = df.Date;
             var _dt = dt.Date;//.AddHours(24);
             var query = from x in unitOfWork.FlightRepository.GetViewFlightDelays()
                         where x.STDDay >= _df && x.STDDay <= _dt
                         select x;
-
+            if (!string.IsNullOrEmpty(cats))
+            {
+                var cts = cats.Split('_').ToList();
+                query = query.Where(q => cts.Contains(q.MapTitle2));
+            }
             if (!string.IsNullOrEmpty(route))
             {
                 var rids = route.Split('_').ToList();
@@ -352,28 +398,115 @@ namespace EPAGriffinAPI.Controllers
             //malakh
             if (!string.IsNullOrEmpty(flts))
             {
-                var fltids = flts.Split(',').Select(q => q.Trim().Replace(" ","")).ToList();
+                var fltids = flts.Split(',').Select(q => q.Trim().Replace(" ", "")).ToList();
                 query = query.Where(q => fltids.Contains(q.FlightNumber));
             }
+
+            switch (range)
+            {
+                case 1:
+
+                    break;
+                case 2:
+                    query = query.Where(q => q.Delay <= 30);
+                    break;
+                case 3:
+                    query = query.Where(q => q.Delay > 30);
+                    break;
+                case 4:
+                    query = query.Where(q => q.Delay >= 31 && q.Delay <= 60);
+                    break;
+                case 5:
+                    query = query.Where(q => q.Delay >= 61 && q.Delay <= 120);
+                    break;
+                case 6:
+                    query = query.Where(q => q.Delay >= 121 && q.Delay <= 180);
+                    break;
+                case 7:
+                    query = query.Where(q => q.Delay >= 181);
+                    break;
+                default: break;
+            }
+
+
+
+
 
             var result = query.OrderBy(q => q.STDDay).ThenBy(q => q.AircraftType).ThenBy(q => q.Register).ThenBy(q => q.STD);
 
             return result;
         }
 
+        //noob
+        //monk
+        [Route("odata/delays/periodic/reportold/{period}/{cats}")]
+        [EnableQuery]
+        // [Authorize]
+        public async Task<IHttpActionResult> GetDelaysReport(DateTime df, DateTime dt, int period, string cats)
+        {
+            var _cats = cats.Split('_').ToList();
+            var result = await unitOfWork.FlightRepository.GetRptDelayReportPeriodic(dt, df, period, _cats);
+            return new CustomActionResult(HttpStatusCode.OK, result);
+        }
+        [Route("odata/delays/periodic/report/{period}/{cats}")]
+        [EnableQuery]
+        // [Authorize]
+        public async Task<IHttpActionResult> GetDelaysReport2(DateTime df, DateTime dt, int period, string cats)
+        {
+            var _cats = cats.Split('_').ToList();
+            var result = await unitOfWork.FlightRepository.GetRptDelayReportPeriodic2(dt, df, period, _cats);
+            return new CustomActionResult(HttpStatusCode.OK, result);
+        }
+
+        [Route("odata/delays/report/airports")]
+        [EnableQuery]
+        // [Authorize]
+        public async Task<IHttpActionResult> GetDelaysAirportReport( DateTime df, DateTime dt )
+        {
+             
+            var result = await unitOfWork.FlightRepository.GetDelaysAirportReport( df, dt );
+            return new CustomActionResult(HttpStatusCode.OK, result);
+        }
+
+
+        [Route("odata/delays/mapped")]
+        [EnableQuery]
+        // [Authorize]
+        public async Task<IHttpActionResult> GetDelaysMapped()
+        {
+
+            var result = await unitOfWork.FlightRepository.GetDelayMapTitles();
+            return new CustomActionResult(HttpStatusCode.OK, result);
+        }
+
 
         [Route("odata/citypair/report")]
         [EnableQuery]
         // [Authorize]
-        public IQueryable<ViewFinMonthlyRoute> GetCityPairReport(int year,int month)
+        public IQueryable<ViewFinMonthlyRoute> GetCityPairReport(int year, int month)
         {
-             
+
             var query = from x in unitOfWork.FlightRepository.GetViewFinMonthlyRoute()
-                        where x.Year==year && x.Month==month
+                        where x.Year == year && x.Month == month
                         select x;
 
-           
-          
+
+
+
+            return query;
+        }
+        [Route("odata/citypair/yearly/report")]
+        [EnableQuery]
+        // [Authorize]
+        public IQueryable<ViewFinYearlyRoute> GetCityPairYearlyReport(int year )
+        {
+
+            var query = from x in unitOfWork.FlightRepository.GetViewFinYearlyRoute()
+                        where x.Year == year 
+                        select x;
+
+
+
 
             return query;
         }
@@ -428,8 +561,8 @@ namespace EPAGriffinAPI.Controllers
         // [Authorize]
         public async Task<IHttpActionResult> GetFlightChangeHistory(int id)
         {
-            var result = await unitOfWork.FlightRepository.GetViewFlightChangeHistories().Where(q=>q.FlightId==id).OrderBy(q => q.Date).ToListAsync();
-            
+            var result = await unitOfWork.FlightRepository.GetViewFlightChangeHistories().Where(q => q.FlightId == id).OrderBy(q => q.Date).ToListAsync();
+
 
             return Ok(result);
 
@@ -521,6 +654,18 @@ namespace EPAGriffinAPI.Controllers
             return unitOfWork.FlightRepository.GetViewCrew().Where(q => q.CustomerId == cid);
 
         }
+
+
+        [Route("odata/dispatch/sms/employees/{cid}")]
+        [EnableQuery]
+        // [Authorize]
+        public IQueryable<ViewDispatchSMSEmployee> GetViewDispatchSMSEmployee(int cid)
+        {
+
+            return unitOfWork.FlightRepository.GetViewDispatchSMSEmployee().Where(q => q.CustomerId == cid);
+
+        }
+
         //bana
         [Route("odata/crew/valid/{cid}")]
         [EnableQuery]
@@ -794,7 +939,7 @@ namespace EPAGriffinAPI.Controllers
         //nookp
         public IQueryable<ViewCrewCode> GetCrewFos()
         {
-            var ips = unitOfWork.FlightRepository.GetViewCrewCode().Where(q => q.JobGroupCode == "0010102" || q.JobGroupCode== "0010103" || q.JobGroupCode == "0010104"
+            var ips = unitOfWork.FlightRepository.GetViewCrewCode().Where(q => q.JobGroupCode == "0010102" || q.JobGroupCode == "0010103" || q.JobGroupCode == "0010104"
              || q.JobGroupCode == "0010105" || q.JobGroupCode == "0010101");
             return ips;
 
@@ -1587,6 +1732,7 @@ namespace EPAGriffinAPI.Controllers
         [AcceptVerbs("POST", "GET")]
         public async Task<IHttpActionResult> GetFlightsGanttByCustomerId(int cid, string from, string to, int tzoffset)
         {
+
             DateTime dateFrom = EPAGriffinAPI.Helper.BuildDateTimeFromYAFormat(from);
             DateTime dateTo = EPAGriffinAPI.Helper.BuildDateTimeFromYAFormat(to);
             //var result = await unitOfWork.FlightRepository.GetFlightGantt(cid, dateFrom, dateTo, tzoffset, null, null);
@@ -1602,7 +1748,7 @@ namespace EPAGriffinAPI.Controllers
             DateTime dateTo = EPAGriffinAPI.Helper.BuildDateTimeFromYAFormat(to);
             //var result = await unitOfWork.FlightRepository.GetFlightGantt(cid, dateFrom, dateTo, tzoffset, null, null);
             //GetFlightGanttFleet
-            var result = await unitOfWork.FlightRepository.GetFlightGanttFleet(cid, dateFrom, dateTo, tzoffset, null, null,1);
+            var result = await unitOfWork.FlightRepository.GetFlightGanttFleet(cid, dateFrom, dateTo, tzoffset, null, null, 1);
             return Ok(result);
         }
 
@@ -1651,12 +1797,12 @@ namespace EPAGriffinAPI.Controllers
 
         [Route("odata/flights/gantt/customer/{cid}/{from}/{to}/{tzoffset}/{airport}")]
         [AcceptVerbs("POST", "GET")]
-        public async Task<IHttpActionResult> GetFlightsGanttByCustomerId(int cid, string from, string to, int tzoffset, int airport,int utc
+        public async Task<IHttpActionResult> GetFlightsGanttByCustomerId(int cid, string from, string to, int tzoffset, int airport, int utc
             , ViewModels.FlightsFilter filter)
         {
             DateTime dateFrom = EPAGriffinAPI.Helper.BuildDateTimeFromYAFormat(from);
             DateTime dateTo = EPAGriffinAPI.Helper.BuildDateTimeFromYAFormat(to);
-            var result = await unitOfWork.FlightRepository.GetFlightGantt(cid, dateFrom, dateTo, tzoffset, airport, filter,utc);
+            var result = await unitOfWork.FlightRepository.GetFlightGantt(cid, dateFrom, dateTo, tzoffset, airport, filter, utc);
             return Ok(result);
         }
 
@@ -1804,6 +1950,17 @@ namespace EPAGriffinAPI.Controllers
             //var result = await unitOfWork.FlightRepository.NotifyFDPCrews(id);
 
             var result = await unitOfWork.FlightRepository.NotifyDelayedFlight(id);
+            //await unitOfWork.SaveAsync();
+            return Ok(true);
+        }
+
+        [Route("odata/notify/delay2/{id}")]
+        [AcceptVerbs("POST", "GET")]
+        public async Task<IHttpActionResult> NotifyDelayedFlight2(int id)
+        {
+            //var result = await unitOfWork.FlightRepository.NotifyFDPCrews(id);
+
+            var result = await unitOfWork.FlightRepository.NotifyDelayedFlight2(id);
             //await unitOfWork.SaveAsync();
             return Ok(true);
         }
@@ -2041,7 +2198,7 @@ namespace EPAGriffinAPI.Controllers
             var saveResult = await unitOfWork.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
                 return saveResult;
-              //var view = await unitOfWork.FlightRepository.GetViewFDPRest().FirstOrDefaultAsync(q => q.Id == result.Id);
+            //var view = await unitOfWork.FlightRepository.GetViewFDPRest().FirstOrDefaultAsync(q => q.Id == result.Id);
             var view = await unitOfWork.FlightRepository.GetViewCrewDuty().FirstOrDefaultAsync(q => q.Id == result.Id);
 
             return Ok(view);
@@ -2686,7 +2843,10 @@ namespace EPAGriffinAPI.Controllers
             var dfrom = from.Date;
             var dto = to.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
             var query = (from x in unitOfWork.FlightRepository.GetViewLegCrew()
-                         where x.CrewId == id && x.STDLocal >= dfrom && x.STDLocal <= dto && x.FlightStatusID != 1 && x.FlightStatusID != 4
+                         where x.CrewId == id && x.STDLocal >= dfrom && x.STDLocal <= dto
+                         //flypersia
+                         //&& x.FlightStatusID != 1 
+                         && x.FlightStatusID != 4
                          orderby x.STDLocal
                          select x).ToList();
             //var query = (from x in unitOfWork.FlightRepository.GetViewFlightCrewNews()
@@ -2812,6 +2972,7 @@ namespace EPAGriffinAPI.Controllers
             public int Legs { get; set; }
             public int? BlockTime { get; set; }
             public int? FlightTime { get; set; }
+            public int? FlightTimeActual { get; set; }
             public int? FixTime { get; set; }
             public int? SITATime { get; set; }
 
@@ -2827,7 +2988,10 @@ namespace EPAGriffinAPI.Controllers
             var dto = to.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
             ///////
             var queryTotal = from x in unitOfWork.FlightRepository.GetViewFlightCrewNewXTime()
-                             where x.STDDay >= dfrom && x.STDDay <= dto && x.FlightStatusID != 1 && x.FlightStatusID != 4
+                             where x.STDDay >= dfrom && x.STDDay <= dto
+                             //flypersia
+                             //&& x.FlightStatusID != 1 
+                             && x.FlightStatusID != 4
                              group x by new { x.CrewId, x.Name, x.ScheduleName, x.JobGroup, x.JobGroupCode, x.GroupId, x.GroupOrder } into grp
                              select new CrewFlightsTotalReport()
                              {
@@ -2841,6 +3005,7 @@ namespace EPAGriffinAPI.Controllers
                                  Legs = grp.Count(),
                                  BlockTime = grp.Sum(q => q.BlockTime),
                                  FlightTime = grp.Sum(q => q.FlightTime),
+                                 FlightTimeActual=grp.Sum(q=>q.FlightTimeActual),
                                  FixTime = grp.Sum(q => q.FixTime),
                                  SITATime = grp.Sum(q => q.SITATime),
 
@@ -3858,7 +4023,7 @@ namespace EPAGriffinAPI.Controllers
         }
 
 
-
+        //kakoli
         [Route("odata/plan/interval/save")]
 
         [AcceptVerbs("POST")]
@@ -4597,6 +4762,7 @@ namespace EPAGriffinAPI.Controllers
             return Ok(view);
         }
         //09-23
+        //kak4
         [Route("odata/flights/cancel")]
 
         [AcceptVerbs("POST")]
@@ -4619,7 +4785,7 @@ namespace EPAGriffinAPI.Controllers
             var saveResult = await unitOfWork.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
                 return saveResult;
-            
+
             var fresult = result.data as updateLogResult;
             if (fresult.offcrews != null && fresult.offcrews.Count > 0)
             {
@@ -4630,12 +4796,235 @@ namespace EPAGriffinAPI.Controllers
                         await unitOfWork.FlightRepository.RemoveItemsFromFDP(rec.flightId.ToString(), (int)crewid, 2, "Flight Cancellation - Removed by AirPocket.", 0, 0);
                     }
                 }
-               
+
             }
 
 
 
-            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => dto.fids .Contains(q.ID)).ToListAsync();
+            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => dto.fids.Contains(q.ID)).ToListAsync();
+            var flights = new List<ViewFlightsGanttDto>();
+            foreach (var x in fg)
+            {
+                ViewModels.ViewFlightsGanttDto odto = new ViewFlightsGanttDto();
+                ViewModels.ViewFlightsGanttDto.FillDto(x, odto, 0, 1);
+                flights.Add(odto);
+            }
+
+
+
+            var resgroups = from x in fg
+                            group x by new { x.AircraftType, AircraftTypeId = x.TypeId }
+                           into grp
+                            select new { groupId = grp.Key.AircraftTypeId, Title = grp.Key.AircraftType };
+            var ressq = (from x in fg
+                         group x by new { x.RegisterID, x.Register, x.TypeId }
+                     into grp
+
+                         orderby unitOfWork.FlightRepository.getOrderIndex(grp.Key.Register, new List<string>())
+                         select new { resourceId = grp.Key.RegisterID, resourceName = grp.Key.Register, groupId = grp.Key.TypeId }).ToList();
+
+            //odto.resourceId.Add((int)odto.RegisterID);
+
+
+            var oresult = new
+            {
+                flights,
+                resgroups,
+                ressq
+            };
+            //////////////////////
+            return Ok(oresult);
+
+        }
+
+
+        [Route("odata/flights/cancel/group")]
+
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostFlightCancelGroup(cnlregs dto)
+        {
+
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+            if (!ModelState.IsValid)
+            {
+
+                return Exceptions.getModelValidationException(ModelState);
+            }
+
+            var result = await unitOfWork.FlightRepository.CancelFlightsGroup(dto);
+
+
+
+
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+            var fresult = result.data as updateLogResult;
+            if (fresult.offcrews != null && fresult.offcrews.Count > 0)
+            {
+                foreach (var rec in fresult.offcrews)
+                {
+                    foreach (var crewid in rec.crews)
+                    {
+                        await unitOfWork.FlightRepository.RemoveItemsFromFDP(rec.flightId.ToString(), (int)crewid, 2, "Flight Cancellation - Removed by AirPocket.", 0, 0);
+                    }
+                }
+
+            }
+
+
+            var beginDate = ((DateTime)dto.RefDate).Date;
+            var endDate = ((DateTime)dto.RefDate).Date.AddDays((int)dto.RefDays).Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => fresult.fltIds .Contains(q.ID)
+             && q.STDDay >= beginDate && q.STDDay <= endDate
+            ).ToListAsync();
+            var flights = new List<ViewFlightsGanttDto>();
+            foreach (var x in fg)
+            {
+                ViewModels.ViewFlightsGanttDto odto = new ViewFlightsGanttDto();
+                ViewModels.ViewFlightsGanttDto.FillDto(x, odto, 0, 1);
+                flights.Add(odto);
+            }
+
+
+
+            var resgroups = from x in fg
+                            group x by new { x.AircraftType, AircraftTypeId = x.TypeId }
+                           into grp
+                            select new { groupId = grp.Key.AircraftTypeId, Title = grp.Key.AircraftType };
+            var ressq = (from x in fg
+                         group x by new { x.RegisterID, x.Register, x.TypeId }
+                     into grp
+
+                         orderby unitOfWork.FlightRepository.getOrderIndex(grp.Key.Register, new List<string>())
+                         select new { resourceId = grp.Key.RegisterID, resourceName = grp.Key.Register, groupId = grp.Key.TypeId }).ToList();
+
+            //odto.resourceId.Add((int)odto.RegisterID);
+
+
+            var oresult = new
+            {
+                flights,
+                resgroups,
+                ressq
+            };
+            //////////////////////
+            return Ok(oresult);
+
+        }
+
+        [Route("odata/flights/active")]
+
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostFlightActive(cnlregs dto)
+        {
+
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+            if (!ModelState.IsValid)
+            {
+
+                return Exceptions.getModelValidationException(ModelState);
+            }
+
+            var result = await unitOfWork.FlightRepository.ActiveFlights(dto);
+
+
+
+
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+            var fresult = result.data as updateLogResult;
+            if (fresult.sendNira)
+            {
+                foreach (var x in fresult.offIds)
+                    await unitOfWork.FlightRepository.NotifyNira((int)x, dto.userName);
+            }
+
+
+
+            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => dto.fids.Contains(q.ID)).ToListAsync();
+            var flights = new List<ViewFlightsGanttDto>();
+            foreach (var x in fg)
+            {
+                ViewModels.ViewFlightsGanttDto odto = new ViewFlightsGanttDto();
+                ViewModels.ViewFlightsGanttDto.FillDto(x, odto, 0, 1);
+                flights.Add(odto);
+            }
+
+
+
+            var resgroups = from x in fg
+                            group x by new { x.AircraftType, AircraftTypeId = x.TypeId }
+                           into grp
+                            select new { groupId = grp.Key.AircraftTypeId, Title = grp.Key.AircraftType };
+            var ressq = (from x in fg
+                         group x by new { x.RegisterID, x.Register, x.TypeId }
+                     into grp
+
+                         orderby unitOfWork.FlightRepository.getOrderIndex(grp.Key.Register, new List<string>())
+                         select new { resourceId = grp.Key.RegisterID, resourceName = grp.Key.Register, groupId = grp.Key.TypeId }).ToList();
+
+            //odto.resourceId.Add((int)odto.RegisterID);
+
+
+            var oresult = new
+            {
+                flights,
+                resgroups,
+                ressq
+            };
+            //////////////////////
+            return Ok(oresult);
+
+        }
+        //magu38
+        [Route("odata/flights/active/group")]
+
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostFlightActiveGroup(cnlregs dto)
+        {
+
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+            if (!ModelState.IsValid)
+            {
+
+                return Exceptions.getModelValidationException(ModelState);
+            }
+
+            var result = await unitOfWork.FlightRepository.ActiveFlightsGroup(dto);
+
+
+
+
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+            var fresult = result.data as updateLogResult;
+            if (fresult.sendNira)
+            {
+
+                foreach (var x in fresult.offIds)
+                    await unitOfWork.FlightRepository.NotifyNira((int)x, dto.userName);
+               // foreach (var x in dto.)
+               //     await unitOfWork.FlightRepository.NotifyNira((int)x, dto.userName);
+            }
+
+            
+
+
+
+            var beginDate = ((DateTime)dto.RefDate).Date;
+            var endDate = ((DateTime)dto.RefDate).Date.AddDays((int)dto.RefDays).Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => fresult.offIds.Contains(q.ID)
+             && q.STDDay >= beginDate && q.STDDay <= endDate
+            ).ToListAsync();
             var flights = new List<ViewFlightsGanttDto>();
             foreach (var x in fg)
             {
@@ -4688,7 +5077,7 @@ namespace EPAGriffinAPI.Controllers
                 return Exceptions.getModelValidationException(ModelState);
             }
 
-             
+
             var result = await unitOfWork.FlightRepository.ShiftFlights(obj);
             var saveResult = await unitOfWork.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
@@ -4701,7 +5090,7 @@ namespace EPAGriffinAPI.Controllers
             }
 
             /////////////////////
-            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q =>obj.ids.Contains( q.ID)).ToListAsync();
+            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => obj.ids.Contains(q.ID)).ToListAsync();
             var flights = new List<ViewFlightsGanttDto>();
             foreach (var x in fg)
             {
@@ -4709,7 +5098,7 @@ namespace EPAGriffinAPI.Controllers
                 ViewModels.ViewFlightsGanttDto.FillDto(x, odto, 0, 1);
                 flights.Add(odto);
             }
-           
+
 
 
             var resgroups = from x in fg
@@ -4734,7 +5123,7 @@ namespace EPAGriffinAPI.Controllers
             };
             //////////////////////
             return Ok(oresult);
-            
+
         }
         [Route("odata/flight/planitem/flight/update")]
 
@@ -4761,7 +5150,7 @@ namespace EPAGriffinAPI.Controllers
 
             if (obj.SMSNira == 1)
             {
-               await unitOfWork.FlightRepository.NotifyNira((int)obj.FlightId,obj.UserName);
+                await unitOfWork.FlightRepository.NotifyNira((int)obj.FlightId, obj.UserName);
             }
 
             /////////////////////
@@ -4912,6 +5301,390 @@ namespace EPAGriffinAPI.Controllers
 
             //return Ok(view);
         }
+        [Route("odata/flight/delete/group")]
+
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> DeleteFlightGroup(dynamic dto)
+        {
+            var interval = Convert.ToInt32(dto.Interval);
+            DateTime intervalFrom = Convert.ToDateTime(dto.IntervalFrom);
+            DateTime intervalTo = Convert.ToDateTime(dto.IntervalTo);
+            string _days = Convert.ToString(dto.Days);
+            var days = _days.Split('_').Select(q => Convert.ToInt32(q)).ToList();
+            var checkTime = (int)dto.CheckTime;
+
+            var flightId = Convert.ToInt32(dto.Id);
+            var result = await unitOfWork.FlightRepository.DeleteFlightGroup(intervalFrom, intervalTo, days, flightId, interval, checkTime);
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+
+
+            return Ok(result);
+        }
+        [Route("odata/flight/group/save")]
+        //kakoli9
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostFlightGroup(ViewModels.FlightDto dto)
+        {
+
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+            if (!ModelState.IsValid)
+            {
+
+                return Exceptions.getModelValidationException(ModelState);
+            }
+
+            var validate = unitOfWork.FlightRepository.ValidateFlight(dto);
+            if (validate.Code != HttpStatusCode.OK)
+                return validate;
+
+            var stdHours = ((DateTime)dto.STD).Hour;
+            var stdMinutes = ((DateTime)dto.STD).Minute;
+            var staHours = ((DateTime)dto.STA).Hour;
+            var staMinutes = ((DateTime)dto.STA).Minute;
+            var duration = (((DateTime)dto.STA) - ((DateTime)dto.STD)).TotalMinutes;
+            // dto.Interval = 2;
+            // dto.IntervalFrom = DateTime.Now;
+            // dto.IntervalTo = DateTime.Now.AddDays(120);
+            // dto.Days = new List<int>() {0};
+            // dto.RefDate = DateTime.Now.Date;
+            //dto.RefDays = 14;
+
+            var intervalDays = unitOfWork.FlightRepository.GetInvervalDates((int)dto.Interval, (DateTime)dto.IntervalFrom, (DateTime)dto.IntervalTo, dto.Days);
+
+
+            FlightInformation entity = null;
+            FlightChangeHistory changeLog = null;
+            //if (dto.ID == -1)
+            //{
+            //    entity = new FlightInformation();
+            //    unitOfWork.FlightRepository.Insert(entity);
+            //}
+
+            //else
+            //{
+            //    entity = await unitOfWork.FlightRepository.GetFlightById(dto.ID);
+            //    if (entity == null)
+            //        return Exceptions.getNotFoundException();
+            //    unitOfWork.FlightRepository.RemoveFlightLink(dto.ID);
+
+            //    changeLog = new FlightChangeHistory()
+            //    {
+            //        Date = DateTime.Now,
+            //        FlightId = entity.ID,
+
+            //    };
+            //    unitOfWork.FlightRepository.Insert(changeLog);
+            //    changeLog.OldFlightNumer = entity.FlightNumber;
+            //    changeLog.OldFromAirportId = entity.FromAirportId;
+            //    changeLog.OldToAirportId = entity.ToAirportId;
+            //    changeLog.OldSTD = entity.STD;
+            //    changeLog.OldSTA = entity.STA;
+            //    changeLog.OldStatusId = entity.FlightStatusID;
+            //    changeLog.OldRegister = entity.RegisterID;
+            //    changeLog.OldOffBlock = entity.ChocksOut;
+            //    changeLog.OldOnBlock = entity.ChocksIn;
+            //    changeLog.OldTakeOff = entity.Takeoff;
+            //    changeLog.OldLanding = entity.Landing;
+            //    changeLog.User = dto.UserName;
+
+            //}
+            List<FlightInformation> flights = new List<FlightInformation>();
+            var str = DateTime.Now.ToString("MMddmmss");
+            var flightGroup = Convert.ToInt32(str);
+            foreach (var dt in intervalDays)
+            {
+                entity = new FlightInformation();
+                unitOfWork.FlightRepository.Insert(entity);
+                flights.Add(entity);
+                if (entity.STD != null)
+                {
+                    var oldSTD = ((DateTime)entity.STD).AddMinutes(270).Date;
+                    var newSTD = ((DateTime)dto.STD).AddMinutes(270).Date;
+                    if (oldSTD != newSTD)
+                    {
+                        entity.FlightDate = oldSTD;
+                    }
+                }
+
+
+                ViewModels.FlightDto.Fill(entity, dto);
+                entity.FlightGroupID = flightGroup;
+                entity.STD = new DateTime(dt.Year, dt.Month, dt.Day, stdHours, stdMinutes, 0);
+                entity.STA = ((DateTime)entity.STD).AddMinutes(duration);
+                entity.ChocksOut = entity.STD;
+                entity.ChocksIn = entity.STA;
+                entity.Takeoff = entity.STD;
+                entity.Landing = entity.STA;
+                entity.BoxId = dto.BoxId;
+            }
+
+            //if (dto.ID != -1 && changeLog!=null)
+            //{
+            //    changeLog.NewFlightNumber = entity.FlightNumber;
+            //    changeLog.NewFromAirportId = entity.FromAirportId;
+            //    changeLog.NewToAirportId = entity.ToAirportId;
+            //    changeLog.NewSTD = entity.STD;
+            //    changeLog.NewSTA = entity.STA;
+            //    changeLog.NewStatusId = entity.FlightStatusID;
+            //    changeLog.NewRegister = entity.RegisterID;
+            //    changeLog.NewOffBlock = entity.ChocksOut;
+            //    changeLog.NewOnBlock = entity.ChocksIn;
+            //    changeLog.NewTakeOff = entity.Takeoff;
+            //    changeLog.NewLanding = entity.Landing;
+            //}
+
+
+            //if (dto.LinkedFlight != null)
+            //{
+            //    var link = new FlightLink()
+            //    {
+            //        FlightInformation = entity,
+            //        Flight2Id = (int)dto.LinkedFlight,
+            //        ReasonId = (int)dto.LinkedReason,
+            //        Remark = dto.LinkedRemark
+
+            //    };
+            //    unitOfWork.FlightRepository.Insert(link);
+            //}
+
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+            if (dto.SMSNira == 1)
+            {
+                foreach (var x in flights)
+                    await unitOfWork.FlightRepository.NotifyNira(x.ID, dto.UserName);
+            }
+
+            //bip
+            var flightIds = flights.Select(q => q.ID).ToList();
+            var beginDate = ((DateTime)dto.RefDate).Date;
+            var endDate = ((DateTime)dto.RefDate).Date.AddDays((int)dto.RefDays).Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => flightIds.Contains(q.ID)
+            && q.STDDay >= beginDate && q.STDDay <= endDate
+            ).ToListAsync();
+
+
+            var odtos = new List<ViewFlightsGanttDto>();
+            foreach (var f in fg)
+            {
+                ViewModels.ViewFlightsGanttDto odto = new ViewFlightsGanttDto();
+
+                ViewModels.ViewFlightsGanttDto.FillDto(f, odto, 0, 1);
+                odto.resourceId.Add((int)odto.RegisterID);
+                odtos.Add(odto);
+            }
+
+            var resgroups = from x in fg
+                            group x by new { x.AircraftType, AircraftTypeId = x.TypeId }
+                           into grp
+                            select new { groupId = grp.Key.AircraftTypeId, Title = grp.Key.AircraftType };
+            var ressq = (from x in fg
+                         group x by new { x.RegisterID, x.Register, x.TypeId }
+                     into grp
+
+                         orderby unitOfWork.FlightRepository.getOrderIndex(grp.Key.Register, new List<string>())
+                         select new { resourceId = grp.Key.RegisterID, resourceName = grp.Key.Register, groupId = grp.Key.TypeId }).ToList();
+
+
+
+
+            var oresult = new
+            {
+                flights = odtos,
+                resgroups,
+                ressq
+            };
+
+            return Ok(/*entity*/oresult);
+
+        }
+
+
+        [Route("odata/flight/group/update")]
+        //kakoli2
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostFlightGroupUpdate(ViewModels.FlightDto dto)
+        {
+
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+            if (!ModelState.IsValid)
+            {
+
+                return Exceptions.getModelValidationException(ModelState);
+            }
+
+            var validate = unitOfWork.FlightRepository.ValidateFlight(dto);
+            if (validate.Code != HttpStatusCode.OK)
+                return validate;
+
+            // dto.Interval = 2;
+            // dto.IntervalFrom = DateTime.Now;
+            // dto.IntervalTo = DateTime.Now.AddDays(120);
+            // dto.Days = new List<int>() {  0 };
+            // dto.RefDate = DateTime.Now.Date;
+            //dto.RefDays = 14;
+            var intervalDays = unitOfWork.FlightRepository.GetInvervalDates((int)dto.Interval, (DateTime)dto.IntervalFrom, (DateTime)dto.IntervalTo, dto.Days).Select(q => (Nullable<DateTime>)q).ToList();
+
+
+            var baseFlight = await unitOfWork.FlightRepository.GetFlightById(dto.ID);
+            if (baseFlight == null)
+                return Exceptions.getNotFoundException();
+
+            var stdHoursBF = ((DateTime)baseFlight.STD).Hour;
+            var stdMinutesBF = ((DateTime)baseFlight.STD).Minute;
+            var staHoursBF = ((DateTime)baseFlight.STA).Hour;
+            var staMinutesBF = ((DateTime)baseFlight.STA).Minute;
+
+            var flightIds = await (from x in unitOfWork.FlightRepository.GetViewLegTime()
+                                   where x.FlightNumber == baseFlight.FlightNumber && intervalDays.Contains(x.STDDay)
+                                   select x.ID).ToListAsync();
+            //var flights = await unitOfWork.FlightRepository.GetFlights().Where(q => flightIds.Contains(q.ID)).ToListAsync();
+            List<FlightInformation> flights = new List<FlightInformation>();
+            if ((int)dto.CheckTime == 0)
+                flights = await unitOfWork.context.FlightInformations.Where(q => flightIds.Contains(q.ID) && q.FlightStatusID == 1).ToListAsync();
+            else
+                flights = await unitOfWork.context.FlightInformations.Where(q => flightIds.Contains(q.ID) && q.FlightStatusID == 1
+
+                ).ToListAsync();
+
+            var stdHours = ((DateTime)dto.STD).Hour;
+            var stdMinutes = ((DateTime)dto.STD).Minute;
+            var staHours = ((DateTime)dto.STA).Hour;
+            var staMinutes = ((DateTime)dto.STA).Minute;
+            var duration = (((DateTime)dto.STA) - ((DateTime)dto.STD)).TotalMinutes;
+
+
+            foreach (var entity in flights)
+            {
+                var flt_stdHours = ((DateTime)entity.STD).Hour;
+                var flt_stdMinutes = ((DateTime)entity.STD).Minute;
+                var flt_staHours = ((DateTime)entity.STA).Hour;
+                var flt_staMinutes = ((DateTime)entity.STA).Minute;
+                bool exec = true;
+                if (((int)dto.CheckTime) == 1)
+                {
+                    exec = flt_stdHours == stdHoursBF && flt_stdMinutes == stdMinutesBF && flt_staHours == staHoursBF && flt_staMinutes == staMinutesBF;
+                }
+                if (entity.FlightStatusID == 1 && exec)
+                {
+
+                    var changeLog = new FlightChangeHistory()
+                    {
+                        Date = DateTime.Now,
+                        FlightId = entity.ID,
+
+                    };
+                    unitOfWork.FlightRepository.Insert(changeLog);
+                    changeLog.OldFlightNumer = entity.FlightNumber;
+                    changeLog.OldFromAirportId = entity.FromAirportId;
+                    changeLog.OldToAirportId = entity.ToAirportId;
+                    changeLog.OldSTD = entity.STD;
+                    changeLog.OldSTA = entity.STA;
+                    changeLog.OldStatusId = entity.FlightStatusID;
+                    changeLog.OldRegister = entity.RegisterID;
+                    changeLog.OldOffBlock = entity.ChocksOut;
+                    changeLog.OldOnBlock = entity.ChocksIn;
+                    changeLog.OldTakeOff = entity.Takeoff;
+                    changeLog.OldLanding = entity.Landing;
+                    changeLog.User = dto.UserName;
+
+                    var oldSTD = (DateTime)entity.STD;
+                    var newSTD = new DateTime(oldSTD.Year, oldSTD.Month, oldSTD.Day, stdHours, stdMinutes, 0);
+                    var newSTA = newSTD.AddMinutes(duration);
+                    if (oldSTD.AddMinutes(270).Date != newSTD.AddMinutes(270).Date)
+                        entity.FlightDate = oldSTD;
+                    ViewModels.FlightDto.FillForGroupUpdate(entity, dto);
+                    //entity.FlightGroupID = flightGroup;
+                    entity.STD = newSTD;
+                    entity.STA = newSTA;
+                    entity.ChocksOut = entity.STD;
+                    entity.ChocksIn = entity.STA;
+                    entity.Takeoff = entity.STD;
+                    entity.Landing = entity.STA;
+                    entity.BoxId = dto.BoxId;
+
+                    changeLog.NewFlightNumber = entity.FlightNumber;
+                    changeLog.NewFromAirportId = entity.FromAirportId;
+                    changeLog.NewToAirportId = entity.ToAirportId;
+                    changeLog.NewSTD = entity.STD;
+                    changeLog.NewSTA = entity.STA;
+                    changeLog.NewStatusId = entity.FlightStatusID;
+                    changeLog.NewRegister = entity.RegisterID;
+                    changeLog.NewOffBlock = entity.ChocksOut;
+                    changeLog.NewOnBlock = entity.ChocksIn;
+                    changeLog.NewTakeOff = entity.Takeoff;
+                    changeLog.NewLanding = entity.Landing;
+
+                    //var state = unitOfWork.context.Entry(entity).State; //= EntityState.Modified;
+
+                }
+
+
+            }
+
+
+
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+            if (dto.SMSNira == 1)
+            {
+                foreach (var x in flights)
+                    await unitOfWork.FlightRepository.NotifyNira(x.ID, dto.UserName);
+            }
+
+            //bip
+            // var flightIds = flights.Select(q => q.ID).ToList();
+            var beginDate = ((DateTime)dto.RefDate).Date;
+            var endDate = ((DateTime)dto.RefDate).Date.AddDays((int)dto.RefDays).Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => flightIds.Contains(q.ID)
+               && q.STDDay >= beginDate && q.STDDay <= endDate
+            ).ToListAsync();
+
+
+            var odtos = new List<ViewFlightsGanttDto>();
+            foreach (var f in fg)
+            {
+                ViewModels.ViewFlightsGanttDto odto = new ViewFlightsGanttDto();
+
+                ViewModels.ViewFlightsGanttDto.FillDto(f, odto, 0, 1);
+                odto.resourceId.Add((int)odto.RegisterID);
+                odtos.Add(odto);
+            }
+
+            var resgroups = from x in fg
+                            group x by new { x.AircraftType, AircraftTypeId = x.TypeId }
+                           into grp
+                            select new { groupId = grp.Key.AircraftTypeId, Title = grp.Key.AircraftType };
+            var ressq = (from x in fg
+                         group x by new { x.RegisterID, x.Register, x.TypeId }
+                     into grp
+
+                         orderby unitOfWork.FlightRepository.getOrderIndex(grp.Key.Register, new List<string>())
+                         select new { resourceId = grp.Key.RegisterID, resourceName = grp.Key.Register, groupId = grp.Key.TypeId }).ToList();
+
+
+            var oflight = odtos.FirstOrDefault(q => q.ID == dto.ID);
+
+            var oresult = new
+            {
+                flights = odtos,
+                flight = oflight,
+                resgroups,
+                ressq
+            };
+
+            return Ok(/*entity*/oresult);
+
+        }
 
         [Route("odata/flight/save")]
         //hoda
@@ -4968,7 +5741,7 @@ namespace EPAGriffinAPI.Controllers
 
             }
 
-             
+
             if (entity.STD != null)
             {
                 var oldSTD = ((DateTime)entity.STD).AddMinutes(270).Date;
@@ -4978,10 +5751,10 @@ namespace EPAGriffinAPI.Controllers
                     entity.FlightDate = oldSTD;
                 }
             }
-           
+
 
             ViewModels.FlightDto.Fill(entity, dto);
-            if (dto.ID != -1 && changeLog!=null)
+            if (dto.ID != -1 && changeLog != null)
             {
                 changeLog.NewFlightNumber = entity.FlightNumber;
                 changeLog.NewFromAirportId = entity.FromAirportId;
@@ -4995,7 +5768,7 @@ namespace EPAGriffinAPI.Controllers
                 changeLog.NewTakeOff = entity.Takeoff;
                 changeLog.NewLanding = entity.Landing;
             }
-                entity.BoxId = dto.BoxId;
+            entity.BoxId = dto.BoxId;
 
             if (dto.LinkedFlight != null)
             {
@@ -5049,6 +5822,8 @@ namespace EPAGriffinAPI.Controllers
             return Ok(/*entity*/oresult);
 
         }
+
+
         [Route("odata/duties/crew/dates/{id}")]
         public async Task<IHttpActionResult> GetCPCrewDuties(DateTime? from, DateTime? to, int id)
         {
@@ -5475,7 +6250,7 @@ namespace EPAGriffinAPI.Controllers
             return Ok(dto);
 
         }
-        //doodool
+        //2020-11-22
         [Route("odata/fdps/off")]
 
         [AcceptVerbs("POST")]
@@ -5510,8 +6285,9 @@ namespace EPAGriffinAPI.Controllers
             var remark = Convert.ToString(dto.remark);
             var notify = Convert.ToInt32(dto.notify);
             var noflight = Convert.ToInt32(dto.noflight);
+            var username = Convert.ToString(dto.UserName);
 
-            var result = await unitOfWork.FlightRepository.RemoveItemsFromFDP(strFlights, crewId,reason,remark,notify,noflight);
+            var result = await unitOfWork.FlightRepository.RemoveItemsFromFDP(strFlights, crewId, reason, remark, notify, noflight, username);
 
 
             return result;
@@ -5538,7 +6314,7 @@ namespace EPAGriffinAPI.Controllers
                 index = Convert.ToInt32(dto.index);
             }
 
-            var result = await unitOfWork.FlightRepository.ActivateStandby(crewId, stbyId, fids, rank,index);
+            var result = await unitOfWork.FlightRepository.ActivateStandby(crewId, stbyId, fids, rank, index);
 
 
             return result;
@@ -5620,6 +6396,13 @@ namespace EPAGriffinAPI.Controllers
             var saveResult = await unitOfWork.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
                 return saveResult;
+
+            //var saveResult =   unitOfWork.SaveActionResult();
+            //if (saveResult.Code != HttpStatusCode.OK)
+            //    return saveResult;
+
+
+
             //if ((bool)result.data)
             //{
             //    unitOfWork.FlightRepository.SetFlightStatusWeather(dto.ID, dto.Takeoff, 2);
@@ -5630,7 +6413,7 @@ namespace EPAGriffinAPI.Controllers
             //internal async Task<CustomActionResult> RemoveItemsFromFDP(string strItems, int crewId, int reason, string remark, int notify, int noflight)
 
             var fresult = result.data as updateLogResult;
-            if (fresult.offIds!=null && fresult.offIds.Count > 0)
+            if (fresult.offIds != null && fresult.offIds.Count > 0)
             {
                 var disoffIds = fresult.offIds.Distinct().ToList();
                 foreach (var crewid in disoffIds)
@@ -5639,12 +6422,12 @@ namespace EPAGriffinAPI.Controllers
                 }
             }
 
-                if (/*dto.SendNiraSMS==1*/fresult.sendNira)
+            if (/*dto.SendNiraSMS==1*/fresult.sendNira)
             {
-                await unitOfWork.FlightRepository.NotifyNira(dto.ID,dto.UserName);
+                await unitOfWork.FlightRepository.NotifyNira(dto.ID, dto.UserName);
             }
 
-            var fg =await  unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => q.ID == fresult.flight).ToListAsync();
+            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => q.ID == fresult.flight).ToListAsync();
             ViewModels.ViewFlightsGanttDto odto = new ViewFlightsGanttDto();
             ViewModels.ViewFlightsGanttDto.FillDto(fg.First(), odto, 0, 1);
 
@@ -5656,7 +6439,7 @@ namespace EPAGriffinAPI.Controllers
             var ressq = (from x in fg
                          group x by new { x.RegisterID, x.Register, x.TypeId }
                      into grp
-                          
+
                          orderby unitOfWork.FlightRepository.getOrderIndex(grp.Key.Register, new List<string>())
                          select new { resourceId = grp.Key.RegisterID, resourceName = grp.Key.Register, groupId = grp.Key.TypeId }).ToList();
 
@@ -5665,12 +6448,42 @@ namespace EPAGriffinAPI.Controllers
 
             var oresult = new
             {
-                flight=odto,
+                flight = odto,
                 resgroups,
                 ressq
             };
-
+            //await unitOfWork.FlightRepository.CreateMVTMessage(dto.ID,dto.UserName);
+            //6-28
+            unitOfWork.FlightRepository.CreateMVTMessage(dto.ID, dto.UserName);
             return Ok(oresult);
+
+        }
+
+        [Route("odata/flight/log/remark/save")]
+
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostFlightLogRemark(DtoLogRemark dto)
+        {
+            System.Globalization.PersianCalendar pc = new System.Globalization.PersianCalendar();
+            var gd = pc.ToDateTime(1399, 10, 1, 0, 0, 0, 0);
+
+
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+
+
+            var result = await unitOfWork.FlightRepository.UpdateFlightLogRemark(dto);
+
+
+
+
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+
+
+            return Ok(saveResult);
 
         }
 
@@ -5680,7 +6493,7 @@ namespace EPAGriffinAPI.Controllers
         // [Authorize]
         public async Task<IHttpActionResult> GetLeg(int id)
         {
-            var leg = await unitOfWork.FlightRepository.GetViewLegTime().FirstOrDefaultAsync(q=>q.ID==id);
+            var leg = await unitOfWork.FlightRepository.GetViewLegTime().FirstOrDefaultAsync(q => q.ID == id);
             return Ok(leg);
 
         }
@@ -5689,7 +6502,7 @@ namespace EPAGriffinAPI.Controllers
         {
             if (String.IsNullOrEmpty(str))
                 return null;
-            var year =Convert.ToInt32( str.Substring(0, 4));
+            var year = Convert.ToInt32(str.Substring(0, 4));
             var month = Convert.ToInt32(str.Substring(4, 2));
             var day = Convert.ToInt32(str.Substring(6, 2));
             var hour = Convert.ToInt32(str.Substring(8, 2));
@@ -5707,21 +6520,22 @@ namespace EPAGriffinAPI.Controllers
             if (dto == null)
                 return Exceptions.getNullException(ModelState);
             var Id = Convert.ToInt32(dto.Id);
-            DateTime? offblock = ConvertToDateTime( Convert.ToString(dto.OffBlock));
+            DateTime? offblock = ConvertToDateTime(Convert.ToString(dto.OffBlock));
 
             DateTime? onblock = ConvertToDateTime(Convert.ToString(dto.OnBlock));
             DateTime? takeoff = ConvertToDateTime(Convert.ToString(dto.TakeOff));
             DateTime? landing = ConvertToDateTime(Convert.ToString(dto.Landing));
-            int? pflr = Convert.ToInt32(dto.PFLR)==-1?null: Convert.ToInt32(dto.PFLR);
-           
+            int? pflr = Convert.ToInt32(dto.PFLR) == -1 ? null : Convert.ToInt32(dto.PFLR);
+
             int FuelUnitID = Convert.ToInt32(dto.FuelUnitID);
             double? FuelArrival = dto.FuelArrival == null ? null : (Nullable<double>)Convert.ToDouble(dto.FuelArrival);
             double? FuelDeparture = dto.FuelDeparture == null ? null : (Nullable<double>)Convert.ToDouble(dto.FuelDeparture);
             double? UsedFuel = dto.UsedFuel == null ? null : (Nullable<double>)Convert.ToDouble(dto.UsedFuel);
+            double? FPFuel = dto.UsedFuel == null ? null : (Nullable<double>)Convert.ToDouble(dto.FPFuel);
 
             int? unitId = dto.FuelUnitID == null ? null : (Nullable<int>)Convert.ToInt32(dto.FuelUnitID);
 
-            var result = await unitOfWork.FlightRepository.UpdateFlightJLog(Id,offblock,onblock,takeoff,landing,pflr, FuelArrival, FuelDeparture, UsedFuel,unitId);
+            var result = await unitOfWork.FlightRepository.UpdateFlightJLog(Id, offblock, onblock, takeoff, landing, pflr, FuelArrival, FuelDeparture, UsedFuel, unitId, FPFuel);
 
             var saveResult = await unitOfWork.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
@@ -5805,17 +6619,17 @@ namespace EPAGriffinAPI.Controllers
 
                 return Exceptions.getModelValidationException(ModelState);
             }
-           
-           
+
+
             var result = await unitOfWork.FlightRepository.ChangeFlightRegister(dto);
 
 
-           // if (result.data != null)
-           //     return result;
+            // if (result.data != null)
+            //     return result;
 
             var saveResult = await unitOfWork.SaveAsync();
-           if (saveResult.Code != HttpStatusCode.OK)
-               return saveResult;
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
 
             if (result.data != null)
             {
@@ -5824,16 +6638,16 @@ namespace EPAGriffinAPI.Controllers
                 {
                     //doolpardaz
                     // var offResult = await unitOfWork.FlightRepository.RemoveItemsFromFDP(obj[1], obj[0], " due to change of aircraft type.");
-                    var offResult = await unitOfWork.FlightRepository.RemoveItemsFromFDPByRegisterChange(obj[2].ToString(),obj[3].ToString());
+                    var offResult = await unitOfWork.FlightRepository.RemoveItemsFromFDPByRegisterChange(obj[2].ToString(), obj[3].ToString());
 
-                      
+
                 }
-                if (obj != null && obj[4]!=null)
+                if (obj != null && obj[4] != null)
                 {
                     var tcitems = obj[4] as List<TypeChangeDto>;
                     if (tcitems != null)
                     {
-                       await unitOfWork.NotificationRepository.SendGroupNotificationRegisterTypeChange(tcitems);
+                        await unitOfWork.NotificationRepository.SendGroupNotificationRegisterTypeChange(tcitems);
                     }
 
                 }
@@ -5842,7 +6656,7 @@ namespace EPAGriffinAPI.Controllers
             // await unitOfWork.FlightRepository.NotifyNira((int)obj.FlightId,obj.UserName);
             foreach (var x in dto.Flights)
             {
-                await unitOfWork.FlightRepository.NotifyNira((int)x, dto.UserName,dto.NewRegisterId.ToString());
+                await unitOfWork.FlightRepository.NotifyNira((int)x, dto.UserName, dto.NewRegisterId.ToString());
             }
 
             return Ok(result);
@@ -5903,6 +6717,112 @@ namespace EPAGriffinAPI.Controllers
             }
             ////////////////////////////////////
             var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => dto.Flights.Contains(q.ID)).ToListAsync();
+            var flights = new List<ViewFlightsGanttDto>();
+            foreach (var x in fg)
+            {
+                ViewModels.ViewFlightsGanttDto odto = new ViewFlightsGanttDto();
+                ViewModels.ViewFlightsGanttDto.FillDto(x, odto, 0, 1);
+                flights.Add(odto);
+            }
+
+
+
+            var resgroups = from x in fg
+                            group x by new { x.AircraftType, AircraftTypeId = x.TypeId }
+                           into grp
+                            select new { groupId = grp.Key.AircraftTypeId, Title = grp.Key.AircraftType };
+            var ressq = (from x in fg
+                         group x by new { x.RegisterID, x.Register, x.TypeId }
+                     into grp
+
+                         orderby unitOfWork.FlightRepository.getOrderIndex(grp.Key.Register, new List<string>())
+                         select new { resourceId = grp.Key.RegisterID, resourceName = grp.Key.Register, groupId = grp.Key.TypeId }).ToList();
+
+            //odto.resourceId.Add((int)odto.RegisterID);
+
+
+            var oresult = new
+            {
+                flights,
+                resgroups,
+                ressq
+            };
+            ///////////////////////////////////
+            return Ok(oresult);
+
+        }
+
+        //magu2-16
+        [Route("odata/flight/register/change/group")]
+        //dooltopoli
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostFlightRegisterChangeGroup(ViewModels.FlightRegisterChangeLogDto dto)
+        {
+
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+            if (!ModelState.IsValid)
+            {
+
+                return Exceptions.getModelValidationException(ModelState);
+            }
+
+
+            var result = await unitOfWork.FlightRepository.ChangeFlightRegisterGroup(dto);
+
+
+            // if (result.data != null)
+            //     return result;
+
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+            List<int> _flts = new List<int>();
+            if (result.data != null)
+            {
+                var obj = result.data as List<object>;
+                if (obj !=null && obj.Count == 1)
+                {
+                    _flts = obj[0] as List<int>;
+                }
+                else
+                {
+                    if (obj != null && !string.IsNullOrEmpty(obj[1].ToString()) && !string.IsNullOrEmpty(obj[0].ToString()))
+                    {
+                        //doolpardaz
+                        // var offResult = await unitOfWork.FlightRepository.RemoveItemsFromFDP(obj[1], obj[0], " due to change of aircraft type.");
+                        var offResult = await unitOfWork.FlightRepository.RemoveItemsFromFDPByRegisterChange(obj[2].ToString(), obj[3].ToString());
+
+
+                    }
+                    if (obj != null && obj[4] != null)
+                    {
+                        var tcitems = obj[4] as List<TypeChangeDto>;
+                        if (tcitems != null)
+                        {
+                            await unitOfWork.NotificationRepository.SendGroupNotificationRegisterTypeChange(tcitems);
+                        }
+
+                    }
+                    if (obj != null && obj[5] != null)
+                    {
+                        _flts = obj[5] as List<int>;
+                    }
+                }
+                
+            }
+
+            // await unitOfWork.FlightRepository.NotifyNira((int)obj.FlightId,obj.UserName);
+            foreach (var x in dto.Flights)
+            {
+                await unitOfWork.FlightRepository.NotifyNira((int)x, dto.UserName, dto.NewRegisterId.ToString());
+            }
+            ////////////////////////////////////
+            var beginDate = ((DateTime)dto.RefDate).Date;
+            var endDate = ((DateTime)dto.RefDate).Date.AddDays((int)dto.RefDays).Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => _flts.Contains(q.ID)
+            && q.STDDay >= beginDate && q.STDDay <= endDate
+            ).ToListAsync();
             var flights = new List<ViewFlightsGanttDto>();
             foreach (var x in fg)
             {
@@ -6431,7 +7351,7 @@ namespace EPAGriffinAPI.Controllers
         {
             df = df.Date;
             dt = dt.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
-           //  var result = await unitOfWork.FlightRepository.RosterFunctionTotal(data, df, dt);
+            //  var result = await unitOfWork.FlightRepository.RosterFunctionTotal(data, df, dt);
             var result = await unitOfWork.FlightRepository.RosterFunctionTest(data, df, dt);
 
             return Ok(result);
@@ -6451,13 +7371,13 @@ namespace EPAGriffinAPI.Controllers
             var result = await unitOfWork.FlightRepository.DeleteFDP(id);
             //if (!string.IsNullOrEmpty(result))
             //   return new CustomActionResult(HttpStatusCode.NotAcceptable, result);
-            
+
 
 
             var saveResult = await unitOfWork.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
                 return saveResult;
-            
+
 
             return Ok(result);
         }
@@ -6467,13 +7387,13 @@ namespace EPAGriffinAPI.Controllers
 
         public async Task<IHttpActionResult> PostRosterFDPSave(RosterFDPDto dto)
         {
-            
+
             var result = await unitOfWork.FlightRepository.saveFDP(dto);
 
             return Ok(result);
 
         }
-
+        //magu2-23
         [Route("odata/roster/fdp/nocrew/save")]
         [AcceptVerbs("POST")]
 
@@ -6482,7 +7402,22 @@ namespace EPAGriffinAPI.Controllers
             var userId = Convert.ToInt32(dto.userId);
             var flightId = Convert.ToInt32(dto.flightId);
             var code = Convert.ToString(dto.code);
-            var result = await unitOfWork.FlightRepository.saveFDPNoCrew(userId,flightId,code);
+            var result = await unitOfWork.FlightRepository.saveFDPNoCrew(userId, flightId, code);
+
+            return Ok(result);
+
+        }
+
+        [Route("odata/roster/fdp/nocrew/group/save")]
+        [AcceptVerbs("POST")]
+
+        public async Task<IHttpActionResult> PostRosterFDPNoCrewSaveGroup(dynamic dto)
+        {
+            var userId = Convert.ToInt32(dto.userId);
+            string flightIds = Convert.ToString(dto.flightIds);
+            
+            var code = Convert.ToString(dto.code);
+            var result = await unitOfWork.FlightRepository.saveFDPNoCrew2(userId, flightIds.Split('_').Select(q => Convert.ToInt32(q)).ToList(), code);
 
             return Ok(result);
 
@@ -6495,8 +7430,8 @@ namespace EPAGriffinAPI.Controllers
         {
             var userId = Convert.ToInt32(dto.userId);
             var flightId = Convert.ToInt32(dto.flightId);
-            
-            var result = await unitOfWork.FlightRepository.deleteFDPNoCrew(userId, flightId );
+
+            var result = await unitOfWork.FlightRepository.deleteFDPNoCrew(userId, flightId);
 
             return Ok(result);
 
@@ -6520,9 +7455,9 @@ namespace EPAGriffinAPI.Controllers
         {
             df = df.Date;
             dt = dt.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
-            
 
-            var result = await unitOfWork.FlightRepository.getRosterFDPDtos(df, dt );
+
+            var result = await unitOfWork.FlightRepository.getRosterFDPDtos(df, dt);
 
             return Ok(result);
 
@@ -6540,7 +7475,7 @@ namespace EPAGriffinAPI.Controllers
 
         }
         [Route("odata/coord/save/{lt}/{lng}/{uid}")]
-        public async Task<IHttpActionResult> GetSaveCoord(decimal lt,decimal lng,int uid)
+        public async Task<IHttpActionResult> GetSaveCoord(decimal lt, decimal lng, int uid)
         {
 
 
@@ -6551,7 +7486,7 @@ namespace EPAGriffinAPI.Controllers
 
         }
         [Route("odata/roster/fdps/{crewId}/{year}/{month}")]
-        public async Task<IHttpActionResult> GetCrewDuties(int crewId,int year,int month)
+        public async Task<IHttpActionResult> GetCrewDuties(int crewId, int year, int month)
         {
 
 
@@ -6562,12 +7497,12 @@ namespace EPAGriffinAPI.Controllers
 
         }
         [Route("odata/roster/duties/{type}/{year}/{month}/{day}")]
-        public async Task<IHttpActionResult> GetDuties(string type, int year, int month,int day)
+        public async Task<IHttpActionResult> GetDuties(string type, int year, int month, int day)
         {
 
 
 
-            var result = await unitOfWork.FlightRepository.GetDayDuties(type, year, month,day);
+            var result = await unitOfWork.FlightRepository.GetDayDuties(type, year, month, day);
 
             return Ok(result);
 
@@ -6583,16 +7518,16 @@ namespace EPAGriffinAPI.Controllers
         //}
 
         [Route("odata/crew/duties/{cabin}/{cockpit}")]
-         
 
-        public async Task<IHttpActionResult> GetCrewDuties( DateTime df, DateTime dt,int cabin,int cockpit)
+
+        public async Task<IHttpActionResult> GetCrewDuties(DateTime df, DateTime dt, int cabin, int cockpit)
         {
             df = df.Date;
             dt = dt.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
             int? _cabin = cabin == 0 ? null : (Nullable<int>)cabin;
             int? _cockpit = cockpit == 0 ? null : (Nullable<int>)cockpit;
 
-            var result = await unitOfWork.FlightRepository.GetCrewDuties(df,dt,_cabin,_cockpit);
+            var result = await unitOfWork.FlightRepository.GetCrewDuties(df, dt, _cabin, _cockpit);
 
             return Ok(result);
 
@@ -6623,7 +7558,7 @@ namespace EPAGriffinAPI.Controllers
         public async Task<IHttpActionResult> PostRosterDeleteFDPItem(dynamic dto)
         {
             string _flights = Convert.ToString(dto.flights);
-            var ids=_flights.Split('_').Select(q =>(Nullable<int>) Convert.ToInt32(q)).ToList();
+            var ids = _flights.Split('_').Select(q => (Nullable<int>)Convert.ToInt32(q)).ToList();
             var crewId = Convert.ToInt32(dto.crewId);
             await unitOfWork.FlightRepository.RosterDeleteFDPItem(crewId, ids);
 
@@ -6661,7 +7596,7 @@ namespace EPAGriffinAPI.Controllers
         [Route("odata/roster/prepost")]
         [AcceptVerbs("POST")]
 
-        public async Task<IHttpActionResult> PostRosterGetPrePost(List<RosterColumn> data,DateTime df, DateTime dt, int crewId)
+        public async Task<IHttpActionResult> PostRosterGetPrePost(List<RosterColumn> data, DateTime df, DateTime dt, int crewId)
         {
             df = df.Date;
             dt = dt.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
@@ -6673,11 +7608,11 @@ namespace EPAGriffinAPI.Controllers
         [Route("odata/roster/method/temp/cal")]
         [AcceptVerbs("POST")]
 
-        public async Task<IHttpActionResult> PostRosterTempCal(List<RosterColumn> data, DateTime df, DateTime dt, int? crewId,int? year,int? month)
+        public async Task<IHttpActionResult> PostRosterTempCal(List<RosterColumn> data, DateTime df, DateTime dt, int? crewId, int? year, int? month)
         {
             df = df.Date;
             dt = dt.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
-            var result = await unitOfWork.FlightRepository.RosterGetTempFDPs(data, df, dt, crewId, 0,year,month);
+            var result = await unitOfWork.FlightRepository.RosterGetTempFDPs(data, df, dt, crewId, 0, year, month);
 
             return Ok(result);
 
@@ -6757,6 +7692,17 @@ namespace EPAGriffinAPI.Controllers
             return result.AsQueryable();
 
         }
+        [Route("odata/roster/report/fp/")]
+        [EnableQuery]
+
+        public IQueryable<ViewRosterReportFP> GetViewRosterReportFP(DateTime day)
+        {
+            //var prts = day.Split('-').Select(q => Convert.ToInt32(q)).ToList();
+            var dt = day.Date; //new DateTime(prts[0], prts[1], prts[2]);
+            var result = unitOfWork.FlightRepository.GetViewRosterReportFP().Where(q => q.STDDay == dt).OrderBy(q => q.Register).ThenBy(q => q.STD).ToList();
+            return result.AsQueryable();
+
+        }
 
         //[Route("odata/roster/sheet/report")]
         //[EnableQuery]
@@ -6773,12 +7719,22 @@ namespace EPAGriffinAPI.Controllers
         //}
 
         [Route("odata/roster/sheet/report")]
-       
+
         public async Task<IHttpActionResult> GetViewRosterSheetReport(DateTime df)
         {
             // return Ok(client);
             df = df.Date;
-            var result =await unitOfWork.FlightRepository.GetDailyRosterReport(df);
+            var result = await unitOfWork.FlightRepository.GetDailyRosterReport(df);
+
+            return Ok(result);
+        }
+        [Route("odata/roster/sheet/report/fp")]
+
+        public async Task<IHttpActionResult> GetViewRosterSheetReportFP(DateTime df)
+        {
+            // return Ok(client);
+            df = df.Date;
+            var result = await unitOfWork.FlightRepository.GetDailyRosterReportFP(df);
 
             return Ok(result);
         }
@@ -6789,11 +7745,11 @@ namespace EPAGriffinAPI.Controllers
 
         public IQueryable<ViewFDPCrewDetailSM> GetViewRosterCrewDetails(string ids)
         {
-            var _ids = ids.Split('_').Select(q =>(Nullable<int>) Convert.ToInt32(q)).ToList();
-            var query =( from x in unitOfWork.FlightRepository.GetViewFDPCrewDetailSMS()
-                        where _ids.Contains(x.FDPId)
-                        orderby x.ScheduleName
-                        select x).ToList();
+            var _ids = ids.Split('_').Select(q => (Nullable<int>)Convert.ToInt32(q)).ToList();
+            var query = (from x in unitOfWork.FlightRepository.GetViewFDPCrewDetailSMS()
+                         where _ids.Contains(x.FDPId)
+                         orderby x.ScheduleName
+                         select x).ToList();
             return query.AsQueryable();
 
         }
@@ -6809,7 +7765,7 @@ namespace EPAGriffinAPI.Controllers
             var ids = dto.Ids;
             var date = dto.Date.Date;
 
-            var result =await unitOfWork.FlightRepository.SMSRosterDaily(ids,date);
+            var result = await unitOfWork.FlightRepository.SMSRosterDaily(ids, date);
             var saveResult = await unitOfWork.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
                 return saveResult;
@@ -6829,8 +7785,117 @@ namespace EPAGriffinAPI.Controllers
                 return Exceptions.getNullException(ModelState);
             var ids = dto.Ids;
             var date = dto.Date.Date;
+            var username = dto.UserName;
 
-            var result = await unitOfWork.FlightRepository.SMSDuties(ids, date);
+            var result = await unitOfWork.FlightRepository.SMSDuties(ids, date, username);
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+
+
+            return Ok(result);
+        }
+        [Route("odata/duties/sms/save/date")]
+        //qool
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostDutiesSMS2(dynamic dto)
+        {
+            // return Ok(client);
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+
+            var datefrom = Convert.ToDateTime(dto.datefrom);
+            var dateto = Convert.ToDateTime(dto.dateto);
+            var username = Convert.ToString(dto.username);
+
+            var result = await unitOfWork.FlightRepository.SMSDutiesByDate(datefrom, dateto, username);
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+
+
+            return Ok(result);
+        }
+        [Route("odata/duties/visiblehide")]
+        //qool
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostHideVisibleHideDuties(RosterSMSDto dto)
+        {
+            // return Ok(client);
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+            var ids = dto.Ids;
+            var date = dto.Date.Date;
+            var username = dto.UserName;
+
+            var result = await unitOfWork.FlightRepository.HideVisibleDuties(ids, date, username);
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+
+
+            return Ok(result);
+        }
+
+        [Route("odata/duties/visible")]
+        //qool
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostVisibleDuties(RosterSMSDto dto)
+        {
+            // return Ok(client);
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+            var ids = dto.Ids;
+            var date = dto.Date.Date;
+            var username = dto.UserName;
+
+            var result = await unitOfWork.FlightRepository.VisibleDuties(ids, date, username);
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+
+
+            return Ok(result);
+        }
+        [Route("odata/duties/hide")]
+        //qool
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostHideDuties(RosterSMSDto dto)
+        {
+            // return Ok(client);
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+            var ids = dto.Ids;
+            var date = dto.Date.Date;
+            var username = dto.UserName;
+
+            var result = await unitOfWork.FlightRepository.HideDuties(ids, date, username);
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+
+
+            return Ok(result);
+        }
+        [Route("odata/duties/visible/dates")]
+        //qool
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostVisibleByDatesDuties(dynamic dto)
+        {
+
+            // return Ok(client);
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+            var datefrom = Convert.ToDateTime(dto.datefrom);
+            var dateto = Convert.ToDateTime(dto.dateto);
+            var username = Convert.ToString(dto.username);
+
+            var result = await unitOfWork.FlightRepository.VisibleDutiesByDate(datefrom, dateto, username);
             var saveResult = await unitOfWork.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
                 return saveResult;
@@ -6851,7 +7916,7 @@ namespace EPAGriffinAPI.Controllers
             string sender = Convert.ToString(dto.sender);
 
             var result = await unitOfWork.FlightRepository.SendSMSGroup(mobiles.Split('_').ToList(), names.Split('_').ToList(), message, sender);
-             
+
             return Ok(result);
         }
 
@@ -6863,8 +7928,8 @@ namespace EPAGriffinAPI.Controllers
             // return Ok(client);
             if (dto == null)
                 return Exceptions.getNullException(ModelState);
-            var ids = dto.Ids.Select(q=>Convert.ToInt64(q)).ToList();
-            
+            var ids = dto.Ids.Select(q => Convert.ToInt64(q)).ToList();
+
 
             var result = await unitOfWork.FlightRepository.GetSMSStatus(ids);
             var saveResult = await unitOfWork.SaveAsync();
@@ -6944,14 +8009,14 @@ namespace EPAGriffinAPI.Controllers
         [Route("odata/flight/ati/{day}/{fn}")]
         [EnableQuery]
         //looi
-        public async Task<IHttpActionResult> GetFlightAti(string day,string fn)
+        public async Task<IHttpActionResult> GetFlightAti(string day, string fn)
         ///(DateTime from, DateTime to, int id, int? airline = null, int? status = null, int? fromAirport = null, int? toAirport = null)
         {
             var y = Convert.ToInt32(day.Substring(0, 4));
             var m = Convert.ToInt32(day.Substring(4, 2));
             var d = Convert.ToInt32(day.Substring(6, 2));
-            var _day = new  DateTime(y, m, d);
-            var flight = await unitOfWork.FlightRepository.GetViewLegTime().FirstOrDefaultAsync(q=>q.STDDay==_day && q.FlightNumber==fn);
+            var _day = new DateTime(y, m, d);
+            var flight = await unitOfWork.FlightRepository.GetViewLegTime().FirstOrDefaultAsync(q => q.STDDay == _day && q.FlightNumber == fn);
             return Ok(new CustomActionResult(HttpStatusCode.OK, flight));
 
         }
@@ -6965,30 +8030,45 @@ namespace EPAGriffinAPI.Controllers
         {
             var result = await unitOfWork.FlightRepository.UpdateAti(id, offset, std, sta, offblock, onblock, takeoff, landing);
 
-             
+
 
             return Ok(result);
 
         }
 
 
-        [Route("odata/ati/nira/all")]
+        [Route("odata/ati/nira/all/{dfrom}/{dto}")]
         [EnableQuery]
         //looi
-        public async Task<IHttpActionResult> GetNieaAll()
+        public async Task<IHttpActionResult> GetNieaAll(string dfrom,string dto)
         ///(DateTime from, DateTime to, int id, int? airline = null, int? status = null, int? fromAirport = null, int? toAirport = null)
         {
-            var result = await unitOfWork.FlightRepository.AllNira();
-             return Ok(result);
+            var fprts = dfrom.Split('-').Select(q=>Convert.ToInt32(q)).ToList();
+            var tprts = dto.Split('-').Select(q => Convert.ToInt32(q)).ToList();
+            var dtfrom = new DateTime(fprts[0], fprts[1], fprts[2]);
+            var dtto = new DateTime(tprts[0], tprts[1], tprts[2]);
+            var result = await unitOfWork.FlightRepository.AllNira(dtfrom, dtto);
+            return Ok(result);
+
+        }
+
+        [Route("odata/ati/nira/flypersia/test")]
+        [EnableQuery]
+        //looi
+        public async Task<IHttpActionResult> GetNiraFlyPersiaTest()
+        ///(DateTime from, DateTime to, int id, int? airline = null, int? status = null, int? fromAirport = null, int? toAirport = null)
+        {
+            var result = await unitOfWork.FlightRepository.NIRAFLYPERSIA();
+            return Ok(result);
 
         }
 
         [Route("odata/airport/dist")]
 
-        public IHttpActionResult  GetAirportDistance()
+        public IHttpActionResult GetAirportDistance()
         {
-            
-            
+
+
             var client = new RestClient("https://greatcirclemapper.p.rapidapi.com/airports/route/EGLL-KJFK/510");
             var request = new RestRequest(Method.GET);
             request.AddHeader("x-rapidapi-host", "greatcirclemapper.p.rapidapi.com");
@@ -7010,6 +8090,53 @@ namespace EPAGriffinAPI.Controllers
             //return unitOfWork.FlightRepository.GetViewFlightCrewNews().Where(q => q.FlightId == id).OrderBy(q => q.IsPositioning).ThenBy(q => q.GroupOrder);
             return result.AsQueryable();
 
+
+        }
+
+        [Route("odata/flight/guid/{id}")]
+        [EnableQuery]
+        // [Authorize]
+        public async Task<IHttpActionResult> GetFlightGUID(int id)
+        {
+            var result = await unitOfWork.FlightRepository.GetFlightGUID(id);
+            return Ok(result);
+
+        }
+
+        [Route("odata/sela")]
+        [EnableQuery]
+        [AcceptVerbs("GET")]
+        // [Authorize]
+        public async Task<IHttpActionResult> CreateSela()
+        {
+            var result = await unitOfWork.FlightRepository.CreateSela();
+            //List<string> logs = new List<string>() { "1", "2", "3" };
+            //var fileExisted = File.Exists(HttpContext.Current.Server.MapPath("~/sela/detaillog.json"));
+            //if (fileExisted)
+            //{
+            //    long length = new System.IO.FileInfo(HttpContext.Current.Server.MapPath("~/sela/detaillog.json")).Length;
+            //    if (length == 0)
+            //        fileExisted = false;
+            //}
+            //using (StreamWriter _detailogwriter = new StreamWriter(HttpContext.Current.Server.MapPath("~/sela/detaillog.json"), true))
+            //{
+                
+            //    var c = 0;
+            //    foreach (var str in logs)
+            //    {
+            //        if (c==0 && fileExisted)
+            //        {
+            //            _detailogwriter.Write("\r\n");
+            //        }
+            //        if (c < logs.Count - 1)
+            //            _detailogwriter.WriteLine(str);
+            //        else
+            //            _detailogwriter.Write(str);
+
+            //        c++;
+            //    }
+            //}
+            return Ok(true);
 
         }
 

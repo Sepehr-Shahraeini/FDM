@@ -17,9 +17,12 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> Year { get; set; }
         public Nullable<int> Month { get; set; }
         public string MonthName { get; set; }
+        public string ArgStr { get; set; }
+        public Nullable<int> ArgNum { get; set; }
         public string Route { get; set; }
         public Nullable<int> FromAirport { get; set; }
         public Nullable<int> ToAirport { get; set; }
+        public string Route2 { get; set; }
         public string FromAirportIATA { get; set; }
         public string ToAirportIATA { get; set; }
         public Nullable<int> Legs { get; set; }
@@ -27,8 +30,10 @@ namespace EPAGriffinAPI.Models
         public decimal Used { get; set; }
         public Nullable<decimal> UpliftKilo { get; set; }
         public Nullable<decimal> UsedKilo { get; set; }
+        public Nullable<decimal> UsedKiloAvg { get; set; }
         public Nullable<decimal> UpliftPerLeg { get; set; }
         public Nullable<decimal> UsedPerLeg { get; set; }
+        public Nullable<decimal> UsedPerLegAvg { get; set; }
         public Nullable<decimal> UpliftKiloPerLeg { get; set; }
         public Nullable<decimal> UsedKiloPerLeg { get; set; }
         public int TotalPax { get; set; }
@@ -48,10 +53,26 @@ namespace EPAGriffinAPI.Models
         public Nullable<double> UpliftPerWeightDistance { get; set; }
         public Nullable<double> UpliftPerWeightDistanceKM { get; set; }
         public Nullable<decimal> UsedPerPax { get; set; }
+        public Nullable<decimal> UsedPerPaxAvg { get; set; }
         public Nullable<decimal> UsedPerWeight { get; set; }
         public Nullable<double> UsedPerDistance { get; set; }
         public Nullable<double> UsedPerDistanceKM { get; set; }
         public Nullable<double> UsedPerWeightDistance { get; set; }
         public Nullable<double> UsedPerWeightDistanceKM { get; set; }
+        public Nullable<double> UsedPerWeightDistanceToneKM { get; set; }
+        public int FlightTime { get; set; }
+        public int BlockTime { get; set; }
+        public Nullable<decimal> UsedPerFlightTime { get; set; }
+        public Nullable<decimal> UsedPerBlockTime { get; set; }
+        public Nullable<decimal> FPFuelPerFlightTime { get; set; }
+        public Nullable<decimal> FPFuelPerBlockTime { get; set; }
+        public double PaxDistanceKM { get; set; }
+        public double PaxKiloDistanceKM { get; set; }
+        public Nullable<double> UsedPerPaxDistanceKM { get; set; }
+        public Nullable<double> UsedPerPaxKiloDistanceKM { get; set; }
+        public double SeatDistanceKM { get; set; }
+        public double SeatKiloDistanceKM { get; set; }
+        public Nullable<double> UsedPerSeatDistanceKM { get; set; }
+        public Nullable<double> UsedPerSeatKiloDistanceKM { get; set; }
     }
 }

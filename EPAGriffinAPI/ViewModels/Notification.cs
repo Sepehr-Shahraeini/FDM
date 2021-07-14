@@ -9,6 +9,7 @@ namespace EPAGriffinAPI.ViewModels
     {
         public List<int> Ids { get; set; }
         public DateTime Date { get; set; }
+        public string UserName { get; set; }
     }
     public class RosterSMSStatusDto
     {

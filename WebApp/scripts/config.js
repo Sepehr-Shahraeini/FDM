@@ -1,5 +1,5 @@
 ﻿Config = {};
-Config.CustomerId =1;
+Config.CustomerId =4;
 Config.AirlineId = 10;
 //Config.CustomerId = 1;
 //Config.AirlineId = 10;
@@ -139,7 +139,13 @@ Config.MenuItems = [
 
 
            { moduleId: 3, key: 'atr_forma', title: 'Form A', url: '/forma', icon: 'content/images/forma.png' },
-      { moduleId: 3, key: 'atr_citypair', title: 'City-Pair Report', url: '/citypair', icon: 'content/images/citypair.png' },
+    { moduleId: 3, key: 'atr_citypair', title: 'City-Pair Report', url: '/citypair', icon: 'content/images/citypair.png' },
+
+
+
+    { moduleId: 3, key: 'register_flights_report', title: 'Register Fix Time', url: '/reg/flights/monthly', icon: 'content/images/actype2.png' },
+
+    { moduleId: 3, key: 'summary_flights_report', title: 'Register Fix Time', url: '/flights/monthly', icon: 'content/images/actype2.png' },
 
 ];
 

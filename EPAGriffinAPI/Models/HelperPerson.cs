@@ -39,5 +39,9 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> RemainFirstAid { get; set; }
         public Nullable<int> RemainLicenceIR { get; set; }
         public Nullable<int> RemainProficiencyOPC { get; set; }
+        public Nullable<int> RemainLine { get; set; }
+        public Nullable<int> RemainRecurrent { get; set; }
+        public Nullable<int> RemainTRI { get; set; }
+        public Nullable<int> RemainTRE { get; set; }
     }
 }

@@ -606,6 +606,7 @@ app.controller('statDelayController', ['$scope', '$location', '$routeParams', '$
                 _d.chb = ({ onValueChanged: function (e) { $scope.selectedCatsChanged2(); }, bindingOptions: { value: 'selectedCats2["' + _d.category + '"]' } });
                
             });
+            //momo
             $.each(response.airportsSum, function (_i, _d) {
                 $scope.selectedApts[_d.airport] = true;
                  

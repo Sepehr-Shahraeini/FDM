@@ -1192,6 +1192,7 @@ app.controller('crewReportController', ['$scope', '$location', '$routeParams', '
                     url: $rootScope.serviceUrl + url,
                     key: "Id",
                     version: 4,
+                      
                     onLoaded: function (e) {
                         $.each(e, function (_i, _d) {
                             _d.Day1_Duty = pad(Math.floor(_d.Day1_Duty / 60)).toString() + ':' + pad(Math.round(_d.Day1_Duty % 60)).toString();
@@ -1223,7 +1224,7 @@ app.controller('crewReportController', ['$scope', '$location', '$routeParams', '
                         $rootScope.$broadcast('OnDataLoaded', null);
                     },
                     beforeSend: function (e) {
-
+                         
                         $scope.dsUrl = General.getDsUrl(e);
 
                         // $scope.$apply(function () {

@@ -28,7 +28,7 @@ app.controller('formmovaledController', ['$scope', '$location', '$routeParams', 
             $scope.dg_route_ds = null;
             $scope.dg_regroute_ds = null;
             $scope.doRefresh = true;
-            $scope.bind();
+            $scope.bind(); 
 
         }
 
@@ -264,21 +264,43 @@ app.controller('formmovaledController', ['$scope', '$location', '$routeParams', 
       { dataField: 'Year', caption: 'سال', allowResizing: true, alignment: 'center', dataType: 'numeric', allowEditing: false, width: 120, fixed: false, fixedPosition: 'left', sortIndex: 0, sortOrder: 'asc' },
       { dataField: 'MonthName', caption: 'ماه', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: false, fixedPosition: 'left', },
       // { dataField: 'Month', caption: 'MM', allowResizing: true, alignment: 'center', dataType: 'numeric', allowEditing: false, width: 120, fixed: false, fixedPosition: 'left', sortIndex: 1, sortOrder: 'asc' },
-       { dataField: 'Legs', caption: 'تعداد پرواز', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'FlightHour', caption: 'ساعت پرواز', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'PaxTotal', caption: 'مسافر حمل شده', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'TotalSeat', caption: 'صندلی عرضه شده', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'Distance', caption: 'مسافت طی شده هزار کیلومتر', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-      
-       { dataField: 'PaxTotalDistRound', caption: 'مسافر کیلومتر حمل شده هزار', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 170, fixed: false, fixedPosition: 'left', },
-       { dataField: 'TotalSeatDistRound', caption: 'صندلی کیلومتر حمل شده هزار', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'PaxLoad', caption: 'ضریب ظرفیت مسافر', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'FreightTone', caption: 'بار حمل شده تن', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       //{ dataField: 'FreightToneDistance', caption: 'پست حمل شده', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-        { dataField: 'TotalToneDistance', caption: 'تن کیلومتر حمل شده هزار', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'TotalToneDistanceAvailable', caption: 'تن کیلومتر عرضه شده هزار', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
-       { dataField: 'WeightLoadFactor', caption: 'ضریب ظرفیت وزنی', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+        {
+            caption: 'DOM', columns: [
+                { dataField: 'Legs', caption: 'تعداد پرواز', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'FlightHour', caption: 'ساعت پرواز', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'PaxTotal', caption: 'مسافر حمل شده', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'TotalSeat', caption: 'صندلی عرضه شده', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'Distance', caption: 'مسافت طی شده هزار کیلومتر', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
 
+                { dataField: 'PaxTotalDistRound', caption: 'مسافر کیلومتر حمل شده هزار', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 170, fixed: false, fixedPosition: 'left', },
+                { dataField: 'TotalSeatDistRound', caption: 'صندلی کیلومتر حمل شده هزار', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'PaxLoad', caption: 'ضریب ظرفیت مسافر', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'FreightTone', caption: 'بار حمل شده تن', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                //{ dataField: 'FreightToneDistance', caption: 'پست حمل شده', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'TotalToneDistance', caption: 'تن کیلومتر حمل شده هزار', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'TotalToneDistanceAvailable', caption: 'تن کیلومتر عرضه شده هزار', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'WeightLoadFactor', caption: 'ضریب ظرفیت وزنی', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+            ]
+        },
+        
+        {
+            caption: 'INT', columns: [
+                { dataField: 'LegsInt', caption: 'تعداد پرواز', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'FlightHourInt', caption: 'ساعت پرواز', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'PaxTotalInt', caption: 'مسافر حمل شده', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'TotalSeatInt', caption: 'صندلی عرضه شده', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'DistanceInt', caption: 'مسافت طی شده هزار کیلومتر', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+
+                { dataField: 'PaxTotalDistRoundInt', caption: 'مسافر کیلومتر حمل شده هزار', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 170, fixed: false, fixedPosition: 'left', },
+                { dataField: 'TotalSeatDistRoundInt', caption: 'صندلی کیلومتر حمل شده هزار', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'PaxLoadInt', caption: 'ضریب ظرفیت مسافر', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'FreightToneInt', caption: 'بار حمل شده تن', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                //{ dataField: 'FreightToneDistance', caption: 'پست حمل شده', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'TotalToneDistanceInt', caption: 'تن کیلومتر حمل شده هزار', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'TotalToneDistanceAvailableInt', caption: 'تن کیلومتر عرضه شده هزار', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+                { dataField: 'WeightLoadFactorInt', caption: 'ضریب ظرفیت وزنی', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 160, fixed: false, fixedPosition: 'left', },
+            ]
+        },
        // { dataField: 'Legs', caption: 'Legs', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, fixed: false, fixedPosition: 'left', },
        //   { dataField: 'Delay2', caption: 'Delay', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130 },
 
@@ -1076,7 +1098,18 @@ app.controller('formmovaledController', ['$scope', '$location', '$routeParams', 
             //$scope.popup_print_visible = true;
         }
     };
+    $scope.btn_year = {
+        text: 'Yearly Report',
+        type: 'default',
 
+        width: 200,
+
+        bindingOptions: {},
+        onClick: function (e) {
+
+            $window.open('#!/formmovaled/yearly/', '_blank');
+        }
+    };
 
     ///////////////////////////////////////////////
     $scope.$on('$viewContentLoaded', function () {

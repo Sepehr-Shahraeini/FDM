@@ -147,6 +147,23 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
 
         return deferred.promise;
     };
+    //2020-11-16
+    var _getRealRegisters = function (cid) {
+
+        //odata/flights/register/{cid}/{airport}/{register}/{from}/{to}
+
+        var deferred = $q.defer();
+        $http.get(serviceBase  + 'odata/aircrafts/customer/' + cid).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+
     var _getDelayCodes = function () {
 
 
@@ -837,6 +854,7 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
     var _saveFlight = function (entity) {
         var deferred = $q.defer();
         $http.post($rootScope.serviceUrl + 'odata/flight/save', entity).then(function (response) {
+        
             deferred.resolve(response.data);
         }, function (err, status) {
 
@@ -845,6 +863,8 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
 
         return deferred.promise;
     };
+     
+   
     var _saveFlightRegister = function (entity) {
         var deferred = $q.defer();
         $http.post($rootScope.serviceUrl + 'odata/flight/register/assign', entity).then(function (response) {
@@ -879,9 +899,33 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
 
         return deferred.promise;
     };
+    //magu2-16
+    var _cancelFlightsGroup = function (entity) {
+        var deferred = $q.defer();
+        $http.post($rootScope.serviceUrl + 'odata/flights/cancel/group', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
     var _saveFlightRegisterChange2 = function (entity) {
         var deferred = $q.defer();
         $http.post($rootScope.serviceUrl + 'odata/flight/register/change2', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    //magu2-16
+    var _saveFlightRegisterChangeGroup = function (entity) {
+        var deferred = $q.defer();
+        $http.post($rootScope.serviceUrl + 'odata/flight/register/change/group', entity).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
 
@@ -2257,6 +2301,18 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
 
          return deferred.promise;
      };
+    var _getRosterSheetReportFP = function (_df) {
+
+        var deferred = $q.defer();
+        $http.get(serviceBase + 'odata/roster/sheet/report/fp?df=' + _df).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
 
 
      var _getRosterCrewDetails = function (ids) {
@@ -2513,7 +2569,63 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
 
          return deferred.promise;
      };
+    var _dutiesSendSMSByDate = function (entity) {
+        var deferred = $q.defer();
+        $http.post($rootScope.serviceUrl + 'odata/duties/sms/save/date', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
 
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    var _dutiesHideVisible = function (entity) {
+        var deferred = $q.defer();
+        $http.post($rootScope.serviceUrl + 'odata/duties/visiblehide', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+    var _dutiesVisible = function (entity) {
+        var deferred = $q.defer();
+        $http.post($rootScope.serviceUrl + 'odata/duties/visible', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+    var _dutiesHide = function (entity) {
+        var deferred = $q.defer();
+        $http.post($rootScope.serviceUrl + 'odata/duties/hide', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    var _dutiesVisibleByDates = function (entity) {
+        var deferred = $q.defer();
+        $http.post($rootScope.serviceUrl + 'odata/duties/visible/dates', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
      var _sendSMS = function (entity) {
          var deferred = $q.defer();
          $http.post($rootScope.serviceUrl + 'odata/sms/save', entity).then(function (response) {
@@ -2573,6 +2685,19 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
 
          return deferred.promise;
      };
+
+    var _getDispatchSmsEmployees = function (cid) {
+
+        var deferred = $q.defer();
+        $http.get(serviceBase + 'odata/dispatch/sms/employees/' + cid).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
 
      var _getFlightChangeHistory = function (id) {
 
@@ -2688,6 +2813,20 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
          return deferred.promise;
      };
 
+    //3-2
+    var _getFormAYearlyReport = function (yf, yt) {
+
+        var deferred = $q.defer();
+        $http.get(serviceBase + 'odata/forma/yearly/' + yf + '/' + yt).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
      var _getIPAccess = function () {
 
          var deferred = $q.defer();
@@ -2789,6 +2928,18 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
         return deferred.promise;
     };
 
+    var _saveNoCrewFDPGroup = function (entity) {
+        var deferred = $q.defer();
+        $http.post($rootScope.serviceUrl + 'odata/roster/fdp/nocrew/group/save', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
     var _deleteNoCrewFDP = function (entity) {
         var deferred = $q.defer();
         $http.post($rootScope.serviceUrl + 'odata/roster/fdp/nocrew/delete', entity).then(function (response) {
@@ -2800,6 +2951,237 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
 
         return deferred.promise;
     };
+
+    var _getDelayReportPeriodic = function (_df, _dt,period) {
+
+        var deferred = $q.defer();
+        $http.get(serviceBase + 'odata/delays/periodic/report/'+period+'?dt=' + _dt + '&df=' + _df).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    //getDelayFlightSummary
+    var _getDelayFlightSummary = function (_df, _dt) {
+
+        var deferred = $q.defer();
+        $http.get(serviceBase + 'odata/delays/flight/summary/' + '?dt=' + _dt + '&df=' + _df).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+    var _getMappedTitle = function () {
+
+        var deferred = $q.defer();
+        $http.get(serviceBase + 'odata/delays/mapped/').then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    var _getFlightGUID = function (id) {
+
+        var deferred = $q.defer();
+        $http.get(serviceBase + 'odata/flight/guid/' + id).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    //2021-1-17
+    var _saveRemrak = function (entity) {
+        var deferred = $q.defer();
+        $http.post($rootScope.serviceUrl + 'odata/flight/log/remark/save', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+    //divargar
+    var _saveFlightGroup = function (entity) {
+        var url = 'odata/flight/group/save';
+        if (entity.ID != -1)
+            url = 'odata/flight/group/update';
+        var deferred = $q.defer();
+
+        $http.post($rootScope.serviceUrl + url, entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    var _activeFlights = function (entity) {
+        var deferred = $q.defer();
+        $http.post($rootScope.serviceUrl + 'odata/flights/active', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    //magu38
+    var _activeFlightsGroup = function (entity) {
+        var deferred = $q.defer();
+        $http.post($rootScope.serviceUrl + 'odata/flights/active/group', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    var _deleteFlightGroup = function (entity) {
+        var deferred = $q.defer();
+        $http.post($rootScope.serviceUrl + 'odata/flight/delete/group', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+
+    var _notifyDelay2 = function (id) {
+
+        var deferred = $q.defer();
+        $http.get(serviceBase + 'odata/notify/delay2/'+id).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+
+    var _getFlightReport = function (url) {
+
+        var deferred = $q.defer();
+        $http.get(serviceBase + url).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+    var _getDayApts = function (dt) {
+        
+        var _dt = moment(dt).format('YYYY-MM-DD');
+        var deferred = $q.defer();
+        $http.get('http://localhost:12271/' + 'api/day/apts?dt='  + _dt).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+
+    var _sendMVT = function (flightId,username) {
+
+     
+        var deferred = $q.defer();
+        $http.get(serviceBaseAPI + 'api/mail/mvt/'+flightId+'/'+username+'/vahid/Chico1359'  ).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+    var _getTrainingSessionConvertingErrors = function () {
+
+        
+        var deferred = $q.defer();
+        $http.get(serviceBaseAPI + 'api/idea/session/update/errors' ).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    var _getCrewsLight = function () {
+
+
+        var deferred = $q.defer();
+        $http.get(serviceBaseAPI + 'api/crew/light').then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    var _getCrewTrainigDuties = function (crewid) {
+
+
+        var deferred = $q.defer();
+        $http.get(serviceBaseAPI + 'api/training/duties/'+crewid+'/1').then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    serviceFactory.getTrainingSessionConvertingErrors = _getTrainingSessionConvertingErrors;
+    serviceFactory.getCrewTrainigDuties = _getCrewTrainigDuties;
+    serviceFactory.getCrewsLight = _getCrewsLight;
+
+    serviceFactory.sendMVT = _sendMVT;
+    serviceFactory.getDayApts = _getDayApts;
+
+
+    serviceFactory.getFlightReport = _getFlightReport;
+    serviceFactory.notifyDelay2 = _notifyDelay2;
+
+
+
+    serviceFactory.saveFlightGroup = _saveFlightGroup;
+    serviceFactory.activeFlights = _activeFlights;
+    serviceFactory.deleteFlightGroup = _deleteFlightGroup;
+    
+
+    serviceFactory.saveRemrak = _saveRemrak;
+
 
     serviceFactory.saveNoCrewFDP = _saveNoCrewFDP;
     serviceFactory.deleteNoCrewFDP = _deleteNoCrewFDP;
@@ -3020,6 +3402,8 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
     serviceFactory.rosterSTBYs = _rosterSTBYs;
     serviceFactory.getRosterSheet = _getRosterSheet;
     serviceFactory.getRosterSheetReport = _getRosterSheetReport;
+    //magu313
+    serviceFactory.getRosterSheetReportFP = _getRosterSheetReportFP;
     serviceFactory.getRosterCrewDetails = _getRosterCrewDetails;
     serviceFactory.rosterSendSMS = _rosterSendSMS;
     serviceFactory.dutiesSendSMS = _dutiesSendSMS;
@@ -3033,6 +3417,26 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
     serviceFactory.getOffItems = _getOffItems;
     serviceFactory.getCrewDutiesByYearMonth = _getCrewDutiesByYearMonth;
     serviceFactory.getDutiesByDay = _getDutiesByDay;
+    serviceFactory.getDispatchSmsEmployees = _getDispatchSmsEmployees;
+    //2020-11-16
+    serviceFactory.getRealRegisters = _getRealRegisters;
+    serviceFactory.getDelayReportPeriodic = _getDelayReportPeriodic;
+    serviceFactory.getDelayFlightSummary = _getDelayFlightSummary;
+    serviceFactory.getMappedTitle = _getMappedTitle;
+    serviceFactory.dutiesHideVisible = _dutiesHideVisible;
+    serviceFactory.getFlightGUID = _getFlightGUID;
+    serviceFactory.dutiesVisible = _dutiesVisible;
+    serviceFactory.dutiesHide = _dutiesHide;
+    serviceFactory.dutiesVisibleByDates = _dutiesVisibleByDates;
+    serviceFactory.dutiesSendSMSByDate = _dutiesSendSMSByDate;
+
+    serviceFactory.saveFlightRegisterChangeGroup = _saveFlightRegisterChangeGroup;
+    serviceFactory.cancelFlightsGroup = _cancelFlightsGroup;
+    serviceFactory.activeFlightsGroup = _activeFlightsGroup;
+    serviceFactory.saveNoCrewFDPGroup = _saveNoCrewFDPGroup;
+
+
+    serviceFactory.getFormAYearlyReport = _getFormAYearlyReport;
 
     return serviceFactory;
 

@@ -12,18 +12,22 @@ namespace EPAGriffinAPI.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class RptFuelDaily
+    public partial class RptFuelYearlyRegister
     {
-        public string Date { get; set; }
         public Nullable<int> Year { get; set; }
-        public Nullable<int> Month { get; set; }
-        public string MonthName { get; set; }
-        public string DayName { get; set; }
-        public Nullable<System.DateTime> LocalDate { get; set; }
+        public string AircraftType { get; set; }
+        public Nullable<int> TypeId { get; set; }
+        public Nullable<int> RegisterID { get; set; }
+        public string Register { get; set; }
         public Nullable<int> Legs { get; set; }
         public decimal Uplift { get; set; }
         public decimal Used { get; set; }
-        public decimal PreUsed { get; set; }
+        public int FlightTime { get; set; }
+        public int BlockTime { get; set; }
+        public Nullable<decimal> UsedPerFlightTime { get; set; }
+        public Nullable<decimal> UsedPerBlockTime { get; set; }
+        public Nullable<decimal> FPFuelPerFlightTime { get; set; }
+        public Nullable<decimal> FPFuelPerBlockTime { get; set; }
         public Nullable<decimal> UpliftKilo { get; set; }
         public Nullable<decimal> UsedKilo { get; set; }
         public Nullable<decimal> UpliftPerLeg { get; set; }
@@ -52,6 +56,13 @@ namespace EPAGriffinAPI.Models
         public Nullable<double> UsedPerDistanceKM { get; set; }
         public Nullable<double> UsedPerWeightDistance { get; set; }
         public Nullable<double> UsedPerWeightDistanceKM { get; set; }
-        public Nullable<double> UsedPerWeightDistanceToneKM { get; set; }
+        public double SeatDistanceKM { get; set; }
+        public double SeatKiloDistanceKM { get; set; }
+        public Nullable<double> UsedPerSeatDistanceKM { get; set; }
+        public Nullable<double> UsedPerSeatKiloDistanceKM { get; set; }
+        public double PaxDistanceKM { get; set; }
+        public double PaxKiloDistanceKM { get; set; }
+        public Nullable<double> UsedPerPaxDistanceKM { get; set; }
+        public Nullable<double> UsedPerPaxKiloDistanceKM { get; set; }
     }
 }

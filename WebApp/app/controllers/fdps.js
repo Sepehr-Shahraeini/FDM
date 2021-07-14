@@ -1,11 +1,23 @@
 ﻿'use strict';
 app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootScope', '$timeout', 'flightService', 'weatherService', 'aircraftService', 'authService', 'notificationService', '$route', '$window', function ($scope, $location, $routeParams, $rootScope, $timeout, flightService, weatherService, aircraftService, authService, notificationService, $route, $window) {
-    $scope.Operator=$rootScope.CustomerName.toUpperCase(); 
-    $scope.firstHour=new Date(General.getDayFirstHour(new Date()));
-    $scope.editable=true;
-    $scope.isAdmin = $route.current.isAdmin || true ;
+    $scope.OnlyRoster = false;
+    if ($rootScope.userName.toLowerCase() == 'train.moradi' || $rootScope.userName.toLowerCase() == 'mohammadifard' )
+        $scope.OnlyRoster = true;
+    //soltani
+    $scope.OnlyTraining = false;
+    if ($rootScope.userName.toLowerCase() == 'train.moradi' || $rootScope.userName.toLowerCase() == 'mohammadifard' || $rootScope.userName.toLowerCase() == 'demo')
+        $scope.OnlyTraining = true;
+
+    $scope.ShowFunctions = !$scope.OnlyRoster;
+
+
+    $scope.Operator = $rootScope.CustomerName.toUpperCase();
+    $scope.firstHour = new Date(General.getDayFirstHour(new Date()));
+    $scope.editable = true;
+    $scope.isAdmin =
+        $route.current.isAdmin  ;
     
-    $scope.bottom=385+50;
+    $scope.bottom = 385 + 50;
     $scope.prms = $routeParams.prms;
     $scope.footerfilter = true;
     var detector = new MobileDetect(window.navigator.userAgent);
@@ -20,8 +32,8 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
     $scope.tabsdet = [
         { text: "FDPs", id: 'FDPs' },
         // { text: "Flights", id: 'Flights' },
-          { text: "Crew", id: 'Crew' },
-            
+        { text: "Crew", id: 'Crew' },
+
     ];
     $scope.$watch("selectedTabDetIndex", function (newValue) {
         //ati
@@ -31,7 +43,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             $scope.selectedTabDetId = id;
             $('#' + id).fadeIn();
         }
-        catch(e){
+        catch (e) {
 
         }
 
@@ -68,7 +80,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         return pad(Math.floor(mm / 60)).toString() + ':' + pad(Math.floor(mm % 60)).toString();
     };
     ////////////////////////////////////
-    $scope.dt_fromSearched=new Date();
+    $scope.dt_fromSearched = new Date();
     $scope.dt_toSearched = new Date().addDays(0);
     $scope._datefrom = new Date();
 
@@ -100,39 +112,39 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
 
     $scope.fillCrew = function () {
-         
-        
+
+
         var _dt = moment($scope.dt_fromSearched).format('YYYY-MM-DDTHH:mm:ss');
-        
+
         var d2 = $scope.dt_toSearched ? new Date($scope.dt_toSearched) : new Date(2020, 0, 21, 0, 0, 0);
         var _d2 = moment(d2).format('YYYY-MM-DDTHH:mm:ss');
         $scope.loadingVisible = true;
         flightService.getCrewForRosterByDate(1, _dt).then(function (response) {
-           
+
             $scope.loadingVisible = false;
-             
+
             $scope.ds_crew = response;
             console.log($scope.ds_crew);
             //$scope.updateFlightsDsInit();
             $.each($scope.ds_crew, function (_i, crw) {
-                
+
                 //var _cflts = $scope.getCrewFlightsObj(crw.Id);
                 var _cfltsSum = 0;//Enumerable.From(_cflts).Sum('$.FlightTime');
-                 
-                
+
+
                 crw.isFtl = false;
                 crw.CurrentFlightsTime = _cfltsSum;
-                
+
                 crw.RosterFlights = crw.Flight28 + _cfltsSum;
                 crw.RosterFlightsStr = $scope.formatMinutes(crw.RosterFlights);
-             
-              
+
+
 
             });
 
-            
-           
-            
+
+
+
             $scope.crewDuties = [];
             //flightService.rosterDuties({},_dt, _d2).then(function (response) {
             //    $.each(response, function (_k, _o) {
@@ -141,11 +153,11 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             //            _o.ScheduleName = _dty.ScheduleName;
             //    });
             //    $scope.crewDuties = (response);
-                
+
             //    $scope.btnGanttDisabled = false;
             //}, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
-            
+
 
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
     };
@@ -158,11 +170,11 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
             $scope.createGantt();
             $scope.initSelection();
-            $scope.getRosterFDPs(function(ds){});
+            $scope.getRosterFDPs(function (ds) { });
 
 
 
-             
+
 
 
 
@@ -188,7 +200,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         }
 
     };
-    $scope.btnGanttDisabled=true;
+    $scope.btnGanttDisabled = true;
     $scope.btn_stby = {
         text: 'StandBy',
         type: 'default',
@@ -210,7 +222,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         // bindingOptions: { disabled: 'btnGanttDisabled' },
         onClick: function (e) {
             //sheler
-            
+
             $scope.cal_crew_current = General.getDayFirstHour(new Date($scope.dt_fromSearched));
             $scope.popup_cal_visible = true;
         }
@@ -226,8 +238,8 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             //sheler
             dfrom = $scope._datefrom;
             $scope.rptcd_dateFrom = General.getDayFirstHour(new Date(dfrom));
-            $scope.rptcd_dateTo  = General.getDayLastHour(new Date(new Date(dfrom).addDays($scope.days_count - 1)));
-            
+            $scope.rptcd_dateTo = General.getDayLastHour(new Date(new Date(dfrom).addDays($scope.days_count - 1)));
+
             $scope.popup_cduties_visible = true;
         }
 
@@ -240,9 +252,10 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         //bindingOptions: { disabled: 'btnGanttDisabled' },
         onClick: function (e) {
             //sheler
-            
-            
-            $scope.popup_report_visible = true;
+
+
+            //$scope.popup_report_visible = true;
+            $scope.popup_reportfp_visible = true;
         }
 
     };
@@ -261,7 +274,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
     $scope.popup_cduties_visible = false;
     $scope.popup_cduties_title = 'Duties Report';
     $scope.rptcd_caco = 'All';
-    
+
     $scope.popup_cduties = {
         elementAttr: {
             //  id: "elementId",
@@ -274,91 +287,214 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         fullScreen: true,
         showTitle: true,
         dragEnabled: true,
-      
+
         toolbarItems: [
-             {
-                 widget: 'dxDateBox', location: 'before', options: {width:120,
-                     onValueChanged: function (e) {
-                         $scope.rptcd_dateFrom = e.value;
-                     },
-                 }, toolbar: 'bottom'
-             },
-              {
-                  widget: 'dxDateBox', location: 'before', options: {width:120,
-                      onValueChanged: function (e) {
-                          $scope.rptcd_dateTo = e.value;
-                      },
-                  }, toolbar: 'bottom'
-              },
-              {
-                  widget: 'dxSelectBox', location: 'before', options: {
-                      dataSource:['All','COCKPIT','CABIN'],
-                      onValueChanged: function (e) {
-                          $scope.rptcd_caco = e.value;
-                      },
-                  }, toolbar: 'bottom'
-              },
-               
-             {
-                 widget: 'dxButton', location: 'before', options: {
-                     type: 'success', text: 'Search', icon: 'find', onClick: function (arg) {
+            {
+                widget: 'dxDateBox', location: 'before', options: {
+                    width: 120,
+                    onValueChanged: function (e) {
+                        $scope.rptcd_dateFrom = e.value;
+                    },
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxDateBox', location: 'before', options: {
+                    width: 120,
+                    onValueChanged: function (e) {
+                        $scope.rptcd_dateTo = e.value;
+                    },
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxSelectBox', location: 'before', options: {
+                    dataSource: ['All', 'COCKPIT', 'CABIN'],
+                    onValueChanged: function (e) {
+                        $scope.rptcd_caco = e.value;
+                    },
+                }, toolbar: 'bottom'
+            },
+
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'success', text: 'Search', icon: 'find', onClick: function (arg) {
+
+                        $scope.getCrewDuties(function (ds) {
+                            $scope.dg_cduties_ds = ds;
+                            $scope.dg_cduties_height = $(window).height() - 130;
+                            setTimeout(function () {
+                                $scope.dg_cduties_height = $(window).height() - 131;
+                            }, 2000  );
+                        });
+
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Notify', onClick: function (arg) {
+
+                        var selected = $rootScope.getSelectedRows($scope.dg_cduties_instance);
+                        var ids = Enumerable.From(selected).Select('$.Id').ToArray();
+                        if (ids.length == 0)
+                            return;
+                        //2020-11-22
+                        var dto = { Ids: ids, Date: new Date($scope.rptcd_dateFrom), UserName: $rootScope.userName };
+                        /////////////////////////////
+                        $scope.loadingVisible = true;
+                        flightService.dutiesSendSMS(dto).then(function (response) {
+                            $scope.loadingVisible = false;
+                            $.each(response, function (_i, _d) {
+                                var rec = Enumerable.From($scope.dg_cduties_ds).Where('$.Id==' + _d.Id).FirstOrDefault();
+                                rec.Ref = _d.Ref;
+                                rec.ResStr = "Queue";
+
+                            });
+                            //2020-11-22
+                            $.each(selected, function (_i, _d) {
+                                if (_d.DateConfirmed) { _d.IsConfirmed = null; _d.DateConfirmed = null; }
+                                else { _d.IsConfirmed = 1; _d.DateConfirmed = new Date(); }
+                            });
+
+                            //$scope.dg_cduties_instance.refresh();
+                            ///////////////////////////
+                            // $scope.start();
+
+
+
+                        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+            //2020-11-24
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Visible', onClick: function (arg) {
+                        //$scope.dg_cduties_instance.refresh();
+                        
                          
-                         $scope.getCrewDuties(function (ds) {
-                             $scope.dg_cduties_ds = ds;
-                            
-                         });
-
-                     }
-                 }, toolbar: 'bottom'
-             },
-             {
-                 widget: 'dxButton', location: 'before', options: {
-                     type: 'default', text: 'Notify', onClick: function (arg) {
-
-                         var selected = $rootScope.getSelectedRows($scope.dg_cduties_instance);
-                         var ids = Enumerable.From(selected).Select('$.Id').ToArray();
-                         if (ids.length == 0)
-                             return;
-                         var dto = { Ids: ids, Date:new Date( $scope.rptcd_dateFrom) };
-                         $scope.loadingVisible = true;
-                         flightService.dutiesSendSMS(dto).then(function (response) {
-                             $scope.loadingVisible = false;
-                             $.each(response, function (_i, _d) {
-                                 var rec = Enumerable.From($scope.dg_cduties_ds).Where('$.Id==' + _d.Id).FirstOrDefault();
-                                 rec.Ref = _d.Ref;
-                                 rec.ResStr = "Queue";
-
-                             });
-
-                             // $scope.start();
-                              
+                        var selected = $rootScope.getSelectedRows($scope.dg_cduties_instance);
+                        var ids = Enumerable.From(selected).Select('$.Id').ToArray();
 
 
-                         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                        if (ids.length == 0) {
+                            General.ShowNotify('No Rows Selected', 'error');
+                            return;
+                        }
+
+                        General.Confirm('Are you sure?', function (res) {
+                            if (res) {
+
+                                var dto = { Ids: ids, Date: new Date(), UserName: $rootScope.userName };
+                                $scope.loadingVisible = true;
+                                flightService.dutiesVisible(dto).then(function (response) {
+                                    $scope.loadingVisible = false;
+                                    $.each(selected, function (_i, _d) {
+                                        if (!_d.DateConfirmed) { _d.IsConfirmed = 1; _d.DateConfirmed = new Date();}
+                                        
+                                    });
+
+                                    $scope.dg_cduties_instance.refresh();
+
+                                }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+                            }
+                        });
 
 
 
-                     }
-                 }, toolbar: 'bottom'
-             },
-             {
-                 widget: 'dxButton', location: 'after', options: {
-                     type: 'default', text: 'Refresh Status', icon: 'refresh', onClick: function (arg) {
 
-                         $scope.refreshDutiesSMSStatus();
 
-                     }
-                 }, toolbar: 'bottom'
-             },
-          {
-              widget: 'dxButton', location: 'after', options: {
-                  type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
 
-                      $scope.popup_cduties_visible = false;
+                    }
+                }, toolbar: 'bottom'
+            },
+            //2020-11-24
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Notify By Date', onClick: function (arg) {
 
-                  }
-              }, toolbar: 'bottom'
-          }
+                        $scope.popup_datessms_visible = true;
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+            ///////////////////////////
+            //2020-11-24
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Visible By Date', onClick: function (arg) {
+
+                        $scope.popup_dates_visible = true;
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+            ///////////////////////////
+            //2020-11-24
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Hide', onClick: function (arg) {
+
+                        var selected = $rootScope.getSelectedRows($scope.dg_cduties_instance);
+                        var ids = Enumerable.From(selected).Select('$.Id').ToArray();
+
+
+                        if (ids.length == 0) {
+                            General.ShowNotify('No Rows Selected', 'error');
+                            return;
+                        }
+
+                        General.Confirm('Are you sure?', function (res) {
+                            if (res) {
+
+                                var dto = { Ids: ids, Date: new Date(), UserName: $rootScope.userName };
+                                $scope.loadingVisible = true;
+                                flightService.dutiesHide(dto).then(function (response) {
+                                    $scope.loadingVisible = false;
+                                    $.each(selected, function (_i, _d) {
+                                        if (_d.DateConfirmed) { _d.IsConfirmed = null; _d.DateConfirmed = null; }
+                                        
+                                    });
+
+                                    $scope.dg_cduties_instance.refresh();
+
+                                }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+                            }
+                        });
+
+
+
+
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+            ///////////////////////////
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Refresh Status', icon: 'refresh', onClick: function (arg) {
+
+                        $scope.refreshDutiesSMSStatus();
+
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
+
+                        $scope.popup_cduties_visible = false;
+
+                    }
+                }, toolbar: 'bottom'
+            }
         ],
         visible: false,
 
@@ -375,7 +511,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         },
         onShown: function (e) {
             // $scope.getCrewAbs2($scope.flight.ID);
-            
+
             if ($scope.dg_cduties_instance)
                 $scope.dg_cduties_instance.refresh();
         },
@@ -401,30 +537,30 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
     $scope.dg_his_columns = [
 
 
-         { dataField: 'ScheduleName', caption: 'Sch. Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 150 },
-           { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
-          
-          
-{ dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
- { dataField: 'DateLocal', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', format: 'yy-MM-dd', allowEditing: false, width: 150 },
- { dataField: 'DutyTypeTitle', caption: 'Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
-  { dataField: 'FltNo', caption: 'Flts', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
-   { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
-   { dataField: 'Remark', caption: 'Remark', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
-    { dataField: 'Register', caption: 'Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-     { dataField: 'Start', caption: 'Start', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'HH:mm', allowEditing: false, width: 100 },
-      { dataField: 'End', caption: 'End', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'HH:mm', allowEditing: false, width: 100 },
-      // { dataField: 'DateSent', caption: 'Sent On', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'YY-MM-dd HH:mm', allowEditing: false, width: 200 },
+        { dataField: 'ScheduleName', caption: 'Sch. Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 150 },
+        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
+
+
+        { dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'DateLocal', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', format: 'yy-MM-dd', allowEditing: false, width: 150 },
+        { dataField: 'DutyTypeTitle', caption: 'Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'FltNo', caption: 'Flts', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Remark', caption: 'Remark', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Register', caption: 'Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'Start', caption: 'Start', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'HH:mm', allowEditing: false, width: 100 },
+        { dataField: 'End', caption: 'End', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'HH:mm', allowEditing: false, width: 100 },
+        // { dataField: 'DateSent', caption: 'Sent On', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'YY-MM-dd HH:mm', allowEditing: false, width: 200 },
         { dataField: 'ResStr', caption: 'Delivery', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
-         { dataField: 'Ref', caption: 'Ref', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
-          { dataField: 'SMS', caption: 'SMS', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 1000 },
-          
+        { dataField: 'Ref', caption: 'Ref', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
+        { dataField: 'SMS', caption: 'SMS', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 1000 },
+
     ];
     $scope.dg_his_selected = null;
     $scope.dg_his_instance = null;
     $scope.dg_his_ds = null;
     $scope.dg_his = {
-         
+
         headerFilter: {
             visible: false
         },
@@ -466,7 +602,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
             }
         },
-       
+
 
         bindingOptions: {
             dataSource: 'dg_his_ds',
@@ -488,47 +624,47 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         fullScreen: false,
         showTitle: true,
         dragEnabled: true,
-      
+
         toolbarItems: [
-             
-               
-               
-             {
-                 widget: 'dxButton', location: 'before', options: {
-                     type: 'success', text: 'Search', icon: 'find', onClick: function (arg) {
-                         
-                        
 
-                     }
-                 }, toolbar: 'bottom'
-             },
-             
-              
-          {
-              widget: 'dxButton', location: 'after', options: {
-                  type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
 
-                      $scope.popup_his_visible = false;
 
-                  }
-              }, toolbar: 'bottom'
-          }
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'success', text: 'Search', icon: 'find', onClick: function (arg) {
+
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
+
+                        $scope.popup_his_visible = false;
+
+                    }
+                }, toolbar: 'bottom'
+            }
         ],
         visible: false,
 
         closeOnOutsideClick: false,
-        
+
         onShowing: function (e) {
- 
+
         },
         onShown: function (e) {
-           
+
             if ($scope.dg_his_instance)
                 $scope.dg_his_instance.refresh();
         },
         onHiding: function () {
 
-            
+
             $scope.dg_his_ds = null;
             $scope.popup_his_visible = false;
 
@@ -537,22 +673,22 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             visible: 'popup_his_visible',
 
             title: 'popup_his_title',
-             
+
         }
     };
 
     /////////////////////
     //doolsms
-    $scope.sms_message=null;
-    $scope.sms_recs=null;
+    $scope.sms_message = null;
+    $scope.sms_recs = null;
     $scope.txt_sms_message = {
-        height:160,
+        height: 160,
         bindingOptions: {
             value: 'sms_message',
-            
+
         }
     };
-    $scope.tag_sms_recs_ds=null;
+    $scope.tag_sms_recs_ds = null;
     $scope.tag_sms_recs = {
         //deferRendering:false,
         showSelectionControls: true,
@@ -565,23 +701,23 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         valueExpr: 'Id',
         bindingOptions: {
             value: 'sms_recs',
-            dataSource:'tag_sms_recs_ds',
+            dataSource: 'tag_sms_recs_ds',
         }
     };
     //////////////////////////////
     $scope.dg_smscrew_columns = [
-         // { dataField: 'Selected', caption: '', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width:45},
-        { dataField: 'ScheduleName', caption: 'Schedule Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false,sortIndex:1,sortOrder:'asc' },
-         { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
-           { dataField: 'GroupOrder', caption: 'O', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, visible: false,sortIndex:0,sortOrder:'asc' },
-          
+        // { dataField: 'Selected', caption: '', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width:45},
+        { dataField: 'ScheduleName', caption: 'Schedule Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, sortIndex: 1, sortOrder: 'asc' },
+        { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'GroupOrder', caption: 'O', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, visible: false, sortIndex: 0, sortOrder: 'asc' },
+
 
     ];
     $scope.dg_smscrew_selected = null;
     $scope.dg_smscrew_instance = null;
     $scope.dg_smscrew_ds = null;
-    $scope.smsRecsKeys=[];
-    $scope.bindSMSRecs=function(){
+    $scope.smsRecsKeys = [];
+    $scope.bindSMSRecs = function () {
         $scope.dg_smscrew_selected = Enumerable.From($scope.ds_crew).Where(function (x) { return $scope.smsRecsKeys.indexOf(x.Id) != -1; }).OrderBy('$.ScheduleName').ToArray();
     };
     $scope.dg_smscrew = {
@@ -595,7 +731,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         showRowLines: true,
         showColumnLines: true,
         sorting: { mode: 'none' },
-        keyExpr:'Id',
+        keyExpr: 'Id',
         noDataText: '',
 
         allowColumnReordering: true,
@@ -604,7 +740,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         paging: { pageSize: 100 },
         showBorders: true,
         selection: { mode: 'multiple' },
-         
+
         columnAutoWidth: false,
         height: function () {
             return 400;
@@ -626,9 +762,9 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             //}
             //else {
             //    $scope.dg_smscrew_selected = data;
-                
+
             //}
-           
+
         },
         onRowPrepared: function (e) {
             //if (e.data && e.data.AvailabilityId != 1)
@@ -656,46 +792,46 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         fullScreen: false,
         showTitle: true,
         dragEnabled: true,
-      
+
         toolbarItems: [
-             
-             {
-                 widget: 'dxButton', location: 'after', options: {
-                     type: 'success', text: 'Send',validationGroup:"smsmessage",  onClick: function (arg) {
-                         
-                         var result = arg.validationGroup.validate();
 
-                         if (!result.isValid || !$scope.dg_smscrew_selected || $scope.dg_smscrew_selected.length==0) {
-                             General.ShowNotify(Config.Text_FillRequired, 'error');
-                             return;
-                         }
-                         var names=Enumerable.From($scope.dg_smscrew_selected).Select('$.Name').ToArray().join('_');
-                         var mobiles=Enumerable.From($scope.dg_smscrew_selected).Select('$.Mobile').ToArray().join('_');
-                         var dto = { names:names,mobiles:mobiles,message: $scope.sms_message,sender:$rootScope.userName };
-                         $scope.loadingVisible = true;
-        
-                         flightService.sendSMS(dto).then(function (response) {
-                             $scope.loadingVisible = false;
-                             General.ShowNotify(Config.Text_SavedOk, 'success');
-                             $scope.popup_sms_visible = false;
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Send', validationGroup: "smsmessage", onClick: function (arg) {
 
-                         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                        var result = arg.validationGroup.validate();
+
+                        if (!result.isValid || !$scope.dg_smscrew_selected || $scope.dg_smscrew_selected.length == 0) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+                        var names = Enumerable.From($scope.dg_smscrew_selected).Select('$.Name').ToArray().join('_');
+                        var mobiles = Enumerable.From($scope.dg_smscrew_selected).Select('$.Mobile').ToArray().join('_');
+                        var dto = { names: names, mobiles: mobiles, message: $scope.sms_message, sender: $rootScope.userName };
+                        $scope.loadingVisible = true;
+
+                        flightService.sendSMS(dto).then(function (response) {
+                            $scope.loadingVisible = false;
+                            General.ShowNotify(Config.Text_SavedOk, 'success');
+                            $scope.popup_sms_visible = false;
+
+                        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
 
 
-                     }
-                 }, toolbar: 'bottom'
-             },
-            
-          {
-              widget: 'dxButton', location: 'after', options: {
-                  type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
+                    }
+                }, toolbar: 'bottom'
+            },
 
-                      $scope.popup_sms_visible = false;
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
 
-                  }
-              }, toolbar: 'bottom'
-          }
+                        $scope.popup_sms_visible = false;
+
+                    }
+                }, toolbar: 'bottom'
+            }
         ],
         visible: false,
 
@@ -705,7 +841,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             // $(e.titleElement).css('background-color', '#f2552c');
         },
         onShowing: function (e) {
- 
+
         },
         onShown: function (e) {
             if (!$scope.dg_smscrew_instance)
@@ -713,9 +849,9 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             // $scope.tag_sms_recs_ds=Enumerable.From($scope.ds_crew).Select("{Id:$.Id,ScheduleName:$.ScheduleName}").ToArray();
         },
         onHiding: function () {
-            $scope.smsRecsKeys=[];
+            $scope.smsRecsKeys = [];
             $scope.dg_smscrew_selected = null;
-            $scope.sms_message=null;
+            $scope.sms_message = null;
             $scope.popup_sms_visible = false;
 
         },
@@ -723,7 +859,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             visible: 'popup_sms_visible',
 
             title: 'popup_sms_title',
-            
+
         }
     };
 
@@ -736,17 +872,17 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
     $scope.$watch("selectedTabDateIndex2", function (newValue) {
 
         try {
-           
+
             if ($scope.selectedTabDateIndex2 == -1)
                 return;
-             
+
             $scope.selectedTab2 = $scope.tabs_date2[newValue];
-           
+
             $scope.selectedDate2 = new Date($scope.selectedTab2.date);
             //$scope.checkStbyAdd();
             $scope.setAmPmDs($scope.selectedDate2, 'AM');
             // $scope.setAmPmDs($scope.selectedDate2, 'PM');
-             
+
 
         }
         catch (e) {
@@ -777,7 +913,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             $scope.selectedTabDateIndex2 = 0;
         },
         bindingOptions: {
-            
+
             dataSource: { dataPath: "tabs_date2", deep: true },
             selectedIndex: 'selectedTabDateIndex2'
         }
@@ -787,7 +923,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
     $scope.getDaySTBYs = function (year, month, day, callback) {
 
         $scope.loadingVisible = true;
-        flightService.getDutiesByDay('stby', year, month,day).then(function (response) {
+        flightService.getDutiesByDay('stby', year, month, day).then(function (response) {
             $scope.loadingVisible = false;
             //var row = {
             //    CrewId: crewid,
@@ -797,116 +933,113 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             //};
             //$scope.crewFDPs.push(row);
             callback(response);
-                   
+
 
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
     };
     $scope.AmDs = [];
     $scope.PmDs = [];
     $scope.ReservedDs = [];
-    $scope.setAmPmDs = function (day,type) {
+    $scope.setAmPmDs = function (day, type) {
         var prts = (new Date(day)).getDatePartArray();
-        
+
         $scope.getDaySTBYs(prts[0], prts[1] + 1, prts[2], function (data) {
             console.log('$scope.setAmPmDs');
             console.log(data);
-            var stbys=data;
-            var stbyCrews=Enumerable.From(data).Select('$.CrewId').ToArray();
+            var stbys = data;
+            var stbyCrews = Enumerable.From(data).Select('$.CrewId').ToArray();
             $scope.dg_crew_stby_ds = Enumerable.From($scope.ds_crew).Where(function (x) {
                 return stbyCrews.indexOf(x.Id) == -1;
             }).OrderBy('$.GroupOrder').ThenBy('$.ScheduleName').ToArray();
-            $scope.AmDs =Enumerable.From(data).Where('$.DutyType==1168').OrderBy('$.OrderIndex').ThenBy('$.ScheduleName').ToArray();
-            $scope.PmDs =Enumerable.From(data).Where('$.DutyType==1167').OrderBy('$.OrderIndex').ThenBy('$.ScheduleName').ToArray();
-            $scope.ReservedDs =Enumerable.From(data).Where('$.DutyType==1170').OrderBy('$.OrderIndex').ThenBy('$.ScheduleName').ToArray();
+            $scope.AmDs = Enumerable.From(data).Where('$.DutyType==1168').OrderBy('$.OrderIndex').ThenBy('$.ScheduleName').ToArray();
+            $scope.PmDs = Enumerable.From(data).Where('$.DutyType==1167').OrderBy('$.OrderIndex').ThenBy('$.ScheduleName').ToArray();
+            $scope.ReservedDs = Enumerable.From(data).Where('$.DutyType==1170').OrderBy('$.OrderIndex').ThenBy('$.ScheduleName').ToArray();
         });
-         
+
     };
     //dooltamiz
-    $scope.removeStby = function (stby,type) {
+    $scope.removeStby = function (stby, type) {
         var crewId = stby.CrewId;
         var crewobj = Enumerable.From($scope.ds_crew).Where('$.Id==' + crewId).FirstOrDefault();
         $scope.dg_crew_stby_ds.push(JSON.parse(JSON.stringify(crewobj)));
 
         $scope.dg_crew_stby_ds = Enumerable.From($scope.dg_crew_stby_ds).OrderBy('$.GroupOrder').ThenBy('$.ScheduleName').ToArray();
-        if (type==1168)
+        if (type == 1168)
             $scope.AmDs = Enumerable.From($scope.AmDs).Where(function (x) {
 
-                return   x.Id!=stby.Id;
+                return x.Id != stby.Id;
             }).ToArray();
-        else  if (type==1167)
+        else if (type == 1167)
             $scope.PmDs = Enumerable.From($scope.PmDs).Where(function (x) {
 
-                return   x.Id!=stby.Id;
+                return x.Id != stby.Id;
             }).ToArray();
-            else 
-             $scope.ReservedDs = Enumerable.From($scope.ReservedDs).Where(function (x) {
+        else
+            $scope.ReservedDs = Enumerable.From($scope.ReservedDs).Where(function (x) {
 
-                return   x.Id!=stby.Id;
+                return x.Id != stby.Id;
             }).ToArray();
-         
+
         var dto = { fdp: stby.Id };
-         
+
         $scope.loadingVisible = true;
         flightService.saveDeleteFDP(dto).then(function (response) {
             $scope.loadingVisible = false;
             //khar
-            
-                 
+
+
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
-       
-       
+
+
     };
-    $scope.addStby = function (_crew,_type) {
-        _crew=_crew.data;
-        var dto={
-            date:new Date( $scope.selectedDate2),
-            crewId:_crew.Id,
-            type:_type,
+    $scope.addStby = function (_crew, _type) {
+        _crew = _crew.data;
+        var dto = {
+            date: new Date($scope.selectedDate2),
+            crewId: _crew.Id,
+            type: _type,
         };
         ///////////////////////////////
         $scope.loadingVisible = true;
         flightService.saveSTBY(dto).then(function (response) {
             $scope.loadingVisible = false;
-               
-            if (response.Code==406){
-                if (response.data.message){
+
+            if (response.Code == 406) {
+                if (response.data.message) {
                     var myDialog = DevExpress.ui.dialog.custom({
                         rtlEnabled: true,
                         title: "Error",
                         message: response.data.message,
-                        buttons: [ { text: "OK", onClick: function () {  } }]
+                        buttons: [{ text: "OK", onClick: function () { } }]
                     });
                     myDialog.show();
                 }
-                    
+
             }
-            else
-            {
+            else {
                 //doolbaz
-                 
-                 
-                 
-                 
+
+
+
+
                 $scope.dg_crew_stby_ds = Enumerable.From($scope.ds_crew).Where(function (x) {
                     return x.Id != _crew.Id;
                 }).OrderBy('$.GroupOrder').ThenBy('$.ScheduleName').ToArray();
-                if (_type==1168)
-                {
+                if (_type == 1168) {
                     $scope.AmDs.push(response.data);
-                    $scope.AmDs =Enumerable.From($scope.AmDs).OrderBy('$.OrderIndex').ThenBy('$.ScheduleName').ToArray();
+                    $scope.AmDs = Enumerable.From($scope.AmDs).OrderBy('$.OrderIndex').ThenBy('$.ScheduleName').ToArray();
                 }
-                else if (_type==1167){
+                else if (_type == 1167) {
                     $scope.PmDs.push(response.data);
-                    $scope.PmDs =Enumerable.From($scope.PmDs).OrderBy('$.OrderIndex').ThenBy('$.ScheduleName').ToArray();
+                    $scope.PmDs = Enumerable.From($scope.PmDs).OrderBy('$.OrderIndex').ThenBy('$.ScheduleName').ToArray();
                 }
-                else
-                {
+                else {
                     $scope.ReservedDs.push(response.data);
-                    $scope.ReservedDs =Enumerable.From($scope.ReservedDs).OrderBy('$.OrderIndex').ThenBy('$.ScheduleName').ToArray();
+                    $scope.ReservedDs = Enumerable.From($scope.ReservedDs).OrderBy('$.OrderIndex').ThenBy('$.ScheduleName').ToArray();
                 }
-                
-               
+
+
             }
 
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
@@ -917,38 +1050,38 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
     /////////////////////////
     $scope.dg_crew_stby_columns = [
 
-            { dataField: 'JobGroup', caption: 'RNK', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width:85, },
-              { dataField: 'ScheduleName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left' },
-              { dataField: 'LastLocation', caption: 'Apt', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90, },
-              
-              {
-                  dataField: "Id", caption: '',
-                  width: 70,
-                  allowFiltering: false,
-                  allowSorting: false,
-                  cellTemplate: 'addStbyAMTemplate',
+        { dataField: 'JobGroup', caption: 'RNK', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 85, },
+        { dataField: 'ScheduleName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left' },
+        { dataField: 'LastLocation', caption: 'Apt', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90, },
 
-              },
-               {
-                   dataField: "Id", caption: '',
-                   width: 70,
-                   allowFiltering: false,
-                   allowSorting: false,
-                   cellTemplate: 'addStbyPMTemplate',
+        {
+            dataField: "Id", caption: '',
+            width: 70,
+            allowFiltering: false,
+            allowSorting: false,
+            cellTemplate: 'addStbyAMTemplate',
 
-               },
-               {
-                   dataField: "Id", caption: '',
-                   width: 70,
-                   allowFiltering: false,
-                   allowSorting: false,
-                   cellTemplate: 'addResTemplate',
+        },
+        {
+            dataField: "Id", caption: '',
+            width: 70,
+            allowFiltering: false,
+            allowSorting: false,
+            cellTemplate: 'addStbyPMTemplate',
 
-               },
+        },
+        {
+            dataField: "Id", caption: '',
+            width: 70,
+            allowFiltering: false,
+            allowSorting: false,
+            cellTemplate: 'addResTemplate',
+
+        },
 
     ];
     $scope.dg_crew_stby_selected = null;
-   
+
     $scope.dg_crew_stby_instance = null;
     $scope.dg_crew_stby_ds = null;
     $scope.dg_crew_stby = {
@@ -1003,12 +1136,12 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                 //$scope.getPrePost($scope.rowCrew.Id, function (prepost) {
                 //    $scope.getTempDutiesSTBY();
                 //});
-                
+
             }
 
 
         },
-         
+
 
 
         bindingOptions: {
@@ -1033,7 +1166,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         showTitle: true,
         dragEnabled: true,
         toolbarItems: [
- 
+
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) {
@@ -1052,7 +1185,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
         closeOnOutsideClick: false,
         onShowing: function (e) {
-             
+
 
             //$scope.IsStbyAMVisible = false;
             //$scope.IsStbyPMVisible = false;
@@ -1069,9 +1202,9 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
         },
         onShown: function (e) {
-             
+
             $scope.dg_crew_stby_instance.repaint();
-             
+
             //$scope.tempContainerStyle.height = $(window).height() - 399;
             //$scope.tempContainerStyle.padding = '5px';
             //$scope.selectedTabDateIndex = 0;
@@ -1083,7 +1216,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         },
         bindingOptions: {
             visible: 'popup_stby_visible',
-            
+
 
         }
     };
@@ -1094,29 +1227,29 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
 
 
-     { dataField: 'FltNo', caption: 'FltNo', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false,   fixed: true, fixedPosition: 'left',width:200  },
-     { dataField: 'Register', caption: 'Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false,   fixed: true, fixedPosition: 'left',width:80   },
-      { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: true, fixedPosition: 'left', width: 200 },
-      { dataField: 'STDLocal', caption: 'Dep', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, fixed: true, fixedPosition: 'left', format: 'HH:mm',width:80 },
-      { dataField: 'STALocal', caption: 'Arr', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, fixed: true, fixedPosition: 'left', format: 'HH:mm',width:80 },
-       
+        { dataField: 'FltNo', caption: 'FltNo', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: true, fixedPosition: 'left', width: 200 },
+        { dataField: 'Register', caption: 'Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: true, fixedPosition: 'left', width: 80 },
+        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: true, fixedPosition: 'left', width: 200 },
+        { dataField: 'STDLocal', caption: 'Dep', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, fixed: true, fixedPosition: 'left', format: 'HH:mm', width: 80 },
+        { dataField: 'STALocal', caption: 'Arr', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, fixed: true, fixedPosition: 'left', format: 'HH:mm', width: 80 },
+
         { dataField: 'P1', caption: 'P1', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
-         { dataField: 'P2', caption: 'P2', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
-           
-           { dataField: 'SCCM', caption: 'SCCM', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
-            { dataField: 'CCM1', caption: 'CCMs', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 400 },
-             { dataField: 'IP', caption: 'IP', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
-             { dataField: 'SAFETY', caption: 'SAFETY', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
-             { dataField: 'OBS', caption: 'OBS', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
-             { dataField: 'CCM3', caption: 'CHECK', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
-            // { dataField: 'CCM2', caption: 'CCM2', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
-            //  { dataField: 'CCM3', caption: 'CCM3', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'P2', caption: 'P2', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+
+        { dataField: 'SCCM', caption: 'SCCM', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'CCM1', caption: 'CCMs', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 400 },
+        { dataField: 'IP', caption: 'IP', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'SAFETY', caption: 'SAFETY', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'OBS', caption: 'OBS', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'CCM3', caption: 'CHECK', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        // { dataField: 'CCM2', caption: 'CCM2', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        //  { dataField: 'CCM3', caption: 'CCM3', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
 
 
 
 
 
- 
+
 
 
 
@@ -1139,7 +1272,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         showRowLines: true,
         showColumnLines: true,
         sorting: { mode: 'none' },
-        keyExpr:'Id',
+        keyExpr: 'Id',
         noDataText: '',
 
         allowColumnReordering: true,
@@ -1180,9 +1313,9 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                 location: "before",
                 template: function () {
                     return $("<div/>")
-                       // .addClass("informer")
+                        // .addClass("informer")
                         .append(
-                           "<span style='color:white;'>Flights</span>"
+                            "<span style='color:white;'>Flights</span>"
                         );
                 }
             });
@@ -1215,7 +1348,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
     };
     ///////////////////////////////////
-    $scope.bindDailyReport=function(){
+    $scope.bindDailyReport = function () {
         var _dt = moment($scope.rptdaily_dateFrom).format('YYYY-MM-DDTHH:mm:ss');
         //odata/crew/report/main?date=' + _dt
         $scope.loadingVisible = true;
@@ -1224,17 +1357,314 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             $scope.dg_flight_ds = response.fdps;
             $scope.ds_am = response.am;
             $scope.ds_pm = response.pm;
-             
+
             var ln = $scope.dg_flight_ds.length;
             if ($scope.dg_flight_ds.length < 12) {
                 for (var i = 0; i <= 12 - ln; i++)
-                    $scope.dg_flight_ds.push({FltNo:'',Route:'',Id:-1*i});
+                    $scope.dg_flight_ds.push({ FltNo: '', Route: '', Id: -1 * i });
             }
-           
+
 
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
     };
     ///////////////////////////////////
+    //magu313
+    $scope.popup_printfp_visible = false;
+    $scope.popup_printfp_title = 'Print';
+    $scope.popup_printfp = {
+
+        fullScreen: false,
+        showTitle: true,
+        width: 1150,
+        height: function () { return $(window).height() * 1 },
+        toolbarItems: [
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Print', icon: 'print', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
+
+
+                        printElem($('#rtblfp'));
+
+                    }
+
+
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) {
+                        $scope.popup_printfp_visible = false;
+                    }
+                }, toolbar: 'bottom'
+            }
+        ],
+
+        visible: false,
+        dragEnabled: false,
+        closeOnOutsideClick: false,
+        onShowing: function (e) {
+
+
+
+        },
+        onShown: function (e) {
+
+            $scope.scroll_jl_height = $(window).height() - 10 - 110;
+        },
+        onHiding: function () {
+
+
+            $scope.popup_printfp_visible = false;
+
+        },
+        //position: 'right',
+        bindingOptions: {
+            visible: 'popup_printfp_visible',
+
+            title: 'popup_printfp_title',
+
+        }
+    };
+
+    $scope.dg_fp_columns = [
+
+
+
+
+        { dataField: 'FlightNumber', caption: 'Flight', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: true, fixedPosition: 'left', width: 100 },
+        { dataField: 'Register', caption: 'Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: true, fixedPosition: 'left', width: 80 },
+        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: true, fixedPosition: 'left', width: 110 },
+        { dataField: 'STD', caption: 'Dep UTC', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: true, fixedPosition: 'left', format: 'HH:mm', width: 80 },
+        { dataField: 'STA', caption: 'Arr UTC', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: true, fixedPosition: 'left', format: 'HH:mm', width: 80 },
+
+        { dataField: 'STDLOC', caption: 'Dep', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: true, fixedPosition: 'left', format: 'HH:mm', width: 80 },
+        { dataField: 'STALOC', caption: 'Arr', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: true, fixedPosition: 'left', format: 'HH:mm', width: 80 },
+        { dataField: 'IP', caption: 'IP', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'CPT', caption: 'CPT', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'FO', caption: 'FO', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'SAFETY', caption: 'SAFETY', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'CHECK', caption: 'CHECK', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'OBS', caption: 'OBS', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+
+        { dataField: 'ISCCM', caption: 'ISCCM', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'SCCM', caption: 'SCCM', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'CCM', caption: 'CCM', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 350 },
+        
+        { dataField: 'CHECKC', caption: 'CHECK', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+        { dataField: 'OBSC', caption: 'OBS', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', minWidth: 150 },
+
+
+
+
+
+
+
+
+
+    ];
+    $scope.dg_fp_selected = null;
+    $scope.dg_fp_instance = null;
+    $scope.dg_fp_ds = null;
+    $scope.dg_fp = {
+        wordWrapEnabled: true,
+        rowAlternationEnabled: true,
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+        keyExpr: 'ID',
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'multiple' },
+
+        columnAutoWidth: false,
+        height: $(window).height() - 280,
+
+        columns: $scope.dg_fp_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_fp_instance)
+                $scope.dg_fp_instance = e.component;
+
+        },
+        onSelectionChanged: function (e) {
+            var data = e.selectedRowsData[0];
+
+            if (!data) {
+                $scope.dg_fp_selected = null;
+            }
+            else
+                $scope.dg_fp_selected = data;
+
+
+        },
+
+        "export": {
+            enabled: true,
+            fileName: "Daily Report",
+            allowExportSelectedData: false
+        },
+        onToolbarPreparing: function (e) {
+            e.toolbarOptions.items.unshift({
+                location: "before",
+                template: function () {
+                    return $("<div/>")
+                        // .addClass("informer")
+                        .append(
+                            "<span style='color:white;'>Flights</span>"
+                        );
+                }
+            });
+        },
+        onExporting: function (e) {
+            e.component.beginUpdate();
+            e.component.columnOption("row", "visible", false);
+        },
+        onExported: function (e) {
+            e.component.columnOption("row", "visible", true);
+            e.component.endUpdate();
+        },
+        onRowPrepared: function (e) {
+            if (e.data && e.data.IsPositioning)
+                e.rowElement.css('background', '#ffccff');
+
+        },
+
+        onCellPrepared: function (e) {
+            if (e.rowType === "data" && e.column.dataField == "FlightStatus")
+                e.cellElement.addClass(e.data.FlightStatus.toLowerCase());
+        },
+        bindingOptions: {
+            dataSource: 'dg_fp_ds',
+            //selectedRowKeys:'selectedIds',
+        },
+        columnChooser: {
+            enabled: true
+        },
+
+    };
+    $scope.bindDailyReportFP = function () {
+        var _dt = moment($scope.rptdaily_dateFrom).format('YYYY-MM-DDTHH:mm:ss');
+        //odata/crew/report/main?date=' + _dt
+        $scope.loadingVisible = true;
+        flightService.getRosterSheetReportFP(_dt).then(function (response) {
+            $scope.loadingVisible = false;
+            $scope.dg_fp_ds = response.items;
+            console.log('report fp');
+            console.log($scope.dg_fp_ds);
+           // $scope.ds_am = response.am;
+           // $scope.ds_pm = response.pm;
+
+            var ln = $scope.dg_fp_ds.length;
+            if ($scope.dg_fp_ds.length < 12) {
+                for (var i = 0; i <= 12 - ln; i++)
+                    $scope.dg_fp_ds.push({ FltNo: '', Route: '', Id: -1 * i });
+            }
+
+
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+    };
+    $scope.popup_reportfp_visible = false;
+    $scope.popup_reportfp_title = 'Daily Report';
+    $scope.popup_reportfp = {
+        elementAttr: {
+            //  id: "elementId",
+            class: "popup_reports"
+        },
+        shading: true,
+        //position: { my: 'left', at: 'left', of: window, offset: '5 0' },
+        height: 800,
+        width: 1300,
+        fullScreen: true,
+        showTitle: true,
+        dragEnabled: true,
+
+        toolbarItems: [
+            {
+                widget: 'dxDateBox', location: 'before', options: {
+                    onValueChanged: function (e) {
+                        $scope.rptdaily_dateFrom = e.value;
+                    },
+                }, toolbar: 'bottom'
+            },
+
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'success', text: 'Search', icon: 'find', onClick: function (arg) {
+
+                        $scope.dg_flight_ds = null;
+                        $scope.bindDailyReportFP();
+
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Print', icon: 'print', onClick: function (arg) {
+
+                        $scope.popup_printfp_visible = true;
+
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
+
+                        $scope.popup_reportfp_visible = false;
+
+                    }
+                }, toolbar: 'bottom'
+            }
+        ],
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onTitleRendered: function (e) {
+            // $(e.titleElement).addClass('vahid');
+            // $(e.titleElement).css('background-color', '#f2552c');
+        },
+        onShowing: function (e) {
+
+
+
+
+        },
+        onShown: function (e) {
+            // $scope.getCrewAbs2($scope.flight.ID);
+            if ($scope.dg_fp_instance)
+                $scope.dg_fp_instance.refresh();
+            $scope.dg_fp_ds = null;
+            $scope.bindDailyReportFP();
+        },
+        onHiding: function () {
+
+            $scope.dg_fp_instance.clearSelection();
+            $scope.dg_fp_ds = null;
+            $scope.popup_reportfp_visible = false;
+
+        },
+        bindingOptions: {
+            visible: 'popup_reportfp_visible',
+
+            title: 'popup_reportfp_title',
+            'toolbarItems[0].options.value': 'rptdaily_dateFrom',
+
+        }
+    };
+    ////////////////////////////////////
     $scope.popup_report_visible = false;
     $scope.popup_report_title = 'Daily Report';
     $scope.rptdaily_dateFrom = new Date();
@@ -1252,45 +1682,45 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         fullScreen: true,
         showTitle: true,
         dragEnabled: true,
-      
+
         toolbarItems: [
-             {
-                 widget: 'dxDateBox', location: 'before', options: {
-                     onValueChanged: function (e) {
-                         $scope.rptdaily_dateFrom = e.value;
-                     },
-                 }, toolbar: 'bottom'
-             },
-             
-             {
-                 widget: 'dxButton', location: 'before', options: {
-                     type: 'success', text: 'Search', icon: 'find', onClick: function (arg) {
-                         
-                         $scope.dg_flight_ds=null;
-                         $scope.bindDailyReport();
+            {
+                widget: 'dxDateBox', location: 'before', options: {
+                    onValueChanged: function (e) {
+                        $scope.rptdaily_dateFrom = e.value;
+                    },
+                }, toolbar: 'bottom'
+            },
 
-                     }
-                 }, toolbar: 'bottom'
-             },
-             {
-                 widget: 'dxButton', location: 'before', options: {
-                     type: 'default', text: 'Print', icon: 'print', onClick: function (arg) {
-                         
-                         $scope.popup_print_visible = true;
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'success', text: 'Search', icon: 'find', onClick: function (arg) {
 
-                     }
-                 }, toolbar: 'bottom'
-             }, 
-              
-          {
-              widget: 'dxButton', location: 'after', options: {
-                  type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
+                        $scope.dg_flight_ds = null;
+                        $scope.bindDailyReport();
 
-                      $scope.popup_report_visible = false;
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Print', icon: 'print', onClick: function (arg) {
 
-                  }
-              }, toolbar: 'bottom'
-          }
+                        $scope.popup_print_visible = true;
+
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
+
+                        $scope.popup_report_visible = false;
+
+                    }
+                }, toolbar: 'bottom'
+            }
         ],
         visible: false,
 
@@ -1309,7 +1739,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             // $scope.getCrewAbs2($scope.flight.ID);
             if ($scope.dg_flight_instance)
                 $scope.dg_flight_instance.refresh();
-            $scope.dg_flight_ds=null;
+            $scope.dg_flight_ds = null;
             $scope.bindDailyReport();
         },
         onHiding: function () {
@@ -1324,7 +1754,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
             title: 'popup_report_title',
             'toolbarItems[0].options.value': 'rptdaily_dateFrom',
-             
+
         }
     };
     $scope.formatDay = function (date) {
@@ -1375,7 +1805,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         //frameDoc.document.write('<link href="content/css/dx.common.css" rel="stylesheet" />');
 
         frameDoc.document.write('<link href="content/css/main.css" rel="stylesheet" />');
-        
+
         //frameDoc.document.write('<link href="content/css/core-ui.css" rel="stylesheet" />');
         //frameDoc.document.write('<link href="sfstyles/ejthemes/default-theme/ej.web.all.min.css" rel="stylesheet" />');
         //frameDoc.document.write('<link href="sfstyles/default.css" rel="stylesheet" />');
@@ -1402,18 +1832,18 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         height: function () { return $(window).height() * 1 },
         toolbarItems: [
 
- {
-     widget: 'dxButton', location: 'after', options: {
-         type: 'default', text: 'Print', icon: 'print', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Print', icon: 'print', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
 
 
-             printElem($('#rtbl'));
+                        printElem($('#rtbl'));
 
-         }
+                    }
 
 
-     }, toolbar: 'bottom'
- },
+                }, toolbar: 'bottom'
+            },
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) {
@@ -1462,84 +1892,99 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         var _dt = moment($scope.rptcd_dateTo).format('YYYY-MM-DDTHH:mm:ss');
         var ca = 0;
         var co = 0;
-        if ($scope.rptcd_caco == 'COCKPIT')
-        {
+        if ($scope.rptcd_caco == 'COCKPIT') {
             co = 1;
         }
         if ($scope.rptcd_caco == 'CABIN') {
             ca = 1;
         }
         $scope.loadingVisible = true;
-        flightService.getCrewDuties(_df,_dt,ca,co).then(function (response) {
+        flightService.getCrewDuties(_df, _dt, ca, co).then(function (response) {
             $scope.loadingVisible = false;
-            $.each(response,function(_i,_d){
-                _d.ExtendedBySplitDuty2=$scope.formatMinutes(Math.round(_d.ExtendedBySplitDuty));
-                _d.Extension2=$scope.formatMinutes(Math.round(_d.Extension));
-                _d.MaxFDPExtended2=$scope.formatMinutes(Math.round(_d.MaxFDPExtended));
-                _d.DutyScheduled2=$scope.formatMinutes(Math.round(_d.DutyScheduled));
-                _d.Duty2=$scope.formatMinutes(Math.round(_d.Duty));
+            $.each(response, function (_i, _d) {
+                _d.ExtendedBySplitDuty2 = $scope.formatMinutes(Math.round(_d.ExtendedBySplitDuty));
+                _d.Extension2 = $scope.formatMinutes(Math.round(_d.Extension));
+                _d.MaxFDPExtended2 = $scope.formatMinutes(Math.round(_d.MaxFDPExtended));
+                _d.DutyScheduled2 = $scope.formatMinutes(Math.round(_d.DutyScheduled));
+                _d.Duty2 = $scope.formatMinutes(Math.round(_d.Duty));
             });
             callback(response);
 
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
     };
     /////////////////REPORT////////////////////////////
-     
+
     $scope.dg_cduties_columns = [
-         {
-             dataField: "IsVisitedStr", caption: '',
-             width: 55,
-             allowFiltering: false,
-             allowSorting: false,
-             cellTemplate: function (container, options) {
-                 var fn = options.value != 'Visited' ? 'notvisited' : 'visited';
+        {
+            dataField: "IsConfirmed", caption: '',
+            width: 55,
+            allowFiltering: false,
+            allowSorting: false,
+            cellTemplate: function (container, options) {
+                var fn = options.value == 1 ? 'registered-24' : 'red';
 
-                 $("<div>")
-                     .append("<img src='content/images/" + fn + ".png' />")
-                     .appendTo(container);
-             },
-             fixed: true, fixedPosition: 'left',//  sortIndex: 0, sortOrder: "desc"
-         },
+                $("<div>")
+                    .append("<img src='content/images/" + fn + ".png' />")
+                    .appendTo(container);
+            },
+            fixed: true, fixedPosition: 'left',//  sortIndex: 0, sortOrder: "desc"
+        },
+        {
+            dataField: "IsVisitedStr", caption: '',
+            width: 55,
+            allowFiltering: false,
+            allowSorting: false,
+            cellTemplate: function (container, options) {
+                var fn = options.value != 'Visited' ? 'notvisited' : 'visited';
 
-         { dataField: 'ScheduleName', caption: 'Sch. Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 150, fixed: true, fixedPosition: 'left', },
-          // { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
-          
-          
-{ dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
- { dataField: 'DateLocal', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', format: 'yy-MM-dd', allowEditing: false, width: 150 },
- { dataField: 'DutyTypeTitle', caption: 'Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
-  { dataField: 'FltNo', caption: 'Flts', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
-   { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
-   { dataField: 'Remark', caption: 'Remark', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
-    { dataField: 'Register', caption: 'Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-     { dataField: 'Start', caption: 'Start', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'HH:mm', allowEditing: false, width: 100 },
-      { dataField: 'End', caption: 'End', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'HH:mm', allowEditing: false, width: 100 },
-       { dataField: 'ExtendedBySplitDuty2', caption: 'Split Duty', allowResizing: true, alignment: 'center', dataType: 'string',   allowEditing: false, width: 100 },
-        { dataField: 'IsExtendedBySplitDuty', caption: 'Splited', allowResizing: true, alignment: 'center', dataType: 'boolean',   allowEditing: false, width: 100 },
-      // { dataField: 'DateSent', caption: 'Sent On', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'YY-MM-dd HH:mm', allowEditing: false, width: 200 },
-        
-        
-        
-    { dataField: 'Extension2', caption: 'Extended', allowResizing: true, alignment: 'center', dataType: 'string',   allowEditing: false, width: 100 },
-   
-    { dataField: 'MaxFDPExtended2', caption: 'Max FDP', allowResizing: true, alignment: 'center', dataType: 'string',   allowEditing: false, width: 100 },
-    
-    { dataField: 'DutyScheduled2', caption: 'Duty Sch.', allowResizing: true, alignment: 'center', dataType: 'string',   allowEditing: false, width: 100 },
-    
-    { dataField: 'Duty2', caption: 'Duty Act.', allowResizing: true, alignment: 'center', dataType: 'string',   allowEditing: false, width: 100 },
-        
-        
-        
+                $("<div>")
+                    .append("<img src='content/images/" + fn + ".png' />")
+                    .appendTo(container);
+            },
+            fixed: true, fixedPosition: 'left',//  sortIndex: 0, sortOrder: "desc"
+        },
+
+        { dataField: 'ScheduleName', caption: 'Sch. Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 150, fixed: true, fixedPosition: 'left', },
+        // { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
+
+
+        { dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'DateLocal', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', format: 'yy-MM-dd', allowEditing: false, width: 150 },
+        { dataField: 'DutyTypeTitle', caption: 'Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'FltNo', caption: 'Flts', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Remark', caption: 'Remark', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Register', caption: 'Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'Start', caption: 'Start', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'HH:mm', allowEditing: false, width: 100 },
+        { dataField: 'End', caption: 'End', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'HH:mm', allowEditing: false, width: 100 },
+        { dataField: 'ExtendedBySplitDuty2', caption: 'Split Duty', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'IsExtendedBySplitDuty', caption: 'Splited', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width: 100 },
+        // { dataField: 'DateSent', caption: 'Sent On', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'YY-MM-dd HH:mm', allowEditing: false, width: 200 },
+
+
+
+        { dataField: 'Extension2', caption: 'Extended', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+
+        { dataField: 'MaxFDPExtended2', caption: 'Max FDP', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+
+        { dataField: 'DutyScheduled2', caption: 'Duty Sch.', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+
+        { dataField: 'Duty2', caption: 'Duty Act.', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+
+
+
         { dataField: 'ResStr', caption: 'Delivery', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
-         { dataField: 'Ref', caption: 'Ref', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
-         { dataField: 'DateVisit', caption: 'Visited', allowResizing: true, alignment: 'center', dataType: 'date', format: 'yy-MM-dd HH:mm', allowEditing: false, width: 200 },
-          { dataField: 'SMS', caption: 'SMS', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth:1000  },
-          
+        { dataField: 'Ref', caption: 'Ref', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
+        { dataField: 'DateVisit', caption: 'Visited', allowResizing: true, alignment: 'center', dataType: 'date', format: 'yy-MM-dd HH:mm', allowEditing: false, width: 200 },
+        { dataField: 'SMS', caption: 'SMS', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 1000 },
+        //2020-11-22
+        { dataField: 'UserName', caption: 'User', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
+
     ];
     $scope.dg_cduties_selected = null;
     $scope.dg_cduties_instance = null;
     $scope.dg_cduties_ds = null;
-    $scope.dg_cduties_height=$(window).height()-130;
+    $scope.dg_cduties_height = $(window).height() - 130;
     $scope.dg_cduties = {
         sorting: {
             mode: "multiple"
@@ -1553,7 +1998,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         },
         showRowLines: true,
         showColumnLines: true,
-      
+
 
         noDataText: '',
 
@@ -1565,13 +2010,14 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         selection: { mode: 'multiple' },
 
         columnAutoWidth: false,
-       // height: $(window).height()-130,
+        // height: $(window).height()-130,
 
         columns: $scope.dg_cduties_columns,
         onContentReady: function (e) {
             if (!$scope.dg_cduties_instance)
                 $scope.dg_cduties_instance = e.component;
-            
+
+            //$scope.dg_cduties_height = $(window).height() - 131;
         },
         onSelectionChanged: function (e) {
             var data = e.selectedRowsData[0];
@@ -1585,16 +2031,16 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
             }
         },
-       
+
 
         bindingOptions: {
             dataSource: 'dg_cduties_ds',
-            height:'dg_cduties_height',
+            height: 'dg_cduties_height',
         }
     };
     ///////////////////
     $scope.refreshDutiesSMSStatus = function () {
-        
+
         var ids = Enumerable.From($scope.dg_cduties_ds).Select('$.Ref').ToArray();
         if (!ids || ids.length == 0)
             return;
@@ -1609,7 +2055,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                 rec.ResStr = _d.Status;
 
             });
- 
+
 
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
     };
@@ -1640,65 +2086,65 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             //        }
             //    }, toolbar: 'bottom'
             //},
-             //{
-             //    widget: 'dxButton', location: 'after', options: {
+            //{
+            //    widget: 'dxButton', location: 'after', options: {
 
-             //        type: 'default', text: 'FDPs', icon: 'airplane', onClick: function (arg) {
-             //            $scope.btn_duties_visible = false;
-             //            $scope.btn_crewlist_visible = true;
-             //            $scope.dg_calfdp_ds = null;
-             //            $('.dgcalcrew').fadeOut('200', function () {
+            //        type: 'default', text: 'FDPs', icon: 'airplane', onClick: function (arg) {
+            //            $scope.btn_duties_visible = false;
+            //            $scope.btn_crewlist_visible = true;
+            //            $scope.dg_calfdp_ds = null;
+            //            $('.dgcalcrew').fadeOut('200', function () {
 
-             //                $('.dgcalfdp').fadeIn('200', function () {
+            //                $('.dgcalfdp').fadeIn('200', function () {
 
-             //                    var prts = (new Date($scope.cal_crew_current)).getDatePartArray();
-             //                    if ($scope.dg_calcrew_selected) {
-             //                        var crewid = $scope.dg_calcrew_selected.Id;
-             //                        $scope.bindValidFDP(crewid, prts[0], prts[1] + 1);
-             //                    }
+            //                    var prts = (new Date($scope.cal_crew_current)).getDatePartArray();
+            //                    if ($scope.dg_calcrew_selected) {
+            //                        var crewid = $scope.dg_calcrew_selected.Id;
+            //                        $scope.bindValidFDP(crewid, prts[0], prts[1] + 1);
+            //                    }
 
-             //                });
-             //            });
-
-
-             //        }
-             //    }, toolbar: 'bottom'
-             //},
-             //{
-             //    widget: 'dxButton', location: 'after', options: {
-
-             //        type: 'default', text: 'Crew List', icon: 'group', onClick: function (arg) {
-             //            $scope.btn_crewlist_visible = false;
-             //            $scope.btn_duties_visible = true;
-             //            $('.dgcalfdp').fadeOut('200', function () {
-
-             //                $('.dgcalcrew').fadeIn('200', function () {
-
-             //                });
-             //            });
+            //                });
+            //            });
 
 
-             //        }
-             //    }, toolbar: 'bottom'
-             //},
+            //        }
+            //    }, toolbar: 'bottom'
+            //},
+            //{
+            //    widget: 'dxButton', location: 'after', options: {
 
-              //{
+            //        type: 'default', text: 'Crew List', icon: 'group', onClick: function (arg) {
+            //            $scope.btn_crewlist_visible = false;
+            //            $scope.btn_duties_visible = true;
+            //            $('.dgcalfdp').fadeOut('200', function () {
+
+            //                $('.dgcalcrew').fadeIn('200', function () {
+
+            //                });
+            //            });
+
+
+            //        }
+            //    }, toolbar: 'bottom'
+            //},
+
+            //{
 
 
 
-              //    widget: 'dxDropDownButton', location: 'after', options: {
-              //        type: 'default',
-              //        text: "Assign Duty",
-              //        icon: "save",
-              //        dropDownOptions: {
-              //            width: 230
-              //        },
-              //        onItemClick: function (e) {
-              //            DevExpress.ui.notify("Download " + e.itemData, "success", 600);
-              //        },
-              //        items: downloads
-              //    }, toolbar: 'bottom'
-              //},
+            //    widget: 'dxDropDownButton', location: 'after', options: {
+            //        type: 'default',
+            //        text: "Assign Duty",
+            //        icon: "save",
+            //        dropDownOptions: {
+            //            width: 230
+            //        },
+            //        onItemClick: function (e) {
+            //            DevExpress.ui.notify("Download " + e.itemData, "success", 600);
+            //        },
+            //        items: downloads
+            //    }, toolbar: 'bottom'
+            //},
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) {
@@ -1724,7 +2170,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         },
         onShown: function (e) {
             if ($scope._calCrewSelected) {
-                
+
                 var arr = [];
                 arr.push($scope._calCrewSelected);
 
@@ -1736,19 +2182,23 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
         },
         onHiding: function () {
-             
 
-            
+
+
 
             $scope.cal_crew_ds = [];
             if ($scope.cal_crew_instance) {
                 $scope.cal_crew_instance.repaint();
-               
+
             }
             $scope.dg_calcrew_instance.clearSelection();
             // $scope.rebind();
             $scope._calCrewSelected = null;
             $scope.popup_cal_visible = false;
+
+            //2020-12-19
+            if ($scope.OnlyRoster)
+                $rootScope.navigatehome();
 
         },
         bindingOptions: {
@@ -1816,7 +2266,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                     };
                     //$scope.crewFDPs.push(row);
                     callback(response);
-                   
+
 
                 }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
             }
@@ -1825,29 +2275,29 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         }
         else callback(null);;
     };
-    $scope.smsCrew=function(crew){
-        var data=crew.data;
-        $scope.smsRecsKeys=[];
+    $scope.smsCrew = function (crew) {
+        var data = crew.data;
+        $scope.smsRecsKeys = [];
         $scope.smsRecsKeys.push(data.Id);
         $scope.bindSMSRecs();
-        $scope.popup_sms_visible=true;
+        $scope.popup_sms_visible = true;
     };
 
     $scope.dg_calcrew_columns = [
-           // { dataField: 'Selected', caption: '', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width:45},
-          { dataField: 'ScheduleName', caption: 'Schedule Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false,sortIndex:1,sortOrder:'asc' },
-           { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
-             { dataField: 'GroupOrder', caption: 'O', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, visible: false,sortIndex:0,sortOrder:'asc' },
-             {
-                 dataField: "Id", caption: '',
-                 width: 70,
-                 allowFiltering: false,
-                 allowSorting: false,
-                 cellTemplate: 'smsTemplate',
-                  
-                 //visible:false,
+        // { dataField: 'Selected', caption: '', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width:45},
+        { dataField: 'ScheduleName', caption: 'Schedule Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, sortIndex: 1, sortOrder: 'asc' },
+        { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'GroupOrder', caption: 'O', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, visible: false, sortIndex: 0, sortOrder: 'asc' },
+        {
+            dataField: "Id", caption: '',
+            width: 70,
+            allowFiltering: false,
+            allowSorting: false,
+            cellTemplate: 'smsTemplate',
 
-             },
+            //visible:false,
+
+        },
 
     ];
     $scope.dg_calcrew_selected = null;
@@ -1864,7 +2314,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         showRowLines: true,
         showColumnLines: true,
         sorting: { mode: 'none' },
-        keyExpr:'Id',
+        keyExpr: 'Id',
         noDataText: '',
 
         allowColumnReordering: true,
@@ -1873,7 +2323,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         paging: { pageSize: 100 },
         showBorders: true,
         selection: { mode: 'single' },
-         
+
         columnAutoWidth: false,
         height: function () {
             return $(window).height() - 114;
@@ -1933,18 +2383,19 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
     //    $scope.popup_event_visible = true;
     //};
 
+    //2020-12-26
     $scope.assign1168 = function (e) {
 
         $scope.event_status = 1168;
-        $scope.FromDateEvent = (new Date($scope.contextMenuCellData.startDate)).setHours(0, 0, 0, 0);
-        $scope.ToDateEvent = (new Date($scope.FromDateEvent)).addMinutes(12 * 60);
+        $scope.FromDateEvent = (new Date($scope.contextMenuCellData.startDate)).setHours(4, 0, 0, 0);
+        $scope.ToDateEvent = (new Date($scope.FromDateEvent)).addMinutes(10 * 60);
         $scope.popup_event_title = 'STBY AM';
         $scope.popup_event_visible = true;
     };
     $scope.assign1167 = function (e) {
         $scope.event_status = 1167;
-        $scope.FromDateEvent = (new Date($scope.contextMenuCellData.startDate)).setHours(12, 0, 0, 0);
-        $scope.ToDateEvent = (new Date($scope.FromDateEvent)).addMinutes(12 * 60);
+        $scope.FromDateEvent = (new Date($scope.contextMenuCellData.startDate)).setHours(13, 0, 0, 0);
+        $scope.ToDateEvent = (new Date($scope.FromDateEvent)).addMinutes((10 * 60)+59);
         $scope.popup_event_title = 'STBY PM';
         $scope.popup_event_visible = true;
     };
@@ -2035,7 +2486,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         $scope.ToDateEvent = (new Date($scope.FromDateEvent)).addMinutes(24 * 60);
         $scope.popup_event_title = 'No Flt';
         $scope.popup_event_visible = true;
-        
+
     };
     $scope.assign100008 = function (e) {
         $scope.event_status = 100008;
@@ -2043,7 +2494,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         $scope.ToDateEvent = (new Date($scope.FromDateEvent)).addMinutes(24 * 60);
         $scope.popup_event_title = 'Requested Off';
         $scope.popup_event_visible = true;
-        
+
     };
     $scope.assign100009 = function (e) {
         $scope.event_status = 100009;
@@ -2051,7 +2502,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         $scope.ToDateEvent = (new Date($scope.FromDateEvent)).addMinutes(24 * 60);
         $scope.popup_event_title = 'Refuse';
         $scope.popup_event_visible = true;
-        
+
     };
     $scope.assign1170 = function (e) {
         $scope.event_status = 1170;
@@ -2069,37 +2520,40 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         $scope.popup_event_visible = true;
     };
     ////////////////////////////
+    //2020-12-19
     $scope.cellContextMenuItems = [
-         
-         { text: 'STBY AM', onItemClick: $scope.assign1168, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-1168' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>STBY AM</td></tr></table>", },
-         { text: 'STBY PM', onItemClick: $scope.assign1167, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-1167' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>STBY PM</td></tr></table>", },
+
+        { visible: !$scope.OnlyRoster, text: 'STBY AM', onItemClick: $scope.assign1168, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-1168' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>STBY AM</td></tr></table>", },
+        { visible: !$scope.OnlyRoster, text: 'STBY PM', onItemClick: $scope.assign1167, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-1167' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>STBY PM</td></tr></table>", },
         /////////////////////////////////////
 
 
 
-        { text: 'Day Off', onItemClick: $scope.assign10000, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-10000' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Day Off</td></tr></table>", },
-        { text: 'Requested Off', onItemClick: $scope.assign100008, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-10000' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Requested Off</td></tr></table>", },
-         // { text: 'Assign Stan By AM', onItemClick: $scope.assign1168, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-1168' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Assign Stand By AM</td></tr></table>", },
-         // { text: 'Assign Stan By PM', onItemClick: $scope.assign1167, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-1167' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Assign Stand By PM</td></tr></table>", },
+        { visible: !$scope.OnlyRoster, text: 'Day Off', onItemClick: $scope.assign10000, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-10000' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Day Off</td></tr></table>", },
+        { visible: !$scope.OnlyRoster,  text: 'Requested Off', onItemClick: $scope.assign100008, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-10000' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Requested Off</td></tr></table>", },
+        // { text: 'Assign Stan By AM', onItemClick: $scope.assign1168, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-1168' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Assign Stand By AM</td></tr></table>", },
+        // { text: 'Assign Stan By PM', onItemClick: $scope.assign1167, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-1167' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Assign Stand By PM</td></tr></table>", },
 
-            { text: 'Office', onItemClick: $scope.assign5001, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-5001' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Office</td></tr></table>", },
-              { text: 'Training', onItemClick: $scope.assign5000, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-5000' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Training</td></tr></table>", },
+        { visible: !$scope.OnlyRoster, text: 'Office', onItemClick: $scope.assign5001, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-5001' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Office</td></tr></table>", },
+        //soltani
+        { visible: $scope.OnlyTraining, text: 'Training', onItemClick: $scope.assign5000, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-5000' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Training</td></tr></table>", },
 
-               { text: 'Meeting', onItemClick: $scope.assign100001, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100001' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Meeting</td></tr></table>", },
-               { text: 'Reserve', onItemClick: $scope.assign1170, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-1170' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Reserve</td></tr></table>", },
-                { text: 'Vacation', onItemClick: $scope.assign1169, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-1169' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Vacation</td></tr></table>", },
-                 { text: 'Ground', onItemClick: $scope.assign100000, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100000' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Ground</td></tr></table>", },
-                  { text: 'Simulator', onItemClick: $scope.assign100003, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100003' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Simulator</td></tr></table>", },
-                   { text: 'Sick', onItemClick: $scope.assign100002, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100002' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Sick</td></tr></table>", },
-                    { text: 'Expired Medical', onItemClick: $scope.assign100005, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100005' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Expired Medical</td></tr></table>", },
-                     { text: 'Expired Licence', onItemClick: $scope.assign100004, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100004' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Expired Licence</td></tr></table>", },
-                      { text: 'Expired Passport', onItemClick: $scope.assign100006, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100006' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Expired Passport</td></tr></table>", },
-                       { text: 'No Flight', onItemClick: $scope.assign100007, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100000' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>No Flight</td></tr></table>", },
-                       { text: 'Refuse', onItemClick: $scope.assign100009, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100000' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Refuse</td></tr></table>", },
+        { visible: !$scope.OnlyRoster, text: 'Meeting', onItemClick: $scope.assign100001, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100001' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Meeting</td></tr></table>", },
+        { visible: !$scope.OnlyRoster, text: 'Reserve', onItemClick: $scope.assign1170, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-1170' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Reserve</td></tr></table>", },
+        { visible: !$scope.OnlyRoster, text: 'Vacation', onItemClick: $scope.assign1169, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-1169' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Vacation</td></tr></table>", },
+        { visible: !$scope.OnlyRoster, text: 'Ground', onItemClick: $scope.assign100000, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100000' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Ground</td></tr></table>", },
 
-                       //2020-10-27
-                       { text: 'Mission', onItemClick: $scope.assign100025, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-5001' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Mission</td></tr></table>", },
-                       ///////////////////////////////////
+        { text: 'Simulator', onItemClick: $scope.assign100003, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100003' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Simulator</td></tr></table>", },
+        { visible: !$scope.OnlyRoster,  text: 'Sick', onItemClick: $scope.assign100002, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100002' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Sick</td></tr></table>", },
+        { visible: !$scope.OnlyRoster, visible: !$scope.OnlyRoster, text: 'Expired Medical', onItemClick: $scope.assign100005, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100005' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Expired Medical</td></tr></table>", },
+        { visible: !$scope.OnlyRoster,  text: 'Expired Licence', onItemClick: $scope.assign100004, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100004' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Expired Licence</td></tr></table>", },
+        { visible: !$scope.OnlyRoster, text: 'Expired Passport', onItemClick: $scope.assign100006, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100006' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Expired Passport</td></tr></table>", },
+        { visible: !$scope.OnlyRoster, text: 'No Flight', onItemClick: $scope.assign100007, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100000' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>No Flight</td></tr></table>", },
+        { visible: !$scope.OnlyRoster, text: 'Refuse', onItemClick: $scope.assign100009, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-100000' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Refuse</td></tr></table>", },
+
+        //2020-10-27
+        { visible: !$scope.OnlyRoster, text: 'Mission', onItemClick: $scope.assign100025, template: "<table><tr><td style='vertical-align:middle;'><div class='duty-5001' style='width:15px;height:15px;border-radius:50%;'></div></td><td style='vertical-align:top;padding-left:5px;'>Mission</td></tr></table>", },
+        ///////////////////////////////////
 
     ];
     $scope.cellContextMenuOptions = {
@@ -2109,7 +2563,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         onShowing: function (e) {
             if (!$scope.dg_calcrew_selected)
                 e.cancel = true;
-            $scope.contextMenuCellData
+           // $scope.contextMenuCellData
             var cdate = new Date($scope.contextMenuCellData.startDate);
             var bdate = new Date($scope.dg_calcrew_selected.DateInactiveBegin);
             var edate = new Date($scope.dg_calcrew_selected.DateInactiveEnd);
@@ -2127,6 +2581,63 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
     $scope.cal_crew_ds = null;
     $scope.cal_crew_instance = null;
+    //4-11
+    var isDouble = 0;
+    var prevCellData = null;
+    $scope.saveNewDutyCalByDate = function (crewid,df,dt,etype,remark, callback) {
+        var dto = {
+            DateStart: new Date(df),
+            DateEnd: new Date(dt),
+            CityId: -1,
+            CrewId: crewid,
+            DutyType:etype,
+            Remark: remark
+
+        }
+        $scope.loadingVisible = true;
+
+        flightService.saveDuty(dto).then(function (response) {
+            $scope.loadingVisible = false;
+            response.dutyTypeTitle = response.DutyTypeTitle;
+            response.dutyType = response.DutyType;
+            $scope.cal_crew_ds.push(response);
+            // $scope.cal_crew_instance.repaint();
+            callback();
+
+
+
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+    };
+    $scope.dblclick = function (cell) {
+        //moradi
+        if (!$scope.dg_calcrew_selected)
+            return;
+        var cdate = new Date(cell.startDate);
+        var bdate = new Date($scope.dg_calcrew_selected.DateInactiveBegin);
+        var edate = new Date($scope.dg_calcrew_selected.DateInactiveEnd);
+        if (cdate >= bdate && cdate <= edate)
+            return;
+        var eventFrom = (new Date(cdate)).setHours(6, 0, 0, 0);
+        var eventEnd = (new Date(eventFrom)).addHours(17);
+         
+        var _event = $scope.createEvent($scope.dg_calcrew_selected, 10000, 'RERRP', eventFrom, eventEnd, '');
+        var check = $scope.IsEventOverLapped(_event);
+        if (check) {
+            General.ShowNotify('Overlapped Duties Found', 'error');
+            return;
+        }
+        else {
+            
+            $scope.saveNewDutyCalByDate($scope.dg_calcrew_selected.Id, eventFrom, eventEnd,10000,'', function () {
+                $scope.ToDateEvent = null;
+                $scope.FromDateEvent = null;
+                $scope.event_status = null;
+                $scope.RemarkEvent = null;
+            });
+
+
+        }
+    }
     $scope.cal_crew = {
         //dataSource: data,
         editing: {
@@ -2178,6 +2689,22 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
             $scope.contextMenuCellData = e.cellData;
         },
+        onCellClick: function (e) {
+            if (isDouble == 1) {
+                prevCellData = e.cellData;
+                
+            }
+            isDouble++;
+            setTimeout(function () {
+                if (isDouble == 2) {
+                    if ((e.cellData.startDate == prevCellData.startDate) && (e.cellData.endDate == prevCellData.endDate))
+                        $scope.dblclick(e.cellData);
+                }
+                else if (isDouble == 1) { };
+                isDouble = 0;
+                prevCellData = null;
+            }, 300);
+        },
         bindingOptions: {
             currentDate: 'cal_crew_current',
             dataSource: 'cal_crew_ds',
@@ -2214,15 +2741,15 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                 return "Vacation";
             case 1170:
                 return "Reserve";
-                //2020-10-27
+            //2020-10-27
             case 100025:
                 return "Mission";
             default:
                 return "-";
         }
     }
-    $scope.createEvent = function (_crew, _type, _typeTitle, eventFrom, eventEnd,remark) {
-        
+    $scope.createEvent = function (_crew, _type, _typeTitle, eventFrom, eventEnd, remark) {
+
         var crewid = _crew.Id; //_crew.data.Id;
         var crew = _crew; //_crew.data;
         if (!_typeTitle)
@@ -2232,7 +2759,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         $scope._eventId = $scope._eventId - 1;
         var offset = 1 * (new Date()).getTimezoneOffset();
         var stby = {
-            Id:$scope._eventId, //-($scope.crewDuties.length + 1),
+            Id: $scope._eventId, //-($scope.crewDuties.length + 1),
             type: 0,
             JobGroup: crew.JobGroup,
             GroupId: crew.GroupId,
@@ -2251,19 +2778,18 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         stby.DutyEndLocal = new Date(eventEnd);
         stby.dutyType = _type;
         stby.dutyTypeTitle = _typeTitle;
-       
+
 
         stby.DutyStart = (new Date(stby.DutyStartLocal)).addMinutes(offset);
         stby.DutyEnd = (new Date(stby.DutyEndLocal)).addMinutes(offset);
         if (_type != 10000 && _type != 1169 && _type != 100000 && _type != 100001 && _type != 100002 && _type != 100004 && _type != 100005 && _type != 100006 && _type != 100007 && _type != 100008 && _type != 100009
             //2020-10-27
-            && _type !=100025
-            ) {
+            && _type != 100025
+        ) {
             stby.RestToLocal = (new Date(stby.DutyEndLocal)).addMinutes(12 * 60);
             stby.RestTo = (new Date(stby.RestToLocal)).addMinutes(offset);
         }
-        else
-        {
+        else {
             stby.RestToLocal = stby.DutyEndLocal;
             stby.RestTo = stby.DutyEnd;
         }
@@ -2272,21 +2798,40 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
         stby.flights = null;
         stby.IsOver = false;
-        
+
         return stby;
 
     };
     $scope.IsEventOverLapped = function (event) {
+        //4-20
+        var f;
+        if (event.dutyType == 10000) {
+            f = Enumerable.From($scope.cal_crew_ds).Where(function (x) {
+                
+                 var   _until = x.EndUTC;
+                return (new Date(event.DutyStart) >= new Date(x.StartUTC) && new Date(event.DutyStart) <= new Date(_until))
+                    ||
+                    (new Date(event.RestTo) >= new Date(x.StartUTC) && new Date(event.RestTo) <= new Date(_until))
+                    ||
+                    (new Date(x.StartUTC) >= new Date(event.DutyStart) && new Date(x.StartUTC) <= new Date(event.RestUntil))
+
+            }).FirstOrDefault();
+        }
+        else {
+            f = Enumerable.From($scope.cal_crew_ds).Where(function (x) {
+                //EndUTC
+                var _until = x.RestUntil;
+                if (!_until)
+                    _until = x.EndUTC;
+                return (new Date(event.DutyStart) >= new Date(x.StartUTC) && new Date(event.DutyStart) <= new Date(_until))
+                    ||
+                    (new Date(event.RestTo) >= new Date(x.StartUTC) && new Date(event.RestTo) <= new Date(_until))
+                    ||
+                    (new Date(x.StartUTC) >= new Date(event.DutyStart) && new Date(x.StartUTC) <= new Date(event.RestUntil))
+
+            }).FirstOrDefault();
+        }
         
-       
-        var f = Enumerable.From($scope.cal_crew_ds).Where(function (x) {
-            return (new Date(event.DutyStart) >= new Date(x.StartUTC) && new Date(event.DutyStart) <= new Date(x.RestUntil))
-            ||
-                  (new Date(event.RestTo) >= new Date(x.StartUTC) && new Date(event.RestTo) <= new Date(x.RestUntil))
-            ||
-                (new Date(x.StartUTC) >= new Date(event.DutyStart) && new Date(x.StartUTC) <= new Date(event.RestUntil))
-                 
-        }).FirstOrDefault();
         console.log('IsEventOverLapped-------------------------------------');
         console.log(event);
         console.log($scope.cal_crew_ds);
@@ -2307,16 +2852,24 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         }
     };
     //hoohoo
+
+    //2020-11-22
+    //2020-12-19
     $scope.notifyDutyCal = function (duty) {
+        var type = duty.DutyType;
+        if ($scope.OnlyRoster && type != 100003) {
+            General.ShowNotify('You dont have enough permission to notify this type of events.', 'error');
+            return;
+        }
         var selected = $rootScope.getSelectedRows($scope.dg_cduties_instance);
         var ids = [];
         ids.push(duty.Id);
-       
-        var dto = { Ids: ids, Date: duty.DateLocal };
+
+        var dto = { Ids: ids, Date: duty.DateLocal, UserName: $rootScope.userName};
         if (!dto.Date)
-            dto.Date=duty.DaySTDLocal;
+            dto.Date = duty.DaySTDLocal;
         $scope.loadingVisible = true;
-        
+
         flightService.dutiesSendSMS(dto).then(function (response) {
             $scope.loadingVisible = false;
             General.ShowNotify(Config.Text_SavedOk, 'success');
@@ -2325,58 +2878,69 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
     };
 
+    //2020-12-19
     $scope.removeDutyCal = function (duty) {
-        var type=duty.DutyType;
-        if (type==1165 && !$scope.isAdmin){
-            
-            if (new Date(duty.End)<$scope.firstHour  ){
-                
+        var type = duty.DutyType;
+        if ($scope.OnlyRoster && type != 100003) {
+            General.ShowNotify('You dont have enough permission to remove this type of events.', 'error');
+            return;
+        }
+        //soltani
+        if (!$scope.OnlyTraining && type == 5000) {
+            General.ShowNotify('You dont have enough permission to remove this type of events.', 'error');
+            return;
+        }
+
+        if (type == 1165 && !$scope.isAdmin) {
+
+            if (new Date(duty.End) < $scope.firstHour) {
+
                 var myDialog = DevExpress.ui.dialog.custom({
                     rtlEnabled: true,
                     title: "Error",
                     message: "You cannot modify crew list due to FLIGHT STATUS.Please contact the administrator.",
-                    buttons: [ { text: "OK", onClick: function () {  } }]
+                    buttons: [{ text: "OK", onClick: function () { } }]
                 });
                 myDialog.show();
                 return;
             }
         }
         var dto = { fdp: duty.Id };
-         
+
         $scope.loadingVisible = true;
         flightService.saveDeleteFDP(dto).then(function (response) {
             $scope.loadingVisible = false;
             //khar
-            var _cr=Enumerable.From($scope.ds_crew).Where('$.Id=='+duty.CrewId).FirstOrDefault();
-            if (_cr && _cr.FlightSum){
-                _cr.FlightSum=_cr.FlightSum-response;
+            var _cr = Enumerable.From($scope.ds_crew).Where('$.Id==' + duty.CrewId).FirstOrDefault();
+            if (_cr && _cr.FlightSum) {
+                _cr.FlightSum = _cr.FlightSum - response;
             }
             $scope.cal_crew_instance.deleteAppointment(duty);
-            if (type==1165){
-                $scope.ati_fdps=Enumerable.From($scope.ati_fdps).Where('$.Id!='+duty.Id).ToArray();
+            if (type == 1165) {
+                $scope.ati_fdps = Enumerable.From($scope.ati_fdps).Where('$.Id!=' + duty.Id).ToArray();
                 $scope.fillPos(true);
                 $scope.fillRangeFdps();
                 $scope.fillFlightCrews();
-                         
+
             }
-                 
+
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
-           
-         
+
+
     };
-    
-    $scope.saveNewDutyCal = function (crewid,callback) {
+
+    $scope.saveNewDutyCal = function (crewid, callback) {
         var dto = {
             DateStart: new Date($scope.FromDateEvent),
             DateEnd: new Date($scope.ToDateEvent),
             CityId: -1,
             CrewId: crewid,
             DutyType: $scope.event_status,
-            Remark:$scope.RemarkEvent
+            Remark: $scope.RemarkEvent
 
         }
         $scope.loadingVisible = true;
-        //doolmask
+       
         flightService.saveDuty(dto).then(function (response) {
             $scope.loadingVisible = false;
             response.dutyTypeTitle = response.DutyTypeTitle;
@@ -2385,7 +2949,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             // $scope.cal_crew_instance.repaint();
             callback();
 
-             
+
 
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
     };
@@ -2418,65 +2982,64 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                             return;
                         }
                         var crewid = $scope.dg_calcrew_selected.Id;
-                        
+
                         var eventFrom = new Date($scope.FromDateEvent);
                         var eventEnd = new Date($scope.ToDateEvent);
-                        var rosterFrom =new Date( General.getDayFirstHour(new Date($scope.dt_fromSearched)));
+                        var rosterFrom = new Date(General.getDayFirstHour(new Date($scope.dt_fromSearched)));
                         //getDayLastHour
-                        var rosterTo =  new Date(getMidNight(new Date($scope.dt_toSearched))) ;
+                        var rosterTo = new Date(getMidNight(new Date($scope.dt_toSearched)));
                         //////////////////////////////
                         if ($scope.event_status == 10000) {
                             //nool
-                           
+
                             //  alert(crewid);
-                            var _event = $scope.createEvent($scope.dg_calcrew_selected, 10000, 'RERRP', eventFrom, eventEnd,$scope.RemarkEvent);
+                            var _event = $scope.createEvent($scope.dg_calcrew_selected, 10000, 'RERRP', eventFrom, eventEnd, $scope.RemarkEvent);
                             var check = $scope.IsEventOverLapped(_event);
                             if (check) {
                                 General.ShowNotify('Overlapped Duties Found', 'error');
                                 return;
                             }
-                            else
-                            {
+                            else {
                                 $scope.saveNewDutyCal($scope.dg_calcrew_selected.Id, function () { $scope.popup_event_visible = false; });
 
-                                    
+
                             }
 
-                          
+
                         }
-                            ///////////////////////////////////
-                            //if ($scope.event_status == 5000 || $scope.event_status == 5001) {
-                            //    if ((eventFrom >= rosterFrom && eventFrom <= rosterTo) || (eventEnd >= rosterFrom && eventEnd <= rosterTo)) {
-                            //        // alert(crewid);
+                        ///////////////////////////////////
+                        //if ($scope.event_status == 5000 || $scope.event_status == 5001) {
+                        //    if ((eventFrom >= rosterFrom && eventFrom <= rosterTo) || (eventEnd >= rosterFrom && eventEnd <= rosterTo)) {
+                        //        // alert(crewid);
 
-                            //        var _event = $scope.createEvent($scope.dg_calcrew_selected, $scope.event_status, ($scope.event_status==5000?'Training':'Office'), eventFrom, eventEnd);
-                            //        var check = $scope.IsEventOverLapped(_event);
-                            //        if (check) {
-                            //            General.ShowNotify('Overlapped Duties Found', 'error');
-                            //            return;
-                            //        }
-                            //        else
-                            //        {
-                            //            $scope.cal_crew_ds.push(_event);
-                            //            $scope.cal_crew_instance.repaint();
-                            //            $scope.crewDuties.push(_event);
-                            //            console.log('event duties');
-                            //            console.log($scope.crewDuties);
-                            //            $scope.popup_event_visible = false;
-                            //        }
-                               
+                        //        var _event = $scope.createEvent($scope.dg_calcrew_selected, $scope.event_status, ($scope.event_status==5000?'Training':'Office'), eventFrom, eventEnd);
+                        //        var check = $scope.IsEventOverLapped(_event);
+                        //        if (check) {
+                        //            General.ShowNotify('Overlapped Duties Found', 'error');
+                        //            return;
+                        //        }
+                        //        else
+                        //        {
+                        //            $scope.cal_crew_ds.push(_event);
+                        //            $scope.cal_crew_instance.repaint();
+                        //            $scope.crewDuties.push(_event);
+                        //            console.log('event duties');
+                        //            console.log($scope.crewDuties);
+                        //            $scope.popup_event_visible = false;
+                        //        }
 
-                            //    }
 
-                            
-                            //}
+                        //    }
+
+
+                        //}
                         else if ($scope.event_status == 5000 || $scope.event_status == 5001
-                              || $scope.event_status == 100001 || $scope.event_status == 100003 || $scope.event_status == 1170 || $scope.event_status == 1167
+                            || $scope.event_status == 100001 || $scope.event_status == 100003 || $scope.event_status == 1170 || $scope.event_status == 1167
                             || $scope.event_status == 1168
-                            ) {
+                        ) {
                             //nool
 
-                        
+
                             var _event = $scope.createEvent($scope.dg_calcrew_selected, $scope.event_status, null, eventFrom, eventEnd, $scope.RemarkEvent);
                             var check = $scope.IsEventOverLapped(_event);
                             if (check) {
@@ -2492,15 +3055,15 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
 
                         }
-                            //2020-10-27
+                        //2020-10-27
                         else if ($scope.event_status == 100025) {
                             $scope.saveNewDutyCal($scope.dg_calcrew_selected.Id, function () { $scope.popup_event_visible = false; });
                         }
-                            //dooltopol
-                        else  {
+                        //dooltopol
+                        else {
                             //nool
 
-                          
+
                             var _event = $scope.createEvent($scope.dg_calcrew_selected, $scope.event_status, null, eventFrom, eventEnd, $scope.RemarkEvent);
                             var check = false; //$scope.IsEventOverLapped(_event);
                             if (check) {
@@ -2508,7 +3071,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                                 return;
                             }
                             else {
-                                 
+
                                 $scope.saveNewDutyCal($scope.dg_calcrew_selected.Id, function () { $scope.popup_event_visible = false; });
 
                             }
@@ -2551,6 +3114,220 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         }
     };
 
+
+    //2020-11-24
+    $scope.FromDateVisible = new Date();
+    $scope.ToDateVisible = new Date();
+        $scope.date_from_visible = {
+        type: "date",
+        width: '100%',
+
+        onValueChanged: function (arg) {
+
+        },
+        bindingOptions: {
+            value: 'FromDateVisible',
+
+        }
+    };
+    $scope.date_to_visible = {
+        type: "date",
+        width: '100%',
+
+        onValueChanged: function (arg) {
+
+        },
+        bindingOptions: {
+            value: 'ToDateVisible',
+
+        }
+    };
+    $scope.popup_dates_visible = false;
+    $scope.popup_dates_title = '';
+    $scope.popup_dates = {
+        width: 300,
+        height: 250,
+        //position: 'left top',
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+        toolbarItems: [
+
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Ok', icon: 'check', validationGroup: 'datevisible', onClick: function (arg) {
+
+                        // console.log($scope.data);
+                        //return;
+                        var result = arg.validationGroup.validate();
+
+                        if (!result.isValid) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+                        
+
+                        var eventFrom = (new Date($scope.FromDateVisible)).toUTCString();
+                        var eventEnd = (new Date($scope.ToDateVisible)).toUTCString();
+                        General.Confirm('Are you sure?', function (res) {
+                            if (res) {
+
+                                var dto = { datefrom: eventFrom, dateto: eventEnd, username: $rootScope.userName };
+                                $scope.loadingVisible = true;
+                                flightService.dutiesVisibleByDates(dto).then(function (response) {
+                                    $scope.loadingVisible = false;
+                                    $scope.getCrewDuties(function (ds) {
+                                        $scope.dg_cduties_ds = ds;
+
+                                    });
+
+                                }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+                            }
+                        });
+
+                        //////////////////////////////
+
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) { $scope.popup_dates_visible = false; } }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onShowing: function (e) {
+
+
+        },
+        onShown: function (e) {
+            $scope.FromDateVisible = $scope.rptcd_dateFrom;
+            $scope.ToDateVisible = $scope.rptcd_dateTo;
+        },
+        onHiding: function () {
+            
+
+        },
+        bindingOptions: {
+            visible: 'popup_dates_visible',
+            //width: 'pop_width',
+            //height: 'pop_height',
+            title: 'popup_dates_title',
+
+        }
+    };
+
+
+
+    $scope.FromDateSMS = new Date();
+    $scope.ToDateSMS = new Date();
+    $scope.datesms_from_visible = {
+        type: "date",
+        width: '100%',
+
+        onValueChanged: function (arg) {
+
+        },
+        bindingOptions: {
+            value: 'FromDateSMS',
+
+        }
+    };
+    $scope.datesms_to_visible = {
+        type: "date",
+        width: '100%',
+
+        onValueChanged: function (arg) {
+
+        },
+        bindingOptions: {
+            value: 'ToDateSMS',
+
+        }
+    };
+    $scope.popup_datessms_visible = false;
+    $scope.popup_datessms_title = '';
+    $scope.popup_datessms = {
+        width: 300,
+        height: 250,
+        //position: 'left top',
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+        toolbarItems: [
+
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Ok', icon: 'check', validationGroup: 'datesms', onClick: function (arg) {
+
+                        // console.log($scope.data);
+                        //return;
+                        var result = arg.validationGroup.validate();
+
+                        if (!result.isValid) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+
+
+                        var eventFrom = (new Date($scope.FromDateSMS)).toUTCString();
+                        var eventEnd = (new Date($scope.ToDateSMS)).toUTCString();
+                        General.Confirm('Are you sure?', function (res) {
+                            if (res) {
+
+                                var dto = { datefrom: eventFrom, dateto: eventEnd, username: $rootScope.userName };
+                                $scope.loadingVisible = true;
+                                flightService.dutiesSendSMSByDate(dto).then(function (response) {
+                                    $scope.loadingVisible = false;
+                                    $scope.getCrewDuties(function (ds) {
+                                        $scope.dg_cduties_ds = ds;
+
+                                    });
+
+                                }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+                            }
+                        });
+
+                        //////////////////////////////
+
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) { $scope.popup_datessms_visible = false; } }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onShowing: function (e) {
+
+
+        },
+        onShown: function (e) {
+            $scope.FromDateSMS = $scope.rptcd_dateFrom;
+            $scope.ToDateSMS = $scope.rptcd_dateTo;
+        },
+        onHiding: function () {
+
+
+        },
+        bindingOptions: {
+            visible: 'popup_datessms_visible',
+            //width: 'pop_width',
+            //height: 'pop_height',
+            title: 'popup_datessms_title',
+
+        }
+    };
+
+    //////////////////////////////
+
     //close button
     $scope.popup_event.toolbarItems[1].options.onClick = function (e) {
 
@@ -2561,8 +3338,8 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
     $scope.ToDateEvent = null;
     $scope.RemarkEvent = null;
 
-     
-    
+
+
 
 
     $scope.date_from_event = {
@@ -2577,13 +3354,25 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
         }
     };
+    $scope.date_to_event = {
+        type: "date",
+        width: '100%',
+
+        onValueChanged: function (arg) {
+
+        },
+        bindingOptions: {
+            value: 'ToDateEvent',
+
+        }
+    };
     $scope.date_from_event_hh = {
         type: "time",
         width: '100%',
 
         displayFormat: "HH:mm",
         interval: 15,
-        
+
         bindingOptions: {
             value: 'FromDateEvent',
         }
@@ -2612,10 +3401,10 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         }
     };
     $scope.remark_event = {
-        height:60,
+        height: 60,
         bindingOptions: {
             value: 'RemarkEvent',
-            
+
         }
     };
     ///////////////////////////////////////
@@ -2650,7 +3439,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
             $scope.selectedDate = new Date($scope.selectedTab.date);
             $scope.scrollFirstFlightDate($scope.selectedDate);
-           
+
 
         }
         catch (e) {
@@ -2777,15 +3566,15 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             return moment(flt.STA).format('HHmm');
     };
     $scope.getFlightClass = function (flt) {
-        var cls='init-flt';
-        if (flt.FlightStatusID==4)
-            cls+=' cnl';
-        
+        var cls = 'init-flt';
+        if (flt.FlightStatusID == 4)
+            cls += ' cnl';
+
         if (flt.hasCrew)
-            cls+=' has-crew';
+            cls += ' has-crew';
         if (flt.hasCrewAll)
-            cls+=' has-crew-all';
-        return cls+' flightitem';
+            cls += ' has-crew-all';
+        return cls + ' flightitem';
     }
     $scope.getDuration = function (d1, d2) {
         var diff = Math.abs(d1.getTime() - d2.getTime()) / 3600000;
@@ -2835,15 +3624,37 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
         return false;
     };
-
+    $scope.timeType = 0;
     $scope.getFlightStyle = function (f, index, res) {
-        
+
         var style = {};
         style.width = $scope.getFlightWidth(f);
-        var left = $scope.getDuration(new Date($scope.datefrom), new Date(f.STD));
+
+
+        var std = f.STD;
+        if ($scope.timeType == 1) {
+            var offset = getOffset(new Date(std.getFullYear(), std.getMonth(), std.getDate(), 1, 0, 0, 0));
+            std = (new Date(std)).addMinutes(offset)
+
+        }
+        var datefromOffset = (new Date($scope.datefrom)).getTimezoneOffset();
+        var stdOffset = (new Date(std)).getTimezoneOffset();
+        var dfirst = new Date($scope.datefrom);
+        var mm = (new Date($scope.datefrom)).getMonth();
+        var dd = (new Date($scope.datefrom)).getDate();
+
+
+        if (stdOffset < datefromOffset || (mm == 2 && dd == 22))
+            dfirst = (new Date($scope.datefrom)).addMinutes(-60);
+        if (stdOffset > datefromOffset)
+            dfirst = (new Date($scope.datefrom)).addMinutes(60);
+
+
+
+        var left = $scope.getDuration(/*new Date($scope.datefrom)*/new Date(dfirst), new Date(f.STD));
         style.left = (left * (hourWidth + 1)) + "px";
         var top = f.top;
-        
+
 
         style.top = top + 'px';
         return style;
@@ -2950,7 +3761,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                     (new Date(x.STD) >= new Date(_d.STD) && new Date(x.STD) <= new Date(_d.STA))
                     ||
                     (new Date(x.STA) >= new Date(_d.STD) && new Date(x.STA) <= new Date(_d.STA))
-                  );
+                );
             }).ToArray();
 
         });
@@ -2984,10 +3795,10 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
 
         return (fltDep > xDep && fltDep < xArr) || (fltArr > xDep && fltArr < xArr)
-        || (xDep > fltDep && xDep < fltArr) || (xArr > fltDep && xArr < fltArr);
+            || (xDep > fltDep && xDep < fltArr) || (xArr > fltDep && xArr < fltArr);
 
 
-       
+
     }
     $scope.findConflict = function (flt, flights) {
         //var query = Enumerable.From(flights).Where(function (x) {
@@ -2996,20 +3807,20 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         //}).OrderByDescending(function (x) { return moment(x.STD).format('YYYYDDMMHHmm') }).ThenByDescending('$.ID').ToArray();
         var cnflt = Enumerable.From(flights).Where(function (x) {
             return new Date(x.STD) <= new Date(flt.STD) && x.ID != flt.ID
-            && (
-                (new Date(flt.STD) >= new Date(x.STD) && new Date(flt.STD) < new Date(x.STA))
-                || (new Date(flt.STA) > new Date(x.STD) && new Date(flt.STA) < new Date(x.STA))
+                && (
+                    (new Date(flt.STD) >= new Date(x.STD) && new Date(flt.STD) < new Date(x.STA))
+                    || (new Date(flt.STA) > new Date(x.STD) && new Date(flt.STA) < new Date(x.STA))
 
-                || (new Date(flt.ChocksOut) >= new Date(x.STD) && new Date(flt.ChocksOut) < new Date(x.STA))
-                || (new Date(flt.ChocksIn) > new Date(x.STD) && new Date(flt.ChocksIn) < new Date(x.STA))
-
-
-                 || (new Date(flt.ChocksOut) >= new Date(x.ChocksOut) && new Date(flt.ChocksOut) < new Date(x.ChocksIn))
-                || (new Date(flt.ChocksIn) > new Date(x.ChocksOut) && new Date(flt.ChocksIn) < new Date(x.ChocksIn))
+                    || (new Date(flt.ChocksOut) >= new Date(x.STD) && new Date(flt.ChocksOut) < new Date(x.STA))
+                    || (new Date(flt.ChocksIn) > new Date(x.STD) && new Date(flt.ChocksIn) < new Date(x.STA))
 
 
-               // || (new Date(flt.STD) == new Date(x.STD) && new Date(flt.STA) == new Date(x.STA))
-                //|| (moment(flt.STD).format('YYYYDDMMHHmm') == moment(x.STD).format('YYYYDDMMHHmm'))
+                    || (new Date(flt.ChocksOut) >= new Date(x.ChocksOut) && new Date(flt.ChocksOut) < new Date(x.ChocksIn))
+                    || (new Date(flt.ChocksIn) > new Date(x.ChocksOut) && new Date(flt.ChocksIn) < new Date(x.ChocksIn))
+
+
+                    // || (new Date(flt.STD) == new Date(x.STD) && new Date(flt.STA) == new Date(x.STA))
+                    //|| (moment(flt.STD).format('YYYYDDMMHHmm') == moment(x.STD).format('YYYYDDMMHHmm'))
                 );
         }).OrderByDescending(function (x) { return moment(x.STD).format('YYYYDDMMHHmm') }).ThenByDescending('$.ID').FirstOrDefault();
         return cnflt;
@@ -3028,32 +3839,55 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             for (var i = 0; i < _flights.length; i++) {
                 var cf = _flights[i];
                 //cf.top = null;
-                if (i == 0)
-                { cf.top = j; last = cf; }
-                else
-                {
-                    if (!$scope.IsConflict(cf, last))
-                    { cf.top = j; last = cf; }
+                if (i == 0) { cf.top = j; last = cf; }
+                else {
+                    if (!$scope.IsConflict(cf, last)) { cf.top = j; last = cf; }
                 }
 
             }
             _flights = Enumerable.From(_flights).Where('$.top==null').ToArray();
-            
+
             j = j + 50;
         }
     }
 
-    $scope.ati_flights=null;
+    $scope.ati_flights = null;
+    //5-17
+    $scope.getResOrderIndex = function (reg) {
+        try {
+            var str = "";
+
+            if (reg.includes("CNL"))
+                str = "ZZZZZZ";
+            else
+
+                if (reg.includes(".")) {
+                    str = "ZZZZ" + reg.charAt(reg.length - 2);
+
+                }
+
+                else
+                    // str = reg.charAt(reg.length - 1);
+                    str = reg.substring(0, 2) + reg.charAt(reg.length - 1);
+
+            return str;
+        }
+        catch (ee) {
+
+            return "";
+        }
+
+    }
     $scope.bindFlights = function (callback) {
         $scope.baseDate = (new Date(Date.now())).toUTCString();
         dfrom = $scope._datefrom;
         $scope.datefrom = General.getDayFirstHour(new Date(dfrom));
         $scope.dateEnd = General.getDayLastHour(new Date(new Date(dfrom).addDays($scope.days_count - 1)));
 
-        $scope.dt_fromSearched=new Date($scope.datefrom);
-        $scope.dt_toSearched = new Date($scope.dateEnd) ;
+        $scope.dt_fromSearched = new Date($scope.datefrom);
+        $scope.dt_toSearched = new Date($scope.dateEnd);
 
-        $scope.btnGanttDisabled=false;
+        $scope.btnGanttDisabled = false;
         var now = new Date();
         if (now >= $scope.datefrom && now <= $scope.dateEnd)
             $scope.IsNowLine = true;
@@ -3140,8 +3974,13 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                     $scope.totalHeight += _d.maxTop;
                     _d.flights = flights;
                 });
+
+                //5-17
+                response.resources = Enumerable.From(response.resources).OrderBy(function (x) { return $scope.getResOrderIndex(x.resourceName); }).ToArray();
+
+
                 $scope.ganttData = response;
-                $scope.ati_flights= $scope.ganttData.flights;
+                $scope.ati_flights = $scope.ganttData.flights;
                 console.log($scope.ati_flights);
                 callback();
             }
@@ -3162,7 +4001,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         //tooki
         $scope.utimer = setTimeout(function () {
             //'info' | 'warning' | 'error' | 'success' | 'custom'
-             
+
 
             //////////////////////////
             var dto = {
@@ -3178,7 +4017,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             };
 
             flightService.getUpdatedFlights(dto).then(function (response) {
-                
+
                 $scope.baseDate = (new Date(Date.now())).toUTCString();
 
                 $.each(response.flights, function (_i, _d) {
@@ -3191,7 +4030,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                         for (var key in _d) {
                             if (_d.hasOwnProperty(key)) {
                                 _flight[key] = _d[key];
-                               
+
                             }
                         }
                     //var data = Enumerable.From($scope.dataSource).Where("$.ID==" + _d.ID).FirstOrDefault();
@@ -3309,7 +4148,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         $scope.showLog();
     };
 
-    
+
     $scope.loadingVisible = false;
     $scope.loadPanel = {
         message: 'Please wait...',
@@ -3331,16 +4170,16 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         }
     };
     ///////////////////////////////////
-  
+
     ////////////////////////////////
     $scope.FromWeatherVisible = true;
-    $scope.formatCellDateDay=function(dt){
+    $scope.formatCellDateDay = function (dt) {
         return moment(new Date(dt)).format('DD');
     };
-    $scope.formatCellDatePersian=function(dt){
+    $scope.formatCellDatePersian = function (dt) {
         persianDate.toLocale('en');
-       return  new persianDate(new Date(dt)).format("DD-MM-YY");
-        
+        return new persianDate(new Date(dt)).format("DD-MM-YY");
+
     };
     $scope.moment = function (date) {
         return moment(date).format('MMMM Do YYYY');
@@ -3374,8 +4213,8 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
     $scope.dg_columns3 = [
 
 
-             { dataField: 'Title', caption: 'No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false,   fixed: false, fixedPosition: 'left' },
-            { dataField: 'Value', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, },
+        { dataField: 'Title', caption: 'No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left' },
+        { dataField: 'Value', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, },
 
 
 
@@ -3383,7 +4222,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
     $scope.dg3_selected = null;
     $scope.dg3_instance = null;
     $scope.dg3_ds = null;
-    $scope.dg3_height=$scope.bottom-108;
+    $scope.dg3_height = $scope.bottom - 108;
     $scope.dg3 = {
         headerFilter: {
             visible: false
@@ -3406,7 +4245,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         selection: { mode: 'single' },
 
         columnAutoWidth: true,
-       // height: $scope.bottom-108,
+        // height: $scope.bottom-108,
 
         columns: $scope.dg_columns3,
         onContentReady: function (e) {
@@ -3445,110 +4284,109 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
         bindingOptions: {
             dataSource: 'dg3_ds',
-            height:'dg3_height'
+            height: 'dg3_height'
         }
     };
-   
-   
+
+
     //////////////////////////////////
-    $scope.ati_selectedFlights=null;
-    $scope.rangeFdps=[];
-    $scope.rangeCrews=[];
-    $scope.ati_fdps=[];
-    $scope.selectedFlightsKey=null;
-    $scope.setSelectedFlightsKey=function(){
-        if (!$scope.ati_selectedFlights || $scope.ati_selectedFlights.length==0){
-            $scope.selectedFlightsKey=null;
-            
+    $scope.ati_selectedFlights = null;
+    $scope.rangeFdps = [];
+    $scope.rangeCrews = [];
+    $scope.ati_fdps = [];
+    $scope.selectedFlightsKey = null;
+    $scope.setSelectedFlightsKey = function () {
+        if (!$scope.ati_selectedFlights || $scope.ati_selectedFlights.length == 0) {
+            $scope.selectedFlightsKey = null;
+
         }
-        else
-        {
-            var _fs=Enumerable.From($scope.ati_selectedFlights).OrderBy(function(x){return new Date(x.sta);}).ToArray();
-            var _fsid=[];
-            var _fsno=[];
-            $.each(_fs,function(_i,_d){
-                _fsid.push(_d.Id+(_d.dh==1?'*1':''));
-                _fsno.push(_d.no+(_d.dh==1?'*1':''));
+        else {
+            var _fs = Enumerable.From($scope.ati_selectedFlights).OrderBy(function (x) { return new Date(x.sta); }).ToArray();
+            var _fsid = [];
+            var _fsno = [];
+            $.each(_fs, function (_i, _d) {
+                _fsid.push(_d.Id + (_d.dh == 1 ? '*1' : ''));
+                _fsno.push(_d.no + (_d.dh == 1 ? '*1' : ''));
             });
-            $scope.selectedFlightsKey={Id:_fsid.join('_'), no:_fsno.join('_')};
+            $scope.selectedFlightsKey = { Id: _fsid.join('_'), no: _fsno.join('_') };
         }
     };
-    $scope.formatNOs=function(str){
+    $scope.formatNOs = function (str) {
         return str.split('_').join(',');
     }
     $scope.getRangeStyle = function () {
         return {
-            padding:  '0px 2px 0 3px',
+            padding: '0px 2px 0 3px',
             //overflowY:'auto',
-            height:($(window).height() -  $scope.bottom+1)+'px',
+            height: ($(window).height() - $scope.bottom + 1) + 'px',
         };
     };
-    $scope.getRangeStyleHeader=function(){
+    $scope.getRangeStyleHeader = function () {
         return {
-            
-            height:($(window).height() -  $scope.bottom-23)+'px',
+
+            height: ($(window).height() - $scope.bottom - 23) + 'px',
         };
     }
-    $scope.getRankOrder=function(rnk,index){
-        if (rnk=='IP')
+    $scope.getRankOrder = function (rnk, index) {
+        if (rnk == 'IP')
             return 0;
-        if (rnk=='P1')
+        if (rnk == 'P1')
             return 1;
-        if (rnk=='P2')
+        if (rnk == 'P2')
             return 2;
-        if (rnk=='SAFETY')
+        if (rnk == 'SAFETY')
             return 3;
-        if (rnk=='ISCCM')
+        if (rnk == 'ISCCM')
             return 4;
-        if (rnk=='SCCM')
+        if (rnk == 'SCCM')
             return 5;
-        if (rnk=='CCM')
-            return 6+index;
+        if (rnk == 'CCM')
+            return 6 + index;
         return 1000;
 
     };
 
-    $scope.fillRangeCrews = function(){
-        $scope.rangeCrews=[];
+    $scope.fillRangeCrews = function () {
+        $scope.rangeCrews = [];
         //var _selectedfids=Enumerable.From($scope.ati_selectedFlights).Select('$.Id').ToArray();
-        var table=[];
+        var table = [];
         console.log('fill range crews');
-        var seletedIds=Enumerable.From($scope.ati_selectedFlights).Select('$.Id').ToArray();
-        var flts=Enumerable.From($scope.ati_flights).Where(function(x){return seletedIds.indexOf(x.ID)!=-1;}).ToArray();
+        var seletedIds = Enumerable.From($scope.ati_selectedFlights).Select('$.Id').ToArray();
+        var flts = Enumerable.From($scope.ati_flights).Where(function (x) { return seletedIds.indexOf(x.ID) != -1; }).ToArray();
         console.log(flts);
-        $.each(flts,function(_i,_f){
-            $.each(_f.crew,function(_j,_c){
-               
-                var exist=Enumerable.From(table).Where('$.Id=='+_c.Id).FirstOrDefault();
+        $.each(flts, function (_i, _f) {
+            $.each(_f.crew, function (_j, _c) {
+
+                var exist = Enumerable.From(table).Where('$.Id==' + _c.Id).FirstOrDefault();
                 if (exist)
                     exist.count++;
                 else
-                    table.push({Id:_c.Id,count:1,rank:_c.rank,name:_c.name,order:_c.order});
+                    table.push({ Id: _c.Id, count: 1, rank: _c.rank, name: _c.name, order: _c.order });
             });
         });
-        $scope.rangeCrews=Enumerable.From(table).Where('$.count=='+seletedIds.length).OrderBy('$.order').ToArray();
+        $scope.rangeCrews = Enumerable.From(table).Where('$.count==' + seletedIds.length).OrderBy('$.order').ToArray();
 
     };
 
-    $scope.fillRangeFdps=function(){
+    $scope.fillRangeFdps = function () {
         // $scope.ati_selectedFlights.push({Id:$d.data('flightid'), dh:!$d.data('dh')?0:$d.data('dh'), sta:new Date($d.data('sta')), std:new Date($d.data('std')), no:$d.data('no') });
         //$.each($scope.ati_selectedFlights,function(_i,_d){
         //    fdp.ids.push({id:_d.Id,dh:_d.dh});
         //});
-       
-        $scope.rangeFdps=[];
-        var _selectedfids=Enumerable.From($scope.ati_selectedFlights).Select('$.Id').ToArray();
-        var _selectedNos=Enumerable.From($scope.ati_selectedFlights).Select('$.no').ToArray().join(',');
+
+        $scope.rangeFdps = [];
+        var _selectedfids = Enumerable.From($scope.ati_selectedFlights).Select('$.Id').ToArray();
+        var _selectedNos = Enumerable.From($scope.ati_selectedFlights).Select('$.no').ToArray().join(',');
         //alert(_selectedNos);
-        $.each($scope.ati_fdps,function(_i,_d){
-            
-            var _ids=Enumerable.From(_d.ids).Where(function(x){
-                return  _selectedfids.indexOf(x.id)!=-1;
+        $.each($scope.ati_fdps, function (_i, _d) {
+
+            var _ids = Enumerable.From(_d.ids).Where(function (x) {
+                return _selectedfids.indexOf(x.id) != -1;
             }).ToArray();
-            if (_ids.length/*==_d.ids.length*/>0){
-                var exist=Enumerable.From($scope.rangeFdps).Where('$.key=="'+_d.key+'"').FirstOrDefault();
-                if (!exist){
-                    exist={key:_d.key,no:_d.no,fdps:[]};
+            if (_ids.length/*==_d.ids.length*/ > 0) {
+                var exist = Enumerable.From($scope.rangeFdps).Where('$.key=="' + _d.key + '"').FirstOrDefault();
+                if (!exist) {
+                    exist = { key: _d.key, no: _d.no, fdps: [] };
                     $scope.rangeFdps.push(exist);
                 }
                 exist.fdps.push(_d);
@@ -3563,141 +4401,310 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             //}
         });
 
-        $.each($scope.rangeFdps,function(_i,_d){
+        $.each($scope.rangeFdps, function (_i, _d) {
             console.log('piano');
             console.log(_d.key);
-            if (_d.fdps)
-            {
-                _d.fdps=Enumerable.From(_d.fdps).OrderBy(function(x){ return $scope.getRankOrder(x.rank,x.index);}).ToArray();
-               
+            if (_d.fdps) {
+                _d.fdps = Enumerable.From(_d.fdps).OrderBy(function (x) { return $scope.getRankOrder(x.rank, x.index); }).ToArray();
+
             }
         });
-        
-       
+
+
     }
-    $scope.removeAssignedFDP = function (id,callback) {
+    $scope.removeAssignedFDP = function (id, callback) {
 
 
         var dto = { Id: id };
         $scope.loadingVisible = true;
         flightService.deleteFDP(dto).then(function (response) {
             $scope.loadingVisible = false;
-          
+
             callback(response);
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
 
     };
     //hoohoo
+    //2020-11-22  
+    $scope.notifyPos = function (id) {
 
-    $scope.notifyPos=function(id){
-         
-        var fdp=Enumerable.From($scope.ati_fdps).Where('($.crewId=='+id+ ' && $.key=="'+$scope.selectedFlightsKey.Id+'")').ToArray()[0];
-       
-        if (fdp){
-            
-            
-            var dto = { Ids: [fdp.Id]  };
-            
-                dto.Date=new Date();
+        var fdp = Enumerable.From($scope.ati_fdps).Where('($.crewId==' + id + ' && $.key=="' + $scope.selectedFlightsKey.Id + '")').ToArray()[0];
+
+        if (fdp) {
+
+
+            var dto = { Ids: [fdp.Id] };
+
+            dto.Date = new Date();
+            dto.UserName = $rootScope.userName;
             $scope.loadingVisible = true;
-        
+
             flightService.dutiesSendSMS(dto).then(function (response) {
                 $scope.loadingVisible = false;
                 General.ShowNotify("The message/notification was successfully sent.", 'success');
 
 
             }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
-          
+
 
         }
     };
-    $scope.removePos=function(id,rnk){
-       
-        if (!$scope.editable && !$scope.isAdmin ){
-                
+    //////////////////////////////////////
+    $scope.removePos = function (id, rnk) {
+
+        if (!$scope.editable && !$scope.isAdmin) {
+
             var myDialog = DevExpress.ui.dialog.custom({
                 rtlEnabled: true,
                 title: "Error",
                 message: "You cannot modify crew list due to FLIGHT STATUS.Please contact the administrator.",
-                buttons: [ { text: "OK", onClick: function () {  } }]
+                buttons: [{ text: "OK", onClick: function () { } }]
             });
             myDialog.show();
             return;
         }
-        var fdp=Enumerable.From($scope.ati_fdps).Where('($.crewId=='+id+ ' && $.key=="'+$scope.selectedFlightsKey.Id+'")').ToArray()[0];
-       
-        if (fdp){
-            $scope.removeAssignedFDP(fdp.Id,function(_flt){
-                var _cr=Enumerable.From($scope.ds_crew).Where('$.Id=='+id).FirstOrDefault();
-                if (_cr && _cr.FlightSum){
-                    _cr.FlightSum=_cr.FlightSum-_flt;
+        var fdp = Enumerable.From($scope.ati_fdps).Where('($.crewId==' + id + ' && $.key=="' + $scope.selectedFlightsKey.Id + '")').ToArray()[0];
+
+        if (fdp) {
+            $scope.removeAssignedFDP(fdp.Id, function (_flt) {
+                var _cr = Enumerable.From($scope.ds_crew).Where('$.Id==' + id).FirstOrDefault();
+                if (_cr && _cr.FlightSum) {
+                    _cr.FlightSum = _cr.FlightSum - _flt;
                 }
-                $scope.currentAssigned.CrewIds=Enumerable.From($scope.currentAssigned.CrewIds).Where('$!='+id).ToArray();
-                $scope.currentAssigned[rnk+'Id']=null;
-                $scope.currentAssigned[rnk]=null;
-                $scope.currentAssigned[rnk+'Group']=null;
-                $scope.ati_fdps=Enumerable.From($scope.ati_fdps).Where('!($.crewId=='+id+ ' && $.key=="'+$scope.selectedFlightsKey.Id+'")').ToArray();
+                $scope.currentAssigned.CrewIds = Enumerable.From($scope.currentAssigned.CrewIds).Where('$!=' + id).ToArray();
+                $scope.currentAssigned[rnk + 'Id'] = null;
+                $scope.currentAssigned[rnk] = null;
+                $scope.currentAssigned[rnk + 'Group'] = null;
+                $scope.ati_fdps = Enumerable.From($scope.ati_fdps).Where('!($.crewId==' + id + ' && $.key=="' + $scope.selectedFlightsKey.Id + '")').ToArray();
                 $scope.fillFilteredCrew();
                 $scope.fillRangeFdps();
                 $scope.fillFlightCrews();
                 $scope.fillRangeCrews();
-                
+
             });
-          
+
 
         }
 
-      
+
     }
-    $scope.clearPos=function(keep){
-        var rnks=['P11','P21','ISCCM1','SCCM1','SCCM2','CCM1','CCM2','CCM3','CCM4','IP1','OBS1','CHECK1','SAFETY1'];
-        $.each(rnks,function(_i,rnk){
-            $scope.currentAssigned[rnk+'Id']=null;
-            $scope.currentAssigned[rnk]=null;
-            $scope.currentAssigned[rnk+'Group']=null;
-           
+    //magu39
+    $scope.clearPos = function (keep) {
+        var rnks = ['P11', 'P12', 'P13', 'P14', 'P15', 'P21',
+            'P22', 'P23', 'P24', 'P25',
+            'ISCCM1', 'ISCCM2', 'ISCCM3', 'ISCCM4', 'ISCCM5',
+            'SCCM1', 'SCCM2', 'SCCM3', 'SCCM4', 'SCCM5',
+            'CCM1', 'CCM2', 'CCM3', 'CCM4', 'CCM5',
+            'IP1', 'IP2', 'IP3', 'IP4', 'IP5',
+            'OBS1', 'OBS2', 'OBS3', 'OBS4', 'OBS5',
+            'CHECK1', 'CHECK2', 'CHECK3', 'CHECK4', 'CHECK5',
+            'SAFETY1', 'SAFETY2', 'SAFETY3', 'SAFETY4', 'SAFETY5',
+        ];
+        $.each(rnks, function (_i, rnk) {
+            $scope.currentAssigned[rnk + 'Id'] = null;
+            $scope.currentAssigned[rnk] = null;
+            $scope.currentAssigned[rnk + 'Group'] = null;
+
         });
-        $scope.currentAssigned.CrewIds=[];
-        if (!keep)
-        { $('.crewpos').removeClass('selected');
-        
-            $scope.selectedPos=null;
+        $scope.currentAssigned.CrewIds = [];
+        if (!keep) {
+            $('.crewpos').removeClass('selected');
+
+            $scope.selectedPos = null;
         }
         $scope.fillFilteredCrew();
     }
-    $scope.fillPos=function(keep){
+
+    //2021-1-4 
+     
+    $scope.indexPos = {
+        SCCM: 1,
+        P1: 1,
+        P2: 1,
+        IP: 0,
+        OBS: 0, 
+        CHECK: 0,
+        CCM: 3,
+        ISCCM: 0,
+        SAFETY:0,
+
+    };
+    $scope.posVisible = {
+        IP1: false,
+        IP2: false,
+        IP3: false,
+        IP4: false,
+        IP5: false,
+        ISCCM1: false,
+        ISCCM2: false,
+        ISCCM3: false,
+        ISCCM4: false,
+        ISCCM5: false,
+        SCCM2: false,
+        SCCM3: false,
+        SCCM4: false,
+        SCCM5: false,
+        OBS1: false,
+        OBS2: false,
+        OBS3: false,
+        OBS4: false,
+        OBS5: false,
+        CHECK1: false,
+        CHECK2: false,
+        CHECK3: false,
+        CHECK4: false,
+        CHECK5: false,
+        SAFETY1: false,
+        SAFETY2: false,
+        SAFETY3: false,
+        SAFETY4: false,
+        SAFETY5: false,
+        P12: false,
+        P13: false,
+        P14: false,
+        P15: false,
+        P22: false,
+        P23: false,
+        P24: false,
+        P25: false,
+        CCM4: false,
+        CCM5:false,
+
+    };
+    $scope.posVisibleClick = function (pos) {
+        if ($scope.currentAssigned[pos]) {
+            General.ShowNotify("Please remove ASSIGNED CREW.", 'error');
+            return;
+        };
+        $scope.posVisible[pos] = !$scope.posVisible[pos];
+    };
+
+    $scope.posVisibleClick2 = function (pos) {
+        
+        if ($scope.indexPos[pos] == 5)
+            return;
+        
+
+        $scope.indexPos[pos]++;
+        if ($scope.posVisible[pos + $scope.indexPos[pos].toString()])
+            $scope.posVisibleClick2(pos);
+        $scope.posVisible[pos + $scope.indexPos[pos].toString()] = true;
+    };
+    $scope.getSelectedPosStyle = function (pos) {
+        if ($scope.posVisible[pos])
+            return {
+                background: '#00b386',
+                color: 'white',
+            };
+        else
+            return {
+                background: 'white',
+                color: 'gray',
+            };
+    }
+     //magu39
+    $scope.refreshPos = function () {
+        $scope.indexPos = {
+            SCCM: 1,
+            P1: 1,
+            P2: 1,
+            IP: 0,
+            OBS: 0,
+            CHECK: 0,
+            CCM: 3,
+            ISCCM: 0,
+            SAFETY:0,
+
+        };
+        $scope.posVisible.IP1 = false;
+        $scope.posVisible.IP2 = false;
+        $scope.posVisible.IP3 = false;
+        $scope.posVisible.IP4 = false;
+        $scope.posVisible.IP5 = false;
+        $scope.posVisible.ISCCM1 = false;
+        $scope.posVisible.ISCCM2 = false;
+        $scope.posVisible.ISCCM3 = false;
+        $scope.posVisible.ISCCM4 = false;
+        $scope.posVisible.ISCCM5 = false;
+        $scope.posVisible.SCCM2 = false;
+        $scope.posVisible.SCCM3 = false;
+        $scope.posVisible.SCCM4 = false;
+        $scope.posVisible.SCCM5 = false;
+        $scope.posVisible.CCM4 = false;
+        $scope.posVisible.CCM5 = false;
+        $scope.posVisible.OBS1 = false;
+        $scope.posVisible.OBS2 = false;
+        $scope.posVisible.OBS3 = false;
+        $scope.posVisible.OBS4 = false;
+        $scope.posVisible.OBS5 = false;
+        $scope.posVisible.CHECK1 = false;
+        $scope.posVisible.CHECK2 = false;
+        $scope.posVisible.CHECK3 = false;
+        $scope.posVisible.CHECK4 = false;
+        $scope.posVisible.CHECK5 = false;
+        $scope.posVisible.SAFETY1 = false;
+        $scope.posVisible.SAFETY2 = false;
+        $scope.posVisible.SAFETY3 = false;
+        $scope.posVisible.SAFETY4 = false;
+        $scope.posVisible.SAFETY5 = false;
+
+        $scope.posVisible.P12 = false;
+        $scope.posVisible.P13 = false;
+        $scope.posVisible.P14 = false;
+        $scope.posVisible.P15 = false;
+
+        $scope.posVisible.P22 = false;
+        $scope.posVisible.P23 = false;
+        $scope.posVisible.P24 = false;
+        $scope.posVisible.P25 = false;
+    };
+    $scope.fillPos = function (keep) {
+        //magu39
+        $scope.refreshPos();
+
         $scope.clearPos(keep);
-        var _id=$scope.selectedFlightsKey.Id;
+        var _id = $scope.selectedFlightsKey.Id;
         console.log(_id);
         console.log($scope.ati_fdps);
-        var _fdps=Enumerable.From($scope.ati_fdps).Where("$.key=='"+_id+"'").ToArray();
+        var _fdps = Enumerable.From($scope.ati_fdps).Where("$.key=='" + _id + "'").ToArray();
         console.log(_fdps);
-        $.each(_fdps,function(_i,_d){
+        $.each(_fdps, function (_i, _d) {
             $scope.currentAssigned.CrewIds.push(_d.crewId);
-            $scope.currentAssigned[_d.rank+_d.index.toString()+'Id']=_d.crewId;
-            $scope.currentAssigned[_d.rank+_d.index.toString()]=_d.scheduleName;
-            $scope.currentAssigned[_d.rank+_d.index.toString()+'Group']=_d.group;
-           
+            $scope.currentAssigned[_d.rank + _d.index.toString() + 'Id'] = _d.crewId;
+            $scope.currentAssigned[_d.rank + _d.index.toString()] = _d.scheduleName;
+            $scope.currentAssigned[_d.rank + _d.index.toString() + 'Group'] = _d.group;
+
+            //2021-1-4
+            $scope.posVisible[_d.rank + _d.index.toString()] = true;
+
         });
-      
+
         $scope.fillFilteredCrew();
     }
     /////////////////////////////////////////
-    $scope.offReason=5;
-    $scope.offRemark=null;
-    $scope.offReasonDs=[
-         {id:5,title:'Canceled - Rescheduling'}
-        ,{id:1,title:'Refused'}
-         
-        ,{id:2,title:'Canceled - Flight(s) cancellations'}
-         ,{id:3,title:'Canceled - Change of Aircraft Type'}
-           ,{id:4,title:'Canceled - Duty/Flight time limitation'}
-            ,{id:6,title:'Canceled - Not using Split Duty'}
+    $scope.offReason = 5;
+    $scope.offRemark = null;
+    $scope.offReasonDs = [
+       
+        { id: 1, title: 'Refused-Sick' }
+        , { id: 7, title: 'Refused-Not Home' }
+        , { id: 8, title: 'Refused-Family Problem' }
+
+        , { id: 9, title: 'Canceled - Training' }
+       ,  { id: 5, title: 'Canceled - Rescheduling' }
+        , { id: 2, title: 'Canceled - Flight(s) cancellations' }
+        , { id: 3, title: 'Canceled - Change of Aircraft Type' }
+        , { id: 4, title: 'Canceled - Duty/Flight time limitation' }
+        , { id: 6, title: 'Canceled - Not using Split Duty' }
+
+        , { id: 10, title: 'Ground - Operation' }
+        , { id: 11, title: 'Ground - Expired License' }
+        , { id: 12, title: 'Ground - Medical' }
     ];
     $scope.offNotify = false;
     $scope.check_offnotify = {
-        
+
         text: "Send Notification",
 
         bindingOptions: {
@@ -3722,16 +4729,17 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
 
     };
-    $scope.txt_offremark={
-        height:100,
-        bindingOptions:{
-            value:'offRemark'
+    $scope.txt_offremark = {
+        height: 100,
+        bindingOptions: {
+            value: 'offRemark'
         }
     };
-    $scope.tempOffFDP=null;
-    $scope.tempOffCrew=null;
+    $scope.tempOffFDP = null;
+    $scope.tempOffCrew = null;
     $scope.popup_off_visible = false;
     $scope.popup_off_title = 'Cancel/Refuse';
+
     $scope.popup_off = {
         elementAttr: {
             //  id: "elementId",
@@ -3744,51 +4752,50 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         fullScreen: false,
         showTitle: true,
         dragEnabled: true,
-      
+
         toolbarItems: [
-             
-             {
-                 widget: 'dxButton', location: 'after', options: {
-                     type: 'success', text: 'Save',validationGroup:"offflight",  onClick: function (arg) {
-                         
-                         var result = arg.validationGroup.validate();
 
-                         if (!result.isValid) {
-                             General.ShowNotify(Config.Text_FillRequired, 'error');
-                             return;
-                         }
-                         // $scope.offFlights=function(crew,reason,remark,notify,noflight){
-                         //$scope.offNotify
-                         //gooz
-                         if ($scope.tempOffFDP){
-                             var flts=[];
-                             $.each($scope.tempOffFDP.ids,function(_i,_d){
-                                 flts.push({Id:_d.id});
-                             });
-                             $scope.offFlights(flts,{Id:$scope.tempOffFDP.crewId},$scope.offReason,$scope.offRemark,$scope.offNotify,0,function(){$scope.popup_off_visible = false;});
-                         }
-                         else
-                         {
-                             $scope.offFlights(null,$scope.tempOffCrew,$scope.offReason,$scope.offRemark,$scope.offNotify,0,function(){$scope.popup_off_visible = false;});
-                         }
-                         
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Save', validationGroup: "offflight", onClick: function (arg) {
 
-                         
-                        
+                        var result = arg.validationGroup.validate();
 
-                     }
-                 }, toolbar: 'bottom'
-             },
-            
-          {
-              widget: 'dxButton', location: 'after', options: {
-                  type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
+                        if (!result.isValid) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+                        // $scope.offFlights=function(crew,reason,remark,notify,noflight){
+                        //$scope.offNotify
+                        //gooz
+                        if ($scope.tempOffFDP) {
+                            var flts = [];
+                            $.each($scope.tempOffFDP.ids, function (_i, _d) {
+                                flts.push({ Id: _d.id });
+                            });
+                            $scope.offFlights(flts, { Id: $scope.tempOffFDP.crewId }, $scope.offReason, $scope.offRemark, $scope.offNotify, 0, function () { $scope.popup_off_visible = false; });
+                        }
+                        else {
+                            $scope.offFlights(null, $scope.tempOffCrew, $scope.offReason, $scope.offRemark, $scope.offNotify, 0, function () { $scope.popup_off_visible = false; });
+                        }
 
-                      $scope.popup_off_visible = false;
 
-                  }
-              }, toolbar: 'bottom'
-          }
+
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
+
+                        $scope.popup_off_visible = false;
+
+                    }
+                }, toolbar: 'bottom'
+            }
         ],
         visible: false,
 
@@ -3798,17 +4805,17 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             // $(e.titleElement).css('background-color', '#f2552c');
         },
         onShowing: function (e) {
- 
+
         },
         onShown: function (e) {
-            
+
         },
         onHiding: function () {
             //$scope.offReason=5;
             //$scope.offRemark=null;
             // $scope.offNotify = false;
-            $scope.tempOffCrew=null;
-            $scope.tempOffFDP=null;
+            $scope.tempOffCrew = null;
+            $scope.tempOffFDP = null;
             $scope.popup_off_visible = false;
 
         },
@@ -3816,54 +4823,55 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             visible: 'popup_off_visible',
 
             title: 'popup_off_title',
-            
+
         }
     };
 
     ////////////////////////////////////////
-    $scope.offFlights2=function(crew){
-        $scope.tempOffCrew=crew;
-        $scope.popup_off_visible=true;
+    $scope.offFlights2 = function (crew) {
+        $scope.tempOffCrew = crew;
+        $scope.popup_off_visible = true;
     };
-    $scope.offFlights3=function(fdp){
-        $scope.tempOffFDP=fdp;
-        $scope.popup_off_visible=true;
+    $scope.offFlights3 = function (fdp) {
+        $scope.tempOffFDP = fdp;
+        $scope.popup_off_visible = true;
     };
-    $scope.offFlights4=function(cid){
-        $scope.tempOffCrew={Id:cid};
-        $scope.popup_off_visible=true;
+    $scope.offFlights4 = function (cid) {
+        $scope.tempOffCrew = { Id: cid };
+        $scope.popup_off_visible = true;
     };
-    $scope.offFlights=function(flights,crew,reason,remark,notify,noflight,callback){
+    $scope.offFlights = function (flights, crew, reason, remark, notify, noflight, callback) {
         //alert('x');
         //console.log('off flights');
         //console.log(crew);
         //console.log($scope.ati_selectedFlights);
-        if (!$scope.editable && !$scope.isAdmin ){
-                
+        if (!$scope.editable && !$scope.isAdmin) {
+
             var myDialog = DevExpress.ui.dialog.custom({
                 rtlEnabled: true,
                 title: "Error",
                 message: "You cannot modify crew list due to FLIGHT STATUS.Please contact the administrator.",
-                buttons: [ { text: "OK", onClick: function () {  } }]
+                buttons: [{ text: "OK", onClick: function () { } }]
             });
             myDialog.show();
             return;
         }
         if (!flights)
-            flights=Enumerable.From($scope.ati_selectedFlights).ToArray();
-        var fids=Enumerable.From(flights).Select('$.Id').ToArray().join('*');
-        var dto = { crewId: crew.Id,flights:fids,reason:reason,remark:remark,notify:notify,noflight:noflight };
-        
-        
+            flights = Enumerable.From($scope.ati_selectedFlights).ToArray();
+        var fids = Enumerable.From(flights).Select('$.Id').ToArray().join('*');
+        var dto = { crewId: crew.Id, flights: fids, reason: reason, remark: remark, notify: notify, noflight: noflight };
+        //2020-11-22
+        dto.UserName = $rootScope.userName;
+
         $scope.loadingVisible = true;
         flightService.fdpsOffbyFlights(dto).then(function (response) {
             $scope.loadingVisible = false;
-          
+
             console.log('off flights result');
             console.log(response);
-            //doolmikh
-            $scope.ati_fdps=Enumerable.From($scope.ati_fdps).Where(function(x){return response.removed.indexOf(x.Id)==-1 && response.updatedId.indexOf(x.Id)==-1;}).ToArray();
-            $.each(response.updated,function(_i,_d){
+            
+            $scope.ati_fdps = Enumerable.From($scope.ati_fdps).Where(function (x) { return response.removed.indexOf(x.Id) == -1 && response.updatedId.indexOf(x.Id) == -1; }).ToArray();
+            $.each(response.updated, function (_i, _d) {
                 $scope.ati_fdps.push(_d);
             });
             $scope.fillPos(true);
@@ -3871,118 +4879,118 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             $scope.fillRangeFdps();
             $scope.fillFlightCrews();
             $scope.fillRangeCrews();
-            if (callback){
+            if (callback) {
                 callback();
             }
-            
+
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
     };
-    $scope.removeFDP=function(fdp){
+    $scope.removeFDP = function (fdp) {
         //khar
-        if (!$scope.editable && !$scope.isAdmin ){
-                
+        if (!$scope.editable && !$scope.isAdmin) {
+
             var myDialog = DevExpress.ui.dialog.custom({
                 rtlEnabled: true,
                 title: "Error",
                 message: "You cannot modify crew list due to FLIGHT STATUS.Please contact the administrator.",
-                buttons: [ { text: "OK", onClick: function () {  } }]
+                buttons: [{ text: "OK", onClick: function () { } }]
             });
             myDialog.show();
             return;
         }
-        
-        $scope.removeAssignedFDP(fdp.Id,function(_flt){
-            var _cr=Enumerable.From($scope.ds_crew).Where('$.Id=='+fdp.crewId).FirstOrDefault();
-            if (_cr && _cr.FlightSum){
-                _cr.FlightSum=_cr.FlightSum-_flt;
+
+        $scope.removeAssignedFDP(fdp.Id, function (_flt) {
+            var _cr = Enumerable.From($scope.ds_crew).Where('$.Id==' + fdp.crewId).FirstOrDefault();
+            if (_cr && _cr.FlightSum) {
+                _cr.FlightSum = _cr.FlightSum - _flt;
             }
-            $scope.ati_fdps=Enumerable.From($scope.ati_fdps).Where('$.Id!='+fdp.Id).ToArray();
+            $scope.ati_fdps = Enumerable.From($scope.ati_fdps).Where('$.Id!=' + fdp.Id).ToArray();
             $scope.fillPos(true);
             $scope.fillRangeFdps();
             $scope.fillFlightCrews();
             $scope.fillRangeCrews();
         });
-       
+
     }
-    $scope.DatetoStr=function(tempDate){
+    $scope.DatetoStr = function (tempDate) {
         return moment(tempDate).format('YYYYMMDDHHmm');
     };
-    $scope.StrToDate=function(str){
+    $scope.StrToDate = function (str) {
         var a = moment(str, 'YYYYMMDDHHmm');
         return new Date(a);
     };
     //dooltalk
-    $scope.getFlightLength=function(fdp){
-        var total=0;
-        $.each(fdp.flights,function(_i,_d){
-            var prts=_d.split('_');
-            var _std=prts[2];
-            var _sta=prts[3];
-            var std=$scope.StrToDate(_std);
-            var sta=$scope.StrToDate(_sta);
+    $scope.getFlightLength = function (fdp) {
+        var total = 0;
+        $.each(fdp.flights, function (_i, _d) {
+            var prts = _d.split('_');
+            var _std = prts[2];
+            var _sta = prts[3];
+            var std = $scope.StrToDate(_std);
+            var sta = $scope.StrToDate(_sta);
             var diff = Math.abs(sta - std);
-            total+=Math.floor((diff/1000)/60);
+            total += Math.floor((diff / 1000) / 60);
         });
 
         return total;
     }
     //book
-    $scope.fillFlightCrews = function(){
-        $.each($scope.ati_flights,function(_i,_d){
-            _d.crew=[];
-            _d.P1=0;
-            _d.IP=0;
-            _d.P2=0;
-            _d.SCCM=0;
-            _d.ISCCM=0;
-            _d.CCM=0;
-            _d.hasCrew=false;
-            _d.hasCabin=false;
-            _d.hasCockpit=false;
-            _d.hasCrewAll=false;
-            _d.hasOffItem=false;
-            _d.offItems=[];
+    $scope.fillFlightCrews = function () {
+        $.each($scope.ati_flights, function (_i, _d) {
+            _d.crew = [];
+            _d.P1 = 0;
+            _d.IP = 0;
+            _d.P2 = 0;
+            _d.SCCM = 0;
+            _d.ISCCM = 0;
+            _d.CCM = 0;
+            _d.hasCrew = false;
+            _d.hasCabin = false;
+            _d.hasCockpit = false;
+            _d.hasCrewAll = false;
+            _d.hasOffItem = false;
+            _d.offItems = [];
         });
-        $.each($scope.ati_fdps,function(_i,fdp){
-            $.each(fdp.flights,function(_j,flt){
+        $.each($scope.ati_fdps, function (_i, fdp) {
+            $.each(fdp.flights, function (_j, flt) {
                 //fdp.flights.push(flt.ID+'_'+_d.dh+'_'+$scope.DatetoStr(new Date(flt.STD))+'_'+$scope.DatetoStr(new Date(flt.STA))+'_'+flt.FlightNumber+'_'+flt.FromAirportIATA+'_'+flt.ToAirportIATA);
-                var fid=flt.split('_')[0];
-                var dh=flt.split('_')[1];
-                var flight=Enumerable.From($scope.ati_flights).Where('$.ID=='+fid).FirstOrDefault();
-                if (flight){
-                    
-                    flight.crew.push({name:fdp.scheduleName+(dh==1?'(DH)':''),rank:fdp.rank,index:fdp.index,order:$scope.getRankOrder(fdp.rank,fdp.index),dh:dh,Id:fdp.crewId});
-                    flight[fdp.rank]++;
-                    if (flight[fdp.rank]>0)
-                        flight.hasCrew=true;
-                    if (fdp.rank=='P1' || fdp.rank=='P2' || fdp.rank=='IP' || fdp.rank=='SAFETY')
-                        flight.hasCockpit=true;
-                    if (fdp.rank=='ISCCM' || fdp.rank=='SCCM' || fdp.rank=='CCM'  )
-                        flight.hasCabin=true;
+                var fid = flt.split('_')[0];
+                var dh = flt.split('_')[1];
+                var flight = Enumerable.From($scope.ati_flights).Where('$.ID==' + fid).FirstOrDefault();
+                if (flight) {
 
-                   
+                    flight.crew.push({ name: fdp.scheduleName + (dh == 1 ? '(DH)' : ''), rank: fdp.rank, index: fdp.index, order: $scope.getRankOrder(fdp.rank, fdp.index), dh: dh, Id: fdp.crewId });
+                    flight[fdp.rank]++;
+                    if (flight[fdp.rank] > 0)
+                        flight.hasCrew = true;
+                    if (fdp.rank == 'P1' || fdp.rank == 'P2' || fdp.rank == 'IP' || fdp.rank == 'SAFETY')
+                        flight.hasCockpit = true;
+                    if (fdp.rank == 'ISCCM' || fdp.rank == 'SCCM' || fdp.rank == 'CCM')
+                        flight.hasCabin = true;
+
+
 
                 }
             });
         });
 
-        $.each($scope.ati_flights,function(_i,_d){
-            
-            var _cbn=_d.ISCCM+_d.SCCM+_d.CCM;
-               
-            if (((_d.P1>=1 && _d.P2>=1) || (_d.IP>=1 && _d.P2>=1) || (_d.IP>=1 && _d.P1>=1)    ) && /*_d.SCCM>=1 && _d.CCM>=3*/ _cbn>=4)
-                _d.hasCrewAll=true;
-            _d.crew=Enumerable.From(_d.crew).OrderBy('$.order').ToArray();
+        $.each($scope.ati_flights, function (_i, _d) {
+
+            var _cbn = _d.ISCCM + _d.SCCM + _d.CCM;
+
+            if (((_d.P1 >= 1 && _d.P2 >= 1) || (_d.IP >= 1 && _d.P2 >= 1) || (_d.IP >= 1 && _d.P1 >= 1)) && /*_d.SCCM>=1 && _d.CCM>=3*/ _cbn >= 4)
+                _d.hasCrewAll = true;
+            _d.crew = Enumerable.From(_d.crew).OrderBy('$.order').ToArray();
             //if (flight.FlightStatusID==4)
             {
-                var _offitems=Enumerable.From($scope.ati_offitems).Where('$.FlightId=='+_d.ID).ToArray();
+                var _offitems = Enumerable.From($scope.ati_offitems).Where('$.FlightId==' + _d.ID).ToArray();
                 console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&7');
                 console.log(_offitems);
-                _d.offItems=_offitems;
-                if (_d.offItems && _d.offItems.length>0)
-                    _d.hasOffItem=true;
+                _d.offItems = _offitems;
+                if (_d.offItems && _d.offItems.length > 0)
+                    _d.hasOffItem = true;
 
-                        
+
             }
         });
 
@@ -3990,12 +4998,16 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         console.log(Enumerable.From($scope.ati_flights).Where('$.hasCrew').ToArray());
     }
     ////////////////////////////////
+    //magu39
     $scope.getDefaultPositionId = function (pos) {
 
         switch (pos) {
             case 'IP':
             case 'IP1':
             case 'IP2':
+            case 'IP3':
+            case 'IP4':
+            case 'IP5':
             case 'TRE':
             case 'TRI':
             case 'LTC':
@@ -4018,9 +5030,19 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             case 'Safety':
             case 'Safety1':
             case 'Safety2':
+            case 'SAFETY':
+            case 'SAFETY1':
+            case 'SAFETY2':
+            case 'SAFETY3':
+            case 'SAFETY4':
+            case 'SAFETY5':
                 return 1162;
             case 'ISCCM':
             case 'ISCCM1':
+            case 'ISCCM2':
+            case 'ISCCM3':
+            case 'ISCCM4':
+            case 'ISCCM5':
                 return 10002;
             case 'SCCM':
             case 'SCCM1':
@@ -4039,17 +5061,24 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             case 'OBS':
             case 'OBS1':
             case 'OBS2':
+            case 'OBS3':
+            case 'OBS4':
+            case 'OBS5':
                 return 1153;
             case 'CHECK':
             case 'CHECK1':
             case 'CHECK2':
+            case 'CHECK3':
+            case 'CHECK4':
+            case 'CHECK5':
+
                 return 1154;
             default:
                 return pos;
         }
     };
-    $scope.activeStby = function (crew,stbyid,rank,index,fdp) {
-        
+    $scope.activeStby = function (crew, stbyid, rank, index, fdp) {
+
         //FDPId
         var flts = Enumerable.From($scope.ati_selectedFlights).OrderBy(function (x) { return new Date(x.std); }).ToArray();
         var fltIds = Enumerable.From(flts).Select('$.Id').ToArray();
@@ -4064,35 +5093,35 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             console.log('STBY STAT');
             console.log(response);
             if (response.maxFDPError) {
-                 
+
                 var myDialog = DevExpress.ui.dialog.custom({
                     rtlEnabled: true,
                     title: "Error",
                     message: 'MAX FDP ERROR DUE TO STBY REDUCTION',
-                    buttons: [ { text: "OK", onClick: function () {  } }]
+                    buttons: [{ text: "OK", onClick: function () { } }]
                 });
                 myDialog.show();
                 return;
             }
             if (response.durationError) {
-                
+
                 var myDialog = DevExpress.ui.dialog.custom({
                     rtlEnabled: true,
                     title: "Error",
                     message: 'TOTAL DURATION IS GREATER THAN 18 HOURS',
-                    buttons: [ { text: "OK", onClick: function () {  } }]
+                    buttons: [{ text: "OK", onClick: function () { } }]
                 });
                 myDialog.show();
                 return;
             }
-            
+
             //doolnaz
             var dto = {
                 crewId: crew.Id,
                 stbyId: stbyid,
                 fids: fltIdsStr,
                 rank: $scope.getDefaultPositionId(rank),
-                index:index,
+                index: index,
             };
             $scope.loadingVisible = true;
 
@@ -4101,17 +5130,17 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                 console.log('stby activated');
                 console.log(response);
                 var fdpId = response.Id; //$scope.activatedStbys.length + 1;
-                fdp.Id=fdpId;
-                     
+                fdp.Id = fdpId;
+
                 $scope.ati_fdps.push(fdp);
-                  
+
                 $scope.currentAssigned.CrewIds.push(crew.Id);
-                $scope.currentAssigned[$scope.selectedPos.rank+$scope.selectedPos.index.toString()+'Id']=crew.Id;
-                $scope.currentAssigned[$scope.selectedPos.rank+$scope.selectedPos.index.toString()]=crew.ScheduleName;
-                $scope.currentAssigned[$scope.selectedPos.rank+$scope.selectedPos.index.toString()+'Group']=crew.JobGroup;
+                $scope.currentAssigned[$scope.selectedPos.rank + $scope.selectedPos.index.toString() + 'Id'] = crew.Id;
+                $scope.currentAssigned[$scope.selectedPos.rank + $scope.selectedPos.index.toString()] = crew.ScheduleName;
+                $scope.currentAssigned[$scope.selectedPos.rank + $scope.selectedPos.index.toString() + 'Group'] = crew.JobGroup;
                 if (!crew.FlightSum)
-                    crew.FlightSum=0;
-                crew.FlightSum+= $scope.FDPStat.Flight;
+                    crew.FlightSum = 0;
+                crew.FlightSum += $scope.FDPStat.Flight;
                 $scope.fillFilteredCrew();
                 $scope.fillRangeFdps();
                 $scope.fillFlightCrews();
@@ -4136,111 +5165,125 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
     };
     ////////////////////////////////
-    var _fdp_id=-1;
+    var _fdp_id = -1;
     //2020-10-20 shamim
-    $scope.IsNonNull=function(exp){
-        
-        if (exp && exp!='null')
+    $scope.IsNonNull = function (exp) {
+
+        if (exp && exp != 'null')
             return true;
         return false;
     }
     ///////////////////////
-    $scope.crewClick=function(crew,$event){
-        if ($event.ctrlKey   )
-        {
-             
-            if (!$scope.editable && !$scope.isAdmin ){
-                
+    $scope.crewClick = function (crew, $event) {
+        if ($event.ctrlKey) {
+
+            if (!$scope.editable && !$scope.isAdmin) {
+
                 var myDialog = DevExpress.ui.dialog.custom({
                     rtlEnabled: true,
                     title: "Error",
                     message: "You cannot modify crew list due to FLIGHT STATUS.Please contact the administrator.",
-                    buttons: [ { text: "OK", onClick: function () {  } }]
+                    buttons: [{ text: "OK", onClick: function () { } }]
                 });
                 myDialog.show();
                 return;
             }
 
 
-            if (!($scope.ati_selectedFlights && $scope.ati_selectedFlights.length>0)){
+            if (!($scope.ati_selectedFlights && $scope.ati_selectedFlights.length > 0)) {
                 General.ShowNotify("No Flight(s) Selected.", 'error');
-               
+
                 return;
             }
 
-            if ($scope.FDPStat.IsOver){
-                if ($scope.FDPStat.AllowedExtension==0 || !$scope.useExtension){
+            if ($scope.FDPStat.IsOver) {
+                if ($scope.FDPStat.AllowedExtension == 0 || !$scope.useExtension) {
                     General.ShowNotify('The FDP is OVER', 'error');
                     return;
                 }
-               
-                
-                
+
+
+
             }
-            if ($scope.FDPStat.WOCLError==1){
-                
+            if ($scope.FDPStat.WOCLError == 1) {
+
                 General.ShowNotify('Not Allowed(WOCL encroachment)', 'error');
-                    return;
-                
-                
+                return;
+
+
             }
 
-            //2020-10-20 shamim
-            var expired=[];
-              
-            if (!crew.RemainSEPT ||crew.RemainSEPT<0)
-            {
+            //2021-06-23
+            if (!crew.RemainMedical || crew.RemainMedical < 0) {
+                var _mestr = 'Medical ' + (crew.MedicalExpired ? moment(crew.MedicalExpired).format('YYYY-MM-DD') : 'UNKNOWN');
+                var _myDialog = DevExpress.ui.dialog.custom({
+                    rtlEnabled: true,
+                    title: "Confirm",
+                    message: _mestr,
+                    buttons: [  { text: "Ok", onClick: function () {  } }]
+                });
+                _myDialog.show();
+                return;
+            }
                  
-                expired.push('SEPT '+( crew.SEPTExpired ?moment(crew.SEPTExpired).format('YYYY-MM-DD'):'UNKNOWN'));
+
+
+
+
+            var expired = [];
+
+            if (!crew.RemainSEPT || crew.RemainSEPT < 0) {
+
+                expired.push('SEPT ' + (crew.SEPTExpired ? moment(crew.SEPTExpired).format('YYYY-MM-DD') : 'UNKNOWN'));
             }
-             
-            if (!crew.RemainMedical || crew.RemainMedical<0)
-                expired.push('Medical '+(crew.MedicalExpired?moment(crew.MedicalExpired).format('YYYY-MM-DD'):'UNKNOWN'));
-            
-            if (!crew.RemainCMC ||crew.RemainCMC<0)
-                expired.push('CMC '+(crew.CMCExpired?moment(crew.CMCExpired).format('YYYY-MM-DD'):'UNKNOWN'));
 
-           
+            if (!crew.RemainMedical || crew.RemainMedical < 0)
+                expired.push('Medical ' + (crew.MedicalExpired ? moment(crew.MedicalExpired).format('YYYY-MM-DD') : 'UNKNOWN'));
 
-             
-            if (!crew.RemainDG ||crew.RemainDG<0)
-                expired.push('DG '+(crew.DGExpired?moment(crew.DGExpired).format('YYYY-MM-DD'):'UNKNOWN'));
+            if (!crew.RemainCMC || crew.RemainCMC < 0)
+                expired.push('CMC ' + (crew.CMCExpired ? moment(crew.CMCExpired).format('YYYY-MM-DD') : 'UNKNOWN'));
 
 
-            
-            if (!crew.RemainCCRM ||crew.RemainCCRM<0)
-                expired.push('CCRM '+(crew.CCRMExpired?moment(crew.CCRMExpired).format('YYYY-MM-DD'):'UNKNOWN'));
 
 
-            
-            if (!crew.RemainSMS ||crew.RemainSMS<0)
-                expired.push('SMS '+(crew.SMSExpired?moment(crew.SMSExpired).format('YYYY-MM-DD'):'UNKNOWN'));
-           
-            if (!crew.RemainAvSec ||crew.RemainAvSec<0)
-                expired.push('AvSec '+(crew.AvSecExpired?moment(crew.AvSecExpired).format('YYYY-MM-DD'):'UNKNOWN'));
-            if (crew.JobGroupCode.startsWith('00101')){
-                if ( !crew.RemainLPC ||crew.RemainLPC<0)
-                    expired.push('LPC '+(crew.LPCExpired?moment(crew.LPCExpired).format('YYYY-MM-DD'):'UNKNOWN'));
-            
-                if (!crew.RemainLPR ||crew.RemainLPR<0)
-                    expired.push('LPR '+(crew.LPRExpired?moment(crew.LPRExpired).format('YYYY-MM-DD'):'UNKNOWN'));
-                if (!crew.RemainLicence ||crew.RemainLicence<0)
-                    expired.push('Licence '+(crew.LicenceExpired?moment(crew.LicenceExpired).format('YYYY-MM-DD'):'UNKNOWN'));
+            if (!crew.RemainDG || crew.RemainDG < 0)
+                expired.push('DG ' + (crew.DGExpired ? moment(crew.DGExpired).format('YYYY-MM-DD') : 'UNKNOWN'));
 
-           
+
+
+            if (!crew.RemainCCRM || crew.RemainCCRM < 0)
+                expired.push('CCRM ' + (crew.CCRMExpired ? moment(crew.CCRMExpired).format('YYYY-MM-DD') : 'UNKNOWN'));
+
+
+
+            if (!crew.RemainSMS || crew.RemainSMS < 0)
+                expired.push('SMS ' + (crew.SMSExpired ? moment(crew.SMSExpired).format('YYYY-MM-DD') : 'UNKNOWN'));
+
+            if (!crew.RemainAvSec || crew.RemainAvSec < 0)
+                expired.push('AvSec ' + (crew.AvSecExpired ? moment(crew.AvSecExpired).format('YYYY-MM-DD') : 'UNKNOWN'));
+            if (crew.JobGroupCode.startsWith('00101')) {
+                if (!crew.RemainLPC || crew.RemainLPC < 0)
+                    expired.push('LPC ' + (crew.LPCExpired ? moment(crew.LPCExpired).format('YYYY-MM-DD') : 'UNKNOWN'));
+
+                if (!crew.RemainLPR || crew.RemainLPR < 0)
+                    expired.push('LPR ' + (crew.LPRExpired ? moment(crew.LPRExpired).format('YYYY-MM-DD') : 'UNKNOWN'));
+                if (!crew.RemainLicence || crew.RemainLicence < 0)
+                    expired.push('Licence ' + (crew.LicenceExpired ? moment(crew.LicenceExpired).format('YYYY-MM-DD') : 'UNKNOWN'));
+
+
             }
-            
+
             //if (crew.RemainFirstAid<0)
             //    expired.push('FirstAid '+moment(crew.FirstAidExpired).format('YYYY-MM-DD'));
-            
-           
+
+             
             /////////////////////////
-            if (expired.length>0){
+            if (expired.length > 0) {
                 var myDialog = DevExpress.ui.dialog.custom({
                     rtlEnabled: true,
                     title: "Expired Documents",
                     message: expired,
-                    buttons: [ { text: "OK", onClick: function () {  } }]
+                    buttons: [{ text: "OK", onClick: function () { } }]
                 });
                 myDialog.show();
                 //return;
@@ -4250,111 +5293,115 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             var continuity = $scope.checkContinuity2($scope.ati_selectedFlights);
             if (conflict || continuity) {
                 General.ShowNotify('Interuption/Continuity Error', 'error');
-                 
-                
+
+
                 return;
             }
-            if ($scope.currentAssigned[$scope.selectedPos.rank+$scope.selectedPos.index.toString()+'Id'])
+            if ($scope.currentAssigned[$scope.selectedPos.rank + $scope.selectedPos.index.toString() + 'Id'])
                 return;
-             
-            var fdp={};
-            _fdp_id--;
-            fdp.Id=_fdp_id;
-            fdp.key=$scope.selectedFlightsKey.Id;
-            fdp.no=$scope.selectedFlightsKey.no;
-            fdp.crewId=crew.Id;
-            fdp.rank=$scope.selectedPos.rank;
-            fdp.index=$scope.selectedPos.index;
-            fdp.group=crew.JobGroup;
-            fdp.scheduleName=crew.ScheduleName;
-            //$scope.ati_flights
-            var ordered=Enumerable.From($scope.ati_selectedFlights).OrderBy(function(x){return new Date(x.sta);}).ToArray();
 
-            var first=Enumerable.From($scope.ati_flights).Where('$.ID=='+$scope.ati_selectedFlights[0].Id).FirstOrDefault();
-            var last=Enumerable.From($scope.ati_flights).Where('$.ID=='+$scope.ati_selectedFlights[$scope.ati_selectedFlights.length-1].Id).FirstOrDefault();
-            fdp.start=(new Date(first.STD)).addMinutes(-60);
-            fdp.end=(new Date(last.STA)).addMinutes(30);
-            fdp.from=first.FromAirport;
-            fdp.to=last.ToAirport;
-            fdp.homeBase=crew.BaseAirportId;
-            fdp.split=$scope.useSplit;
+            var fdp = {};
+            _fdp_id--;
+            fdp.Id = _fdp_id;
+            fdp.key = $scope.selectedFlightsKey.Id;
+            fdp.no = $scope.selectedFlightsKey.no;
+            fdp.crewId = crew.Id;
+            fdp.rank = $scope.selectedPos.rank;
+            fdp.index = $scope.selectedPos.index;
+            fdp.group = crew.JobGroup;
+            fdp.scheduleName = crew.ScheduleName;
+            //$scope.ati_flights
+            var ordered = Enumerable.From($scope.ati_selectedFlights).OrderBy(function (x) { return new Date(x.sta); }).ToArray();
+
+            var first = Enumerable.From($scope.ati_flights).Where('$.ID==' + $scope.ati_selectedFlights[0].Id).FirstOrDefault();
+            var last = Enumerable.From($scope.ati_flights).Where('$.ID==' + $scope.ati_selectedFlights[$scope.ati_selectedFlights.length - 1].Id).FirstOrDefault();
+            fdp.start = (new Date(first.STD)).addMinutes(-60);
+            fdp.end = (new Date(last.STA)).addMinutes(30);
+            fdp.from = first.FromAirport;
+            fdp.to = last.ToAirport;
+            fdp.homeBase = crew.BaseAirportId;
+            fdp.split = $scope.useSplit;
             //dooltala
-            fdp.ids=[];
-            fdp.flights=[];
-            var _tmp=[];
-            $.each(ordered,function(_i,_d){
-                var flt=Enumerable.From($scope.ati_flights).Where('$.ID=='+_d.Id).FirstOrDefault();
-                fdp.ids.push({id:_d.Id,dh:_d.dh});
-                _tmp.push(_d.Id+'*'+_d.dh);
-                fdp.flights.push(flt.ID+'_'+_d.dh+'_'+$scope.DatetoStr(new Date(flt.STD))+'_'+$scope.DatetoStr(new Date(flt.STA))+'_'+flt.FlightNumber+'_'+flt.FromAirportIATA+'_'+flt.ToAirportIATA);
+            fdp.ids = [];
+            fdp.flights = [];
+            var _tmp = [];
+            $.each(ordered, function (_i, _d) {
+                var flt = Enumerable.From($scope.ati_flights).Where('$.ID==' + _d.Id).FirstOrDefault();
+                fdp.ids.push({ id: _d.Id, dh: _d.dh });
+                _tmp.push(_d.Id + '*' + _d.dh);
+                fdp.flights.push(flt.ID + '_' + _d.dh + '_' + $scope.DatetoStr(new Date(flt.STD)) + '_' + $scope.DatetoStr(new Date(flt.STA)) + '_' + flt.FlightNumber + '_' + flt.FromAirportIATA + '_' + flt.ToAirportIATA);
             });
-            fdp.key2=_tmp.join('_');
+            fdp.key2 = _tmp.join('_');
             if ($scope.useExtension)
-                fdp.extension=$scope.FDPStat.AllowedExtension;
+                fdp.extension = $scope.FDPStat.AllowedExtension;
             else
-                fdp.extension=0;
+                fdp.extension = 0;
 
             $scope.loadingVisible = true;
+
+            //2020-11-22-2
+            fdp.UserName = $rootScope.userName;
+            //magu3-6
+            fdp.IsAdmin = $scope.isAdmin ? 1 : 0;
             flightService.saveFDP(fdp).then(function (response) {
                 $scope.loadingVisible = false;
-               
-                if (response.Code==406){
-                    if (response.data.message){
+
+                if (response.Code == 406) {
+                    if (response.data.message) {
                         var myDialog = DevExpress.ui.dialog.custom({
                             rtlEnabled: true,
                             title: "Error",
                             message: response.data.message,
-                            buttons: [ { text: "OK", onClick: function () {  } }]
+                            buttons: [{ text: "OK", onClick: function () { } }]
                         });
                         myDialog.show();
                     }
-                    
-                }else
-                    if (response.Code==501){
+
+                } else
+                    if (response.Code == 501) {
                         General.Confirm("The selected crew is on STANDBY. Do you want to activate him/her?", function (res) {
                             if (res) {
 
-                                $scope.activeStby(crew,response.data.Id,fdp.rank,fdp.index,fdp);
+                                $scope.activeStby(crew, response.data.Id, fdp.rank, fdp.index, fdp);
                                 //personService.delete(dto).then(function (response) {
-                                 
+
                                 //}, function (err) {  $scope.loadingVisible = false; General.ShowNotify2(err.message, 'error',5000); });
 
                             }
                         });
                     }
                     else
-                        if (response.Code==304){
+                        if (response.Code == 304) {
                             var myDialog = DevExpress.ui.dialog.custom({
                                 rtlEnabled: true,
                                 title: "Error",
                                 message: "You can not activate this reserved crew.",
-                                buttons: [ { text: "OK", onClick: function () {  } }]
+                                buttons: [{ text: "OK", onClick: function () { } }]
                             });
                             myDialog.show();
                         }
-                    else
-                    {
-                        fdp.Id=response.data.Id;
-                     
-                        $scope.ati_fdps.push(fdp);
-                  
-                        $scope.currentAssigned.CrewIds.push(crew.Id);
-                        $scope.currentAssigned[$scope.selectedPos.rank+$scope.selectedPos.index.toString()+'Id']=crew.Id;
-                        $scope.currentAssigned[$scope.selectedPos.rank+$scope.selectedPos.index.toString()]=crew.ScheduleName;
-                        $scope.currentAssigned[$scope.selectedPos.rank+$scope.selectedPos.index.toString()+'Group']=crew.JobGroup;
-                        if (!crew.FlightSum)
-                            crew.FlightSum=0;
-                        crew.FlightSum+= $scope.FDPStat.Flight;
-                        $scope.fillFilteredCrew();
-                        $scope.fillRangeFdps();
-                        $scope.fillFlightCrews();
-                        $scope.fillRangeCrews();
-                    }
+                        else {
+                            fdp.Id = response.data.Id;
+
+                            $scope.ati_fdps.push(fdp);
+
+                            $scope.currentAssigned.CrewIds.push(crew.Id);
+                            $scope.currentAssigned[$scope.selectedPos.rank + $scope.selectedPos.index.toString() + 'Id'] = crew.Id;
+                            $scope.currentAssigned[$scope.selectedPos.rank + $scope.selectedPos.index.toString()] = crew.ScheduleName;
+                            $scope.currentAssigned[$scope.selectedPos.rank + $scope.selectedPos.index.toString() + 'Group'] = crew.JobGroup;
+                            if (!crew.FlightSum)
+                                crew.FlightSum = 0;
+                            crew.FlightSum += $scope.FDPStat.Flight;
+                            $scope.fillFilteredCrew();
+                            $scope.fillRangeFdps();
+                            $scope.fillFlightCrews();
+                            $scope.fillRangeCrews();
+                        }
 
             }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
 
-           
+
         }
     };
 
@@ -4367,7 +5414,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                     (new Date(x.STD) >= new Date(_d.STD) && new Date(x.STD) <= new Date(_d.STA))
                     ||
                     (new Date(x.STA) >= new Date(_d.STD) && new Date(x.STA) <= new Date(_d.STA))
-                  );
+                );
             }).FirstOrDefault();
             if (f)
                 hasConflict = true;
@@ -4382,7 +5429,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         var ordered = Enumerable.From(flights).OrderBy(function (x) { return new Date(x.STD); }).ToArray();
         $.each(ordered, function (_i, _d) {
             if (_i >= 0 && _i < ordered.length - 1) {
-                
+
                 if (_d.ToAirport != ordered[_i + 1].FromAirport)
                     hasError = true;
             }
@@ -4400,7 +5447,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                     (new Date(x.std) >= new Date(_d.std) && new Date(x.std) <= new Date(_d.sta))
                     ||
                     (new Date(x.sta) >= new Date(_d.std) && new Date(x.sta) <= new Date(_d.sta))
-                  );
+                );
             }).FirstOrDefault();
             if (f)
                 hasConflict = true;
@@ -4409,12 +5456,12 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         return hasConflict;
     };
     $scope.checkContinuity2 = function (flights) {
-        
+
         var hasError = false;
         var ordered = Enumerable.From(flights).OrderBy(function (x) { return new Date(x.std); }).ToArray();
         $.each(ordered, function (_i, _d) {
             if (_i >= 0 && _i < ordered.length - 1) {
-                
+
                 if (_d.ToAirport != ordered[_i + 1].FromAirport)
                     hasError = true;
             }
@@ -4423,11 +5470,11 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
     };
     ////////////////////////
-    $scope.ati_selectedTypes=[];
+    $scope.ati_selectedTypes = [];
     $scope.initSelection = function () {
         /////////////////////////////////
-       
-        
+
+
         // Initialize selectionjs
         const selection = Selection.create({
 
@@ -4440,11 +5487,11 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             // The container is also the boundary in this case
             boundaries: ['.mainselection']
         }).on('beforestart', evt => {
-    
-            
+
+
             return evt.oe.target.tagName !== 'SPAN';
-            
-        }).on('start', ({inst, selected, oe}) => {
+
+        }).on('start', ({ inst, selected, oe }) => {
 
             // Remove class if the user isn't pressing the control key or ⌘ key
             if (!oe.ctrlKey && !oe.metaKey) {
@@ -4459,10 +5506,10 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                 inst.clearSelection();
 
             }
-            $scope.rangeFdps=[];
+            $scope.rangeFdps = [];
             $scope.clearPos();
 
-        }).on('move', ({changed: {removed, added}}) => {
+        }).on('move', ({ changed: { removed, added } }) => {
 
             // Add a custom class to the elements that where selected.
             for (const el of added) {
@@ -4475,37 +5522,37 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                 el.classList.remove('selected');
             }
 
-        }).on('stop', ({inst,selected}) => {
+        }).on('stop', ({ inst, selected }) => {
             inst.keepSelection();
-            $scope.ati_selectedFlights=[];
-            $scope.ati_selectedTypes=[];
-            
+            $scope.ati_selectedFlights = [];
+            $scope.ati_selectedTypes = [];
+
             //var temps=[];
             //$.each(selected,function(_i,_d){
-                
+
             //    var $d=$(_d);
             //    temps.push(Enumerable.From($scope.ati_flights).Where('$.ID=='+$d.data('flightid')).FirstOrDefault());
-                 
-                
+
+
             //});
             //var conflict = $scope.checkConflict(temps);
             //var continuity = $scope.checkContinuity(temps);
             //if (conflict || continuity) {
             //    General.ShowNotify('Interuption/Continuity Error', 'error');
             //    selection.clearSelection();
-                
+
             //    return;
             //}
-            
-            $.each(selected,function(_i,_d){
+
+            $.each(selected, function (_i, _d) {
                 //  alert($(_d).data('flightid')+'    '+ $(_d).data('dh'));
                 // console.log();
-                var $d=$(_d);
-                $scope.ati_selectedFlights.push({Id:$d.data('flightid'), dh:!$d.data('dh')?0:$d.data('dh'), sta:new Date($d.data('sta')), std:new Date($d.data('std')), no:$d.data('no'),FromAirport:$d.data('from'),ToAirport:$d.data('to') });
+                var $d = $(_d);
+                $scope.ati_selectedFlights.push({ Id: $d.data('flightid'), dh: !$d.data('dh') ? 0 : $d.data('dh'), sta: new Date($d.data('sta')), std: new Date($d.data('std')), no: $d.data('no'), FromAirport: $d.data('from'), ToAirport: $d.data('to') });
                 $scope.ati_selectedTypes.push($d.data('type'));
-                
+
             });
-            $scope.ati_selectedTypes=Enumerable.From($scope.ati_selectedTypes).Distinct().ToArray();
+            $scope.ati_selectedTypes = Enumerable.From($scope.ati_selectedTypes).Distinct().ToArray();
 
             $scope.setSelectedFlightsKey();
             //console.log($scope.ati_selectedTypes);
@@ -4522,8 +5569,8 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
     $scope.popup_crews_visible = false;
     $scope.popup_crews_title = '';
     $scope.popup_crews = {
-        shading:false,
-        
+        shading: false,
+
         width: 400,
         height: 400,
         position: 'right top',
@@ -4545,7 +5592,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
         },
         onHiding: function () {
-            $scope.shiftFlight=null;
+            $scope.shiftFlight = null;
         },
         bindingOptions: {
             visible: 'popup_crews_visible',
@@ -4563,131 +5610,137 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
     };
     //////////////////////////////////
-    $scope.shiftFlight=null;
-    $scope.clickFlight=function(f,$event){
-       
+    $scope.shiftFlight = null;
+    $scope.clickFlight = function (f, $event) {
+
         $event.stopPropagation();
-        if($event.ctrlKey){
-            $scope.shiftFlight=Enumerable.From($scope.ati_flights).Where('$.Id=='+f.ID).FirstOrDefault();
-            
-            
-            $scope.popup_crews_title=$scope.shiftFlight.FlightNumber+' '+$scope.shiftFlight.FromAirportIATA+'-'+$scope.shiftFlight.ToAirportIATA;
+        if ($event.ctrlKey) {
+            $scope.shiftFlight = Enumerable.From($scope.ati_flights).Where('$.Id==' + f.ID).FirstOrDefault();
+
+
+            $scope.popup_crews_title = $scope.shiftFlight.FlightNumber + ' ' + $scope.shiftFlight.FromAirportIATA + '-' + $scope.shiftFlight.ToAirportIATA;
             if (!$scope.popup_crews_visible)
-                $scope.popup_crews_visible=true;
+                $scope.popup_crews_visible = true;
 
         }
-        else{
-            var $elem=$($event.currentTarget);
-            var dh=0;
-            if (!$elem.hasClass('flightitem')){
-             
-                $elem=$elem.parents( ".flightitem" );
+        else {
+            var $elem = $($event.currentTarget);
+            var dh = 0;
+            if (!$elem.hasClass('flightitem')) {
+
+                $elem = $elem.parents(".flightitem");
             }
-            var flightarea=$elem.parents( ".flightarea" );
-            if ($elem.hasClass('dh'))
-            {
+            var flightarea = $elem.parents(".flightarea");
+            if ($elem.hasClass('dh')) {
                 $elem.removeClass('dh');
-                $(flightarea).data('dh',0);
-                dh=0;
-            }else
-            {
+                $(flightarea).data('dh', 0);
+                dh = 0;
+            } else {
                 $elem.addClass('dh');
-                $(flightarea).data('dh',1);
-                dh=1;
+                $(flightarea).data('dh', 1);
+                dh = 1;
             }
 
-            var flt=Enumerable.From($scope.ati_selectedFlights).Where('$.Id=='+f.ID).FirstOrDefault();
+            var flt = Enumerable.From($scope.ati_selectedFlights).Where('$.Id==' + f.ID).FirstOrDefault();
             if (flt)
-                flt.dh=dh;
-            $scope.rangeFdps=[];
+                flt.dh = dh;
+            $scope.rangeFdps = [];
             $scope.clearPos();
             $scope.setSelectedFlightsKey();
-     
+
             $scope.fillPos();
             $scope.fillRangeFdps();
             $scope.getFDPStat();
         }
-        
-       
+
+
     };
 
-    $scope.searchStr=null;
+    $scope.searchStr = null;
     $scope.text_search = {
-        placeholder:'Search',
-        valueChangeEvent:'keyup',
-        onValueChanged:function(e){
+        placeholder: 'Search',
+        valueChangeEvent: 'keyup',
+        onValueChanged: function (e) {
             $scope.fillFilteredCrew();
         },
-        bindingOptions:{
+        bindingOptions: {
             value: 'searchStr'
         }
     }
-    $scope.selectedPos=null;
-    $scope.tempAssignedCrews=[];
-    $scope.dg_crew_ds=[];
-    $scope.currentAssigned={CrewIds:[]};
+    $scope.selectedPos = null;
+    $scope.tempAssignedCrews = [];
+    $scope.dg_crew_ds = [];
+    $scope.currentAssigned = { CrewIds: [] };
 
     //2020-10-20///////////
-    $scope.getDaysDiff=function(d1,d2){
-        var date1 =new Date( General.getDayFirstHour(d1)); 
-        var date2 =new Date( General.getDayLastHour(d2)); 
-  
+    $scope.getDaysDiff = function (d1, d2) {
+        var date1 = new Date(General.getDayFirstHour(d1));
+        var date2 = new Date(General.getDayLastHour(d2));
+
         // To calculate the time difference of two dates 
-        var Difference_In_Time = date2.getTime() - date1.getTime(); 
-  
+        var Difference_In_Time = date2.getTime() - date1.getTime();
+
         // To calculate the no. of days between two dates 
-        var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24); 
+        var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
 
         return Difference_In_Days;
     };
     ///////////////////// 
-    $scope.fillFilteredCrew=function(){
-        var dateFirst=new Date();
-        if ($scope.ati_selectedFlights && $scope.ati_selectedFlights.length>0){
-            var ordered=Enumerable.From($scope.ati_selectedFlights).OrderBy(function(x){return new Date(x.sta);}).ToArray();
+    //4-14
+    $scope.fillFilteredCrew = function () {
+         
+        var dateFirst = new Date();
+        if ($scope.ati_selectedFlights && $scope.ati_selectedFlights.length > 0) {
+            var ordered = Enumerable.From($scope.ati_selectedFlights).OrderBy(function (x) { return new Date(x.sta); }).ToArray();
 
-            var first=Enumerable.From($scope.ati_flights).Where('$.ID=='+$scope.ati_selectedFlights[0].Id).FirstOrDefault();
-              dateFirst=new Date(first.ChocksOut);
+            var first = Enumerable.From($scope.ati_flights).Where('$.ID==' + $scope.ati_selectedFlights[0].Id).FirstOrDefault();
+            dateFirst = new Date(first.ChocksOut);
         }
-       
-        
+
+        var alldh = false;
+        var dhflights = Enumerable.From($scope.ati_selectedFlights).Where('$.dh').ToArray();
+        if (dhflights.length == $scope.ati_selectedFlights.length)
+            alldh = true;
+         
+
+
         var _ds = null;
-        if (!$scope.selectedPos){
-            $scope.dg_crew_ds=null;
+        if (!$scope.selectedPos) {
+            $scope.dg_crew_ds = null;
             return;
         }
-        var id=$scope.selectedPos.rank;
+        var id = $scope.selectedPos.rank;
         switch (id) {
             case 'IP':
                 _ds = Enumerable.From($scope.ds_crew).Where(function (x) {
-                    return (x.JobGroup == 'TRE' || x.JobGroup == 'TRI' || x.JobGroup == 'LTC') /*&& x.ValidTypes && x.ValidTypes.indexOf($scope.ati_selectedTypes[0])!=-1*/ ;
+                    return (x.JobGroup == 'TRE' || x.JobGroup == 'TRI' || x.JobGroup == 'LTC') /*&& x.ValidTypes && x.ValidTypes.indexOf($scope.ati_selectedTypes[0])!=-1*/;
                 }).ToArray();
-                
+
                 break;
             case 'P1':
                 _ds = Enumerable.From($scope.ds_crew).Where(function (x) {
-                    return (x.JobGroup == 'TRE' || x.JobGroup == 'TRI' || x.JobGroup == 'LTC') || (  (x.JobGroup == 'P1' ) && x.ValidTypes && x.ValidTypes.indexOf($scope.ati_selectedTypes[0])!=-1);
+                    return (x.JobGroup == 'TRE' || x.JobGroup == 'TRI' || x.JobGroup == 'LTC') || ((x.JobGroup == 'P1') && x.ValidTypes && (x.ValidTypes.indexOf($scope.ati_selectedTypes[0]) != -1 || alldh));
                 }).ToArray();
                 break;
             case 'P2':
                 _ds = Enumerable.From($scope.ds_crew).Where(function (x) {
-                    return  (x.JobGroup == 'P2' || x.JobGroup=='P1') && x.ValidTypes && x.ValidTypes.indexOf($scope.ati_selectedTypes[0])!=-1;
+                    return (x.JobGroup == 'P2' || x.JobGroup == 'P1') && x.ValidTypes && (x.ValidTypes.indexOf($scope.ati_selectedTypes[0]) != -1 || alldh);
                 }).ToArray();
                 break;
             case 'Safety':
             case 'SAFETY':
                 _ds = Enumerable.From($scope.ds_crew).Where(function (x) {
-                    return (x.JobGroup == 'TRE' || x.JobGroup == 'TRI' || x.JobGroup == 'LTC') || ( x.JobGroup == 'P1' || x.JobGroup == 'P2') && x.ValidTypes && x.ValidTypes.indexOf($scope.ati_selectedTypes[0])!=-1;
+                    return (x.JobGroup == 'TRE' || x.JobGroup == 'TRI' || x.JobGroup == 'LTC') || (x.JobGroup == 'P1' || x.JobGroup == 'P2') && (x.ValidTypes && x.ValidTypes.indexOf($scope.ati_selectedTypes[0]) != -1 || alldh);
                 }).ToArray();
                 break;
             case 'ISCCM':
                 _ds = Enumerable.From($scope.ds_crew).Where(function (x) {
-                    return  x.JobGroup=='ISCCM';
+                    return x.JobGroup == 'ISCCM';
                 }).ToArray();
                 break;
             case 'SCCM':
                 _ds = Enumerable.From($scope.ds_crew).Where(function (x) {
-                    return x.JobGroup == 'SCCM' || x.JobGroup=='ISCCM';
+                    return x.JobGroup == 'SCCM' || x.JobGroup == 'ISCCM';
                 }).ToArray();
                 break;
             case 'CCM':
@@ -4712,26 +5765,28 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                 break;
             case 'OBS':
                 _ds = Enumerable.From($scope.ds_crew).Where(function (x) {
-                    return x.JobGroup == 'CCM' || x.JobGroup=='P2' || x.JobGroup=='P1' || x.JobGroup == 'TRE' || x.JobGroup == 'TRI' || x.JobGroup == 'LTC';
+                    return x.JobGroup == 'CCM' || x.JobGroup == 'P2' || x.JobGroup == 'P1' || x.JobGroup == 'TRE' || x.JobGroup == 'TRI' || x.JobGroup == 'LTC';
                 }).ToArray();
                 break;
             case 'CHECK':
                 _ds = Enumerable.From($scope.ds_crew).Where(function (x) {
-                    return (x.JobGroup == 'TRE' || x.JobGroup == 'TRI' || x.JobGroup == 'LTC') || ( x.JobGroup == 'P1' || x.JobGroup == 'P2') && x.ValidTypes && x.ValidTypes.indexOf($scope.ati_selectedTypes[0])!=-1;
+                    //magu313
+                    //return (x.JobGroup == 'TRE' || x.JobGroup == 'TRI' || x.JobGroup == 'LTC') || (x.JobGroup == 'P1' || x.JobGroup == 'P2') && x.ValidTypes && x.ValidTypes.indexOf($scope.ati_selectedTypes[0]) != -1;
+                    return x ;
                 }).ToArray();
                 break;
             default:
                 break;
         }
         var filtered = Enumerable.From(_ds).Where(function (x) {
-            var fltr=$scope.currentAssigned.CrewIds.indexOf(x.Id)==-1;
-            if ($scope.searchStr){
-                fltr=fltr && x.ScheduleName.toLowerCase().includes($scope.searchStr.toLowerCase());
+            var fltr = $scope.currentAssigned.CrewIds.indexOf(x.Id) == -1;
+            if ($scope.searchStr) {
+                fltr = fltr && x.ScheduleName.toLowerCase().includes($scope.searchStr.toLowerCase());
             }
             return fltr;
             //var assigned = Enumerable.From($scope.currentAssigned).Where(function(q){ return q.CrewIds.indexOf(x.Id)!=-1;}).ToArray();
             //if (assigned && assigned.length > 0) {
-                
+
             //    return false;
             //}
             //else
@@ -4740,53 +5795,56 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         //$scope.dg_crew_ds = Enumerable.From(filtered).OrderBy('$.GroupOrder').ThenBy('$.RosterFlights').ThenBy('$.Flight28').ThenBy('$.Duty7').ThenBy('$.ScheduleName').ToArray();
 
         //2020-10-20 shamim
-        $.each(filtered,function(_i,_d){
-            _d.RemainMedical=!_d.MedicalExpired?null:$scope.getDaysDiff(dateFirst,new Date(_d.MedicalExpired));
-            _d.RemainCMC=!_d.CMCExpired?null:$scope.getDaysDiff(dateFirst,new Date(_d.CMCExpired));
-            
-            _d.RemainSEPT=!_d.SEPTExpired?null:$scope.getDaysDiff(dateFirst,new Date(_d.SEPTExpired));
-            _d.RemainDG=!_d.DGExpired?null:$scope.getDaysDiff(dateFirst,new Date(_d.DGExpired));
-            _d.RemainCCRM=!_d.CCRMExpired?null:$scope.getDaysDiff(dateFirst,new Date(_d.CCRMExpired));
-            _d.RemainSMS=!_d.SMSExpired?null:$scope.getDaysDiff(dateFirst,new Date(_d.SMSExpired));
-            _d.RemainAvSec=!_d.AvSecExpired?null:$scope.getDaysDiff(dateFirst,new Date(_d.AvSecExpired));
-            _d.RemainLPC=!_d.LPCExpired?null:$scope.getDaysDiff(dateFirst,new Date(_d.LPCExpired));
-            _d.RemainLPR=!_d.LPRExpired?null:$scope.getDaysDiff(dateFirst,new Date(_d.LPRExpired));
-            _d.RemainFirstAid=!_d.FirstAidExpired?null:$scope.getDaysDiff(dateFirst,new Date(_d.FirstAidExpired));
-            _d.RemainLicence=!_d.LicenceExpired?null:$scope.getDaysDiff(dateFirst,new Date(_d.LicenceExpired));
- 
- 
-              
+        $.each(filtered, function (_i, _d) {
+            _d.RemainMedical = !_d.MedicalExpired ? null : $scope.getDaysDiff(dateFirst, new Date(_d.MedicalExpired));
+            _d.RemainCMC = !_d.CMCExpired ? null : $scope.getDaysDiff(dateFirst, new Date(_d.CMCExpired));
+
+            _d.RemainSEPT = !_d.SEPTExpired ? null : $scope.getDaysDiff(dateFirst, new Date(_d.SEPTExpired));
+            _d.RemainDG = !_d.DGExpired ? null : $scope.getDaysDiff(dateFirst, new Date(_d.DGExpired));
+            _d.RemainCCRM = !_d.CCRMExpired ? null : $scope.getDaysDiff(dateFirst, new Date(_d.CCRMExpired));
+            _d.RemainSMS = !_d.SMSExpired ? null : $scope.getDaysDiff(dateFirst, new Date(_d.SMSExpired));
+            _d.RemainAvSec = !_d.AvSecExpired ? null : $scope.getDaysDiff(dateFirst, new Date(_d.AvSecExpired));
+            _d.RemainLPC = !_d.LPCExpired ? null : $scope.getDaysDiff(dateFirst, new Date(_d.LPCExpired));
+            _d.RemainLPR = !_d.LPRExpired ? null : $scope.getDaysDiff(dateFirst, new Date(_d.LPRExpired));
+            _d.RemainFirstAid = !_d.FirstAidExpired ? null : $scope.getDaysDiff(dateFirst, new Date(_d.FirstAidExpired));
+            _d.RemainLicence = !_d.LicenceExpired ? null : $scope.getDaysDiff(dateFirst, new Date(_d.LicenceExpired));
+
+
+
         });
 
 
         $scope.dg_crew_ds = Enumerable.From(filtered).OrderBy('$.FlightSum').ThenBy('$.GroupOrder').ThenBy('$.ScheduleName').ToArray();
+        //$scope.dg_crew_ds = Enumerable.From(filtered).OrderBy(function (x) {
+        //    return x.FlightSum;
+        //}).ToArray();
+        console.log('Flight Sum');
+        console.log($scope.dg_crew_ds);
 
-        
     };
-   
+
 
     //jooj
-    $scope.posClick=function(rank,index,$event){
-        if ($scope.ati_selectedFlights && $scope.ati_selectedFlights.length>0){
-            if ((rank=='P1' || rank=='P2' /*|| rank=='IP'*/) && $scope.ati_selectedTypes.length>1){
+    $scope.posClick = function (rank, index, $event) {
+        if ($scope.ati_selectedFlights && $scope.ati_selectedFlights.length > 0) {
+            if ((rank == 'P1' || rank == 'P2' /*|| rank=='IP'*/) && $scope.ati_selectedTypes.length > 1) {
                 General.ShowNotify("Multiple Types Not Allowd.", 'error');
                 return;
             }
-            var $elem=$($event.currentTarget);
-            $scope.searchStr=null;
+            var $elem = $($event.currentTarget);
+            $scope.searchStr = null;
             $('.crewpos').removeClass('selected');
             $elem.addClass('selected');
-            $scope.selectedPos={rank:rank,index:index};
+            $scope.selectedPos = { rank: rank, index: index };
             $scope.fillFilteredCrew();
         }
-        else
-        {
+        else {
             General.ShowNotify("No Flight(s) Selected.", 'error');
             return;
         }
-      
+
     };
-    
+
     $scope.useExtension = false;
     $scope.check_extension = {
         width: '100%',
@@ -4794,53 +5852,53 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
 
         bindingOptions: {
             value: 'useExtension',
-           
+
         }
     };
     $scope.useSplit = false;
     $scope.check_split = {
         width: '100%',
         text: "Use Split",
-        onValueChanged:function(e){
-            if ($scope.IsSplitVisible){
-                if (e.value){
-                    $scope.FDPStat.IsOver=$scope.FDPStat.Duration>$scope.FDPStat.MaxFDPExtended;
+        onValueChanged: function (e) {
+            if ($scope.IsSplitVisible) {
+                if (e.value) {
+                    $scope.FDPStat.IsOver = $scope.FDPStat.Duration > $scope.FDPStat.MaxFDPExtended;
                 }
-                else{
-                    $scope.FDPStat.IsOver=$scope.FDPStat.Duration>$scope.FDPStat.MaxFDP;
+                else {
+                    $scope.FDPStat.IsOver = $scope.FDPStat.Duration > $scope.FDPStat.MaxFDP;
                 }
                 $scope.dg3_instance.refresh();
             }
         },
         bindingOptions: {
             value: 'useSplit',
-           
+
         }
     };
-    $scope.FDPStat =null;
-    $scope.IsExtensionVisible=false;
-    $scope.IsSplitVisible=false;
-    $scope.getFDPStat=function(){
-        $scope.IsExtensionVisible=false;
-        $scope.IsSplitVisible=false;
+    $scope.FDPStat = null;
+    $scope.IsExtensionVisible = false;
+    $scope.IsSplitVisible = false;
+    $scope.getFDPStat = function () {
+        $scope.IsExtensionVisible = false;
+        $scope.IsSplitVisible = false;
         $scope.loadingVisible = true;
-        var ids=Enumerable.From($scope.ati_selectedFlights).Select('$.Id').ToArray();
-        var dhs=Enumerable.From($scope.ati_selectedFlights).Where('$.dh==1').ToArray().length;
+        var ids = Enumerable.From($scope.ati_selectedFlights).Select('$.Id').ToArray();
+        var dhs = Enumerable.From($scope.ati_selectedFlights).Where('$.dh==1').ToArray().length;
         flightService.getFDPStats(ids.join('_'), dhs).then(function (response) {
-            
-             
+
+
             $scope.loadingVisible = false;
-            try{
-                var _end=(new Date(response.RestFrom)).addMinutes(-30);
-                
-                $scope.editable= !(_end<$scope.firstHour);
-                   
+            try {
+                var _end = (new Date(response.RestFrom)).addMinutes(-30);
+
+                $scope.editable = !(_end < $scope.firstHour);
+
 
             }
-            catch(e){
+            catch (e) {
 
             }
-           
+
 
 
 
@@ -4855,29 +5913,28 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
             response.MaxFDPStr = pad(Math.floor(response.MaxFDP / 60)).toString() + ':' + pad(Math.round(response.MaxFDP % 60)).toString();
             response.RestTo = moment(new Date(response.RestTo)).format('YY-MM-DD HH:mm');
             $scope.dg3_ds = [];
-            $scope.dg3_height=$scope.bottom-108;
+            $scope.dg3_height = $scope.bottom - 108;
             //$scope.dg3_ds.push({ Title: 'Max FDP', Value: response.MaxFDPStr });
             $scope.dg3_ds.push({ Title: 'WOCL', Value: response.WOCLStr });
-           
-            if (response.Extended>0){
+
+            if (response.Extended > 0) {
                 $scope.dg3_ds.push({ Title: 'Max FDP', Value: response.MaxFDPStr });
                 $scope.dg3_ds.push({ Title: 'By Split', Value: response.ExtendedStr });
                 $scope.dg3_ds.push({ Title: 'Max Ext. FDP', Value: response.MaxFDPExtendedStr });
-                $scope.dg3_height=$scope.bottom-108-60;
-                $scope.IsSplitVisible=true;
-                $scope.useSplit=true;
+                $scope.dg3_height = $scope.bottom - 108 - 60;
+                $scope.IsSplitVisible = true;
+                $scope.useSplit = true;
             } else
-                if (response.AllowedExtension>0){
+                if (response.AllowedExtension > 0) {
                     $scope.dg3_ds.push({ Title: 'Max FDP', Value: response.MaxFDPExtendedStr });
                     $scope.dg3_ds.push({ Title: 'By Extension', Value: response.AllowedExtensionStr });
-                    $scope.dg3_height=$scope.bottom-108-60;
-                    $scope.IsExtensionVisible=true;
-                } else
-                {
+                    $scope.dg3_height = $scope.bottom - 108 - 60;
+                    $scope.IsExtensionVisible = true;
+                } else {
                     $scope.dg3_ds.push({ Title: 'Max FDP', Value: response.MaxFDPStr });
                     //$scope.dg3_ds.push({ Title: 'Max FDP', Value: response.MaxFDPExtendedStr });
                 }
-           
+
 
             $scope.dg3_ds.push({ Title: 'FDP', Value: response.DurationStr });
             $scope.dg3_ds.push({ Title: 'Duty', Value: response.DutyStr });
@@ -4886,23 +5943,23 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
         });
     };
     ///////////////////////////////////
-    $scope.ati_offitems=[];
+    $scope.ati_offitems = [];
     $scope.getRosterFDPs = function (callback) {
-         
+
         var _df = moment($scope.dt_fromSearched).format('YYYY-MM-DDTHH:mm:ss');
         var _dt = moment($scope.dt_toSearched).format('YYYY-MM-DDTHH:mm:ss');
-        $scope.ati_fdps=[];
-        $scope.ati_offitems=[];
+        $scope.ati_fdps = [];
+        $scope.ati_offitems = [];
         $scope.loadingVisible = true;
-        flightService.getRosterFDPs(_df,_dt).then(function (response) {
-            
-            flightService.getOffItems(_df,_dt).then(function (response2) {
+        flightService.getRosterFDPs(_df, _dt).then(function (response) {
+
+            flightService.getOffItems(_df, _dt).then(function (response2) {
                 $scope.loadingVisible = false;
-                $.each(response,function(_i,_d){
+                $.each(response, function (_i, _d) {
                     $scope.ati_fdps.push(_d);
                 });
-                $.each(response2,function(_i,_d){
-                     $scope.ati_offitems.push(_d);
+                $.each(response2, function (_i, _d) {
+                    $scope.ati_offitems.push(_d);
                 });
                 console.log('$scope.ati_offitems');
                 console.log($scope.ati_offitems);
@@ -4910,7 +5967,7 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                 if (callback)
                     callback(response);
             });
-           
+
 
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
     };
@@ -4923,14 +5980,21 @@ app.controller('fdpsController', ['$scope', '$location', '$routeParams', '$rootS
                     $scope.fillCrew();
                     $scope.createGantt();
                     $scope.initSelection();
-                    $scope.getRosterFDPs(function(ds){});
+                    $scope.getRosterFDPs(function (ds) {
+                        //2020-12-19
+                        if ($scope.OnlyRoster) {
+                            $scope.cal_crew_current = General.getDayFirstHour(new Date($scope.dt_fromSearched));
+                            $scope.popup_cal_visible = true;
+                        }
+                      
+                    });
 
 
 
                     if ($(window).width() > $(window).height()) {
                         //height: calc(100% - 300px);
                         //$scope.footerfilter = false;
-                        $('.gantt-main-container').height($(window).height() -  $scope.bottom);//.css('height', 'calc(100% - 40px)');
+                        $('.gantt-main-container').height($(window).height() - $scope.bottom);//.css('height', 'calc(100% - 40px)');
                     }
                     //else {
                     //    $scope.footerfilter = true;

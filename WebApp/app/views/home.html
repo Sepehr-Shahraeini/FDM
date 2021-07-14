@@ -901,6 +901,25 @@
                             <div class="title-small ng-binding" style="color:gray;font-size:1em">Flights</div>
                         </a>
                     </div>
+
+
+
+                    <div class="box-app" style="padding-top:0" ng-show="HasMenuAccess('register_flights_report',3)">
+                        <a class="logo" style="text-decoration:none;" href="" data-ng-click="navigate(  '/flights/monthly'  , 'summary_flights_report')">
+                            <img src="content/images/rgflt.png">
+                            <div class="title-small ng-binding" style="color:gray;font-size:1em">Flights Summary</div>
+                        </a>
+                    </div>
+                    <div class="box-app" style="padding-top:0" ng-show="HasMenuAccess('register_flights_report',3)">
+                        <a class="logo" style="text-decoration:none;" href="" data-ng-click="navigate(  '/reg/flights/monthly'  , 'register_flights_report')">
+                            <img src="content/images/rgflt.png">
+                            <div class="title-small ng-binding" style="color:gray;font-size:1em">Register Flight Time</div>
+                        </a>
+                    </div>
+
+
+
+
                     <!--8-19-->
                     <div class="box-app" style="padding-top:0" ng-show="HasMenuAccess('atr_forma',3)">
                         <a class="logo" style="text-decoration:none;" href="" data-ng-click="navigate(  '/forma'  , 'atr_forma')">
@@ -965,6 +984,12 @@
                         <a class="logo" style="text-decoration:none;" href="" data-ng-click="navigate(  '/delays'  , 'delays_report')">
                             <img src="content/images/delay.png">
                             <div class="title-small ng-binding" style="color:gray;font-size:1em">Delays</div>
+                        </a>
+                    </div>
+                    <div class="box-app" style="padding-top:0" ng-show="HasMenuAccess('delays_report',3)">
+                        <a class="logo" style="text-decoration:none;" href="" data-ng-click="navigate(  '/delays'  , 'delays_report')">
+                            <img src="content/images/delaybi.png">
+                            <div class="title-small ng-binding" style="color:gray;font-size:1em">Delays Monitoring</div>
                         </a>
                     </div>
 

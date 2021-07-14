@@ -1,7 +1,8 @@
 ﻿'use strict';
-app.controller('personController', ['$scope', '$location', '$routeParams', '$rootScope', 'personService', 'authService', 'notificationService', '$route', function ($scope, $location, $routeParams, $rootScope, personService, authService, notificationService, $route) {
+app.controller('personController', ['$scope', '$location', '$routeParams', '$rootScope', 'personService', 'authService', 'notificationService', 'flightService', '$route', function ($scope, $location, $routeParams, $rootScope, personService, authService, notificationService, flightService, $route) {
     $scope.prms = $routeParams.prms;
     $scope.IsEditable = $rootScope.IsProfileEditable(); //$rootScope.roles.indexOf('Admin') != -1;
+    $scope.IsAccountEdit = $rootScope.roles.indexOf('Crew Scheduler') != -1;
     $scope.editButtonIcon = 'edit';
     $scope.editButtonText = 'Edit';
     $scope.isCrew = $route.current.isCrew;
@@ -340,12 +341,21 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
 
              { dataField: 'RemainAvSec', caption: 'AvSec', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 90 },
               { dataField: 'RemainSMS', caption: 'SMS', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 90 },
-               { dataField: 'RemainSEPT', caption: 'SEPT', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 90 },
-                { dataField: 'RemainDG', caption: 'DG', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 90 },
+
+        //7-12
+        { dataField: 'RemainSEPTP', caption: 'SEPT-P', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 90 },
+        { dataField: 'RemainSEPT', caption: 'SEPT-T', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 90 },
+
+
+        { dataField: 'RemainDG', caption: 'DG', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 90 },
                 { dataField: 'RemainCRM', caption: 'CRM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 90 },
                 { dataField: 'RemainCCRM', caption: 'CCRM', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 90 },
-                { dataField: 'RemainFirstAid', caption: 'FirstAid', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 90 },
-        
+        //moradi
+        { dataField: 'RemainFirstAid', caption: 'FirstAid', name: 'FirstAid', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 90, visible:false },
+        { dataField: 'RemainLine', caption: 'Line',name:'Line', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100 },
+        { dataField: 'RemainRecurrent', caption: 'Recurrent',name:'Recurrent', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100,visible:false },
+        //moradi2
+        { dataField: 'RemainCMC', caption: 'CMC', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 90 },
         
     ];
 
@@ -373,7 +383,8 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
         scrolling: { mode: 'infinite' },
         paging: { pageSize: 100 },
         showBorders: true,
-        selection: { mode: 'single' },
+        //3-16
+        selection: { mode: 'multiple' },
 
         columnAutoWidth: false,
         height: $(window).height() - 135,
@@ -418,7 +429,7 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
                 $scope.styleCell(e, e.data.RemainProficiencyOPC);
             }
             if (e.rowType === "data" && e.column.dataField == "RemainLPR") {
-                $scope.styleCell(e, e.data.RemainProficiencyOPC);
+                $scope.styleCell(e, e.data.RemainLPR);
             }
             if (e.rowType === "data" && e.column.dataField == "RemainAvSec") {
                 $scope.styleCell(e, e.data.RemainAvSec);
@@ -436,12 +447,19 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
             if (e.rowType === "data" && e.column.dataField == "RemainSEPT") {
                 $scope.styleCell(e, e.data.RemainSEPT);
             }
+            //7-12
+            if (e.rowType === "data" && e.column.dataField == "RemainSEPTP") {
+                $scope.styleCell(e, e.data.RemainSEPTP);
+            }
             if (e.rowType === "data" && e.column.dataField == "RemainDG") {
                 $scope.styleCell(e, e.data.RemainDG);
             }
             if (e.rowType === "data" && e.column.dataField == "RemainFirstAid") {
                 $scope.styleCell(e, e.data.RemainFirstAid);
             }
+
+            
+
 
             if (e.rowType === 'data'
                 && ((e.column.dataField == "RemainMedical")
@@ -456,11 +474,17 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
                 || (e.column.dataField == "RemainCRM")
                 || (e.column.dataField == "RemainCCRM")
                 || (e.column.dataField == "RemainSEPT")
+                //7-12
+                || (e.column.dataField == "RemainSEPTP")
                 || (e.column.dataField == "RemainDG")
                 || (e.column.dataField == "RemainFirstAid")
-
+              
+                || (e.column.dataField == "RemainLine")
+                || (e.column.dataField == "RemainRecurrent")
+                //moradi2
+                || (e.column.dataField == "RemainCMC")
                 )
-                && (!e.value || e.value == '-100000')) {
+                && ((!e.value && e.value!=0) || e.value == '-100000')) {
                  
                 e.cellElement.html('?');
             }
@@ -501,8 +525,9 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
         }
         if (value>45)
             return;
-        
-        if (!value || value == -100000) {
+        //moradi2
+         
+        if ((!value && value!==0) || value == -100000) {
             //#a6a6a6
             e.cellElement.css("backgroundColor", "#a6a6a6");
             e.cellElement.css("color", "#fff");
@@ -524,7 +549,7 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
     }
     $scope.doRefresh = false;
     $scope.showActive = false;
-    $scope.rankGroup='Cockpit';
+    $scope.rankGroup ='Cockpit';
     $scope.sb_rankgroup = {
         width:150,
         showClearButton: false,
@@ -532,6 +557,27 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
         dataSource: ['Cockpit','Cabin','All'],
         //readOnly:true,
         onValueChanged: function (e) {
+            //moradi
+            if (e.value == 'Cockpit') {
+                $scope.dg_instance.columnOption('FirstAid', 'visible', false);
+                $scope.dg_instance.columnOption('LPC', 'visible', true);
+                $scope.dg_instance.columnOption('OPC', 'visible', true);
+                $scope.dg_instance.columnOption('Licence', 'visible', true);
+                $scope.dg_instance.columnOption('LPR', 'visible', true);
+                $scope.dg_instance.columnOption('Line', 'visible', true);
+                $scope.dg_instance.columnOption('Recurrent', 'visible', false);
+            }
+            //if (e.value == 'Cabin')
+        else
+            {
+                $scope.dg_instance.columnOption('FirstAid', 'visible', true);
+                $scope.dg_instance.columnOption('LPC', 'visible', false);
+                $scope.dg_instance.columnOption('OPC', 'visible', false);
+                $scope.dg_instance.columnOption('Licence', 'visible', false);
+                $scope.dg_instance.columnOption('LPR', 'visible', false);
+                $scope.dg_instance.columnOption('Line', 'visible', false);
+                $scope.dg_instance.columnOption('Recurrent', 'visible', true);
+            }
             $scope.$broadcast('getFilterQuery', null);
         },
         bindingOptions: {
@@ -549,6 +595,593 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
              
         }
     };
+
+    ////////////////////
+    //3-16
+    $scope.btn_sms = {
+        text: 'Notify',
+        type: 'default',
+        //icon: 'plus',
+        width: 120,
+        onClick: function (e) {
+            var selected = $rootScope.getSelectedRows($scope.dg_instance);
+            if (!selected) {
+                General.ShowNotify(Config.Text_NoRowSelected, 'error');
+                return;
+            }
+           
+            $scope.popup_sms_visible = true;
+        },
+        bindingOptions: {
+           
+        }
+
+    };
+    //moradi2
+    $scope.btn_training = {
+        text: 'Training',
+        type: 'default',
+        //icon: 'plus',
+        width: 140,
+        onClick: function (e) {
+            $window.open('#!/training/', '_blank');
+        },
+        bindingOptions: {
+
+        }
+
+    };
+    $scope.txt_sms_message = {
+        height: 300,
+        bindingOptions: {
+            value: 'sms_message',
+
+        }
+    };
+    $scope.popup_sms_visible = false;
+    $scope.popup_sms_title = 'Notification';
+    $scope.popup_sms = {
+        elementAttr: {
+            //  id: "elementId",
+            class: "popup_sms"
+        },
+        shading: true,
+        //position: { my: 'left', at: 'left', of: window, offset: '5 0' },
+        height: 450,
+        width: 600,
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+
+        toolbarItems: [
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Send', validationGroup: "smsmessageperson", onClick: function (arg) {
+
+                        var result = arg.validationGroup.validate();
+
+                        if (!result.isValid ) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+                        var selected = $rootScope.getSelectedRows($scope.dg_instance);
+
+                        var names = Enumerable.From(selected).Select('$.Name').ToArray().join('_');
+                        var mobiles = Enumerable.From(selected).Select('$.Mobile').ToArray().join('_');
+                        var dto = { names: names, mobiles: mobiles, message: $scope.sms_message, sender: $rootScope.userName };
+                        $scope.loadingVisible = true;
+
+                        flightService.sendSMS(dto).then(function (response) {
+                            $scope.loadingVisible = false;
+                            General.ShowNotify(Config.Text_SavedOk, 'success');
+                            $scope.popup_sms_visible = false;
+
+                        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (arg) {
+
+                        $scope.popup_sms_visible = false;
+
+                    }
+                }, toolbar: 'bottom'
+            }
+        ],
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onTitleRendered: function (e) {
+            // $(e.titleElement).addClass('vahid');
+            // $(e.titleElement).css('background-color', '#f2552c');
+        },
+        onShowing: function (e) {
+
+        },
+        onShown: function (e) {
+             
+        },
+        onHiding: function () {
+           
+            $scope.popup_sms_visible = false;
+
+        },
+        bindingOptions: {
+            visible: 'popup_sms_visible',
+
+            title: 'popup_sms_title',
+
+        }
+    };
+    //////////////////////
+    //2021-06-29
+    //USER
+    //////////////////////////////////////
+    $scope.btn_user = {
+        text: 'User',
+        type: 'default',
+        icon: 'user',
+        width: 120,
+        onClick: function (e) {
+            $scope.dg_selected = $rootScope.getSelectedRow($scope.dg_instance);
+            if (!$scope.dg_selected) {
+                General.ShowNotify(Config.Text_NoRowSelected, 'error');
+                return;
+            }
+            var isCrew = $scope.dg_selected.JobGroupCode.startsWith('00101') || $scope.dg_selected.JobGroupCode.startsWith('00102');
+            if (!isCrew) {
+                return;
+            }
+            $scope.getUsers(function () {
+                $scope.loadingVisible = true;
+                personService.getCrewLight(Config.CustomerId, $scope.dg_selected.Id).then(function (response) {
+                    $scope.loadingVisible = false;
+                    var _data = response[0];
+                    $scope.employee = _data;
+                    $scope.dto_user.FirstName = $scope.employee.FirstName;
+                    $scope.dto_user.LastName = $scope.employee.LastName;
+                    $scope.dto_user.PhoneNumber = $scope.employee.Mobile;
+                    $scope.dto_user.PersonId = $scope.employee.PersonId;
+                    console.log($scope.employee);
+                    if (!$scope.employee.UserId) {
+                        $scope.user = null;
+                        $scope.userId = null;
+                    }
+                    else {
+
+
+                        $scope.user = Enumerable.From($scope.users).Where('$.Id=="' + $scope.employee.UserId + '"').FirstOrDefault();
+
+                    }
+
+                    $scope.dto_user.UserId = null;
+                    $scope.dto_user.Id = null;
+                    $scope.dto_user.UserName = null;
+                    $scope.IsUserEdit = false;
+                    if ($scope.user) {
+                        $scope.dto_user.UserId = $scope.user.Id;
+                        $scope.dto_user.UserName = $scope.user.UserName;
+                        $scope.dto_user.Id = $scope.user.Id;
+                        $scope.IsUserEdit = true;
+                    }
+                     
+                    $scope.popup_user_visible = true;
+                });
+            });
+           
+           
+        },
+        bindingOptions: {
+            //visible: 'IsEditable'
+        }
+
+    };
+
+    $scope.selectedPassword = null;
+    $scope.btn_password = {
+        text: 'Password',
+        type: 'default',
+        icon: 'key',
+        width: 150,
+
+        onClick: function (e) {
+            $scope.selectedPassword  = $rootScope.getSelectedRow($scope.dg_instance);
+            if (!$scope.selectedPassword ) {
+                General.ShowNotify(Config.Text_NoRowSelected, 'error');
+                return;
+            }
+            var isCrew = $scope.selectedPassword.JobGroupCode.startsWith('00101') || $scope.selectedPassword.JobGroupCode.startsWith('00102');
+            if (!isCrew) {
+                return;
+            }
+            $scope.loadingVisible = true;
+            personService.getCrewLight(Config.CustomerId, $scope.selectedPassword.Id).then(function (response) {
+                $scope.loadingVisible = false;
+                var _data = response[0];
+                
+                if (!_data.UserId) {
+                    General.ShowNotify("user not found", 'error');
+                    return;
+                }
+                $scope.selectedPassword = _data;
+                $scope.popup_password_visible = true;
+            });
+          
+
+        }
+
+    };
+    /////////////////////////////////////
+    $scope.newPassword = '';
+    $scope.txt_newPassword = {
+        hoverStateEnabled: false,
+        bindingOptions: {
+            value: 'newPassword',
+
+
+        }
+    };
+    $scope.popup_password_visible = false;
+    $scope.popup_password_title = 'Password';
+
+    $scope.popup_password = {
+
+        fullScreen: false,
+        showTitle: true,
+        width: 400,
+        height: 200,
+        toolbarItems: [
+
+            { widget: 'dxButton', location: 'after', options: { type: 'success', text: 'Save', icon: 'check', validationGroup: 'password', bindingOptions: {} }, toolbar: 'bottom' },
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+        dragEnabled: true,
+        closeOnOutsideClick: false,
+        onShowing: function (e) {
+
+
+        },
+        onShown: function (e) {
+
+
+        },
+        onHiding: function () {
+
+            // $scope.clearEntity();
+
+            $scope.popup_password_visible = false;
+
+        },
+        onContentReady: function (e) {
+
+        },
+        bindingOptions: {
+            visible: 'popup_password_visible',
+
+        }
+    };
+    $scope.popup_password.toolbarItems[1].options.onClick = function (e) {
+
+        $scope.popup_password_visible = false;
+    };
+
+    //save button
+    $scope.popup_password.toolbarItems[0].options.onClick = function (e) {
+        //sook
+        // alert($scope.dto.Roles);
+        var result = e.validationGroup.validate();
+
+        if (!result.isValid) {
+            General.ShowNotify(Config.Text_FillRequired, 'error');
+            return;
+        }
+        var dto = { Id: $scope.selectedPassword.UserId, Password: $scope.newPassword }
+
+        $scope.loadingVisible = true;
+        authService.setPassword(dto).then(function (response) {
+            $scope.loadingVisible = false;
+            $scope.newPassword = '';
+            $scope.popup_password_visible = false;
+
+
+        },
+            function (err) {
+                $scope.loadingVisible = false;
+                $scope.message = err.message;
+                General.ShowNotify(err.message, 'error');
+
+            });
+
+    };
+    /////////////////////////////
+    $scope.dto_user = {
+        UserId: null,
+        UserName: null,
+        Password: '1234@aA',
+        FirstName: null,
+        LastName: null,
+        PhoneNumber: null,
+        Email: '',
+        PersonId: -1,
+        Id: null,
+    };
+    $scope.popup_user_visible = false;
+    $scope.popup_user_title = 'User';
+    $scope.popup_user_instance = null;
+    $scope.popup_user = {
+
+        fullScreen: false,
+        showTitle: true,
+        width: 400,
+        height: 400,
+        toolbarItems: [
+
+            { widget: 'dxButton', location: 'after', options: { type: 'success', text: 'Save', icon: 'check', validationGroup: 'useradd', bindingOptions: {} }, toolbar: 'bottom' },
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+        dragEnabled: true,
+        closeOnOutsideClick: false,
+        onShowing: function (e) {
+
+
+        },
+        onShown: function (e) {
+           
+
+        },
+        onHiding: function () {
+
+            // $scope.clearEntity();
+            $scope.users = [];
+            $scope.user = null;
+            $scope.employeeId = null;
+            $scope.userId = null;
+            $scope.personId = null;
+            $scope.employee = null;
+            $scope.IsUserEdit = false;
+            $scope.dto_user = {
+                Id: null,
+                UserId: null,
+                UserName: null,
+                Password: '1234@aA',
+                FirstName: null,
+                LastName: null,
+                PhoneNumber: null,
+                Email: '',
+                PersonId: -1,
+            };
+            $scope.popup_user_visible = false;
+
+        },
+        onContentReady: function (e) {
+            if (!$scope.popup_user_instance)
+                $scope.popup_user_instance = e.component;
+
+        },
+        bindingOptions: {
+            visible: 'popup_user_visible',
+
+        }
+    };
+    $scope.popup_user.toolbarItems[1].options.onClick = function (e) {
+
+        $scope.popup_user_visible = false;
+    };
+
+    //save button
+    $scope.popup_user.toolbarItems[0].options.onClick = function (e) {
+        //sook
+        
+        var result = e.validationGroup.validate();
+
+        if (!result.isValid) {
+            General.ShowNotify(Config.Text_FillRequired, 'error');
+            return;
+        }
+         $scope.dto_user.Email = $scope.dto_user.FirstName.replace(/\s/g, '') + '.' + $scope.dto_user.LastName.replace(/\s/g, '') + '@airpocket.ir';
+         $scope.loadingVisible = true;
+        if (!$scope.IsUserEdit) {
+            //if ($scope.personId)
+            //    $scope.dto.PersonId = $scope.personId;
+            //else
+            //    $scope.dto.PersonId = -1;
+            authService.register2($scope.dto_user).then(function (response) {
+                $scope.loadingVisible = false;
+                $scope.dto_user = {
+                    UserId: null,
+                    UserName: null,
+                    Password: '1234@aA',
+                    FirstName: null,
+                    LastName: null,
+                    PhoneNumber: null,
+                    Email: '',
+                    PersonId: -1,
+                    Id: null,
+                };
+                $scope.personId = null;
+                $scope.popup_user_visible = false;
+
+
+            },
+                function (err) {
+                    $scope.loadingVisible = false;
+                    $scope.message = err.message;
+                    General.ShowNotify(err.message, 'error');
+
+                });
+        }
+        else {
+          
+            authService.updateUser($scope.dto_user).then(function (response) {
+                $scope.loadingVisible = false;
+                $scope.dto_user = {
+                    UserId: null,
+                    UserName: null,
+                    Password: '1234@aA',
+                    FirstName: null,
+                    LastName: null,
+                    PhoneNumber: null,
+                    Email: '',
+                    PersonId: -1,
+                    Id: null,
+                };
+                $scope.popup_user_visible = false;
+
+
+            },
+                function (err) {
+                    $scope.loadingVisible = false;
+                    $scope.message = err.message;
+                    General.ShowNotify(err.message, 'error');
+
+                });
+        }
+
+
+    };
+    /////////////////////////////////////
+    $scope.users = [];
+    $scope.getUsers = function (callback) {
+
+        $scope.loadingVisible = true;
+        authService.getUsers().then(function (response) {
+            $scope.loadingVisible = false;
+
+            $scope.users = response;
+            if (callback)
+                callback();
+
+
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+    };
+    $scope.getDatasourceEmployees = function (cid) {
+        return new DevExpress.data.DataSource({
+            store:
+
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/employees/light/' + cid,
+                    version: 4
+                }),
+
+            sort: ['LastName'],
+        });
+    };
+    $scope.isPropDisabled = false;
+    $scope.employeeId = null;
+    $scope.userId = null;
+    $scope.user = null;
+    $scope.personId = null;
+    $scope.employee = null;
+    $scope.IsUserEdit = false;
+   
+    $scope.txtuser_UserName = {
+        hoverStateEnabled: false,
+        bindingOptions: {
+            value: 'dto_user.UserName',
+
+        }
+    };
+    $scope.txtuser_Password = {
+        hoverStateEnabled: false,
+        bindingOptions: {
+            value: 'dto_user.Password',
+
+
+        }
+    };
+    $scope.txtuser_FirstName = {
+        hoverStateEnabled: false,
+
+        valueChangeEvent: 'keyup',
+        onValueChanged: function (e) {
+           // $scope.nameChanged();
+        },
+        readOnly:true,
+        bindingOptions: {
+            value: 'dto_user.FirstName',
+             
+        }
+    };
+    $scope.txtuser_LastName = {
+        hoverStateEnabled: false,
+        valueChangeEvent: 'keyup',
+        onValueChanged: function (e) {
+            //$scope.nameChanged();
+        },
+        readOnly:true,
+        bindingOptions: {
+            value: 'dto_user.LastName',
+            
+        }
+    };
+    $scope.txtuser_phone = {
+        hoverStateEnabled: false,
+        readOnly:true,
+        bindingOptions: {
+            value: 'dto_user.PhoneNumber',
+             
+        }
+    };
+    $scope.sb_employees = {
+        showClearButton: true,
+        searchEnabled: true,
+        dataSource: $scope.getDatasourceEmployees(Config.CustomerId),
+        //itemTemplate: function (data) {
+        //    return $rootScope.getSbTemplateAirport(data);
+        //},
+
+        searchExpr: ["Name"],
+        displayExpr: "Name",
+        valueExpr: 'PersonId',
+        onSelectionChanged: function (arg) {
+
+            $scope.employee = arg.selectedItem;
+            $scope.dto_user.FirstName = $scope.employee.FirstName;
+            $scope.dto_user.LastName = $scope.employee.LastName;
+            $scope.dto_user.PhoneNumber = $scope.employee.Mobile;
+            $scope.dto_user.PersonId = $scope.employee.personId;
+            console.log($scope.employee);
+            if (!$scope.employee.UserId) {
+                $scope.user = null;
+                $scope.userId = null;
+            }
+            else {
+                 
+
+                $scope.user = Enumerable.From($scope.users).Where('$.Id=="' + $scope.employee.UserId + '"').FirstOrDefault();
+                
+            }
+
+            $scope.dto_user.UserId = null;
+            $scope.dto_user.UserName = null;
+            $scope.IsUserEdit = false;
+            if ($scope.user) {
+                $scope.dto_user.UserId = $scope.user.Id;
+                $scope.dto_user.UserName = $scope.user.UserName;
+                
+                $scope.IsUserEdit = true;
+            }
+            
+            
+
+        },
+        bindingOptions: {
+            value: 'personId',
+
+        }
+    };
+    //////////////////////
     $scope.getFilters = function () {
         var filters = $scope.filters;
         if (filters.length == 0)
@@ -614,7 +1247,7 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
     }
     //////////////////////////////////////////
     $scope.$on('getFilterResponse', function (event, prms) {
-
+        
         $scope.filters = prms;
 
         $scope.doRefresh = true;
@@ -638,6 +1271,7 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
        
         setTimeout(function () {
             $scope.showActive = true;
+            
             //$scope.$broadcast('getFilterQuery', null);
         },  500);
     });

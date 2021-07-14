@@ -58,7 +58,7 @@ namespace EPAGriffinAPI.Models
         public Nullable<System.DateTime> DutyEnd { get; set; }
         public Nullable<System.DateTime> DateEndLocal { get; set; }
         public Nullable<System.DateTime> DutyEndLocal { get; set; }
-        public int DelayAmount { get; set; }
+        public double DelayAmount { get; set; }
         public Nullable<System.DateTime> DelayedReportingTime { get; set; }
         public Nullable<System.DateTime> NextNotification { get; set; }
         public Nullable<System.DateTime> RevisedDelayedReportingTime { get; set; }
@@ -99,5 +99,9 @@ namespace EPAGriffinAPI.Models
         public string CanceledRoute { get; set; }
         public Nullable<int> Extension { get; set; }
         public int IsExtension { get; set; }
+        public Nullable<System.DateTime> DateConfirmed { get; set; }
+        public string ConfirmedBy { get; set; }
+        public int IsConfirmed { get; set; }
+        public string UserName { get; set; }
     }
 }

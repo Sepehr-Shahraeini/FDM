@@ -74,6 +74,9 @@ namespace EPAGriffinAPI.Models
         public string CanceledRoute { get; set; }
         public Nullable<int> Extension { get; set; }
         public Nullable<double> Split { get; set; }
+        public Nullable<System.DateTime> DateConfirmed { get; set; }
+        public string ConfirmedBy { get; set; }
+        public string UserName { get; set; }
     
         public virtual Box Box { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

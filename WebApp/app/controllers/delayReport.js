@@ -1,9 +1,22 @@
 ﻿'use strict';
-app.controller('delayReportController', ['$scope', '$location', '$routeParams', '$rootScope', 'flightService', 'aircraftService', 'authService', 'notificationService', '$route', function ($scope, $location, $routeParams, $rootScope, flightService, aircraftService, authService, notificationService, $route) {
+app.controller('delayReportController', ['$scope', '$location', '$routeParams', '$rootScope', 'flightService', 'aircraftService', 'authService', 'notificationService', '$route', '$window',function ($scope, $location, $routeParams, $rootScope, flightService, aircraftService, authService, notificationService, $route,$window) {
     $scope.prms = $routeParams.prms;
     var isTaxiVisible = false;
+    $scope.isprintvisible = true;
     //if ($rootScope.userName.toLowerCase() == 'ashrafi')
     //    isTaxiVisible = true;
+    $scope.btn_airport = {
+        text: 'Airports Report',
+        type: 'default',
+
+        width: 200,
+
+        bindingOptions: {},
+        onClick: function (e) {
+
+            $window.open('#!/delays/airports/', '_blank');
+        }
+    };
     $scope.btn_search = {
         text: 'Search',
         type: 'success',
@@ -15,6 +28,33 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
             $scope.dg_flight_ds = null;
             $scope.doRefresh = true;
             $scope.bind();
+
+        }
+
+    };
+    $scope.btn_print = {
+        text: 'Print',
+        type: 'default',
+        icon: 'print',
+        width: 120,
+        // validationGroup: 'ctrsearch',
+        bindingOptions: {},
+        onClick: function (e) {
+            if (!$scope.cats || $scope.cats.length==0) {
+                General.ShowNotify('No Categories Selected', 'error');
+                return;
+            }
+            var _dfrom = moment($scope.dt_from).format('YYYY-MM-DDTHH:mm:ss');
+            var _dto = moment($scope.dt_to).format('YYYY-MM-DDTHH:mm:ss');
+            var days = 31;
+            var cts =$scope.cats.join('_');
+          
+            $window.open($rootScope.reportServer + '?type=3&p=' + days + '&df=' + _dfrom+'&dt='+_dto+'&cats='+cts, '_blank');
+            //flightService.getDelayReportPeriodic(_dfrom, _dto, 5).then(function (response) {
+            //    $scope.loadingVisible = false;
+            //    $scope.total = response;
+            //}, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
 
         }
 
@@ -116,14 +156,28 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
     };
     $scope.flights = null;
     $scope.txt_fltnos = {
-        height: 100,
+        height: 70,
         bindingOptions: {
             value: 'flights'
         }
     };
     /////////////////////////////////////////
+    $scope.summary = {};
+    $scope.getSummary = function () {
+        var _df = moment($scope.dt_from).format('YYYY-MM-DDTHH:mm:ss');
+        var _dt = moment($scope.dt_to).format('YYYY-MM-DDTHH:mm:ss');
+        flightService.getDelayFlightSummary(_df, _dt).then(function (response) {
+            $scope.summary = response;
+             
+
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+    };
     $scope.bind = function () {
         //iruser558387
+       
+         
+
+
         var dts = [];
         if ($scope.dt_to) {
             var _dt = moment($scope.dt_to).format('YYYY-MM-DDTHH:mm:ss');
@@ -140,6 +194,10 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
 
         if ($scope.flights)
             dts.push('flts=' + $scope.flights);
+
+        if ($scope.cats)
+            dts.push('cats=' + $scope.cats.join('_'));
+        dts.push('range='+$scope.range);
 
         var prms = dts.join('&');
 
@@ -191,6 +249,7 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
             $scope.doRefresh = false;
             $scope.dg_flight_instance.refresh();
         }
+        $scope.getSummary();
 
     };
     //////////////////////////////////////////
@@ -334,7 +393,34 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
 
         }
     };
+    $scope.rangeDs = [
+        { Id: 1, Title: 'All' },
+        { Id: 2, Title: 'Under 30 min' },
+        { Id: 3, Title: 'Above 30 min' },
+        { Id: 4, Title: 'Between 31 min & 60 min' },
+        { Id: 5, Title: 'Between 1 hrs & 2 hrs' },
+        { Id: 6, Title: 'Between 2 hrs & 3 hrs' },
+        { Id: 7, Title: 'Above 3 hrs' },
+    ];
+    $scope.range = 1;
+    $scope.sb_range = {
+        placeholder: 'Status',
+        showClearButton: false,
+        searchEnabled: false,
+        dataSource: $scope.rangeDs,
 
+        onSelectionChanged: function (arg) {
+
+        },
+
+        displayExpr: "Title",
+        valueExpr: 'Id',
+        bindingOptions: {
+            value: 'range',
+
+
+        }
+    };
 
 
     //////////////////////////////////
@@ -353,7 +439,30 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
         { dataField: 'STDDayPersian', caption: 'Date(P)', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120,   fixed: true, fixedPosition: 'left' },
       
         { dataField: 'FlightNumber', caption: 'Flight No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left', fixed: true, fixedPosition: 'left' },
-         { dataField: 'FlightStatus', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: false, fixedPosition: 'left', fixed: true, fixedPosition: 'left' },
+        {
+            caption: 'Route',
+            columns: [
+                { dataField: 'FromAirportIATA', caption: 'From', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+                { dataField: 'ToAirportIATA', caption: 'To', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+            ]
+        },
+        {
+            caption: 'Delay',
+            columns: [
+                { dataField: 'Delay2', caption: 'hh:mm', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+                { dataField: 'Delay', name: 'Delaymm', caption: 'mm', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 120 },
+                //{ dataField: 'ICategory', caption: 'Category', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 250 },
+                { dataField: 'MapTitle2', caption: 'Category', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 250 },
+                { dataField: 'Remark', caption: 'Operator Remark', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 300 },
+                { dataField: 'Code', caption: 'Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+                
+                { dataField: 'Category', caption: 'IATA', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 300 },
+
+
+            ]
+        },
+
+        { dataField: 'FlightStatus', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: false, fixedPosition: 'left', fixed: true, fixedPosition: 'left' },
 
        {
            caption: 'Aircraft', columns: [
@@ -361,13 +470,7 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
         { dataField: 'Register', caption: 'Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, sortIndex: 2, sortOrder: 'asc' },
            ]
        },
-      {
-          caption: 'Route',
-          columns: [
-              { dataField: 'FromAirportIATA', caption: 'From', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
-              { dataField: 'ToAirportIATA', caption: 'To', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
-          ]
-      },
+      
        {
            caption: 'Dep/Arr',
            columns: [
@@ -389,18 +492,7 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
        //    ]
        //},
 
-        {
-            caption: 'Delay',
-            columns: [
-                { dataField: 'Delay2', caption: 'Amount', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
-                 { dataField: 'Remark', caption: 'Remark', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 300 },
-                { dataField: 'Code', caption: 'Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
-                { dataField: 'ICategory', caption: 'Category', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 250 },
-                  { dataField: 'Category', caption: 'IATA', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 300 },
-                  
-
-            ]
-        },
+        
 
         
 
@@ -445,7 +537,7 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
         selection: { mode: 'single' },
 
         columnAutoWidth: false,
-        height: $(window).height() - 140,
+        height: $(window).height() - 160,
 
         columns: $scope.dg_flight_columns,
         onContentReady: function (e) {
@@ -474,6 +566,20 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
                     displayFormat: "{0}",
 
                     summaryType: "custom"
+                },
+                {
+                    column: "Delaymm",
+                    summaryType: "sum",
+                    customizeText: function (data) {
+                        return data.value;
+                    }
+                },
+                {
+                    column: "Delaymm",
+                    summaryType: "avg",
+                    customizeText: function (data) {
+                        return 'Avg: ' + Math.round(data.value);
+                    }
                 },
                 {
                     name: "DelayAvg",
@@ -1095,6 +1201,13 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
             sort: ['Register'],
         });
     };
+    $scope.catsDs = [];
+    $scope.getCats = function () {
+        flightService.getMappedTitle().then(function (response) {
+            
+            $scope.catsDs = response;
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+    };
 
     $scope.route = null;
     $scope.tag_route = {
@@ -1133,6 +1246,23 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
             value: 'reg',
         }
     };
+    $scope.cats = null;
+    $scope.tag_cats = {
+
+        showSelectionControls: true,
+        applyValueMode: "instantly",
+
+        showClearButton: true,
+        searchEnabled: true,
+        dataSource: $scope.getDatasourceMSN(),
+
+
+        
+        bindingOptions: {
+            value: 'cats',
+            dataSource: 'catsDs'
+        }
+    };
     //////////////////////////////////
     if (!authService.isAuthorized()) {
 
@@ -1150,7 +1280,7 @@ app.controller('delayReportController', ['$scope', '$location', '$routeParams', 
 
     $scope.$on('$viewContentLoaded', function () {
 
-
+        $scope.getCats();
     });
 
     $rootScope.$broadcast('FlightsReportLoaded', null);

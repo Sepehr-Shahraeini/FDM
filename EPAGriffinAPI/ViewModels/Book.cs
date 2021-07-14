@@ -115,18 +115,33 @@ namespace EPAGriffinAPI.ViewModels
             set { bookRelatedEmployees = value; }
         }
 
-        List<JobGroup> bookRelatedGroups = null;
-        public List<JobGroup> BookRelatedGroups
+        //List<JobGroup> bookRelatedGroups = null;
+        //public List<JobGroup> BookRelatedGroups
+        //{
+        //    get
+        //    {
+        //        if (bookRelatedGroups == null)
+        //            bookRelatedGroups = new List<JobGroup>();
+        //        return bookRelatedGroups;
+
+        //    }
+        //    set { bookRelatedGroups = value; }
+        //}
+
+        List<BookTypeGroup> bookRelatedGroups = null;
+        public List<BookTypeGroup> BookRelatedGroups
         {
             get
             {
                 if (bookRelatedGroups == null)
-                    bookRelatedGroups = new List<JobGroup>();
+                    bookRelatedGroups = new List<BookTypeGroup>();
                 return bookRelatedGroups;
 
             }
             set { bookRelatedGroups = value; }
         }
+
+        
 
         List<string> bookKeywords = null;
         public List<string> BookKeywords
@@ -307,7 +322,18 @@ namespace EPAGriffinAPI.ViewModels
 
         }
     }
+    public class BookTypeGroup
+    {
+        public int Id { get; set; }
+        public int? TypeId { get; set; }
 
+        public string Title { get; set; }
+        public string FullCode { get; set; }
+        public string Remark { get; set; }
+        public string Parent { get; set; }
+        public string Type { get; set; }
+
+    }
     public class BookAutor
     {
         public int Id { get; set; }

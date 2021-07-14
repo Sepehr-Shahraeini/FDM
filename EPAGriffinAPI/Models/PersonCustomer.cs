@@ -35,7 +35,7 @@ namespace EPAGriffinAPI.Models
     
         public virtual Customer Customer { get; set; }
         public virtual JobGroup JobGroup { get; set; }
-        public virtual Person Person { get; set; }
         public virtual Employee Employee { get; set; }
+        public virtual Person Person { get; set; }
     }
 }

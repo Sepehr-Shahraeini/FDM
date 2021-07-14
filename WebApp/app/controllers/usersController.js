@@ -1,6 +1,66 @@
 ﻿'use strict';
 app.controller('usersController', ['$scope', '$location', '$routeParams', '$rootScope', 'flightService', 'aircraftService', 'authService', 'notificationService', '$route', function ($scope, $location, $routeParams, $rootScope, flightService, aircraftService, authService, notificationService, $route) {
     $scope.prms = $routeParams.prms;
+    $scope.dto = {
+        UserName: '',
+        FirstName: '',
+        LastName: '',
+        Email: '',
+        Password: '',
+        PhoneNumber: '',
+        Station: '',
+    };
+
+    $scope.getDatasourceEmployees = function (cid) {
+        return new DevExpress.data.DataSource({
+            store:
+
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/employees/light/' + cid,
+                    version: 4
+                }),
+
+            sort: ['LastName'],
+        });
+    };
+    $scope.isPropDisabled = false;
+    $scope.employeeId = null;
+    $scope.personId = null;
+    $scope.employee = null;
+    $scope.sb_employees = {
+        showClearButton: true,
+        searchEnabled: true,
+        dataSource: $scope.getDatasourceEmployees(Config.CustomerId),
+        //itemTemplate: function (data) {
+        //    return $rootScope.getSbTemplateAirport(data);
+        //},
+         
+        searchExpr: ["Name"],
+        displayExpr: "Name",
+        valueExpr: 'PersonId',
+        onSelectionChanged: function (arg) {
+
+            $scope.employee = arg.selectedItem;
+            $scope.isPropDisabled = $scope.employee;
+            $scope.dto.FirstName = null;
+            $scope.dto.LastName = null;
+            $scope.dto.PhoneNumber = null;
+            if ($scope.employee) {
+                $scope.dto.FirstName = $scope.employee.FirstName;
+                $scope.dto.LastName = $scope.employee.LastName;
+                $scope.dto.PhoneNumber = $scope.employee.Mobile;
+            }
+            // $scope.fillSchedule2();
+
+        },
+        bindingOptions: {
+            value: 'personId',
+
+        }
+    };
+
+
+
     $scope.btn_search = {
         text: 'Search',
         type: 'success',
@@ -38,15 +98,7 @@ app.controller('usersController', ['$scope', '$location', '$routeParams', '$root
         }
 
     };
-    $scope.dto = {
-        UserName: '',
-        FirstName: '',
-        LastName: '',
-        Email: '',
-        Password: '',
-        PhoneNumber: '',
-        Station: '',
-    };
+    
     function generatePassword() {
         var length = 8;
         var capital="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -111,7 +163,9 @@ app.controller('usersController', ['$scope', '$location', '$routeParams', '$root
                PhoneNumber: selected.PhoneNumber,
                Station:selected.SecurityStamp,
                Roles: null,
-           };
+
+            };
+            $scope.personId = selected.PersonId;
            $scope.getUserRoles(selected.Id, function (ds) {
                $scope.dto.Roles = Enumerable.From(ds).Select('$.Name').ToArray();
                $scope.popup_add_visible = true;
@@ -356,7 +410,8 @@ app.controller('usersController', ['$scope', '$location', '$routeParams', '$root
         },
         bindingOptions: {
             value: 'dto.FirstName',
-            readOnly:'IsDisabled',
+            readOnly: 'IsDisabled',
+            disabled: 'isPropDisabled',
 
         }
     };
@@ -369,6 +424,7 @@ app.controller('usersController', ['$scope', '$location', '$routeParams', '$root
         bindingOptions: {
             value: 'dto.LastName',
             readOnly: 'IsDisabled',
+            disabled: 'isPropDisabled',
         }
     };
     $scope.txt_Email = {
@@ -391,7 +447,7 @@ app.controller('usersController', ['$scope', '$location', '$routeParams', '$root
         
         bindingOptions: {
             value: 'dto.PhoneNumber',
-
+            disabled: 'isPropDisabled',
         }
     };
     $scope.txt_Password = {
@@ -446,7 +502,7 @@ app.controller('usersController', ['$scope', '$location', '$routeParams', '$root
         fullScreen: false,
         showTitle: true,
         width: 500,
-        height: 440,
+        height: 550,
         toolbarItems: [
 
             { widget: 'dxButton', location: 'after', options: { type: 'success', text: 'Save', icon: 'check', validationGroup: 'useradd', bindingOptions: {} }, toolbar: 'bottom' },
@@ -501,6 +557,10 @@ app.controller('usersController', ['$scope', '$location', '$routeParams', '$root
         $scope.dto.Email = $scope.dto.FirstName.replace(/\s/g, '') + '.' + $scope.dto.LastName.replace(/\s/g, '') + '@airpocket.ir';
         $scope.loadingVisible = true;
         if (!$scope.IsEdit) {
+            if ($scope.personId)
+                $scope.dto.PersonId = $scope.personId;
+            else
+                $scope.dto.PersonId = -1;
             authService.register2($scope.dto).then(function (response) {
                 $scope.loadingVisible = false;
                 $scope.dto = {
@@ -513,7 +573,9 @@ app.controller('usersController', ['$scope', '$location', '$routeParams', '$root
                     Password: '1234@aA', //generatePassword(),
                     Station:'',
                     Roles: null,
+                    PersonId:null,
                 };
+                $scope.personId = null;
                 console.log(response);
 
 
@@ -528,6 +590,10 @@ app.controller('usersController', ['$scope', '$location', '$routeParams', '$root
         else
         {
             console.log($scope.dto);
+            if ($scope.personId)
+                $scope.dto.PersonId = $scope.personId;
+            else
+                $scope.dto.PersonId = -1;
             authService.updateUser($scope.dto).then(function (response) {
                 $scope.loadingVisible = false;
                 $scope.dto = {

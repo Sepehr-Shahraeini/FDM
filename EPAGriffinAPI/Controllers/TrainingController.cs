@@ -37,6 +37,17 @@ namespace EPAGriffinAPI.Controllers
 
         }
 
+        [Route("odata/training/idea/all")]
+
+        public async Task<IHttpActionResult> GetTrainingTestAll()
+        {
+            // var data=HelperTraining.GetTrainingTest();
+            var data = HelperTraining.GetIdeaAll();
+
+            return Ok(data);
+
+        }
+
         [Route("odata/training/ext/test2")]
 
         public async Task<IHttpActionResult> GetTrainingTest2()
@@ -58,6 +69,17 @@ namespace EPAGriffinAPI.Controllers
             return Ok(data);
 
         }
+
+        //[Route("odata/training/ext/test4")]
+
+        //public async Task<IHttpActionResult> GetTrainingTest4()
+        //{
+        //    // var data=HelperTraining.GetTrainingTest();
+        //    var data = HelperTraining.GetIdeaAll4();
+
+        //    return Ok(data);
+
+        //}
 
         [Route("odata/training/ext/idea/update")]
         [AcceptVerbs("GET")]

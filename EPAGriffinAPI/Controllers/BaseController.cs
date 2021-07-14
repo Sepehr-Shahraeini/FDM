@@ -259,6 +259,23 @@ namespace EPAGriffinAPI.Controllers
 
         }
 
+        [Route("odata/base/jobgroups/type/{cid}")]
+        [EnableQuery]
+        // [Authorize]
+        public IQueryable<ViewJobGroupType> GetJobGroupTypes(int cid)
+        {
+            try
+            {
+                return unitOfWork.ViewJobGroupTypeRepository.GetQuery().Where(q => q.CustomerId == cid);
+                // return db.ViewAirports.AsNoTracking() ;
+            }
+            catch (Exception ex)
+            {
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+            }
+
+        }
+
         [Route("odata/base/library/folders/{cid}")]
         [EnableQuery]
         // [Authorize]

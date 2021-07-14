@@ -64,6 +64,7 @@ app.controller('crewTimeReportController', ['$scope', '$location', '$routeParams
                 // _d.DurationM = _d.FlightTime % 60;
                 // var fh = _d.FlightH * 60 + _d.FlightM;
                 _d.FlightTime2 = $scope.formatMinutes(_d.FlightTime);
+                _d.FlightTimeActual2 = $scope.formatMinutes(_d.FlightTimeActual);
                 _d.FixTime2 = $scope.formatMinutes(_d.FixTime);
                 //var bm = _d.BlockH * 60 + _d.BlockM;
                 _d.BlockTime2 = $scope.formatMinutes(_d.BlockTime);
@@ -91,10 +92,10 @@ app.controller('crewTimeReportController', ['$scope', '$location', '$routeParams
                     _d.ChocksIn = (new Date(_d.ChocksIn)).addMinutes(offset);
                 if (_d.ChocksOut)
                     _d.ChocksOut = (new Date(_d.ChocksOut)).addMinutes(offset);
-                if (_d.Takeoff)
-                    _d.Takeoff = (new Date(_d.Takeoff)).addMinutes(offset);
-                if (_d.Landing)
-                    _d.Landing = (new Date(_d.Landing)).addMinutes(offset);
+                // if (_d.Takeoff)
+                //    _d.Takeoff = (new Date(_d.Takeoff)).addMinutes(offset);
+                // if (_d.Landing)
+                //     _d.Landing = (new Date(_d.Landing)).addMinutes(offset);
                 _d.DurationH = Math.floor(_d.FlightTime / 60);
                 _d.DurationM = _d.FlightTime % 60;
                 var fh = _d.FlightH * 60 + _d.FlightM;
@@ -141,24 +142,25 @@ app.controller('crewTimeReportController', ['$scope', '$location', '$routeParams
     $scope.dg_flight_total_columns = [
         {
             name: 'date', caption: 'Date', columns: [
-                   {
-                       cellTemplate: function (container, options) {
-                           $("<div style='text-align:center'/>")
-                               .html(options.rowIndex + 1)
-                               .appendTo(container);
-                       }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
-                   },
-         { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', width: 90, allowEditing: false, fixed: false, fixedPosition: 'left' },
+                {
+                    cellTemplate: function (container, options) {
+                        $("<div style='text-align:center'/>")
+                            .html(options.rowIndex + 1)
+                            .appendTo(container);
+                    }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+                },
+                { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', width: 90, allowEditing: false, fixed: false, fixedPosition: 'left' },
 
-         { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left',width:100 },
+                { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 200 },
 
-         { dataField: 'Legs', caption: 'Legs', allowResizing: true, dataType: 'number', allowEditing: false, width: 90, alignment: 'center', },
-         { dataField: 'DH', caption: 'DH', allowResizing: true, dataType: 'number', allowEditing: false, width: 90, alignment: 'center', },
-         { dataField: 'LayOver', caption: 'LO', allowResizing: true, dataType: 'number', allowEditing: false, width: 90, alignment: 'center', },
-         { dataField: 'FlightTime2', caption: 'Sch. FLT Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: true, fixedPosition: 'right' },
-         { dataField: 'BlockTime2', caption: 'Block Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: true, fixedPosition: 'right' },
-         { dataField: 'SITATime2', caption: 'SITA FLT Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: true, fixedPosition: 'right' },
-         { dataField: 'FixTime2', caption: 'Fix Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: true, fixedPosition: 'right' },
+                { dataField: 'Legs', caption: 'Legs', allowResizing: true, dataType: 'number', allowEditing: false, width: 80, alignment: 'center', },
+                { dataField: 'DH', caption: 'DH', allowResizing: true, dataType: 'number', allowEditing: false, width: 90, alignment: 'center', },
+                //  { dataField: 'LayOver', caption: 'LO', allowResizing: true, dataType: 'number', allowEditing: false, width: 90, alignment: 'center', },
+                { dataField: 'FlightTime2', caption: 'Sch. Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: true, fixedPosition: 'right' },
+                { dataField: 'FlightTimeActual2', caption: 'FLT Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: true, fixedPosition: 'right' },
+                { dataField: 'BlockTime2', caption: 'Block Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: true, fixedPosition: 'right' },
+                { dataField: 'SITATime2', caption: 'SITA FLT Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: true, fixedPosition: 'right' },
+                // { dataField: 'FixTime2', caption: 'Fix Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: true, fixedPosition: 'right' },
 
             ]
         },
@@ -226,6 +228,21 @@ app.controller('crewTimeReportController', ['$scope', '$location', '$routeParams
 
                 summaryType: "custom"
             },
+                {
+                    name: "FlightTimeActualTotal",
+                    showInColumn: "FlightTimeActual2",
+                    displayFormat: "{0}",
+
+                    summaryType: "custom"
+                },
+
+            {
+                name: "BlockTimeTotal",
+                showInColumn: "BlockTime2",
+                displayFormat: "{0}",
+
+                summaryType: "custom"
+            },
             {
                 name: "SITATimeTotal",
                 showInColumn: "SITATime2",
@@ -252,6 +269,36 @@ app.controller('crewTimeReportController', ['$scope', '$location', '$routeParams
                     if (options.summaryProcess === "calculate") {
 
                         options.totalValueMinutes = options.totalValueMinutes + options.value.FlightTime;
+                        options.totalValue = pad(Math.floor(options.totalValueMinutes / 60)).toString() + ':' + pad(options.totalValueMinutes % 60).toString();
+
+
+
+                    }
+                }
+                if (options.name === "FlightTimeActualTotal") {
+                    if (options.summaryProcess === "start") {
+                        options.totalValueMinutes = 0;
+                        options.totalValue = '';
+
+                    }
+                    if (options.summaryProcess === "calculate") {
+
+                        options.totalValueMinutes = options.totalValueMinutes + options.value.FlightTimeActual;
+                        options.totalValue = pad(Math.floor(options.totalValueMinutes / 60)).toString() + ':' + pad(options.totalValueMinutes % 60).toString();
+
+
+
+                    }
+                }
+                if (options.name === "BlockTimeTotal") {
+                    if (options.summaryProcess === "start") {
+                        options.totalValueMinutes = 0;
+                        options.totalValue = '';
+
+                    }
+                    if (options.summaryProcess === "calculate") {
+
+                        options.totalValueMinutes = options.totalValueMinutes + options.value.BlockTime;
                         options.totalValue = pad(Math.floor(options.totalValueMinutes / 60)).toString() + ':' + pad(options.totalValueMinutes % 60).toString();
 
 
@@ -305,9 +352,9 @@ app.controller('crewTimeReportController', ['$scope', '$location', '$routeParams
                 location: "before",
                 template: function () {
                     return $("<div/>")
-                       // .addClass("informer")
+                        // .addClass("informer")
                         .append(
-                           "<span style='color:white;'>Total</span>"
+                            "<span style='color:white;'>Total</span>"
                         );
                 }
             });
@@ -328,28 +375,36 @@ app.controller('crewTimeReportController', ['$scope', '$location', '$routeParams
     $scope.dg_flight_columns = [
         {
             caption: 'Crew', name: 'crew', columns: [
-                  {
-                      cellTemplate: function (container, options) {
-                          $("<div style='text-align:center'/>")
-                              .html(options.rowIndex + 1)
-                              .appendTo(container);
-                      }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
-                  },
-                   { dataField: 'IsPositioning', caption: 'DH', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width: 60 },
-        { dataField: 'Date', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 120, format: 'yy-MMM-dd' },
-        { dataField: 'FlightNumber', caption: 'No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left' },
+                {
+                    cellTemplate: function (container, options) {
+                        $("<div style='text-align:center'/>")
+                            .html(options.rowIndex + 1)
+                            .appendTo(container);
+                    }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+                },
+                { dataField: 'IsPositioning', caption: 'DH', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width: 60 },
+                { dataField: 'Date', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 120, format: 'yy-MMM-dd' },
+                { dataField: 'Position', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left' },
+                { dataField: 'FlightNumber', caption: 'No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80, fixed: false, fixedPosition: 'left' },
 
-       { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
-        { dataField: 'STD', caption: 'Dep.', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm', sortIndex: 0, sortOrder: 'asc' },
-         { dataField: 'STA', caption: 'Arr.', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm' },
+                { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130 },
+                { dataField: 'FlightTimeActual2', caption: 'FLT Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: true, fixedPosition: 'right' },
+
+                { dataField: 'BlockTime2', caption: 'Block Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: true, fixedPosition: 'right' },
+                { dataField: 'Departure', caption: 'Off', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm', sortIndex: 0, sortOrder: 'asc' },
+
+                { dataField: 'Takeoff', caption: 'T/O', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm', sortIndex: 0, sortOrder: 'asc' },
 
 
-        { dataField: 'ScheduledFlightTime2', caption: 'Sch. FLT Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: true, fixedPosition: 'right' },
-        { dataField: 'FlightTimeActual2', caption: 'FLT Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: true, fixedPosition: 'right' },
+                { dataField: 'Landing', caption: 'LND', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm' },
 
-                 { dataField: 'BlockTime2', caption: 'Block Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: true, fixedPosition: 'right' },
-                { dataField: 'SITATime2', caption: 'SITA FLT Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: true, fixedPosition: 'right' },
-                 { dataField: 'FixTime2', caption: 'Fix Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90, fixed: true, fixedPosition: 'right' },
+                { dataField: 'Arrival', caption: 'On', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm' },
+
+
+                { dataField: 'ScheduledFlightTime2', caption: 'Sch. FLT Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: false, fixedPosition: 'right' },
+                { dataField: 'SITATime2', caption: 'SITA FLT Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, fixed: false, fixedPosition: 'right' },
+                //  { dataField: 'FixTime2', caption: 'Fix Time', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90, fixed: true, fixedPosition: 'right' },
+
 
             ]
         },
@@ -422,21 +477,21 @@ app.controller('crewTimeReportController', ['$scope', '$location', '$routeParams
 
                 summaryType: "custom"
             },
-                {
-                    name: "SITATimeTotal",
-                    showInColumn: "SITATime2",
-                    displayFormat: "{0}",
+            {
+                name: "SITATimeTotal",
+                showInColumn: "SITATime2",
+                displayFormat: "{0}",
 
-                    summaryType: "custom"
-                }
+                summaryType: "custom"
+            }
                 ,
-                {
-                    name: "FixTimeTotal",
-                    showInColumn: "FixTime2",
-                    displayFormat: "{0}",
+            {
+                name: "FixTimeTotal",
+                showInColumn: "FixTime2",
+                displayFormat: "{0}",
 
-                    summaryType: "custom"
-                }
+                summaryType: "custom"
+            }
             ],
             calculateCustomSummary: function (options) {
                 if (options.name === "FlightTimeTotal") {
@@ -531,9 +586,9 @@ app.controller('crewTimeReportController', ['$scope', '$location', '$routeParams
                 location: "before",
                 template: function () {
                     return $("<div/>")
-                       // .addClass("informer")
+                        // .addClass("informer")
                         .append(
-                           "<span style='color:white;'>Legs</span>"
+                            "<span style='color:white;'>Legs</span>"
                         );
                 }
             });

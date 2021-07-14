@@ -182,7 +182,10 @@ namespace EPAGriffinAPI.Providers
                 }
                 else
                 {
-                    var _userid = user.Id.Replace("A", "").Replace("a", "") + "000";
+                    // var _userid = user.Id.Replace("A", "").Replace("a", "") + "000";
+                    //2,147,483,647
+                    var dt = DateTime.Now;
+                    var _userid =   dt.Hour.ToString() + dt.Minute.ToString() + dt.Second.ToString() + dt.Millisecond.ToString();
                     try
                     {
                         var intuserid = Convert.ToInt32(_userid);
@@ -226,6 +229,7 @@ namespace EPAGriffinAPI.Providers
             }
             catch (Exception ex)
             {
+                
                 int i = 0;
             }
 

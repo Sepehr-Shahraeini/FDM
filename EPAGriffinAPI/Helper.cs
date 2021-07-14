@@ -96,7 +96,7 @@ namespace EPAGriffinAPI
             else if (dt >= new DateTime(2020, 9, 21) && dt < new DateTime(2021, 1, 1))
                 return 210;
             else
-                return 210;
+                return 270;
 
 
         }

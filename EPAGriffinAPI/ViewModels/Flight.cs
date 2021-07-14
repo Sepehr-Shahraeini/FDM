@@ -74,6 +74,14 @@ namespace EPAGriffinAPI.ViewModels
 
         public int? SMSNira { get; set; }
         public string UserName { get; set; }
+
+        public int? Interval { get; set; }
+        public DateTime?  IntervalFrom { get; set; }
+        public DateTime? IntervalTo { get; set; }
+        public List<int> Days { get; set; }
+        public DateTime? RefDate { get; set; }
+        public int? RefDays { get; set; }
+        public int? CheckTime { get; set; }
        
 
 
@@ -83,6 +91,98 @@ namespace EPAGriffinAPI.ViewModels
             entity.ID = flightinformation.ID;
             entity.TypeID = flightinformation.TypeID;
             entity.RegisterID = flightinformation.RegisterID;
+            entity.FlightTypeID = flightinformation.FlightTypeID;
+            entity.FlightStatusID = flightinformation.FlightStatusID;
+            entity.AirlineOperatorsID = flightinformation.AirlineOperatorsID;
+            entity.FlightGroupID = flightinformation.FlightGroupID;
+            entity.FlightNumber = flightinformation.FlightNumber;
+            entity.FromAirportId = flightinformation.FromAirportId;
+            entity.ToAirportId = flightinformation.ToAirportId;
+            entity.STD = flightinformation.STD;
+            entity.STA = flightinformation.STA;
+            entity.ChocksOut = flightinformation.ChocksOut;
+            entity.Takeoff = flightinformation.Takeoff;
+            entity.Landing = flightinformation.Landing;
+            entity.ChocksIn = flightinformation.ChocksIn;
+            entity.FlightH = flightinformation.FlightH;
+            entity.FlightM = flightinformation.FlightM;
+            entity.BlockH = flightinformation.BlockH;
+            entity.BlockM = flightinformation.BlockM;
+            entity.GWTO = flightinformation.GWTO;
+            entity.GWLand = flightinformation.GWLand;
+            entity.FuelPlanned = flightinformation.FuelPlanned;
+            entity.FuelActual = flightinformation.FuelActual;
+            entity.FuelDeparture = flightinformation.FuelDeparture;
+            entity.FuelArrival = flightinformation.FuelArrival;
+            entity.PaxAdult = flightinformation.PaxAdult;
+            entity.PaxInfant = flightinformation.PaxInfant;
+            entity.PaxChild = flightinformation.PaxChild;
+            entity.CargoWeight = flightinformation.CargoWeight;
+            entity.CargoUnitID = flightinformation.CargoUnitID;
+            entity.BaggageCount = flightinformation.BaggageCount;
+            entity.CustomerId = flightinformation.CustomerId;
+            entity.FlightPlanId = flightinformation.FlightPlanId;
+            entity.DateCreate = flightinformation.DateCreate;
+            entity.CargoCount = flightinformation.CargoCount;
+            entity.BaggageWeight = flightinformation.BaggageWeight;
+            entity.FuelUnitID = flightinformation.FuelUnitID;
+            entity.ArrivalRemark = flightinformation.ArrivalRemark;
+            entity.DepartureRemark = flightinformation.DepartureRemark;
+            entity.EstimatedDelay = flightinformation.EstimatedDelay;
+            entity.FlightStatusUserId = flightinformation.FlightStatusUserId;
+        }
+
+        public static void FillNotID(Models.FlightInformation entity, ViewModels.FlightDto flightinformation)
+        {
+            //entity.ID = flightinformation.ID;
+            entity.TypeID = flightinformation.TypeID;
+            entity.RegisterID = flightinformation.RegisterID;
+            entity.FlightTypeID = flightinformation.FlightTypeID;
+            entity.FlightStatusID = flightinformation.FlightStatusID;
+            entity.AirlineOperatorsID = flightinformation.AirlineOperatorsID;
+            entity.FlightGroupID = flightinformation.FlightGroupID;
+            entity.FlightNumber = flightinformation.FlightNumber;
+            entity.FromAirportId = flightinformation.FromAirportId;
+            entity.ToAirportId = flightinformation.ToAirportId;
+            entity.STD = flightinformation.STD;
+            entity.STA = flightinformation.STA;
+            entity.ChocksOut = flightinformation.ChocksOut;
+            entity.Takeoff = flightinformation.Takeoff;
+            entity.Landing = flightinformation.Landing;
+            entity.ChocksIn = flightinformation.ChocksIn;
+            entity.FlightH = flightinformation.FlightH;
+            entity.FlightM = flightinformation.FlightM;
+            entity.BlockH = flightinformation.BlockH;
+            entity.BlockM = flightinformation.BlockM;
+            entity.GWTO = flightinformation.GWTO;
+            entity.GWLand = flightinformation.GWLand;
+            entity.FuelPlanned = flightinformation.FuelPlanned;
+            entity.FuelActual = flightinformation.FuelActual;
+            entity.FuelDeparture = flightinformation.FuelDeparture;
+            entity.FuelArrival = flightinformation.FuelArrival;
+            entity.PaxAdult = flightinformation.PaxAdult;
+            entity.PaxInfant = flightinformation.PaxInfant;
+            entity.PaxChild = flightinformation.PaxChild;
+            entity.CargoWeight = flightinformation.CargoWeight;
+            entity.CargoUnitID = flightinformation.CargoUnitID;
+            entity.BaggageCount = flightinformation.BaggageCount;
+            entity.CustomerId = flightinformation.CustomerId;
+            entity.FlightPlanId = flightinformation.FlightPlanId;
+            entity.DateCreate = flightinformation.DateCreate;
+            entity.CargoCount = flightinformation.CargoCount;
+            entity.BaggageWeight = flightinformation.BaggageWeight;
+            entity.FuelUnitID = flightinformation.FuelUnitID;
+            entity.ArrivalRemark = flightinformation.ArrivalRemark;
+            entity.DepartureRemark = flightinformation.DepartureRemark;
+            entity.EstimatedDelay = flightinformation.EstimatedDelay;
+            entity.FlightStatusUserId = flightinformation.FlightStatusUserId;
+        }
+
+        public static void FillForGroupUpdate(Models.FlightInformation entity, ViewModels.FlightDto flightinformation)
+        {
+            //entity.ID = flightinformation.ID;
+            //entity.TypeID = flightinformation.TypeID;
+            //entity.RegisterID = flightinformation.RegisterID;
             entity.FlightTypeID = flightinformation.FlightTypeID;
             entity.FlightStatusID = flightinformation.FlightStatusID;
             entity.AirlineOperatorsID = flightinformation.AirlineOperatorsID;
@@ -1061,10 +1161,10 @@ namespace EPAGriffinAPI.ViewModels
         public string FromSortName { get; set; }
         public string FromContry { get; set; }
         public string FromCity { get; set; }
-        public decimal? FromLatitude { get; set; }
-        public decimal? FromLongitude { get; set; }
-        public decimal? ToLatitude { get; set; }
-        public decimal? ToLongitude { get; set; }
+        public double? FromLatitude { get; set; }
+        public double? FromLongitude { get; set; }
+        public double? ToLatitude { get; set; }
+        public double? ToLongitude { get; set; }
         public int? CargoCount { get; set; }
         public int? BaggageWeight { get; set; }
         public int? FuelUnitID { get; set; }
@@ -1143,7 +1243,7 @@ namespace EPAGriffinAPI.ViewModels
             entity.STA = viewflightinformation.STA;
             entity.FlightStatusID = viewflightinformation.FlightStatusID;
             entity.RegisterID = viewflightinformation.RegisterID;
-            entity.FlightTypeID = viewflightinformation.FlightTypeID;
+            entity.FlightTypeID = viewflightinformation.FlightTypeID ?? 0;
             entity.TypeId =(int) viewflightinformation.TypeId;
             entity.AirlineOperatorsID = viewflightinformation.AirlineOperatorsID;
             entity.FlightNumber = viewflightinformation.FlightNumber;
@@ -1201,8 +1301,8 @@ namespace EPAGriffinAPI.ViewModels
             entity.ArrivalRemark = viewflightinformation.ArrivalRemark;
             entity.DepartureRemark = viewflightinformation.DepartureRemark;
             entity.TotalSeat = viewflightinformation.TotalSeat;
-            entity.EstimatedDelay = viewflightinformation.EstimatedDelay;
-            entity.PaxOver = viewflightinformation.PaxOver;
+            entity.EstimatedDelay = viewflightinformation.EstimatedDelay ?? 0;
+            entity.PaxOver = viewflightinformation.PaxOver ?? 0;
             entity.TotalPax = viewflightinformation.TotalPax;
             entity.FuelUnit = viewflightinformation.FuelUnit;
             entity.DateStatus = viewflightinformation.DateStatus;
@@ -1235,8 +1335,10 @@ namespace EPAGriffinAPI.ViewModels
         {
 
             tzoffset = Helper.GetTimeOffset((DateTime)entity.STD);
+            var tzoffset2 = Helper.GetTimeOffset((DateTime)entity.STD);
+            var tzoffset3= TimeZoneInfo.Local.GetUtcOffset((DateTime)entity.STD).TotalMinutes;
             if (utc == 1)
-                tzoffset = 0;
+            { tzoffset = 0; tzoffset3 = 0; }
             viewflightinformation.Date = entity.Date;
             viewflightinformation.OTypeId = entity.OTypeId;
             viewflightinformation.OAircraftType = entity.OAircraftType;
@@ -1265,15 +1367,26 @@ namespace EPAGriffinAPI.ViewModels
             viewflightinformation.GWTO = entity.GWTO;
             viewflightinformation.BlockM = entity.BlockM;
             viewflightinformation.BlockH = entity.BlockH;
+            if (entity.FromAirportIATA == "NJF")
+                viewflightinformation.GWLand = 180;
+            else
+                viewflightinformation.GWLand = tzoffset2;
+
+            if (entity.ToAirportIATA == "NJF")
+                viewflightinformation.GWTO = 180;
+            else
+                viewflightinformation.GWTO = tzoffset2;
+
+
             viewflightinformation.FlightH = entity.FlightH;
             viewflightinformation.FlightM = entity.FlightM;
-            viewflightinformation.ChocksIn = entity.ChocksIn == null ? null : (Nullable<DateTime>)((DateTime)entity.ChocksIn).AddMinutes(tzoffset);
-            viewflightinformation.Landing = entity.Landing == null ? null : (Nullable<DateTime>)((DateTime)entity.Landing).AddMinutes(tzoffset); ;
-            viewflightinformation.Takeoff = entity.Takeoff == null ? null : (Nullable<DateTime>)((DateTime)entity.Takeoff).AddMinutes(tzoffset);
-            viewflightinformation.ChocksOut = entity.ChocksOut == null ? null : (Nullable<DateTime>)((DateTime)entity.ChocksOut).AddMinutes(tzoffset);
-            viewflightinformation.STD = entity.STD == null ? null : (Nullable<DateTime>)((DateTime)entity.STD).AddMinutes(tzoffset);
-            viewflightinformation.STA = entity.STA == null ? null : (Nullable<DateTime>)((DateTime)entity.STA).AddMinutes(tzoffset);
-            viewflightinformation.RampDate = entity.RampDate == null ? null : (Nullable<DateTime>)((DateTime)entity.RampDate).AddMinutes(tzoffset);
+            viewflightinformation.ChocksIn = entity.ChocksIn == null ? null : (Nullable<DateTime>)((DateTime)entity.ChocksIn).AddMinutes(tzoffset3);
+            viewflightinformation.Landing = entity.Landing == null ? null : (Nullable<DateTime>)((DateTime)entity.Landing).AddMinutes(tzoffset3); ;
+            viewflightinformation.Takeoff = entity.Takeoff == null ? null : (Nullable<DateTime>)((DateTime)entity.Takeoff).AddMinutes(tzoffset3);
+            viewflightinformation.ChocksOut = entity.ChocksOut == null ? null : (Nullable<DateTime>)((DateTime)entity.ChocksOut).AddMinutes(tzoffset3);
+            viewflightinformation.STD = entity.STD == null ? null : (Nullable<DateTime>)((DateTime)entity.STD).AddMinutes(tzoffset3);
+            viewflightinformation.STA = entity.STA == null ? null : (Nullable<DateTime>)((DateTime)entity.STA).AddMinutes(tzoffset3);
+            viewflightinformation.RampDate = entity.RampDate == null ? null : (Nullable<DateTime>)((DateTime)entity.RampDate).AddMinutes(tzoffset3);
             viewflightinformation.FlightStatusID = (int)entity.FlightStatusID;
             viewflightinformation.RegisterID = entity.RegisterID;
             viewflightinformation.FlightTypeID = entity.FlightTypeID;
@@ -1282,8 +1395,8 @@ namespace EPAGriffinAPI.ViewModels
             viewflightinformation.FlightNumber = entity.FlightNumber;
             viewflightinformation.FromAirport = entity.FromAirport;
             viewflightinformation.ToAirport = entity.ToAirport;
-            viewflightinformation.STAPlanned = entity.STAPlanned == null ? null : (Nullable<DateTime>)((DateTime)entity.STAPlanned).AddMinutes(tzoffset);
-            viewflightinformation.STDPlanned = entity.STDPlanned == null ? null : (Nullable<DateTime>)((DateTime)entity.STDPlanned).AddMinutes(tzoffset);
+            viewflightinformation.STAPlanned = entity.STAPlanned == null ? null : (Nullable<DateTime>)((DateTime)entity.STAPlanned).AddMinutes(tzoffset3);
+            viewflightinformation.STDPlanned = entity.STDPlanned == null ? null : (Nullable<DateTime>)((DateTime)entity.STDPlanned).AddMinutes(tzoffset3);
             viewflightinformation.FlightHPlanned = entity.FlightHPlanned;
             viewflightinformation.FlightMPlanned = entity.FlightMPlanned;
             viewflightinformation.FlightPlan = entity.FlightPlan;
@@ -1311,7 +1424,7 @@ namespace EPAGriffinAPI.ViewModels
             viewflightinformation.status = entity.status;
             viewflightinformation.progress = entity.progress;
             viewflightinformation.taskName = entity.taskName;
-            viewflightinformation.startDate = entity.startDate == null ? null : (Nullable<DateTime>)((DateTime)entity.startDate).AddMinutes(tzoffset);
+            viewflightinformation.startDate = entity.startDate == null ? null : (Nullable<DateTime>)((DateTime)entity.startDate).AddMinutes(tzoffset3);
             viewflightinformation.duration = entity.duration;
             viewflightinformation.taskId = entity.taskId;
             viewflightinformation.taskID = entity.taskId;
@@ -1342,10 +1455,10 @@ namespace EPAGriffinAPI.ViewModels
 
 
             viewflightinformation.FuelUnit = entity.FuelUnit;
-            viewflightinformation.DateStatus = entity.DateStatus == null ? null : (Nullable<DateTime>)((DateTime)entity.DateStatus).AddMinutes(tzoffset);
+            viewflightinformation.DateStatus = entity.DateStatus == null ? null : (Nullable<DateTime>)((DateTime)entity.DateStatus).AddMinutes(tzoffset3);
             viewflightinformation.FlightStatusUserId = entity.FlightStatusUserId;
 
-            viewflightinformation.CancelDate = entity.CancelDate == null ? null : (Nullable<DateTime>)((DateTime)entity.CancelDate).AddMinutes(tzoffset);
+            viewflightinformation.CancelDate = entity.CancelDate == null ? null : (Nullable<DateTime>)((DateTime)entity.CancelDate).AddMinutes(tzoffset3);
             viewflightinformation.CancelReasonId = entity.CancelReasonId;
             viewflightinformation.CancelReason = entity.CancelReason;
             viewflightinformation.CancelRemark = entity.CancelRemark;
@@ -1356,7 +1469,7 @@ namespace EPAGriffinAPI.ViewModels
             viewflightinformation.RampReason = entity.RampReason;
             viewflightinformation.RampRemark = entity.RampRemark;
 
-            viewflightinformation.RedirectDate = entity.RedirectDate == null ? null : (Nullable<DateTime>)((DateTime)entity.RedirectDate).AddMinutes(tzoffset); ;
+            viewflightinformation.RedirectDate = entity.RedirectDate == null ? null : (Nullable<DateTime>)((DateTime)entity.RedirectDate).AddMinutes(tzoffset3); ;
             viewflightinformation.RedirectReasonId = entity.RedirectReasonId;
             viewflightinformation.RedirectReason = entity.RedirectReason;
             viewflightinformation.RedirectRemark = entity.RedirectRemark;
@@ -2713,6 +2826,12 @@ namespace EPAGriffinAPI.ViewModels
         public string From { get; set; }
         public string To { get; set; }
         public int CustomerId { get; set; }
+        public DateTime? intervalFrom { get; set; }
+        public DateTime? intervalTo { get; set; }
+        public List<int> days { get; set; }
+        public int? interval { get; set; }
+        public DateTime? RefDate { get; set; }
+        public int? RefDays { get; set; }
         public List<int> Flights = new List<int>();
         public static void Fill(Models.FlightRegisterChangeLog entity, ViewModels.FlightRegisterChangeLogDto flightregisterchangelog)
         {
@@ -2786,7 +2905,7 @@ namespace EPAGriffinAPI.ViewModels
         public int? GroupId { get; set; }
         public string JobGroup { get; set; }
         public string JobGroupCode { get; set; }
-        public int GroupOrder { get; set; }
+        public int? GroupOrder { get; set; }
         public int IsCockpit { get; set; }
 
         public List<string> Legs { get; set; }
@@ -3389,6 +3508,7 @@ namespace EPAGriffinAPI.ViewModels
     public class RosterFDPDto
     {
         public int Id { get; set; }
+        public string UserName { get; set; }
         public List<RosterFDPId> ids { get; set; }
         public int crewId { get; set; }
         public string rank { get; set; }
@@ -3409,6 +3529,8 @@ namespace EPAGriffinAPI.ViewModels
 
         public bool? IsSplitDuty { get; set; }
         public int? SplitValue { get; set; }
+
+        public int? IsAdmin { get; set; }
 
         public List<RosterFDPDtoItem> items { get; set; }
 
@@ -3478,6 +3600,9 @@ namespace EPAGriffinAPI.ViewModels
                 return 12001;
             if (rank.StartsWith("004"))
                 return 12002;
+            if (rank.StartsWith("005"))
+                return 12003;
+
             return -1;
 
         }

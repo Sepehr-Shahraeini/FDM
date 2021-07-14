@@ -61,16 +61,16 @@ namespace EPAGriffinAPI.Models
         public System.DateTime CDate { get; set; }
         public string DateStr { get; set; }
         public int Positioning { get; set; }
-        public double Day1_Duty { get; set; }
-        public int Day1_Flight { get; set; }
-        public double Day7_Duty { get; set; }
-        public int Day7_Flight { get; set; }
-        public double Day14_Duty { get; set; }
-        public int Day14_Flight { get; set; }
-        public double Day28_Duty { get; set; }
-        public int Day28_Flight { get; set; }
-        public int Year_Flight { get; set; }
-        public int CYear_Flight { get; set; }
+        public Nullable<double> Day1_Duty { get; set; }
+        public Nullable<double> Day7_Duty { get; set; }
+        public Nullable<double> Day14_Duty { get; set; }
+        public Nullable<double> Day28_Duty { get; set; }
+        public Nullable<int> Day1_Flight { get; set; }
+        public Nullable<int> Day7_Flight { get; set; }
+        public Nullable<int> Day14_Flight { get; set; }
+        public Nullable<int> Day28_Flight { get; set; }
+        public Nullable<int> Year_Flight { get; set; }
+        public Nullable<int> CYear_Flight { get; set; }
         public int CalendarStatusId { get; set; }
         public string CalendarStatus { get; set; }
         public int IsMedicalExpired { get; set; }

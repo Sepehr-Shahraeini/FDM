@@ -27,8 +27,6 @@ namespace EPAGriffinAPI.Models
         public Nullable<System.DateTime> STALocal { get; set; }
         public Nullable<System.DateTime> Takeoff { get; set; }
         public Nullable<System.DateTime> Landing { get; set; }
-        public Nullable<System.DateTime> TakeoffLocal { get; set; }
-        public Nullable<System.DateTime> LandingLocal { get; set; }
         public Nullable<decimal> FlightHour { get; set; }
         public string FlightStatus { get; set; }
         public Nullable<int> FlightStatusID { get; set; }
@@ -74,5 +72,6 @@ namespace EPAGriffinAPI.Models
         public Nullable<double> TotalToneDistanceAvailable { get; set; }
         public Nullable<double> WeightLoadFactor { get; set; }
         public Nullable<double> Distance { get; set; }
+        public int IsDom { get; set; }
     }
 }

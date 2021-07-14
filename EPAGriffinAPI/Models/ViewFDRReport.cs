@@ -47,5 +47,20 @@ namespace EPAGriffinAPI.Models
         public string ToAirportIATA { get; set; }
         public Nullable<int> FromAirport { get; set; }
         public Nullable<int> ToAirport { get; set; }
+        public Nullable<decimal> FuelRemaining { get; set; }
+        public Nullable<decimal> FuelUplift { get; set; }
+        public Nullable<decimal> FuelUsed { get; set; }
+        public Nullable<int> FuelUnitID { get; set; }
+        public string FuelUnit { get; set; }
+        public Nullable<int> PFLR { get; set; }
+        public Nullable<decimal> FPFuel { get; set; }
+        public string PFLRTitle { get; set; }
+        public Nullable<System.DateTime> DepartureLocal { get; set; }
+        public Nullable<System.DateTime> ArrivalLocal { get; set; }
+        public Nullable<System.DateTime> Departure { get; set; }
+        public Nullable<System.DateTime> Arrival { get; set; }
+        public Nullable<int> BlockTime { get; set; }
+        public Nullable<int> FlightTime { get; set; }
+        public Nullable<int> Freight { get; set; }
     }
 }

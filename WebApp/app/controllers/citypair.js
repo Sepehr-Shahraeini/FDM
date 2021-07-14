@@ -1,5 +1,5 @@
 ﻿'use strict';
-app.controller('citypairController', ['$scope', '$location', '$routeParams', '$rootScope', 'flightService', 'aircraftService', 'authService', 'notificationService', '$route', function ($scope, $location, $routeParams, $rootScope, flightService, aircraftService, authService, notificationService, $route) {
+app.controller('citypairController', ['$scope', '$location', '$routeParams', '$rootScope', 'flightService', 'aircraftService', 'authService', 'notificationService', '$route', '$window', function ($scope, $location, $routeParams, $rootScope, flightService, aircraftService, authService, notificationService, $route,$window) {
     $scope.prms = $routeParams.prms;
     var isTaxiVisible = false;
     //if ($rootScope.userName.toLowerCase() == 'ashrafi')
@@ -19,6 +19,18 @@ app.controller('citypairController', ['$scope', '$location', '$routeParams', '$r
         }
 
     };
+    $scope.btn_year = {
+        text: 'Yearly Report',
+        type: 'default',
+
+        width: 200,
+
+        bindingOptions: {},
+        onClick: function (e) {
+
+            $window.open('#!/citypair/yearly/', '_blank');
+        }
+    };
     /////////////////////////////////////////
     $scope.bind = function () {
         //iruser558387
@@ -26,7 +38,7 @@ app.controller('citypairController', ['$scope', '$location', '$routeParams', '$r
          
         if ($scope.year)
             dts.push('year=' + $scope.year);
-        if ($scope.month)
+       // if ($scope.month)
             dts.push('month=' + ($scope.month+1));
          
 
@@ -241,7 +253,7 @@ app.controller('citypairController', ['$scope', '$location', '$routeParams', '$r
                   },
 
       
-        
+        { dataField: 'IsDom', caption: 'DOM', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width:120},
         
       {
           caption: 'City-Pair',alignment: 'center',

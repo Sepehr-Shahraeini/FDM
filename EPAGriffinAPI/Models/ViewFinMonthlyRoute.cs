@@ -34,5 +34,6 @@ namespace EPAGriffinAPI.Models
         public int BaggageWeight { get; set; }
         public int CargoWeight { get; set; }
         public int Freight { get; set; }
+        public Nullable<bool> IsDom { get; set; }
     }
 }

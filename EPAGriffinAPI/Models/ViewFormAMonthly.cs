@@ -43,5 +43,29 @@ namespace EPAGriffinAPI.Models
         public Nullable<double> TotalToneDistanceAvailable { get; set; }
         public Nullable<double> WeightLoadFactor { get; set; }
         public Nullable<double> Distance { get; set; }
+        public int LegsInt { get; set; }
+        public decimal FlightHourInt { get; set; }
+        public int PaxChildInt { get; set; }
+        public int PaxInfantInt { get; set; }
+        public int PaxAdultInt { get; set; }
+        public int PaxTotalInt { get; set; }
+        public double PaxTotalDistRoundInt { get; set; }
+        public double PaxTotalDistInt { get; set; }
+        public int PaxAllInt { get; set; }
+        public int TotalSeatInt { get; set; }
+        public double TotalSeatDistInt { get; set; }
+        public int PaxLoadInt { get; set; }
+        public double TotalSeatDistRoundInt { get; set; }
+        public int PaxAllWeightInt { get; set; }
+        public double PaxAllWeightDistanceInt { get; set; }
+        public int BaggageWeightInt { get; set; }
+        public int CargoWeightInt { get; set; }
+        public int FreightInt { get; set; }
+        public decimal FreightToneInt { get; set; }
+        public double FreightToneDistanceInt { get; set; }
+        public double TotalToneDistanceInt { get; set; }
+        public double TotalToneDistanceAvailableInt { get; set; }
+        public double WeightLoadFactorInt { get; set; }
+        public double DistanceInt { get; set; }
     }
 }

@@ -16,6 +16,8 @@ namespace EPAGriffinAPI.ViewModels
         public string Parent { get; set; }
         public string ParentCode { get; set; }
         public string TitleFormated { get; set; }
+        public int? TypeId { get; set; }
+        public string Type { get; set; }
         public int CustomerId { get; set; }
         public static void Fill(Models.JobGroup entity, ViewModels.JobGroup jobgroup)
         {

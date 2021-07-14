@@ -19,6 +19,7 @@ namespace EPAGriffinAPI.DAL
         public GenericRepository(EPAGRIFFINEntities context)
         {
             this.context = context;
+            this.context.Database.CommandTimeout = 240;
             this.dbSet = context.Set<TEntity>();
             
         }

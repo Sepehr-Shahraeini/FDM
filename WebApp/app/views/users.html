@@ -233,6 +233,10 @@
 
     <div id="popup_add" dx-popup="popup_add" class="no-padding">
         <div class="dx-border" style="padding:10px;">
+            <div class="padding-7 margin-bottom-5">
+                <label>Select From Employees</label>
+                <div dx-select-box="sb_employees"  ></div>
+            </div>
             <div class="col-lg-6 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
                 <label>First Name</label>
                 <div dx-text-box="txt_FirstName" dx-validator="{validationGroup:'useradd',  validationRules: [{ type: 'required'}]}"></div>
@@ -250,10 +254,8 @@
                 <div dx-text-box="txt_Password" dx-validator="{validationGroup:'useradd',  validationRules: [{ type: 'required'}]}"></div>
             </div>
             <div style="clear:both"></div>
-            <div class="col-lg-6 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
-                <label>Phone</label>
-                <div dx-text-box="txt_phone"></div>
-            </div>
+           
+
             <div class="col-lg-6 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
                 <label>Station</label>
                 <div dx-select-box="sb_airport"></div>

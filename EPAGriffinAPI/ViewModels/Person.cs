@@ -133,6 +133,12 @@ namespace EPAGriffinAPI.ViewModels
         public DateTime? DateTRIExpired { get; set; }
         public DateTime? DateTREExpired { get; set; }
 
+        public DateTime? LineIssueDate { get; set; }
+        public DateTime? LineExpireDate { get; set; }
+
+        public DateTime? RecurrentIssueDate { get; set; }
+        public DateTime? RecurrentExpireDate { get; set; }
+
 
         List<PersonEducation> educations = null;
         public List<PersonEducation> Educations
@@ -356,7 +362,15 @@ namespace EPAGriffinAPI.ViewModels
             entity.ProficiencyCheckDateOPC = person.ProficiencyCheckDateOPC;
             entity.ProficiencyDescriptionOPC = person.ProficiencyDescriptionOPC;
             entity.ProficiencyValidUntilOPC = person.ProficiencyValidUntilOPC;
-            
+
+            entity.LineIssueDate = person.LineIssueDate;
+            entity.LineExpireDate = person.LineExpireDate;
+
+            entity.RecurrentIssueDate = person.RecurrentIssueDate;
+            entity.RecurrentExpireDate = person.RecurrentExpireDate;
+
+
+
 
         }
         public static void FillDto(Models.Person entity, ViewModels.Person person)
@@ -479,6 +493,11 @@ namespace EPAGriffinAPI.ViewModels
 
             person.DateTRIExpired = entity.DateTRIExpired;
             person.DateTREExpired = entity.DateTREExpired;
+
+            person.LineExpireDate = entity.LineExpireDate;
+            person.LineIssueDate = entity.LineIssueDate;
+            person.RecurrentExpireDate = entity.RecurrentExpireDate;
+            person.RecurrentIssueDate = entity.RecurrentIssueDate;
 
         }
     }
@@ -827,5 +846,33 @@ namespace EPAGriffinAPI.ViewModels
             personmisc.Tel = entity.Tel;
         }
     }
+
+    public class TrainingCard
+    {
+        public string Name { get; set; }
+        public int Id { get; set; }
+        public string Rank { get; set; }
+
+        public string IdNo { get; set; }
+        public DateTime? BirthDate { get; set; }
+
+        public string BirthDateStr { get; set; }
+
+        public List<TrianingCardCourse> Items { get; set; }
+
+        public string ImageUrl { get; set; }
+        public string NID { get; set; }
+    }
+
+    public class TrianingCardCourse
+    {
+        public string Title { get; set; }
+        public DateTime? Date1 { get; set; }
+        public DateTime? Date2 { get; set; }
+        public DateTime? Date3 { get; set; }
+        public DateTime? Date4 { get; set; }
+        public DateTime? Approved { get; set; }
+    }
+
 
 }

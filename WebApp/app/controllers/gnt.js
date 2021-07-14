@@ -351,7 +351,7 @@ app.controller('gntController', ['$scope', '$location', '$routeParams', '$rootSc
 
         return false;
     };
-
+    $scope.timeType = 0;
     $scope.getFlightStyle = function (f, index, res) {
         //console.log(f.FlightNumber);
         //if (f.FlightNumber == '0020') {
@@ -360,7 +360,28 @@ app.controller('gntController', ['$scope', '$location', '$routeParams', '$rootSc
         //       }
         var style = {};
         style.width = $scope.getFlightWidth(f);
-        var left = $scope.getDuration(new Date($scope.datefrom), new Date(f.STD));
+
+
+        var std = f.STD;
+        if ($scope.timeType == 1) {
+            var offset = getOffset(new Date(std.getFullYear(), std.getMonth(), std.getDate(), 1, 0, 0, 0));
+            std = (new Date(std)).addMinutes(offset)
+
+        }
+        var datefromOffset = (new Date($scope.datefrom)).getTimezoneOffset();
+        var stdOffset = (new Date(std)).getTimezoneOffset();
+        var dfirst = new Date($scope.datefrom);
+        var mm = (new Date($scope.datefrom)).getMonth();
+        var dd = (new Date($scope.datefrom)).getDate();
+
+
+        if (stdOffset < datefromOffset || (mm == 2 && dd == 22))
+            dfirst = (new Date($scope.datefrom)).addMinutes(-60);
+        if (stdOffset > datefromOffset)
+            dfirst = (new Date($scope.datefrom)).addMinutes(60);
+
+
+        var left = $scope.getDuration(/*new Date($scope.datefrom)*/new Date(dfirst), new Date(f.STD));
         if (new Date(f.STD) < new Date($scope.datefrom))
             left = -1 * left;
         style.left = (left * (hourWidth + 1)) + "px";
@@ -589,6 +610,32 @@ app.controller('gntController', ['$scope', '$location', '$routeParams', '$rootSc
             j=j+50;
         }
     }
+    //5-17
+    $scope.getResOrderIndex = function (reg) {
+        try {
+            var str = "";
+
+            if (reg.includes("CNL"))
+                str = "ZZZZZZ";
+            else
+
+                if (reg.includes(".")) {
+                    str = "ZZZZ" + reg.charAt(reg.length - 2);
+
+                }
+
+                else
+                    // str = reg.charAt(reg.length - 1);
+                    str = reg.substring(0, 2) + reg.charAt(reg.length - 1);
+
+            return str;
+        }
+        catch (ee) {
+
+            return "";
+        }
+
+    }
     $scope.bindFlights = function (callback) {
         $scope.baseDate = (new Date(Date.now())).toUTCString();
         dfrom = $scope._datefrom;
@@ -680,6 +727,11 @@ app.controller('gntController', ['$scope', '$location', '$routeParams', '$rootSc
                     $scope.totalHeight += _d.maxTop;
                     _d.flights = flights;
                 });
+
+                //5-17
+                response.resources = Enumerable.From(response.resources).OrderBy(function (x) { return $scope.getResOrderIndex(x.resourceName); }).ToArray();
+
+
                 $scope.ganttData = response;
                 console.log(response);
                 callback();
@@ -2023,6 +2075,11 @@ app.controller('gntController', ['$scope', '$location', '$routeParams', '$rootSc
         return moment(date).format('HH:mm');
     };
     $scope.getCrewAbs = function (fid) {
+        //5-9
+        if (!$rootScope.HasAccessToCrewList()) {
+            $scope.dg_crew_abs_ds = [];
+            return;
+        }
         $scope.loadingVisible = true;
         var archived_crews = 0;
         if (new Date($scope.flight.Date) < new Date(2020, 6, 1, 0, 0, 0, 0))

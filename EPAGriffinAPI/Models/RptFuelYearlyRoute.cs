@@ -51,5 +51,13 @@ namespace EPAGriffinAPI.Models
         public Nullable<double> UsedPerDistanceKM { get; set; }
         public Nullable<double> UsedPerWeightDistance { get; set; }
         public Nullable<double> UsedPerWeightDistanceKM { get; set; }
+        public double SeatDistanceKM { get; set; }
+        public double SeatKiloDistanceKM { get; set; }
+        public Nullable<double> UsedPerSeatDistanceKM { get; set; }
+        public Nullable<double> UsedPerSeatKiloDistanceKM { get; set; }
+        public double PaxDistanceKM { get; set; }
+        public double PaxKiloDistanceKM { get; set; }
+        public Nullable<double> UsedPerPaxDistanceKM { get; set; }
+        public Nullable<double> UsedPerPaxKiloDistanceKM { get; set; }
     }
 }

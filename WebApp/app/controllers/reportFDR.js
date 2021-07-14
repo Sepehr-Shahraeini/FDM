@@ -77,6 +77,8 @@ app.controller('reportFDRController', ['$scope', '$location', '$routeParams', '$
                             _d.TaxiTO2 = $scope.formatMinutes(_d.TaxiTO);
                             _d.TaxiLND2 = $scope.formatMinutes(_d.TaxiLND);
 
+                            _d.FuelTotal = (!_d.FuelRemaining ? 0 : _d.FuelRemaining) + (!_d.FuelUplift ? 0 : _d.FuelUplift);
+
 
                         });
 
@@ -280,9 +282,11 @@ app.controller('reportFDRController', ['$scope', '$location', '$routeParams', '$
            caption: 'Local',
            columns: [
                  { dataField: 'STDLocal', caption: 'STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
-                 { dataField: 'STALocal', caption: 'STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+               { dataField: 'STALocal', caption: 'STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+               { dataField: 'DepartureLocal', caption: 'BlockOff', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 110, format: 'HH:mm',   },
                   { dataField: 'TakeoffLocal', caption: 'T/O', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm', sortIndex: 2, sortOrder: 'asc' },
-                { dataField: 'LandingLocal', caption: 'LND', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm' },
+               { dataField: 'LandingLocal', caption: 'LND', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm' },
+               { dataField: 'ArrivalLocal', caption: 'BlockOn', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 110, format: 'HH:mm', },
 
            ]
        },
@@ -290,23 +294,41 @@ app.controller('reportFDRController', ['$scope', '$location', '$routeParams', '$
            caption: 'UTC',
            columns: [
                  { dataField: 'STD', caption: 'STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
-                 { dataField: 'STA', caption: 'STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+               { dataField: 'STA', caption: 'STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+               { dataField: 'Departure', caption: 'BlockOff', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 110, format: 'HH:mm', },
                  { dataField: 'Takeoff', caption: 'T/O', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm', sortIndex: 2, sortOrder: 'asc' },
-                 { dataField: 'Landing', caption: 'LND', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm' },
+               { dataField: 'Landing', caption: 'LND', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 90, format: 'HH:mm' },
+               { dataField: 'Arrival', caption: 'BlockOn', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 110, format: 'HH:mm', },
            ]
        },
-      
         {
             caption: 'Cockpit',
             columns: [
                 { dataField: 'IPSCH', caption: 'IP', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
-                 { dataField: 'IPCode', caption: 'IP Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+                { dataField: 'IPCode', caption: 'IP Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
                 { dataField: 'P1SCH', caption: 'P1', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
-                  { dataField: 'P1Code', caption: 'P1 Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+                { dataField: 'P1Code', caption: 'P1 Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
                 { dataField: 'P2SCH', caption: 'P2', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
-                   { dataField: 'P2Code', caption: 'P2 Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+                { dataField: 'P2Code', caption: 'P2 Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+                { dataField: 'PFLRTitle', caption: 'PF L/R', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
             ]
         },
+        {
+            caption: 'Fuel',
+            columns: [
+                { dataField: 'FuelRemaining', caption: 'Remainig', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100 },
+                { dataField: 'FuelUplift', caption: 'Uplift', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100 },
+                { dataField: 'FuelUsed', caption: 'Used', allowResizing: true, alignment: 'center', dataType: 'numer', allowEditing: false, width: 100 },
+                { dataField: 'FuelTotal', caption: 'Total', allowResizing: true, alignment: 'center', dataType: 'numer', allowEditing: false, width: 100 },
+                { dataField: 'FPFuel', caption: 'Plan', allowResizing: true, alignment: 'center', dataType: 'numer', allowEditing: false, width: 100 },
+                { dataField: 'FuelUnit', caption: 'Unit', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+                
+            ]
+        },
+
+        { dataField: 'BlockTime2', caption: 'BlockTime', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: false, fixedPosition: 'right' },
+        { dataField: 'FlightTime2', caption: 'FlightTime', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, fixed: false, fixedPosition: 'right' },
+        { dataField: 'Freight', caption: 'LBS/KG', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100 },
 
 
           
@@ -485,8 +507,27 @@ app.controller('reportFDRController', ['$scope', '$location', '$routeParams', '$
 
                     summaryType: "custom"
                 },
-
-
+                {
+                    column: "FuelUsed",
+                    summaryType: "sum",
+                    customizeText: function (data) {
+                        return data.value;
+                    }
+                },
+                {
+                    column: "FuelUplift",
+                    summaryType: "sum",
+                    customizeText: function (data) {
+                        return data.value;
+                    }
+                },
+                {
+                    column: "FuelTotal",
+                    summaryType: "sum",
+                    customizeText: function (data) {
+                        return data.value;
+                    }
+                },
                  {
                      column: "PaxAdult",
                      summaryType: "sum",

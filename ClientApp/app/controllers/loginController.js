@@ -38,6 +38,9 @@ app.controller('loginController', ['$scope', '$location', 'authService', 'ngAuth
               //$rootScope.app_selected
               
               $rootScope.userName = authService.authentication.userName;
+              if ($rootScope.EmailConfirmed != "True")
+                  $location.path('/cp');
+              else
               $location.path('/home');
             
 

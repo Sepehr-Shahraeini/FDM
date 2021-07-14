@@ -17,10 +17,10 @@ namespace EPAGriffinAPI.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public JobGroup()
         {
-            this.BookRelatedGroups = new HashSet<BookRelatedGroup>();
             this.CourseRelatedGroups = new HashSet<CourseRelatedGroup>();
             this.JobGroup1 = new HashSet<JobGroup>();
             this.PersonCustomers = new HashSet<PersonCustomer>();
+            this.BookRelatedGroups = new HashSet<BookRelatedGroup>();
         }
     
         public int Id { get; set; }
@@ -32,13 +32,13 @@ namespace EPAGriffinAPI.Models
         public int CustomerId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<BookRelatedGroup> BookRelatedGroups { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CourseRelatedGroup> CourseRelatedGroups { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<JobGroup> JobGroup1 { get; set; }
         public virtual JobGroup JobGroup2 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PersonCustomer> PersonCustomers { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<BookRelatedGroup> BookRelatedGroups { get; set; }
     }
 }

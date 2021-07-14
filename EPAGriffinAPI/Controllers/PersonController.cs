@@ -200,6 +200,7 @@ namespace EPAGriffinAPI.Controllers
             var userName = Convert.ToString(dto.UserName);
             var fn = Convert.ToString(dto.FirstName);
             var ln = Convert.ToString(dto.LastName);
+            var personId = Convert.ToInt32(dto.PersonId);
 
             ApplicationUserManager UserManager = Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
             var user = new ApplicationUser() { UserName = userName, Email = email };
@@ -232,6 +233,12 @@ namespace EPAGriffinAPI.Controllers
             };
 
             unitOfWork.PersonRepository.Insert(ext);
+            
+            if (personId != -1)
+            {
+                await unitOfWork.PersonRepository.UpdateUserId(personId, created.Id);
+            }
+            
             var saveResult = await unitOfWork.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
                 return saveResult;
@@ -254,6 +261,7 @@ namespace EPAGriffinAPI.Controllers
             var userName = Convert.ToString(dto.UserName);
             var fn = Convert.ToString(dto.FirstName);
             var ln = Convert.ToString(dto.LastName);
+            var personId = Convert.ToInt32(dto.PersonId);
             string st = "";
             if (dto.Station!=null)
               st = Convert.ToString(dto.Station);
@@ -282,6 +290,10 @@ namespace EPAGriffinAPI.Controllers
 
             }
             await unitOfWork.PersonRepository.UpdateUser(dto);
+            if (personId != -1)
+            {
+                await unitOfWork.PersonRepository.UpdateUserId(personId, user.Id);
+            }
             var saveResult = await unitOfWork.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
                 return saveResult;
@@ -1482,6 +1494,14 @@ namespace EPAGriffinAPI.Controllers
         public async Task<IHttpActionResult> GetEmployeeProfileById(int id)
         {
             var employee = await unitOfWork.PersonRepository.GetEmployeeDtoByID(id);
+            return Ok(employee);
+        }
+
+
+        [Route("odata/employee/training/card/{id}")]
+        public async Task<IHttpActionResult> GetTrainingCard(int id)
+        {
+            var employee = await unitOfWork.PersonRepository.GetTrainingCard(id);
             return Ok(employee);
         }
 

@@ -22,10 +22,10 @@ namespace EPAGriffinAPI.Models
             this.BookAutors = new HashSet<BookAutor>();
             this.BookKeywords = new HashSet<BookKeyword>();
             this.BookRelatedEmployees = new HashSet<BookRelatedEmployee>();
-            this.BookRelatedGroups = new HashSet<BookRelatedGroup>();
             this.BookRelatedStudyFields = new HashSet<BookRelatedStudyField>();
             this.EmployeeBookStatus = new HashSet<EmployeeBookStatu>();
             this.BookFiles = new HashSet<BookFile>();
+            this.BookRelatedGroups = new HashSet<BookRelatedGroup>();
         }
     
         public int Id { get; set; }
@@ -78,12 +78,12 @@ namespace EPAGriffinAPI.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<BookRelatedEmployee> BookRelatedEmployees { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<BookRelatedGroup> BookRelatedGroups { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<BookRelatedStudyField> BookRelatedStudyFields { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<EmployeeBookStatu> EmployeeBookStatus { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<BookFile> BookFiles { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<BookRelatedGroup> BookRelatedGroups { get; set; }
     }
 }

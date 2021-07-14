@@ -9,7 +9,7 @@ namespace EPAGriffinAPI.DAL
 {
     public class UnitOfWork : IDisposable
     {
-        private EPAGRIFFINEntities context = null;
+        public EPAGRIFFINEntities context = null;
         public UnitOfWork()
         {
             context = new EPAGRIFFINEntities();
@@ -21,6 +21,7 @@ namespace EPAGriffinAPI.DAL
         private GenericRepository<Organization> viewOrganizationRepository;
         private GenericRepository<Currency> viewCurrencyRepository;
         private GenericRepository<ViewJobGroup> viewJobGroupRepository;
+        private GenericRepository<ViewJobGroupType> viewJobGroupTypeRepository;
         private GenericRepository<ViewLibraryFolder> viewLibraryFolderRepository;
         private CourseTypeRepository courseTypeRepository;
        
@@ -331,6 +332,19 @@ namespace EPAGriffinAPI.DAL
             }
         }
 
+        public GenericRepository<ViewJobGroupType> ViewJobGroupTypeRepository
+        {
+            get
+            {
+
+                if (this.viewJobGroupTypeRepository == null)
+                {
+                    this.viewJobGroupTypeRepository = new GenericRepository<ViewJobGroupType>(context);
+                }
+                return viewJobGroupTypeRepository;
+            }
+        }
+
         public GenericRepository<ViewLibraryFolder> ViewLibraryFolderRepository
         {
             get
@@ -457,6 +471,13 @@ namespace EPAGriffinAPI.DAL
         {
             // context.SaveChanges();
             var result =  context.SaveChanges();
+            return result;
+        }
+
+        public CustomActionResult SaveActionResult()
+        {
+            // context.SaveChanges();
+            var result = context.SaveActionResult();
             return result;
         }
 

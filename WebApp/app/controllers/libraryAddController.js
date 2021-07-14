@@ -175,10 +175,10 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
         { text: "Main", id: 'main', visible_btn: false },
         { text: "Chapters/Files", id: 'files', visible_btn: false, visible: true },
 
-        { text: "Aircraft Types", id: 'actypes', visible_btn: true, visible: true },
-        { text: "Groups", id: 'groups', visible_btn: false, visible_btn2: true, visible: true },
+        //{ text: "Aircraft Types", id: 'actypes', visible_btn: true, visible: true },
+        //{ text: "Groups", id: 'groups', visible_btn: false, visible_btn2: true, visible: true },
 
-        { text: "Educations", id: 'educations', visible_btn: false, visible: true },
+       // { text: "Educations", id: 'educations', visible_btn: false, visible: true },
 
         { text: "Employees", id: 'employees', visible_btn: false, visible: true },
 
@@ -442,7 +442,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
         }
     };
 
-
+    
     $scope.sb_publisher_instance = null;
     $scope.sb_Publisher = {
         dataSource: $rootScope.getDatasourcePublishers(),
@@ -808,14 +808,14 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
             return;
         }
 
-        if ($scope.entity.TypeId == 83 && !$scope.entity.PublisherId) {
-            General.ShowNotify('Please select "Publisher".', 'error');
-            return;
-        }
-        if ($scope.entity.TypeId == 84 && !$scope.entity.JournalId) {
-            General.ShowNotify('Please select "Journal / Conference".', 'error');
-            return;
-        }
+        //if ($scope.entity.TypeId == 83 && !$scope.entity.PublisherId) {
+        //    General.ShowNotify('Please select "Publisher".', 'error');
+        //    return;
+        //}
+        //if ($scope.entity.TypeId == 84 && !$scope.entity.JournalId) {
+        //    General.ShowNotify('Please select "Journal / Conference".', 'error');
+        //    return;
+        //}
 
         if ($scope.isNew)
             $scope.entity.Id = -1;
@@ -944,8 +944,9 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
 
     ///////////////////////////
     $scope.dg_group_columns = [
+        { dataField: "Type", caption: "Type", allowResizing: true, alignment: "center", dataType: 'string', allowEditing: false,width:200 },
         { dataField: "Title", caption: "Title", allowResizing: true, alignment: "left", dataType: 'string', allowEditing: false, },
-        { dataField: 'FullCode', caption: 'Code', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, encodeHtml: false, width: 200, sortIndex: 0, sortOrder: "asc" },
+        //{ dataField: 'FullCode', caption: 'Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, encodeHtml: false, width: 200, sortIndex: 0, sortOrder: "asc" },
 
     ];
     $scope.dg_group_selected = null;
@@ -983,10 +984,11 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
 
 
         },
+        height:350,
         bindingOptions: {
 
             dataSource: 'entity.BookRelatedGroups',
-            height: 'dg_height',
+           // height: 'dg_height',
         },
         // dataSource:ds
 
@@ -1605,6 +1607,19 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
         });
         $scope.dg_aircrafttype_instance.refresh();
     });
+    $scope.removeGroup = function () {
+        var dg_selected = $rootScope.getSelectedRow($scope.dg_group_instance);
+        if (!dg_selected) {
+            General.ShowNotify(Config.Text_NoRowSelected, 'error');
+            return;
+        }
+        $scope.entity.BookRelatedGroups = Enumerable.From($scope.entity.BookRelatedGroups).Where('$.Id!=' + dg_selected.Id).ToArray();
+
+
+    };
+    $scope.addGroup = function () {
+        $rootScope.$broadcast('InitJobGroupSelect', null);
+    };
     $scope.$on('onJobGroupSelectHide', function (event, prms) {
 
         //  alert('ac');
@@ -1613,7 +1628,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
         if (!prms || prms.length == 0)
             return;
         $.each(prms, function (_i, _d) {
-            var exist = Enumerable.From($scope.entity.BookRelatedGroups).Where("$.Id==" + _d.Id).FirstOrDefault();
+            var exist = Enumerable.From($scope.entity.BookRelatedGroups).Where("$.Id==" + _d.Id + " && $.TypeId==" + _d.TypeId).FirstOrDefault();
             if (!exist) {
                 $scope.entity.BookRelatedGroups.push(_d);
             }

@@ -21,7 +21,10 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> PYear { get; set; }
         public string PMonthName { get; set; }
         public Nullable<int> PMonth { get; set; }
+        public int Season { get; set; }
+        public string SeasonTitle { get; set; }
         public string PDayName { get; set; }
+        public Nullable<int> PDay { get; set; }
         public string PYearMonthName { get; set; }
         public int FlightId { get; set; }
         public Nullable<System.DateTime> Date { get; set; }
@@ -42,7 +45,9 @@ namespace EPAGriffinAPI.Models
         public string Register { get; set; }
         public Nullable<decimal> Defuel { get; set; }
         public Nullable<decimal> FPFuel { get; set; }
+        public Nullable<decimal> FPFuelKilo { get; set; }
         public Nullable<int> TotalPax { get; set; }
+        public Nullable<decimal> TotalPaxKilo { get; set; }
         public Nullable<int> FuelUnitID { get; set; }
         public string FuelUnit { get; set; }
         public Nullable<int> CargoUnitID { get; set; }
@@ -70,13 +75,16 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> PaxAdult { get; set; }
         public Nullable<decimal> Remaining { get; set; }
         public Nullable<decimal> UpLift { get; set; }
+        public Nullable<decimal> UpliftKilo { get; set; }
         public Nullable<decimal> Used { get; set; }
+        public Nullable<decimal> UsedKilo { get; set; }
         public Nullable<int> TotalSeat { get; set; }
         public int BaggageWeight { get; set; }
         public int CargoWeight { get; set; }
         public Nullable<int> Freight { get; set; }
         public Nullable<decimal> FreightTone { get; set; }
         public Nullable<int> TotalPaxAll { get; set; }
+        public Nullable<decimal> TotalPaxAllKilo { get; set; }
         public Nullable<int> Weight { get; set; }
         public Nullable<decimal> WeightTone { get; set; }
         public Nullable<int> PaxWeight { get; set; }
@@ -84,7 +92,27 @@ namespace EPAGriffinAPI.Models
         public string Route { get; set; }
         public Nullable<double> DistanceKM { get; set; }
         public Nullable<double> Distance { get; set; }
+        public Nullable<double> PaxDistanceKM { get; set; }
+        public Nullable<double> PaxKiloDistanceKM { get; set; }
+        public Nullable<double> SeatDistanceKM { get; set; }
+        public Nullable<double> SeatKiloDistanceKM { get; set; }
         public Nullable<double> WeightDistance { get; set; }
+        public Nullable<double> WeightToneDistance { get; set; }
         public Nullable<double> WeightDistanceToneKM { get; set; }
+        public Nullable<decimal> PaxBlockTime { get; set; }
+        public Nullable<decimal> WeightBlockTime { get; set; }
+        public Nullable<decimal> WeightToneBlockTime { get; set; }
+        public Nullable<decimal> UsedPerSeatBlockTime { get; set; }
+        public Nullable<decimal> SeatBlockTime { get; set; }
+        public Nullable<double> UsedPerPaxKiloDistanceKM { get; set; }
+        public Nullable<double> UsedPerSeatKiloDistanceKM { get; set; }
+        public Nullable<decimal> UsedPerPaxBlockTime { get; set; }
+        public Nullable<decimal> UsedPerWeightToneBlockTime { get; set; }
+        public Nullable<double> UsedPerWeightToneDistance { get; set; }
+        public Nullable<decimal> UsedPerBlockTime { get; set; }
+        public Nullable<decimal> UsedPerPax { get; set; }
+        public decimal UsedPerLeg { get; set; }
+        public Nullable<decimal> UsedPerUpLift { get; set; }
+        public Nullable<decimal> UsedPerFPFuel { get; set; }
     }
 }

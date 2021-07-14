@@ -75,5 +75,6 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> DayLanding { get; set; }
         public Nullable<System.DateTime> Pickup { get; set; }
         public Nullable<System.DateTime> PickupLocal { get; set; }
+        public Nullable<System.DateTime> DateConfirmed { get; set; }
     }
 }

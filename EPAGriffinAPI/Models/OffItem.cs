@@ -18,7 +18,7 @@ namespace EPAGriffinAPI.Models
         public int FlightId { get; set; }
         public string Remark { get; set; }
     
-        public virtual FlightInformation FlightInformation { get; set; }
         public virtual FDP FDP { get; set; }
+        public virtual FlightInformation FlightInformation { get; set; }
     }
 }

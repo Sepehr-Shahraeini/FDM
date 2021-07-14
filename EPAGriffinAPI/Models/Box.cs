@@ -21,8 +21,8 @@ namespace EPAGriffinAPI.Models
             this.BoxCrews = new HashSet<BoxCrew>();
             this.BoxFlightPlanItems = new HashSet<BoxFlightPlanItem>();
             this.FlightPlanItems = new HashSet<FlightPlanItem>();
-            this.FlightInformations = new HashSet<FlightInformation>();
             this.FDPs = new HashSet<FDP>();
+            this.FlightInformations = new HashSet<FlightInformation>();
         }
     
         public int Id { get; set; }
@@ -50,8 +50,8 @@ namespace EPAGriffinAPI.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<FlightPlanItem> FlightPlanItems { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<FlightInformation> FlightInformations { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<FDP> FDPs { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<FlightInformation> FlightInformations { get; set; }
     }
 }

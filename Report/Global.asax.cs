@@ -1,5 +1,7 @@
-﻿using System;
+﻿using DevExpress.Utils.Serializing;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
@@ -12,7 +14,8 @@ namespace Report
 
         protected void Application_Start(object sender, EventArgs e)
         {
-
+            PrintingSystemXmlSerializer.UnregisterConverter(typeof(Font));
+            PrintingSystemXmlSerializer.RegisterConverter(new CustomFontConverter());
             DevExpress.XtraReports.Web.ASPxWebDocumentViewer.StaticInitialize();
         }
 

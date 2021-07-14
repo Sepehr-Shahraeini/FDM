@@ -29,6 +29,7 @@ namespace EPAGriffinAPI.Models
         public int IsCockpit { get; set; }
         public Nullable<int> BlockTime { get; set; }
         public Nullable<int> FlightTime { get; set; }
+        public Nullable<int> FlightTimeActual { get; set; }
         public Nullable<int> FixTime { get; set; }
         public Nullable<int> SITATime { get; set; }
         public Nullable<System.DateTime> STD { get; set; }

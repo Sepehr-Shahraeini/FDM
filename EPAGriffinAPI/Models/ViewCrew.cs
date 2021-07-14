@@ -130,5 +130,13 @@ namespace EPAGriffinAPI.Models
         public Nullable<System.DateTime> LPRExpired { get; set; }
         public Nullable<System.DateTime> FirstAidExpired { get; set; }
         public Nullable<System.DateTime> LicenceExpired { get; set; }
+        public Nullable<int> RemainTRI { get; set; }
+        public Nullable<int> RemainTRE { get; set; }
+        public Nullable<int> RemainRecurrent { get; set; }
+        public Nullable<int> RemainLine { get; set; }
+        public int IsRecurrentExpired { get; set; }
+        public int IsLineExpired { get; set; }
+        public int IsTRIExpired { get; set; }
+        public int IsTREExpired { get; set; }
     }
 }
