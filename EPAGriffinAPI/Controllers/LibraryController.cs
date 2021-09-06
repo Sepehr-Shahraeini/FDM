@@ -52,7 +52,7 @@ namespace EPAGriffinAPI.Controllers
                     return unitOfWork.BookRepository.GetViewBooks().Where(q => q.CustomerId == cid && q.TypeId != 86 && q.FullCode.StartsWith(fullcode));
                 else
 
-                    return unitOfWork.BookRepository.GetViewBooks().Where(q => q.CustomerId == cid && q.TypeId != 86 && q.FullCode==fullcode);
+                    return unitOfWork.BookRepository.GetViewBooks().Where(q => q.CustomerId == cid && q.TypeId != 86 && q.FullCode == fullcode);
                 // return db.ViewAirports.AsNoTracking() ;
             }
             catch (Exception ex)
@@ -174,7 +174,7 @@ namespace EPAGriffinAPI.Controllers
         {
             try
             {
-                var file  = unitOfWork.BookRepository.GetBookFileUrl(id);
+                var file = unitOfWork.BookRepository.GetBookFileUrl(id);
                 return Ok(file);
                 // return db.ViewAirports.AsNoTracking() ;
             }
@@ -207,24 +207,51 @@ namespace EPAGriffinAPI.Controllers
                 return InternalServerError();
         }
 
-        [Route("odata/library/move")]
-        [AcceptVerbs("POST")]
-        public async Task<IHttpActionResult> PostMove(dynamic dto)
+        [Route("odata/library/book/notify/{id}")]
+        [AcceptVerbs("GET")]
+        public async Task<IHttpActionResult> PostExposeBook(int id)
         {
-            var fid = Convert.ToInt32(dto.folderId);
-            string _ids = Convert.ToString( dto.ids);
-            var ids = _ids.Split('_').Select(q => Convert.ToInt32(q)).ToList();
-            var items = unitOfWork.BookRepository.GetQuery().Where(q => ids.Contains(q.Id)).ToList();
-            foreach (var item in items)
-                item.FolderId = fid;
-             
+            ViewModels.BookExpose dto = new ViewModels.BookExpose()
+            {
+                BookId = id,
+                AppNotification = true,
+                CustomerId = 1,
+                Email = true,
+                SMS = true,
+            };
+            var result = await unitOfWork.BookRepository.ExposeBook(dto);
+            if (result)
+            {
                 var saveResult = await unitOfWork.SaveAsync();
                 if (saveResult.Code != HttpStatusCode.OK)
                     return saveResult;
 
 
-                return Ok(true);
-            
+                return Ok(id);
+            }
+
+            else
+                return InternalServerError();
+        }
+
+        [Route("odata/library/move")]
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostMove(dynamic dto)
+        {
+            var fid = Convert.ToInt32(dto.folderId);
+            string _ids = Convert.ToString(dto.ids);
+            var ids = _ids.Split('_').Select(q => Convert.ToInt32(q)).ToList();
+            var items = unitOfWork.BookRepository.GetQuery().Where(q => ids.Contains(q.Id)).ToList();
+            foreach (var item in items)
+                item.FolderId = fid;
+
+            var saveResult = await unitOfWork.SaveAsync();
+            if (saveResult.Code != HttpStatusCode.OK)
+                return saveResult;
+
+
+            return Ok(true);
+
         }
 
 
@@ -308,14 +335,14 @@ namespace EPAGriffinAPI.Controllers
             unitOfWork.BookRepository.FillBookAuthors(entity, dto);
             unitOfWork.BookRepository.FillBookKeywords(entity, dto);
             unitOfWork.BookRepository.FillBookFiles(entity, dto);
-            
+
 
 
             var saveResult = await unitOfWork.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
                 return saveResult;
             await unitOfWork.BookRepository.UpdateChapters(entity.BookKey, entity.Id);
-              saveResult = await unitOfWork.SaveAsync();
+            saveResult = await unitOfWork.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
                 return saveResult;
 
@@ -325,7 +352,7 @@ namespace EPAGriffinAPI.Controllers
 
             //};
             //string inputJson = Newtonsoft.Json.JsonConvert.SerializeObject(input);
-            
+
             //WebClient client = new WebClient();
             //client.Headers["Content-type"] = "application/json";
             //client.Encoding = Encoding.UTF8;
@@ -347,7 +374,7 @@ namespace EPAGriffinAPI.Controllers
             {
                 return NotFound();
             }
-            
+
             unitOfWork.BookRepository.Delete(entity);
 
             var saveResult = await unitOfWork.SaveAsync();

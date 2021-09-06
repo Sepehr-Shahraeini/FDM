@@ -1,4 +1,17 @@
-﻿<div class="box person" style="height:100%;display:none;overflow-y:hidden">
+﻿<style>
+    .dx-toolbar-items-container .dx-texteditor-input {
+        border: 1px solid #ccc;
+        padding-right: 5px !important;
+        padding-left: 5px !important;
+        padding: 10px !important;
+    }
+
+    .dx-toolbar-items-container .dx-placeholder {
+        padding-right: 5px !important;
+        padding-left: 5px !important;
+    }
+</style>
+<div class="box person" style="height:100%;display:none;overflow-y:hidden">
 
 
     <div ng-include="'app/views/header.html'" class="rowx header"></div>
@@ -34,6 +47,7 @@
                     <td style="padding-left:5px;">  <div dx-button="btn_edit"></div></td>
                     <td style="padding-left:5px;">  <div dx-button="btn_sms"></div></td>
                     <td style="padding-left:5px;">  <div dx-button="btn_training"></div></td>
+                    <td style="padding-left:5px;">  <div dx-button="btn_courses"></div></td>
                     <td style="padding-left:5px;" ng-show="IsAccountEdit"> <div dx-button="btn_user"></div></td>
                     <td style="padding-left:5px;" ng-show="IsAccountEdit"> <div dx-button="btn_password"></div></td>
 
@@ -144,6 +158,127 @@
 
         </div>
     </div>
+
+    <div id="popup_course" dx-popup="popup_course">
+        <div style="border:1px solid #ccc;padding:10px; " class="dx-border">
+            <table style="width:100%">
+                <tr>
+                    <td style="width:500px">
+                        <div dx-select-box="sb_employees" dx-item-alias="prsn">
+                            <div data-options="dxTemplate: { name: 'field' }">
+                                <table style="width:100%;">
+                                    <tr>
+                                        <!--<td style="width:60%"><div class="product-name" dx-text-box=" {value: prsn && prsn.Name, readOnly: true }"></div> </td>-->
+                                        <td style="width:65%">{{prsn && prsn.Name}} </td>
+                                        <td style="width:35%;text-align:center;color:darkviolet;font-weight:bold"> {{prsn && prsn.JobGroup}}  </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="text-align:right; width:80px;padding-right:3px;">
+                        Group
+                    </td>
+                    <td style="border:1px solid #ccc;text-align:center;width:150px">{{selected_person.JobGroup}}</td>
+
+                    <td style="text-align:right; width:80px;padding-right:3px;">
+                        Mobile
+                    </td>
+                    <td style="border:1px solid #ccc;text-align:center;width:150px">{{selected_person.Mobile}}</td>
+                    <td style="text-align:right; width:80px;padding-right:3px;">
+                        NID
+                    </td>
+                    <td style="border:1px solid #ccc;text-align:center;width:150px">{{selected_person.NID}}</td>
+                    <td style="text-align:right; width:80px;padding-right:3px;">
+                        PID
+                    </td>
+                    <td style="border:1px solid #ccc;text-align:center;width:150px">{{selected_person.PID}}</td>
+                    <td></td>
+                </tr>
+
+            </table>
+
+
+        </div>
+        <div dx-data-grid="dg_courses" dx-item-alias="error" id="dg_courses" style="margin-top:10px;">          
+        </div>
+
+
+    </div>
+
+    <div id="popup_cer" dx-popup="popup_cer">
+        <div class="col-lg-8 padding-0">
+            
+            <div class="dx-border" dx-select-box="sb_course_type" dx-validator="{validationGroup:'pceradd',  validationRules: [{ type: 'required'}]}"></div>
+            <div dx-data-grid="dg_arccourse" dx-item-alias="error" id="dg_arccourse" style="margin-top:10px;">
+            </div>
+        </div>
+        <div class="col-lg-4 padding-0 dx-border" style="padding-left:5px">
+            <div style="border:1px solid #ccc;padding:15px;height:583px">
+                <div class="col-lg-12 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>Title</label>
+                    <div dx-text-box="txt_course_Title" dx-validator="{validationGroup:'pceradd',  validationRules: [{ type: 'required'}]}"></div>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>Start Date</label>
+                    <div dx-date-box="date_course_DateStart" class="center" dx-validator="{validationGroup:'pceradd',  validationRules: [{ type: 'required'}]}"></div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>End Date</label>
+                    <div dx-date-box="date_course_DateEnd" class="center"></div>
+                </div>
+
+
+                <div class="col-lg-6 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>Organization</label>
+                    <div dx-select-box="sb_course_OrganizationId"></div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>Location</label>
+                    <div dx-text-box="txt_course_Location"></div>
+                </div>
+                <div style="clear:both"></div>
+                <div class="col-lg-6    col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>Instructor</label>
+                    <div dx-text-box="txt_course_Instructor"></div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>Training Director</label>
+                    <div dx-text-box="txt_course_TrainingDirector"></div>
+                </div>
+                <div style="clear:both"></div>
+                <div class="col-lg-3 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>Duration (hrs)</label>
+                    <div dx-number-box="txt_course_Duration" class="center" dx-validator="{validationGroup:'pceradd',  validationRules: [{ type: 'required'}]}"></div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>Interval</label>
+                    <div dx-number-box="txt_course_Interval" class="center" dx-validator="{validationGroup:'pceradd',  validationRules: [{ type: 'required'}]}"></div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>&nbsp;</label>
+                    <div dx-select-box="sb_course_CalanderTypeId" dx-validator="{validationGroup:'pceradd',  validationRules: [{ type: 'required'}]}"></div>
+                </div>
+                <div style="clear:both"></div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>Issue Date</label>
+                    <div dx-date-box="date_course_resultissue" class="center"></div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>Expire Date</label>
+                    <div dx-date-box="date_course_resultexpire" class="center"></div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12 col-12  margin-bottom-5 padding-7">
+                    <label>Certificate No.</label>
+                    <div dx-text-box="txt_course_resultno" class="center"></div>
+                </div>
+                <div style="clear:both"></div>
+            </div>
+        </div>
+        <div style="clear:both"></div>
+    </div>
+
     <div ng-include="'app/views/personAdd.html'"></div>
     <div ng-include="'app/views/personView.html'"></div>
     <div dx-load-panel="loadPanel"></div>

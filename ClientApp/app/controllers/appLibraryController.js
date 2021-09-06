@@ -4,8 +4,17 @@ app.controller('appLibraryController', ['$scope', '$location', '$window', '$rout
 
     $scope.folderId = $routeParams.fid;
     $scope.parentId = $routeParams.pid;
-
-
+    $scope.chapterId =null;
+    //alert($scope.chapterId);
+     
+     
+    var qprms = $location.search();
+    if (qprms.chid)
+        $scope.chapterId = qprms.chid;
+    
+    //$location.search('id', 500);
+   // console.log($location.search());
+    //alert($location.search().target);
     $scope.firstBind = true;
     $scope.active = $route.current.type;
     $scope.typeId = null;
@@ -221,11 +230,19 @@ app.controller('appLibraryController', ['$scope', '$location', '$window', '$rout
             //$scope.expandedRow.push(response[0].Id);
 
 
+            //2021-07-26
+            if ($scope.chapterId) {
+                var chptr = Enumerable.From($scope.chapters).Where('$.Id==' + $scope.chapterId).FirstOrDefault();
+                if (chptr)
+                    $scope.goChapter(chptr);
+            }
+
         }, function (err) { General.ShowNotify(err.message, 'error'); });
     };
     ////////////////////////////////
     $scope.ds = null;
-    $scope.bind = function () {
+    //2021-07-26
+    $scope.bind = function (callback) {
         if ($scope.firstBind)
             $scope.loadingVisible = true;
         libraryService.getPersonLibrary($rootScope.employeeId, $scope.typeId).then(function (response) {
@@ -243,6 +260,7 @@ app.controller('appLibraryController', ['$scope', '$location', '$window', '$rout
                 _d.ImageUrl= _d.ImageUrl ? $rootScope.clientsFilesUrl + _d.ImageUrl : '../../content/images/image.png';
             });
             $scope.ds = response;
+            callback();
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
     };
 
@@ -271,8 +289,119 @@ app.controller('appLibraryController', ['$scope', '$location', '$window', '$rout
         $rootScope.page_title = 'Library';// > ' + $scope.title;
         $scope.scroll_height = $(window).height() - 45 - 62;
         $('.library').fadeIn();
-          $scope.bind();
-        $scope.bindTree();
+
+        //2021-07-26
+        $scope.bind(function () { $scope.bindTree(); });
+        
+    }
+
+    ///////////////////////////////////////
+    //2021-07-26
+    $scope.popup_folder_visible = false;
+    $scope.popup_folder_title = 'Folder';
+    $scope.popup_folder = {
+        width: 300,
+        height: 260,
+        //position: 'left top',
+        fullScreen: true,
+        showTitle: true,
+        dragEnabled: false,
+        toolbarItems: [
+
+
+
+
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onShowing: function (e) {
+
+
+        },
+        onShown: function (e) {
+            
+        },
+        onHiding: function () {
+            $scope.searchStr = null;
+            $location.search('chid', null);
+        },
+        bindingOptions: {
+            visible: 'popup_folder_visible',
+            //width: 'pop_width',
+            //height: 'pop_height',
+            title: 'popup_folder_title',
+
+        }
+    };
+
+    //close button
+    $scope.popup_folder.toolbarItems[0].options.onClick = function (e) {
+
+        $scope.popup_folder_visible = false;
+
+    };
+    $scope.scroll_popup_folder = {
+        width: '100%',
+        bounceEnabled: false,
+        showScrollbar: 'never',
+        pulledDownText: '',
+        pullingDownText: '',
+        useNative: false,
+        refreshingText: 'Updating...',
+        onPullDown: function (options) {
+            //$scope.bind();
+            //Alert.getStartupNots(null, function (arg) {
+            //    options.component.release();
+            //    // refreshCarts(arg);
+            //});
+            options.component.release();
+
+        },
+        onInitialized: function (e) {
+
+
+        },
+        //heigh: '100%',
+        bindingOptions: { height: 'scroll_height_folder', }
+    };
+    $scope.scroll_height_folder = $(window).height() - 230;
+    $scope.goChapter = function (ch) {
+        $location.search('chid', ch.Id);
+        $location.search('bid', ch.BookId);
+        $scope.popup_folder_title = '';
+        console.log('chapter', ch);
+        $scope.currentChapter = ch;
+        $scope.currentChapter.filesFiltered = Enumerable.From($scope.currentChapter.files).ToArray();
+        $scope.popup_folder_visible = true;
+    };
+    $scope.getFolderTitle = function (f) {
+        var str = "<span>" + f.TitleFormated + "</span>";
+        if (f.files && f.files.length > 0)
+            str += "<span class='fcnt'>(" + f.files.length + ")</span>";
+        return str;
+        
+    };
+    $scope.searchFiles = function () {
+        $scope.currentChapter.filesFiltered = Enumerable.From($scope.currentChapter.files).Where(
+            function (x) {
+                 
+                return x.SysUrl.toLowerCase().includes($scope.searchStr.toLowerCase());
+            }
+        ).ToArray();
+    };
+    $scope.searchStr = null;
+    $scope.text_search = {
+        placeholder: 'Search',
+        valueChangeEvent: 'keyup',
+        onValueChanged: function (e) {
+            $scope.searchFiles();
+        },
+        bindingOptions: {
+            value: 'searchStr'
+        }
     }
     //////////////////////////////////////////
     $scope.$on('PageLoaded', function (event, prms) {

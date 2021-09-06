@@ -470,21 +470,38 @@ namespace EPAGriffinAPI.DAL
                 book.DatePublished = DateTime.Now;
 
                 var applicables = this.context.ViewBookApplicableEmployees.Where(q => q.BookId == dto.BookId).Select(q => new { q.EmployeeId, q.Name, q.Title, q.Type,q.Mobile }).ToList();
-                
+
+                string _issue = "";
+                if (book.Issue != null)
+                {
+                    try
+                    {
+                        _issue = book.Issue.ToString();
+                    }
+                    catch(Exception _ex)
+                    {
+
+                    }
+                }
+
                 foreach (var x in applicables)
                 {
                     var datesent = DateTime.Now.Year + "/" + DateTime.Now.Month + "/" + DateTime.Now.Day + " " + DateTime.Now.Hour + ":" + DateTime.Now.Minute;
                     var _message = "Dear " + x.Name + ",<br/>"
                         + "A new " + x.Type + " added to your e-library: " + x.Title
                         + "<br/>"
-                        + "Please access your Crew Pocket account to see more details."
+                        + "Please access your WebPocket account to see more details."
                         + "<br/>"
                         + "Date Sent: " + datesent;
 
                     var _sms= "Dear " + x.Name + ","+ "\n\n"
-                        + "A new " + x.Type + " added to your e-library: " + x.Title
-                        + "\n\n"
-                        + "Please access your Crew Pocket account to see more details."
+                        + "A new " + x.Type + " added to your e-library: "
+                        + "\n"
+                        + x.Title
+                        + "\n"
+                        +(!string.IsNullOrEmpty(_issue)?"Issue: "+_issue+ "\n" : "")
+                        + (!string.IsNullOrEmpty(book.Edition) ? "Revision: " + book.Edition + "\n" : "")
+                        + "Please access your WebPocket account to see more details."
                         + "\n\n"
                         + "Date Sent: " + datesent;
 
@@ -514,25 +531,25 @@ namespace EPAGriffinAPI.DAL
                     }
                 }
                 //send notification
-                //new Thread(() =>
-                // {
-                //try
-                //{
-                //    int c = 0;
-                //    Magfa mgf = new Magfa();
-                //    foreach (var m in numbers)
-                //    {
-                //        var txt = sms[c];
-                //        var res = mgf.enqueue(1, m, txt);
-                //        c++;
-                //    }
-                //}
-                //catch(Exception eex)
-                //{
-                //         int i = 0;
-                //}
-                   
-                // }).Start();
+                new Thread(() =>
+                 {
+                     try
+                     {
+                         int c = 0;
+                         Magfa mgf = new Magfa();
+                         foreach (var m in numbers)
+                         {
+                             var txt = sms[c];
+                             var res = mgf.enqueue(1, m, txt);
+                             c++;
+                         }
+                     }
+                     catch (Exception eex)
+                     {
+                         int i = 0;
+                     }
+
+                 }).Start();
 
                 return true;
             }

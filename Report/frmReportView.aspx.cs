@@ -18,12 +18,56 @@ namespace Report
 
             string apiUrl = WebConfigurationManager.AppSettings["api_url"];
             string apiUrlExt = WebConfigurationManager.AppSettings["api_url_ext"];
+            string apiUrlTrn = WebConfigurationManager.AppSettings["api_url_trn"];
             string type = Request.QueryString["type"];
             if (string.IsNullOrEmpty(type))
                 type = "1";
             JsonDataSource dataSource = null;
             switch (type)
             {
+                //api/courses/passed/history
+                case "11":
+                     string pid = Request.QueryString["pid"];
+                   // string airline = Request.QueryString["airline"];
+                   // string aptdt = Request.QueryString["dt"];
+                   // string aptuser = Request.QueryString["user"];
+                   // string aptphone = Request.QueryString["phone"];
+                    var rptcer = new rptCertificates();
+                    dataSource = new JsonDataSource();
+
+                    dataSource.JsonSource = new UriJsonSource(new Uri(apiUrlTrn + "api/certificates/history/"+pid ));
+                    dataSource.Fill();
+                    rptcer.DataSource = dataSource;
+                    ASPxWebDocumentViewer1.OpenReport(rptcer);
+                    break;
+                case "12":
+                    string pid2 = Request.QueryString["pid"];
+                    // string airline = Request.QueryString["airline"];
+                    // string aptdt = Request.QueryString["dt"];
+                    // string aptuser = Request.QueryString["user"];
+                    // string aptphone = Request.QueryString["phone"];
+                    var rptcour = new rptCourses();
+                    dataSource = new JsonDataSource();
+
+                    dataSource.JsonSource = new UriJsonSource(new Uri(apiUrlTrn + "api/courses/passed/history/" + pid2));
+                    dataSource.Fill();
+                    rptcour.DataSource = dataSource;
+                    ASPxWebDocumentViewer1.OpenReport(rptcour);
+                    break;
+                case "13":
+                    string aptirdaily = Request.QueryString["apt"];
+                    string airlineirdaily = Request.QueryString["airline"];
+                    string aptdtfromirdaily = Request.QueryString["dtfrom"];
+                     
+
+                    var rptaptirdaily = new rptAptDailyCaspian();
+                    dataSource = new JsonDataSource();
+
+                    dataSource.JsonSource = new UriJsonSource(new Uri(apiUrlExt + "api/flights/apt/range/type2/1?apt=" + aptirdaily + "&airline=" + airlineirdaily + "&dtfrom=" + aptdtfromirdaily));
+                    dataSource.Fill();
+                    rptaptirdaily.DataSource = dataSource;
+                    ASPxWebDocumentViewer1.OpenReport(rptaptirdaily);
+                    break;
                 case "8":
                     string apt = Request.QueryString["apt"];
                     string airline = Request.QueryString["airline"];

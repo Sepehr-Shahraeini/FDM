@@ -1,5 +1,5 @@
 ﻿'use strict';
-app.controller('courseTypeController', ['$scope', '$location', '$routeParams', '$rootScope', 'courseService', 'authService', function ($scope, $location, $routeParams, $rootScope, courseService, authService) {
+app.controller('courseTypeController', ['$scope', '$location', '$routeParams', '$rootScope', 'courseService', 'authService', 'trnService', function ($scope, $location, $routeParams, $rootScope, courseService, authService, trnService) {
     $scope.prms = $routeParams.prms;
 
     //////////////////////////////////
@@ -23,11 +23,16 @@ app.controller('courseTypeController', ['$scope', '$location', '$routeParams', '
 
                     var dto = { Id: $scope.dg_selected.Id, };
                     $scope.loadingVisible = true;
-                    courseService.deleteCourseType(dto).then(function (response) {
+                    trnService.deleteCourseType(dto).then(function (response) {
                         $scope.loadingVisible = false;
-                        General.ShowNotify(Config.Text_SavedOk, 'success');
-                        $scope.doRefresh = true;
-                        $scope.bind();
+                        if (response.IsSuccess) {
+                            General.ShowNotify(Config.Text_SavedOk, 'success');
+                            $scope.doRefresh = true;
+                            $scope.bind();
+                        }
+                        else
+                            General.ShowNotify(response.Errors[0], 'error');
+                       
 
 
 
@@ -77,7 +82,8 @@ app.controller('courseTypeController', ['$scope', '$location', '$routeParams', '
         bindingOptions: {},
         onClick: function (e) {
 
-            $scope.$broadcast('getFilterQuery', null);
+           // $scope.$broadcast('getFilterQuery', null);
+            $scope.bind();
         }
 
     };
@@ -139,13 +145,15 @@ app.controller('courseTypeController', ['$scope', '$location', '$routeParams', '
                     .appendTo(container);
             }, caption: '#', width: 60, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
         },
-        { dataField: 'Title', caption: 'Title', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, },
+        { dataField: 'Title', caption: 'Title', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width:300 },
       
-       
+        { dataField: 'Duration', caption: 'Duration (hrs)', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
         { dataField: 'Interval2', caption: 'Interval', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
+        { dataField: 'CertificateType', caption: 'Certificate Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'JobGroups', caption: 'Groups', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 300 },
+        { dataField: 'CoursesCount', caption: 'Courses', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100 },
+        { dataField: 'Remark', caption: 'Remark', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, minWidth: 300 },
         
-        { dataField: 'Remark', caption: 'Remark', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 300 },
-        { dataField: 'CoursesCount', caption: 'Courses', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
         
     ];
 
@@ -215,40 +223,48 @@ app.controller('courseTypeController', ['$scope', '$location', '$routeParams', '
         return filters;
     };
     $scope.bind = function () {
-        if (!$scope.dg_ds) {
-            $scope.dg_ds = {
-                store: {
-                    type: "odata",
-                    url: $rootScope.serviceUrl + 'odata/courses/types',
-                    key: "Id",
-                    version: 4,
-                    onLoaded: function (e) {
-                        // $scope.loadingVisible = false;
-                        //filter
-                        $rootScope.$broadcast('OnDataLoaded', null);
-                    },
-                    beforeSend: function (e) {
+        $scope.dg_ds = [];
+        $scope.loadingVisible = true;
+        trnService.getCourseTypes().then(function (response) {
+            $scope.loadingVisible = false;
+            $scope.dg_ds = response.Data;
 
-                        $scope.dsUrl = General.getDsUrl(e);
 
-                        // $scope.$apply(function () {
-                        //    $scope.loadingVisible = true;
-                        // });
-                        $rootScope.$broadcast('OnDataLoading', null);
-                    },
-                },
-                // filter: [['OfficeCode', 'startswith', $scope.ParentLocation.FullCode]],
-                  sort: ['Title' ],
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+        //if (!$scope.dg_ds) {
+        //    $scope.dg_ds = {
+        //        store: {
+        //            type: "odata",
+        //            url: $rootScope.serviceUrl + 'odata/courses/types',
+        //            key: "Id",
+        //            version: 4,
+        //            onLoaded: function (e) {
+        //                // $scope.loadingVisible = false;
+        //                //filter
+        //                $rootScope.$broadcast('OnDataLoaded', null);
+        //            },
+        //            beforeSend: function (e) {
 
-            };
-        }
+        //                $scope.dsUrl = General.getDsUrl(e);
 
-        if ($scope.doRefresh) {
-            $scope.filters = $scope.getFilters();
-            $scope.dg_ds.filter = $scope.filters;
-            $scope.dg_instance.refresh();
-            $scope.doRefresh = false;
-        }
+        //                // $scope.$apply(function () {
+        //                //    $scope.loadingVisible = true;
+        //                // });
+        //                $rootScope.$broadcast('OnDataLoading', null);
+        //            },
+        //        },
+        //        // filter: [['OfficeCode', 'startswith', $scope.ParentLocation.FullCode]],
+        //          sort: ['Title' ],
+
+        //    };
+        //}
+
+        //if ($scope.doRefresh) {
+        //    $scope.filters = $scope.getFilters();
+        //    $scope.dg_ds.filter = $scope.filters;
+        //    $scope.dg_instance.refresh();
+        //    $scope.doRefresh = false;
+        //}
 
     };
     ///////////////////////

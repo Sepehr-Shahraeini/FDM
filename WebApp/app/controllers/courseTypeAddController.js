@@ -1,5 +1,5 @@
 ﻿'use strict';
-app.controller('courseTypeAddController', ['$scope', '$location', 'courseService', 'authService', '$routeParams', '$rootScope', function ($scope, $location, courseService, authService, $routeParams, $rootScope) {
+app.controller('courseTypeAddController', ['$scope', '$location', 'courseService', 'authService', '$routeParams', '$rootScope', 'trnService', function ($scope, $location, courseService, authService, $routeParams, $rootScope, trnService) {
     $scope.isNew = true;
 
 
@@ -13,6 +13,9 @@ app.controller('courseTypeAddController', ['$scope', '$location', 'courseService
         Interval: null,
         IsGeneral: null,
         Status: null,
+        CertificateTypeId: null,
+        Duration: null,
+        JobGroups: [],
     };
 
     $scope.clearEntity = function () {
@@ -25,6 +28,9 @@ app.controller('courseTypeAddController', ['$scope', '$location', 'courseService
         $scope.entity.Interval = null;
         $scope.entity.IsGeneral = null;
         $scope.entity.Status = null;
+        $scope.entity.CertificateTypeId = null;
+        $scope.entity.Duration = null;
+        $scope.entity.JobGroups = [];
     };
 
     $scope.bind = function (data) {
@@ -38,6 +44,9 @@ app.controller('courseTypeAddController', ['$scope', '$location', 'courseService
         $scope.entity.Interval = data.Interval;
         $scope.entity.IsGeneral = data.IsGeneral;
         $scope.entity.Status = data.Status;
+        $scope.entity.CertificateTypeId = data.CertificateTypeId;
+        $scope.entity.Duration = data.Duration;
+        $scope.entity.JobGroups = data.JobGroups;
     };
 
 
@@ -81,6 +90,12 @@ app.controller('courseTypeAddController', ['$scope', '$location', 'courseService
             value: 'entity.Interval',
         }
     };
+    $scope.txt_duration = {
+        min: 1,
+        bindingOptions: {
+            value: 'entity.Duration',
+        }
+    };
     $scope.sb_CalanderTypeId = {
         showClearButton: true,
         searchEnabled: true,
@@ -92,10 +107,78 @@ app.controller('courseTypeAddController', ['$scope', '$location', 'courseService
 
         }
     };
-     
+
+    $scope.sb_CerTypes = {
+        
+        showClearButton: true,
+        searchEnabled: true,
+        dataSource: $rootScope.getDatasourceCertificateTypes(),
+
+        onSelectionChanged: function (arg) {
+
+        },
+        searchExpr: ["Title"],
+        displayExpr: "Title",
+        valueExpr: 'Id',
+        bindingOptions: {
+            value: 'entity.CertificateTypeId',
+
+
+        }
+    };
+    $scope.dg_group_columns = [
+         
+        { dataField: "Title", caption: "Title", allowResizing: true, alignment: "left", dataType: 'string', allowEditing: false, },
+        { dataField: 'FullCode', caption: 'Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, encodeHtml: false, width: 200, sortIndex: 0, sortOrder: "asc" },
+
+    ];
+    $scope.dg_group_selected = null;
+    $scope.dg_group_instance = null;
+    $scope.dg_group = {
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'multiple' },
+
+        noDataText: '',
+        showColumnHeaders:false,
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        filterRow: { visible: false, showOperationChooser: true, },
+        columnAutoWidth: false,
+        columns: $scope.dg_group_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_group_instance)
+                $scope.dg_group_instance = e.component;
+
+        },
+        onSelectionChanged: function (e) {
+            var data = e.selectedRowsData[0];
+
+            if (!data) {
+                $scope.dg_group_selected = null;
+            }
+            else
+                $scope.dg_group_selected = data;
+
+
+        },
+        height: 250,
+        bindingOptions: {
+
+            dataSource: 'entity.JobGroups',
+            // height: 'dg_height',
+        },
+        // dataSource:ds
+
+    };
     /////////////////////////////
-    $scope.pop_width = 600;
-    $scope.pop_height = 380;
+    $scope.pop_width = 850;
+    $scope.pop_height = 430;
     $scope.popup_add_visible = false;
     $scope.popup_add_title = 'New';
     $scope.popup_add = {
@@ -113,7 +196,7 @@ app.controller('courseTypeAddController', ['$scope', '$location', 'courseService
         closeOnOutsideClick: false,
         onShowing: function (e) {
             var size = $rootScope.getWindowSize();
-            if (size.width <= 600) {
+            if (size.width <=  600) {
                 $scope.pop_width = size.width;
                 $scope.pop_height = size.height;
             }
@@ -134,8 +217,21 @@ app.controller('courseTypeAddController', ['$scope', '$location', 'courseService
             //var dsclient = $rootScope.getClientsDatasource($scope.LocationId);
             //$scope.clientInstance.option('dataSource', dsclient);
 
-            if ($scope.tempData != null)
-                $scope.bind($scope.tempData);
+            if ($scope.tempData != null) {
+                var _dt = {};
+                JSON.copy($scope.tempData, _dt);
+                $scope.loadingVisible = true;
+                trnService.getCourseTypeGroups($scope.tempData.Id).then(function (response) {
+                    $scope.loadingVisible = false;
+                    _dt.JobGroups = response.Data;
+                    $scope.bind(_dt);
+                }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                
+            }
+                
+
+            if ($scope.dg_group_instance)
+                $scope.dg_group_instance.refresh();
 
         },
         onHiding: function () {
@@ -173,14 +269,14 @@ app.controller('courseTypeAddController', ['$scope', '$location', 'courseService
             $scope.entity.Id = -1;
         
         $scope.loadingVisible = true;
-        courseService.saveType($scope.entity).then(function (response) {
+        trnService.saveCourseType($scope.entity).then(function (response) {
 
             $scope.clearEntity();
 
 
             General.ShowNotify(Config.Text_SavedOk, 'success');
 
-            $rootScope.$broadcast('onCourseTypeSaved', response);
+            $rootScope.$broadcast('onCourseTypeSaved', response.Data);
 
 
 
@@ -195,6 +291,35 @@ app.controller('courseTypeAddController', ['$scope', '$location', 'courseService
 
     };
     ////////////////////////////
+    $scope.removeGroup = function () {
+        var dg_selected = $rootScope.getSelectedRow($scope.dg_group_instance);
+        if (!dg_selected) {
+            General.ShowNotify(Config.Text_NoRowSelected, 'error');
+            return;
+        }
+        $scope.entity.JobGroups = Enumerable.From($scope.entity.JobGroups).Where('$.Id!=' + dg_selected.Id).ToArray();
+
+
+    };
+    $scope.addGroup = function () {
+        $rootScope.$broadcast('InitJobGroupSelectSimple', null);
+    };
+    $scope.$on('onJobGroupSelectSimpleHide', function (event, prms) {
+
+
+        if (!prms || prms.length == 0)
+            return;
+        $.each(prms, function (_i, _d) {
+            var exist = Enumerable.From($scope.entity.JobGroups).Where("$.Id==" + _d.Id).FirstOrDefault();
+            if (!exist) {
+                var jg = { Id: _d.Id, Title: _d.Title, FullCode: _d.FullCode };
+                console.log($scope.entity.JobGroups);
+                $scope.entity.JobGroups.push(jg);
+            }
+        });
+        $scope.dg_group_instance.refresh();
+    });
+
     $scope.tempData = null;
     $scope.$on('InitAddCourseType', function (event, prms) {
 

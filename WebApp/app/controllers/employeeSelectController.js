@@ -172,10 +172,12 @@ app.controller('employeeSelectController', ['$scope', '$location', 'authService'
 
     };
     ////////////////////////////
-
+    $scope.groups = null;
     $scope.$on('InitEmployeeSelect', function (event, prms) {
-
-
+        
+        if (prms) {
+            $scope.groups = prms.groups;
+        }
         $scope.popup_add_visible = true;
 
     });

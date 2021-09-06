@@ -490,6 +490,11 @@ app.config(function ($routeProvider) {
         templateUrl: "/app/views/board.html",
         isAdmin: true,
     });
+    $routeProvider.when("/board/fly", {
+        controller: "boardflyController",
+        templateUrl: "/app/views/boarfly.html",
+        isAdmin: true,
+    });
 
     $routeProvider.when("/board/test", {
         controller: "boardTestController",
@@ -567,24 +572,38 @@ app.config(function ($routeProvider) {
         templateUrl: "/app/views/training.html"
     });
 
+
+    $routeProvider.when("/nira", {
+        controller: "niraController",
+        templateUrl: "/app/views/nira.html"
+    });
+
+    $routeProvider.when("/asr", {
+        controller: "asrreportController",
+        templateUrl: "/app/views/asrreport.html"
+    });
+
     $routeProvider.otherwise({ redirectTo: "/home" });
 
 });   
 
-//var serviceBase = 'http://grfn.api.epatrin.ir/';
-//var webBase = 'http://grfn.epatrin.ir/';
-if (window.location.href.indexOf('fleet.flypersia.aero') != -1) {
-    var webBase = 'http://fleet.flypersia.aero/airpocket/';
-    var serviceBase = 'http://fleet.flypersia.aero/api.airpocket/';
-}
-else {
-    //var serviceBase = 'http://apig.epapocket.ir/';
-    var serviceBase = 'http://localhost:58908/';
-   // var serviceBase = 'http://fleet.caspianairlines.com/api/';
-    var webBase = 'http://localhost:30273/';
-}
+////var serviceBase = 'http://grfn.api.epatrin.ir/';
+////var webBase = 'http://grfn.epatrin.ir/';
+//if (window.location.href.indexOf('fleet.flypersia.aero') != -1) {
+//    var webBase = 'http://fleet.flypersia.aero/airpocket/';
+//    var serviceBase = 'http://fleet.flypersia.aero/api.airpocket/';
+//}
+//else {
+//    //var serviceBase = 'http://apig.epapocket.ir/';
+//    var serviceBase = 'http://localhost:58908/';
+//   // var serviceBase = 'http://fleet.caspianairlines.com/api/';
+//    var webBase = 'http://localhost:30000/';
+//} 
+//var serviceBase = 'http://fleet.caspianairlines.com/api/';
 var serviceBaseAPI = 'http://localhost:12271/';
-//var serviceBase =  'http://localhost:58908/';
+var serviceBaseTRN = 'http://localhost:4000/';
+var webBase = 'http://localhost:30000/';
+var serviceBase =  'http://localhost:58908/';
  //var webBase = 'http://localhost:30273/';
 
 
@@ -805,7 +824,7 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
     //vahid
     $rootScope.roles = null;
     $rootScope.HasAccessToCrewList = function () {
-
+        return true;
         var role = Enumerable.From($rootScope.roles).Where('$=="Flight Crew List"').FirstOrDefault();
         if (role)
             return true;
@@ -1447,6 +1466,36 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
             }),
             //filter: ['ParentId', '=', pid],
             sort: ['ScheduleName'],
+        });
+    };
+
+    //training
+    $rootScope.getDatasourceCertificateTypes = function () {
+        return new DevExpress.data.DataSource({
+            store:
+
+                new DevExpress.data.ODataStore({
+                    url: serviceBaseTRN + 'api/certificate/types/query',
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    //version: 4
+                }),
+            //filter: ['ParentId', '=', pid],
+            sort: ['Title'],
+        });
+    };
+    $rootScope.getDatasourceCourseTypeNew = function () {
+        return new DevExpress.data.DataSource({
+            store:
+
+                new DevExpress.data.ODataStore({
+                    url: serviceBaseTRN + 'api/course/types/query', 
+                    //  key: "Id",
+                    // keyType: "Int32" ,
+                    
+                }),
+            //filter: ['ParentId', '=', pid],
+            sort: ['Title'],
         });
     };
     ///////////////////////////////////////////////

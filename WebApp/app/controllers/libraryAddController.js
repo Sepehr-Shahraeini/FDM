@@ -227,15 +227,15 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
                 clearInterval(myVar);
             }, 10);
 
-            $scope.btn_visible_aircrafttype = newValue == 2;
+           // $scope.btn_visible_aircrafttype = newValue == 2;
 
             $scope.btn_visible_file = newValue == 1;
             $scope.btn_visible_education = newValue == 4;
             //$scope.btn_visible_course = newValue == 4;
-            $scope.btn_visible_group = newValue == 3;
-            $scope.btn_visible_employee = newValue == 5;
+           // $scope.btn_visible_group = newValue == 3;
+            $scope.btn_visible_employee = newValue ==2;
 
-
+           
 
 
 

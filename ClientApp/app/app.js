@@ -55,9 +55,17 @@ app.config(function ($routeProvider) {
     $routeProvider.when("/applibrary/:fid/:pid", {
         controller: "appLibraryController",
         templateUrl: "/app/views/applibrary.html?v=20",
+        reloadOnSearch: false,
         //type:'all',
         type:'book',
     });
+    $routeProvider.when("/applibrary/:fid/:pid/:chid", {
+        controller: "appLibraryController",
+        templateUrl: "/app/views/applibrary.html?v=20",
+        //type:'all',
+        type: 'book',
+    });
+
     $routeProvider.when("/applibrary/books", {
         controller: "appLibraryController",
         templateUrl: "/app/views/applibrary.html?v=20",

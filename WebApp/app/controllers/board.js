@@ -1,7 +1,7 @@
 ﻿'use strict';
-app.controller('boardController', ['$scope', '$location', '$routeParams', '$rootScope', '$timeout', 'flightService', 'weatherService', 'aircraftService', 'authService', 'notificationService', '$route', '$window', function ($scope, $location, $routeParams, $rootScope, $timeout, flightService, weatherService, aircraftService, authService, notificationService, $route, $window) {
+app.controller('boardController', ['$scope', '$location', '$routeParams', '$rootScope', '$timeout', 'flightService', 'weatherService', 'aircraftService', 'authService', 'notificationService', '$route', '$window', 'fbService', '$http', function ($scope, $location, $routeParams, $rootScope, $timeout, flightService, weatherService, aircraftService, authService, notificationService, $route, $window, fbService, $http) {
     $scope.prms = $routeParams.prms;
-   
+
     var hourWidth = 85;
     authService.setModule(3);
     $rootScope.setTheme();
@@ -936,6 +936,18 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     $scope.jl = {};
     //divargar-ok
+    var _getFDPItemCount = function (id) {
+
+        var deferred = $q.defer();
+        $http.get(serviceBase + 'api/flights/fdpitem/count/' + id).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
     $scope.btn_delete = {
         hint: 'Delete Flight',
         type: 'danger',
@@ -954,35 +966,74 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 General.ShowNotify("The flight cannot be deleted.", 'error');
                 return;
             }
-            $scope.ati_flight = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[0].ID).FirstOrDefault();
-            $scope.ati_resid = $scope.ati_flight.RegisterID;
+            _getFDPItemCount($scope.ati_selectedFlights[0].ID).then(function (response) {
+                if (respone) {
+                    General.ShowNotify("The flight cannot be deleted.", 'error');
+                    return;
+                }
+                $scope.ati_flight = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[0].ID).FirstOrDefault();
+                $scope.ati_resid = $scope.ati_flight.RegisterID;
 
-            if ($scope.IsComm) {
-                $scope.time_interval_from_date = new Date($scope.ati_flight.STD);
-                $scope.time_interval_to_date = new Date($scope.ati_flight.STD);
-                $scope.interval_days = [];
-                $scope.interval_days.push((new Date($scope.ati_flight.STD)).getDay());
-                $scope.popup_delete_visible = true;
-            }
-            else {
-                General.Confirm(Config.Text_DeleteConfirm, function (res) {
-                    if (res) {
+                if ($scope.IsComm) {
+                    $scope.time_interval_from_date = new Date($scope.ati_flight.STD);
+                    $scope.time_interval_to_date = new Date($scope.ati_flight.STD);
+                    $scope.interval_days = [];
+                    $scope.interval_days.push((new Date($scope.ati_flight.STD)).getDay());
+                    $scope.popup_delete_visible = true;
+                }
+                else {
+                    General.Confirm(Config.Text_DeleteConfirm, function (res) {
+                        if (res) {
 
-                        var dto = { Id: $scope.ati_flight.ID, };
-                        $scope.loadingVisible = true;
-                        flightService.deleteFlight(dto).then(function (response) {
-                            $scope.loadingVisible = false;
-                            General.ShowNotify(Config.Text_SavedOk, 'success');
-                            //sooks
-                            $scope.removeFromGantt($scope.ati_flight, $scope.ati_resid);
-
-
-                        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                            var dto = { Id: $scope.ati_flight.ID, };
+                            $scope.loadingVisible = true;
+                            flightService.deleteFlight(dto).then(function (response) {
+                                $scope.loadingVisible = false;
+                                General.ShowNotify(Config.Text_SavedOk, 'success');
+                                //sooks
+                                $scope.removeFromGantt($scope.ati_flight, $scope.ati_resid);
 
 
-                    }
-                });
-            }
+                            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+
+                        }
+                    });
+                }
+
+            }, function (err) { $scope.loadingVisible = false; $scope.popup_notify_visible = false; General.ShowNotify(err.message, 'error'); });
+
+
+
+            //$scope.ati_flight = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[0].ID).FirstOrDefault();
+            //$scope.ati_resid = $scope.ati_flight.RegisterID;
+
+            //if ($scope.IsComm) {
+            //    $scope.time_interval_from_date = new Date($scope.ati_flight.STD);
+            //    $scope.time_interval_to_date = new Date($scope.ati_flight.STD);
+            //    $scope.interval_days = [];
+            //    $scope.interval_days.push((new Date($scope.ati_flight.STD)).getDay());
+            //    $scope.popup_delete_visible = true;
+            //}
+            //else {
+            //    General.Confirm(Config.Text_DeleteConfirm, function (res) {
+            //        if (res) {
+
+            //            var dto = { Id: $scope.ati_flight.ID, };
+            //            $scope.loadingVisible = true;
+            //            flightService.deleteFlight(dto).then(function (response) {
+            //                $scope.loadingVisible = false;
+            //                General.ShowNotify(Config.Text_SavedOk, 'success');
+            //                //sooks
+            //                $scope.removeFromGantt($scope.ati_flight, $scope.ati_resid);
+
+
+            //            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+
+            //        }
+            //    });
+            //}
 
 
 
@@ -1207,7 +1258,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.midnightLines = [];
 
     $scope.baseDate = null;
-
+    //najaf
     $scope.fillFlight = function (data, newData) {
         data.FlightPlanId = newData.FlightPlanId;
         data.BaggageCount = newData.BaggageCount;
@@ -1989,9 +2040,9 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         width: '100%',
 
         onClick: function (e) {
-           
 
-            
+
+
 
             if (!$scope.ati_selectedFlights || $scope.ati_selectedFlights.length == 0) {
                 General.ShowNotify(Config.Text_NoFlightSelected, 'error');
@@ -2006,8 +2057,219 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         }
     };
 
+    //08-28
+    /////////// FLIGHT FOLDER /////////////////
+    $scope.btn_folder = {
+        hint: 'Flight Folder',
+        type: 'default',
+        icon: 'fas fa-folder',
+        width: '100%',
 
+        onClick: function (e) {
+
+            if (!$scope.ati_selectedFlights || $scope.ati_selectedFlights.length == 0) {
+                General.ShowNotify(Config.Text_NoFlightSelected, 'error');
+                return;
+            }
+
+            $scope.popup_folder_visible = true;
+
+
+        }
+    };
+    $scope.folderItemClick = function (key) {
+        if (key == 'dr') {
+            var data = { FlightId: $scope.ati_selectedFlights[0].ID };
+            $rootScope.$broadcast('InitDrAdd', data);
+        }
+        if (key == 'ofp') {
+            $scope.popup_ofp_visible = true;
+        }
+    };
+    $scope.popup_folder_visible = false;
+    $scope.popup_folder_title = 'Flight Folder';
+    $scope.popup_folder = {
+        elementAttr: {
+            //  id: "elementId",
+            class: "popup_aptrptrange"
+        },
+        shading: true,
+        //position: { my: 'left', at: 'left', of: window, offset: '5 0' },
+        height: 300,
+        width: 700,
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+        toolbarItems: [
+            //{
+            //    widget: 'dxButton', location: 'after', options: {
+            //        type: 'danger', text: 'SAVE', icon: 'remove', onClick: function (e) {
+            //            var dto = { user: 'demo', fltId: 66287, text: $scope.ofp };
+            //            $http.post('http://localhost:12271/api/ofp/parse/text', dto);
+            //        }
+            //    }, toolbar: 'bottom'
+            //},
+
+
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) { $scope.popup_folder_visible = false; } }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+         
+        closeOnOutsideClick: false,
+        onTitleRendered: function (e) {
+
+        },
+        onShowing: function (e) {
+
+        },
+        onShown: function (e) {
+
+
+        },
+        onHiding: function () {
+
+
+            $scope.popup_folder_visible = false;
+
+        },
+        bindingOptions: {
+            visible: 'popup_folder_visible',
+
+            title: 'popup_folder_title',
+
+        }
+    };
+
+    //close button
+    //$scope.popup_folder.toolbarItems[0].options.onClick = function (e) {
+
+    //    $scope.popup_folder_visible = false;
+
+    //};
+    ////OFP
+    $scope.ofp = null;
+    $scope.txt_ofp = {
+        height: 530,
+        bindingOptions: {
+
+            value: "ofp"
+        }
+    };
+
+    $scope.txt_ofp_user = {
+        hoverStateEnabled: false,
+        readOnly: true,
+        placeholder: 'Imported By...',
+        bindingOptions: {
+            value: 'ofp_user',
+        }
+    };
+    $scope.txt_ofp_date = {
+        hoverStateEnabled: false,
+        placeholder: 'Importing date...',
+        readOnly: true,
+        bindingOptions: {
+            value: 'ofp_date',
+        }
+    };
+
+    $scope.popup_ofp_visible = false;
+    $scope.popup_ofp_title = 'OFP';
+    $scope.popup_ofp = {
+        elementAttr: {
+            //  id: "elementId",
+            class: "popup_aptrptrange"
+        },
+        shading: true,
+        //position: { my: 'left', at: 'left', of: window, offset: '5 0' },
+        height: 700,
+        width: 700,
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+        toolbarItems: [
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'SAVE', icon: 'check', validationGroup: 'ofptext', onClick: function (e) {
+                        var result = e.validationGroup.validate();
+
+                        if (!result.isValid) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+
+                        var dto = { user: $rootScope.userName, fltId: $scope.ati_selectedFlights[0].ID, text: $scope.ofp };
+
+                        $scope.loadingVisible = true;
+
+                        flightService.saveOFP(dto).then(function (response) {
+                            $scope.loadingVisible = false;
+                            if (response == "-1") {
+                                General.ShowNotify("OFP conversion failed. please check the text", 'error');
+                            }
+                            else {
+                                General.ShowNotify(Config.Text_SavedOk, 'success');
+                                $scope.popup_ofp_visible = false;
+                            }
+                            
+
+
+                        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                    }
+                }, toolbar: 'bottom'
+            },
+
+
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) { $scope.popup_ofp_visible = false; } }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onTitleRendered: function (e) {
+
+        },
+        onShowing: function (e) {
+
+
+        },
+        onShown: function (e) {
+            $scope.loadingVisible = true;
+
+            flightService.getOFP($scope.ati_selectedFlights[0].ID).then(function (response) {
+                $scope.loadingVisible = false;
+                if (response && response.Id != -1) {
+                    $scope.ofp = response.Text;
+                    $scope.ofp_user = response.User;
+                    $scope.ofp_date = moment(new Date(response.DateCreate)).format('YYYY-MM-DD HH:mm');
+                }
+
+            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        },
+        onHiding: function () {
+
+            $scope.ofp = null;
+            $scope.ofp_user = null;
+            $scope.ofp_date = null;
+            $scope.popup_ofp_visible = false;
+
+        },
+        bindingOptions: {
+            visible: 'popup_ofp_visible',
+
+            title: 'popup_ofp_title',
+
+        }
+    };
+
+
+
+
+    ////////////END FLIGHT FOLDER///////////////////////
     //magu2-23
+
     $scope.btn_addemp = {
         hint: 'Add Employees',
         type: 'default',
@@ -2048,15 +2310,15 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 return;
             }
             var ati_flight1 = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[0].ID).FirstOrDefault();
-            var ati_flight2 = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[$scope.ati_selectedFlights.length-1].ID).FirstOrDefault();
+            var ati_flight2 = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + $scope.ati_selectedFlights[$scope.ati_selectedFlights.length - 1].ID).FirstOrDefault();
             //$scope.ati_resid=$scope.ati_flight.RegisterID;
             if ($scope.IsComm) {
                 $scope.time_interval_from_date = new Date(ati_flight1.STD);
                 $scope.time_interval_to_date = new Date(ati_flight2.STD);
                 $scope.interval_days = [];
-                $scope.interval_days.push((new Date( ati_flight1.STD)).getDay());
-                $scope.interval_days.push((new Date( ati_flight2.STD)).getDay());
-                
+                $scope.interval_days.push((new Date(ati_flight1.STD)).getDay());
+                $scope.interval_days.push((new Date(ati_flight2.STD)).getDay());
+
             }
             $scope.popup_creg_visible = true;
 
@@ -3515,12 +3777,12 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     $scope.jl.crewscabin.push(co);
                 });
 
-                if ($scope.jl.crewscockpit.length <  7)
-                    for (var i = $scope.jl.crewscockpit.length; i <  7; i++) {
+                if ($scope.jl.crewscockpit.length < 7)
+                    for (var i = $scope.jl.crewscockpit.length; i < 7; i++) {
                         $scope.jl.crewscockpit.push({ Position: ' ', Name: ' ' });
-                        
+
                     }
-               
+
 
                 if ($scope.jl.crewscabin.length < 7)
                     for (var i = $scope.jl.crewscabin.length; i < 7; i++) {
@@ -3591,14 +3853,14 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     //dooltala
 
     //kabiri-ok
-    $scope.OrderGD = ['IP', 'CPT', 'FO', 'SO', 'CHK(CO)', 'OBS(CO)', 'DH(CO)', 'FD', 'GE', 'FSO','ISCCM','SCCM','CCM','CHK(CA)','OBS(CA)','DH(CA)'];
-    
+    $scope.OrderGD = ['IP', 'CPT', 'FO', 'SO', 'CHK(CO)', 'OBS(CO)', 'DH(CO)', 'FD', 'GE', 'FSO', 'ISCCM', 'SCCM', 'CCM', 'CHK(CA)', 'OBS(CA)', 'DH(CA)'];
+
     $scope.generateGDTables = function (cds) {
         $scope.cl.crewsAll = Enumerable.From(cds).OrderBy('$.IsPositioning')
             //.ThenBy('$.GroupOrder').ThenBy('$.Name')
             .ThenBy('$.GroupOrder').ThenBy('$.PositionId').ThenBy('$.Name')
             .ToArray();
-         
+
         $.each($scope.cl.crewsAll, function (_i, _d) {
             if (!_d.Position)
                 _d.Position = " ";
@@ -3617,7 +3879,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 _d.Position = "CCM";
             if (_d.JobGroup == "ISCCM")
                 _d.Position = "ISCCM";
-               if (_d.IsPositioning)
+            if (_d.IsPositioning)
                 _d.Position = 'DH';
 
             if (_d.Position == "CHECK" && ['IP', 'TRE', 'TRI', 'LTC', 'P1', 'P2'].indexOf(_d.JobGroup) != -1)
@@ -3626,7 +3888,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 _d.Position = "OBS(CO)";
             if (_d.Position == "DH" && ['IP', 'TRE', 'TRI', 'LTC', 'P1', 'P2'].indexOf(_d.JobGroup) != -1)
                 _d.Position = "DH(CO)";
-            if (_d.Position == "CHECK" && ['ISCCM','SCCM','CCM'].indexOf(_d.JobGroup) != -1)
+            if (_d.Position == "CHECK" && ['ISCCM', 'SCCM', 'CCM'].indexOf(_d.JobGroup) != -1)
                 _d.Position = "CHK(CA)";
             if (_d.Position == "OBS" && ['ISCCM', 'SCCM', 'CCM'].indexOf(_d.JobGroup) != -1)
                 _d.Position = "OBS(CA)";
@@ -3646,13 +3908,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             .OrderBy(function (x) { var idx = $scope.OrderGD.indexOf(x.Position); return idx == -1 ? 1000 : idx; })
             .ThenBy('$.PositionId').ThenBy('$.Name')
             .ToArray();
-        
-         
+
+
         $.each($scope.cl.crews, function (_i, _d) {
-           
-            
-           // if (_d.IsPositioning)
-           //     _d.Position = 'DH';
+
+
+            // if (_d.IsPositioning)
+            //     _d.Position = 'DH';
 
         });
 
@@ -3665,7 +3927,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         ////////////////////////////////////
         $scope.cl.crewsfso = Enumerable.From(cds).Where('$.Position.trim()=="ACM" || $.Position.trim()=="FSO"')
             .OrderBy('$.PositionId')
-          
+
             //.ThenBy('$.GroupOrder').ThenBy('$.PositionId')
             .ThenBy('$.Name')
             .ToArray();
@@ -4471,6 +4733,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     //var _oof=(new Date(2020,8,1,10,0,0,0)).getTimezoneOffset();
     // alert(_oof);
     //ati log
+
+    //najaf
     var getOffset = function (dt) {
         var _oof = (new Date(dt)).getTimezoneOffset();
         return _oof;
@@ -5508,11 +5772,11 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                         var _nd = _y - 1;
                                         if (_nd == -1)
                                             _nd = 6;
-                                       _Days.push(_nd);
+                                        _Days.push(_nd);
 
                                     });
                                     _flight.Days = _Days.join('_');
-                                   
+
                                 }
 
 
@@ -5757,7 +6021,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                         var allflights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
                         var flights = Enumerable.From(_nflights).Select('$.ID').ToArray();
                         var utcflights = Enumerable.From(_utcFlights).Select('$.ID').ToArray();
-                       // var flights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
+                        // var flights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
                         var entity = {
 
 
@@ -5873,7 +6137,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 }
                                 else
                                     $scope.popup_actv_visible = false;
-                                
+
 
                             }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
                         }
@@ -5901,7 +6165,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                             }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
                         }
-                  
+
 
 
                     }
@@ -5947,13 +6211,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     //////////////////////////////////////
     $scope.saveFree = function () {
         //07-10
-       
+
 
         var std_dates = (new Date($scope.time_ir_std_date)).getDatePartArray();
         var std_times = (new Date($scope.time_ir_std_time)).getTimePartArray();
         var std = new Date(std_dates[0], std_dates[1], std_dates[2], std_times[0], std_times[1], 0, 0);
 
-        
+
         var sta_dates = (new Date($scope.time_ir_sta_date)).getDatePartArray();
         var sta_times = (new Date($scope.time_ir_sta_time)).getTimePartArray();
         var sta = new Date(sta_dates[0], sta_dates[1], sta_dates[2], sta_times[0], sta_times[1], 0, 0);
@@ -5962,7 +6226,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         _flight.FlightStatusID = 1;
         _flight.STD = (new Date(std)).toUTCString();
-         
+
         _flight.STA = (new Date(sta)).toUTCString();
         _flight.SMSNira = $scope.sms_nira_nsf ? 1 : 0;
         _flight.UserName = $rootScope.userName;
@@ -5975,10 +6239,10 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         //07-10
         _flight.Days = $scope.interval_days;
-         var ref_dates = (new Date($scope._datefrom)).getDatePartArray();
+        var ref_dates = (new Date($scope._datefrom)).getDatePartArray();
         var ref = new Date(ref_dates[0], ref_dates[1], ref_dates[2], 12, 0, 0, 0);
         _flight.RefDate = (new Date(ref)).toUTCString();
-       _flight.RefDays = $scope.days_count;
+        _flight.RefDays = $scope.days_count;
 
         var _zoffset = (new Date($scope.time_ir_std_date)).getTimezoneOffset();
         var stdOffset = (new Date(std)).addMinutes(_zoffset);
@@ -5996,7 +6260,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             });
             _flight.RefDate = (new Date(ref)).addDays(-1).toUTCString();
         }
-       
+
 
         _flight.IntervalFrom = (new Date(intervalFrom)).toUTCString();
         _flight.IntervalTo = (new Date(intervalTo)).toUTCString();
@@ -6007,7 +6271,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         //var ref_dates = (new Date($scope._datefrom)).getDatePartArray();
         //var ref = new Date(ref_dates[0], ref_dates[1], ref_dates[2], 12, 0, 0, 0);
         //_flight.RefDate = (new Date(ref)).toUTCString();
-       // _flight.RefDays = $scope.days_count;
+        // _flight.RefDays = $scope.days_count;
 
         //magu2-16
         _flight.DepartureRemark = $scope.dep_remark_edit;
@@ -6022,7 +6286,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
 
                 General.ShowNotify(Config.Text_SavedOk, 'success');
-                 
+
                 $scope.linkEntity.FlightNumber = null;
                 $scope.linkEntity.FromAirportId = $scope.linkEntity.ToAirportId;
                 $scope.linkEntity.ToAirportId = null;
@@ -6073,7 +6337,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
 
                 General.ShowNotify(Config.Text_SavedOk, 'success');
-                
+
                 $scope.linkEntity.FlightNumber = null;
                 $scope.linkEntity.FromAirportId = $scope.linkEntity.ToAirportId;
                 $scope.linkEntity.ToAirportId = null;
@@ -6169,9 +6433,9 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 }
                             });
                         }
-                        
-                        
-                        
+
+
+
 
 
                     }
@@ -6282,7 +6546,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.popup_shift_visible = false;
     $scope.popup_shift_title = 'Shift STD';
 
-    $scope.popup_shift = { 
+    $scope.popup_shift = {
         elementAttr: {
             //  id: "elementId",
             class: "popup_shift"
@@ -6452,7 +6716,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                             var _zoffset = (new Date(_w.STD)).getTimezoneOffset();
                             var _b1 = (new Date(_w.STD)).getDate();
                             var _b2 = (new Date(_w.STD)).addMinutes(_zoffset).getDate();
-                             
+
 
                             if (_b1 == _b2)
                                 _nflights.push(_w);
@@ -6464,8 +6728,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                         var allflights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
                         var flights = Enumerable.From(_nflights).Select('$.ID').ToArray();
                         var utcflights = Enumerable.From(_utcFlights).Select('$.ID').ToArray();
-                        
-                        
+
+
                         var entity = {
 
 
@@ -6552,13 +6816,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                         var _ressq = Enumerable.From(response.ressq).Where('$.resourceId==' + aflt.RegisterID).FirstOrDefault();
                                         $scope.modifyGantt(aflt, _ressq, oldResId);
                                     }
-                                   
+
                                 });
                                 if (_utcFlights.length > 1) {
 
                                     $scope.loadingVisible = true;
                                     flightService.cancelFlightsGroup(uentity).then(function (response) {
-                                        
+
                                         $scope.loadingVisible = false;
                                         $.each(response.flights, function (_i, _flt) {
                                             var aflt = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _flt.ID).FirstOrDefault();
@@ -6611,7 +6875,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
                             }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
                         }
-                       
+
 
 
                     }
@@ -6690,7 +6954,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.popup_creg_visible = false;
     $scope.popup_creg_title = 'Chenge Register';
     //magu2-16
-     
+
     $scope.cregHeight = $scope.IsComm ? 540 : 400;
     $scope.popup_creg = {
         elementAttr: {
@@ -6734,9 +6998,9 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                         var flights = Enumerable.From(_nflights).Select('$.ID').ToArray();
                         var utcflights = Enumerable.From(_utcFlights).Select('$.ID').ToArray();
 
-                        console.log('utc',utcflights);
+                        console.log('utc', utcflights);
                         console.log('normal', flights);
-                         
+
                         //var flights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
                         var entity = {
 
@@ -6819,11 +7083,11 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                         var _ressq = Enumerable.From(response.ressq).Where('$.resourceId==' + aflt.RegisterID).FirstOrDefault();
                                         $scope.modifyGantt(aflt, _ressq, oldResId);
                                     }
-                                    
+
                                 });
-                                
+
                                 if (_utcFlights.length >= 1) {
-                                   
+
                                     $scope.loadingVisible = true;
                                     flightService.saveFlightRegisterChangeGroup(uentity).then(function (response) {
 
@@ -6852,7 +7116,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 }
                                 else
                                     $scope.popup_creg_visible = false;
-                               
+
                             }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
                         }
                         else {
@@ -6880,7 +7144,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                             }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
                         }
 
-                        
+
 
                         /////////////////////////////////////////////
                     }
@@ -6911,7 +7175,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         },
         bindingOptions: {
             visible: 'popup_creg_visible',
-            height:'cregHeight',
+            height: 'cregHeight',
             title: 'popup_creg_title',
 
         }
@@ -10970,7 +11234,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     type: 'default', text: 'Edit', icon: 'edit', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
 
                         if ($scope.cl && $scope.cl.crews && $scope.cl.crews.length > 0) {
-                           
+
 
                             $scope.popup_cledit_visible = true;
                         }
@@ -11011,7 +11275,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         },
         onHiding: function () {
-           
+
 
             $scope.popup_cl_visible = false;
 
@@ -11204,13 +11468,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
     //kabiri
     $scope.gd_remark = {
-        height:60,
+        height: 60,
         bindingOptions: {
             value: 'cl.remark'
         }
     };
     $scope.gd_user = {
-        
+
         bindingOptions: {
             value: 'cl.user'
         }
@@ -11226,7 +11490,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         showTitle: true,
         dragEnabled: true,
         toolbarItems: [
- 
+
 
             { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) { $scope.popup_cledit_visible = false; } }, toolbar: 'bottom' }
         ],
@@ -11245,9 +11509,9 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         onHiding: function () {
 
             //kabiri
-           
+
             $scope.cl.crewsAll = Enumerable.From($scope.cl.crewsAll).Where('$.Position.trim()').ToArray();
-             
+
             $scope.generateGDTables($scope.cl.crewsAll);
             $scope.popup_cledit_visible = false;
 
@@ -11273,7 +11537,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             }
         },
         { dataField: 'PID', caption: 'ID No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 120, },
-       
+
 
     ];
     $scope.dg_cledit_selected = null;
@@ -11385,13 +11649,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
 
     $scope.OrderCockpit = ['IP', 'CPT', 'FO', 'SO', 'CHECK', 'OBS', 'DH'];
-    $scope.OrderCabin = ['ISCCM', 'SCCM', 'CCM',  'CHECK', 'OBS', 'DH'];
+    $scope.OrderCabin = ['ISCCM', 'SCCM', 'CCM', 'CHECK', 'OBS', 'DH'];
     $scope.refreshJlCrews = function () {
         var cockpit = [];
         var cabin = [];
         $.each($scope.jl.crews, function (_i, _d) {
             if (_d.cockpit.Name)
-                cockpit.push(JSON.parse( JSON.stringify( _d.cockpit)));
+                cockpit.push(JSON.parse(JSON.stringify(_d.cockpit)));
             if (_d.cabin.Name)
                 cabin.push(JSON.parse(JSON.stringify(_d.cabin)));
 
@@ -11444,11 +11708,11 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         {
             dataField: 'Position', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 135,
             lookup: {
-                dataSource: ['IP','CPT','FO','SO','CHECK','OBS','DH'],
-               
+                dataSource: ['IP', 'CPT', 'FO', 'SO', 'CHECK', 'OBS', 'DH'],
+
             }
         },
-       // { dataField: 'PID', caption: 'ID No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 120, },
+        // { dataField: 'PID', caption: 'ID No', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 120, },
 
     ];
     $scope.dg_jledit_selected = null;
@@ -11503,24 +11767,24 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             }
         },
         onRowRemoved: function (e) {
-             
+
             var rowcockpit = Enumerable.From($scope.jl.crews).Where(function (x) { return x.cockpit.Name == e.data.Name && x.cockpit.Position == e.data.Position }).FirstOrDefault();
             if (rowcockpit) {
-                 
+
                 rowcockpit.cockpit.Name = ''; rowcockpit.cockpit.Position = '';
             }
             $scope.refreshJlCrews();
 
         },
         onRowUpdating: function (e) {
-            
+
             var rowcockpit = Enumerable.From($scope.jl.crews).Where(function (x) { return x.cockpit.Name == e.oldData.Name && x.cockpit.Position == e.oldData.Position }).FirstOrDefault();
             if (!rowcockpit) {
 
                 rowcockpit = Enumerable.From($scope.jl.crews).Where(function (x) { return x.cockpit.Name == '' && x.cockpit.Position == '' }).FirstOrDefault();
                 rowcockpit.cockpit = { Name: e.newData.Name, Position: e.newData.Position };
-               
-                
+
+
             }
             else {
                 rowcockpit.cockpit.Name = e.newData.Name ? e.newData.Name : rowcockpit.cockpit.Name;
@@ -11541,7 +11805,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         {
             dataField: 'Position', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: true, width: 135,
             lookup: {
-                dataSource: ['ISCCM', 'SCCM', 'CCM',  'CHECK', 'OBS', 'DH'],
+                dataSource: ['ISCCM', 'SCCM', 'CCM', 'CHECK', 'OBS', 'DH'],
 
             }
         },
@@ -13934,7 +14198,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     var stopped;
     //magu 3-17
     $scope.drawNowLine = function () {
-         
+
         var nowDate = new Date();
         if ($scope.timeType == 1) {
             var offset = getOffset(new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 1, 0, 0, 0));
@@ -13953,7 +14217,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             dfirst = (new Date($scope.datefrom)).addMinutes(-60);
         if (stdOffset > datefromOffset)
             dfirst = (new Date($scope.datefrom)).addMinutes(60);
-        
+
         var time = moment(/*new Date()*/nowDate).format('HH:mm');
         var _left = $scope.getDuration(new Date(/*$scope.datefrom*/dfirst), /*new Date()*/nowDate);
         //////////////////////////////////////
@@ -14005,9 +14269,9 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     persianDate.toLocale('en');
     //magu utc 
-   
+
     $scope.getDep = function (flt) {
-      
+
         var dt = flt.ChocksOut;
         if (flt.ChocksOut)
             dt = flt.ChocksOut;
@@ -14035,7 +14299,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             dt = (new Date(dt)).addMinutes(offset)
         }
         if ($scope.timeType == 2) {
-            
+
             var offset = getOffset(new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 1, 0, 0, 0));
             offset += flt.GWTO;
             dt = (new Date(dt)).addMinutes(offset)
@@ -14117,7 +14381,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     }
 
     //3-16
-    $scope.getFlightStyle = function (f, index, res) { 
+    $scope.getFlightStyle = function (f, index, res) {
 
         var style = {};
         style.width = $scope.getFlightWidth(f);
@@ -14126,27 +14390,27 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         if ($scope.timeType == 1) {
             var offset = getOffset(new Date(std.getFullYear(), std.getMonth(), std.getDate(), 1, 0, 0, 0));
             std = (new Date(std)).addMinutes(offset)
-            
+
         }
 
         var datefromOffset = (new Date($scope.datefrom)).getTimezoneOffset();
         var stdOffset = (new Date(std)).getTimezoneOffset();
         var dfirst = new Date($scope.datefrom);
-        var mm=(new Date($scope.datefrom)).getMonth();
-		var dd= (new Date($scope.datefrom)).getDate();
-	  
-		
-        if (stdOffset < datefromOffset || (mm==2 && dd==22))
+        var mm = (new Date($scope.datefrom)).getMonth();
+        var dd = (new Date($scope.datefrom)).getDate();
+
+
+        if (stdOffset < datefromOffset || (mm == 2 && dd == 22))
             dfirst = (new Date($scope.datefrom)).addMinutes(-60);
         if (stdOffset > datefromOffset)
             dfirst = (new Date($scope.datefrom)).addMinutes(60);
 
 
         var left = $scope.getDuration(new Date(dfirst), /*new Date(f.ChocksOut?f.ChocksOut: f.STD)*/new Date(std));
-        
+
         if (new Date(std) < new Date($scope.datefrom))
             left = -1 * left;
-        style.left =  (left * (hourWidth + 1))  + "px";
+        style.left = (left * (hourWidth + 1)) + "px";
         var top = f.top;
         if (f.FlightStatusID == 4)
             top += 30;
@@ -14206,8 +14470,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 }
 
                 else
-                   // str = reg.charAt(reg.length - 1);
-                    str = reg.substring(0, 2)+ reg.charAt(reg.length - 1);
+                    // str = reg.charAt(reg.length - 1);
+                    str = reg.substring(0, 2) + reg.charAt(reg.length - 1);
 
             return str;
         }
@@ -14318,12 +14582,12 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     $scope.timeType = 0;
     $scope.timeTypeChanged = function () {
         if ($scope.timeType == 1) {
-             
+
             $('.second-time').hide();
             $('.second-time-right').show();
         }
         else {
-            
+
             $('.second-time').show();
             $('.second-time-right').hide();
         }
@@ -14334,13 +14598,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         searchEnabled: false,
         dataSource: [{ id: 0, title: 'LCB' }, { id: 1, title: 'UTC' }, { id: 2, title: 'LCL' },],
         displayExpr: 'title',
-        valueExpr:'id',
+        valueExpr: 'id',
         onValueChanged: function (e) {
             $scope.timeTypeChanged();
         },
         bindingOptions: {
             value: 'timeType',
-             
+
         }
     };
     $scope.createGantt = function () {
@@ -14369,7 +14633,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         $dayBar.empty();
         //$flightArea.empty();
         $('.reg-row').remove();
-        $('.hour-line').remove(); 
+        $('.hour-line').remove();
         $('.halfhour-line').remove();
         $('.mid-line').remove();
         $('.now-line').remove();
@@ -14626,7 +14890,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         dfrom = $scope._datefrom;
         $scope.datefrom = General.getDayFirstHour(new Date(dfrom));
         $scope.dateEnd = General.getDayLastHour(new Date(new Date(dfrom).addDays($scope.days_count - 1)));
-        
+
         var now = new Date();
         if (now >= $scope.datefrom && now <= $scope.dateEnd)
             $scope.IsNowLine = true;
@@ -15205,7 +15469,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                             }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
                         }
 
-                        
+
 
 
                     }
@@ -15245,7 +15509,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             if (!$scope.noCrewGroup) {
                 $scope.getCrewAbs($scope.logFlight.ID);
             }
-            
+
             $scope.popup_nocrew_visible = false;
 
         },
@@ -15263,7 +15527,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         type: 'default',
         icon: 'fas fa-print',
         width: '100%',
-       
+
         onClick: function (e) {
             $scope.popup_aptrpt_visible = true;
         }
@@ -15286,7 +15550,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         toolbarItems: [
             {
                 widget: 'dxButton', location: 'after', options: {
-                    type: 'success', text: 'Form 1', icon: 'print', validationGroup: 'fbaptrpt',  onClick: function (arg) {
+                    type: 'success', text: 'Form 1', icon: 'print', validationGroup: 'fbaptrpt', onClick: function (arg) {
 
                         var result = arg.validationGroup.validate();
                         if (!result.isValid) {
@@ -15295,8 +15559,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                         }
 
                         $window.open($rootScope.reportServer + '?type=8&apt=' + $scope.aptrpt + '&airline=FlyPersia&dt=' + moment(new Date($scope.selectedDate)).format('YYYY-MM-DD')
-                            + (  '&user=' + $scope.aptrpt_user  ) + ( '&phone=' + $scope.aptrpt_phone ), '_blank');
-                         
+                            + ('&user=' + $scope.aptrpt_user) + ('&phone=' + $scope.aptrpt_phone), '_blank');
+
 
 
 
@@ -15340,8 +15604,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             $scope.loadingVisible = true;
             flightService.getDayApts(new Date($scope.selectedDate)).then(function (response) {
                 $scope.loadingVisible = false;
-                $scope.ds_aptrpt =response;
-                 
+                $scope.ds_aptrpt = response;
+
             }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
         },
         onHiding: function () {
@@ -15352,7 +15616,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         },
         bindingOptions: {
             visible: 'popup_aptrpt_visible',
-            
+
             title: 'popup_aptrpt_title',
 
         }
@@ -15371,7 +15635,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         showClearButton: true,
         width: '100%',
         searchEnabled: true,
-         
+
         onSelectionChanged: function (arg) {
 
         },
@@ -15384,7 +15648,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
     $scope.aptrpt_user = "";
     $scope.txt_aptuser = {
-         
+
         bindingOptions: {
             value: 'aptrpt_user',
 
@@ -15399,6 +15663,22 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         }
     };
     //////////////////////////////////////
+    //nira
+    $scope.IsNiraVisible = $rootScope.userName.toLowerCase().startsWith('comm.') || $rootScope.userName.toLowerCase().startsWith('sale.')
+        || $rootScope.userName.toLowerCase().startsWith('demo')
+        || $rootScope.userName.toLowerCase().includes('razbani');
+    $scope.btn_nira = {
+        text: 'NIRA',
+        //hint: 'Airport Weekly Report',
+        type: 'default',
+        //icon: 'fas fa-print',
+        width: '100%',
+
+        onClick: function (e) {
+            $window.open('#!/nira/', '_blank');
+        }
+
+    };
     //aptrange
     $scope.IsAptRangeVisible = $rootScope.userName.toLowerCase().startsWith('comm.') || $rootScope.userName.toLowerCase().startsWith('dis.')
         || $rootScope.userName.toLowerCase().startsWith('demo')
@@ -15448,7 +15728,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         showClearButton: true,
         searchEnabled: true,
         dataSource: $rootScope.getDatasourceAirport(),
-         
+
         searchExpr: ["IATA", "Country", "SortName", "City"],
         displayExpr: "IATA",
         valueExpr: 'IATA',
@@ -15467,7 +15747,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         },
         shading: true,
         //position: { my: 'left', at: 'left', of: window, offset: '5 0' },
-        height: 350,
+        height: 390,
         width: 400,
         fullScreen: false,
         showTitle: true,
@@ -15482,10 +15762,14 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                             General.ShowNotify(Config.Text_FillRequired, 'error');
                             return;
                         }
-
-                        $window.open($rootScope.reportServer + '?type=10&apt=' + $scope.aptrptrange
-                            + '&airline=CASPIAN&dtfrom=' + moment(new Date($scope.aptrangefrom)).format('YYYY-MM-DD')
-                            + '&dtto=' + moment(new Date($scope.aptrangeto)).format('YYYY-MM-DD') , '_blank');
+                        if ($scope.apt_rpt_type == 'Weekly')
+                            $window.open($rootScope.reportServer + '?type=10&apt=' + $scope.aptrptrange
+                                + '&airline=CASPIAN&dtfrom=' + moment(new Date($scope.aptrangefrom)).format('YYYY-MM-DD')
+                                + '&dtto=' + moment(new Date($scope.aptrangeto)).format('YYYY-MM-DD'), '_blank');
+                        else
+                            $window.open($rootScope.reportServer + '?type=13&apt=' + $scope.aptrptrange
+                                + '&airline=CASPIAN&dtfrom=' + moment(new Date($scope.aptrangefrom)).format('YYYY-MM-DD')
+                                , '_blank');
 
 
 
@@ -15493,7 +15777,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     }
                 }, toolbar: 'bottom'
             },
-             
+
 
             { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', }, toolbar: 'bottom' }
         ],
@@ -15510,7 +15794,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         onShown: function (e) {
 
             $scope.aptrangefrom = new Date($scope.selectedDate);
-           
+
             //flightService.getDayApts(new Date($scope.selectedDate)).then(function (response) {
             //    $scope.loadingVisible = false;
             //    $scope.ds_aptrpt = response;
@@ -15518,7 +15802,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             //}, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
         },
         onHiding: function () {
-            
+
 
             $scope.popup_aptrptrange_visible = false;
 
@@ -15536,6 +15820,18 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         $scope.popup_aptrptrange_visible = false;
 
+    };
+
+    $scope.apt_rpt_type = 'Weekly';
+    $scope.sb_aptrange_report_type = {
+        dataSource: ['Daily', 'Weekly'],
+
+        showClearButton: false,
+
+        bindingOptions: {
+            value: 'apt_rpt_type',
+
+        }
     };
     ///////////////////////
     $scope.IsGNTVisible = false;

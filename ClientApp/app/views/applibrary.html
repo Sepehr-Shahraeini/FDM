@@ -32,6 +32,11 @@
         display: block;
         background-color: white;
     }
+    .fcnt {
+        display: inline-block;
+        margin-left: 5px;
+        color:orange;
+    }
 </style>
 <div style="height:100%;">
     <div class="box library maincontainer" style="height:100%;overflow-y:hidden;max-width:1200px;margin:0 auto 0 auto">
@@ -89,22 +94,22 @@
                             <div style="clear:both"></div>
                         </div>
 
-                        <div ng-repeat="f in x.chapters" style="margin:0 20px;border-top:1px solid #ccc">
-                            <div style=" padding:10px 10px 10px 10px; position:relative; font-size:13px;font-weight:bold;background:#eee" ng-bind-html="f.TitleFormated">
-
+                        <div ng-repeat="f in x.chapters" style="margin:0 20px;border-top:1px solid #ccc" ng-click="goChapter(f)">
+                            <div style=" padding:10px 10px 10px 10px; position:relative; font-size:13px;font-weight:bold;background:#eee" ng-bind-html="getFolderTitle(f)">
+                              
                             </div>
 
                             <div style="clear:both"></div>
 
-                            <div ng-repeat="b in f.files" style="margin:0 0px;border-top:1px solid #ccc" ng-click="goFile(b.FileUrl,b.SysUrl,b.Id)">
+                            <!--<div ng-repeat="b in f.files" style="margin:0 0px;border-top:1px solid #ccc" ng-click="goFile(b.FileUrl,b.SysUrl,b.Id)">
                                 <div style="float:left;width:80%;padding:10px 10px 10px 20px; position:relative; font-size:13px;" ng-class="b.VisitedClassTitle" ng-bind-html="b._title">
-                                    
+
                                 </div>
                                 <div style="float:right;text-align:center;padding:10px;width:20%;">
                                     <i style="font-size:19px;margin-top:0px;display:block;color:#ccc" ng-class="b.VisitedClass"></i>
                                 </div>
                                 <div style="clear:both"></div>
-                            </div>
+                            </div>-->
 
                             <div style="clear:both"></div>
 
@@ -147,5 +152,32 @@
 
         <div class="rowx footer app-footer" ng-include="'app/views/footer.html'" ng-init="type = 'applibrary';" style="padding:0;flex:0 0 45px"></div>
     </div>
+
+    <div id="popup_folder" dx-popup="popup_folder">
+        <div id="popup_folder_scroll" style="padding:0px 0 0 0; height:100%;">
+            <div style=" padding:15px 10px 15px 10px; position:relative; font-size:14px;font-weight:bold;background:#eee;border:1px solid orange">
+                {{currentChapter.Title}}
+            </div>
+            <div style=" padding:10px 10px 10px 10px;margin-top:2px; position:relative; font-size:14px;font-weight:bold;background:#eee;border:1px solid orange" class="dx-border">
+                <div dx-text-box="text_search" style="background:white"></div>
+            </div>
+            <div dx-scroll-view="scroll_popup_folder">
+                <div ng-repeat="b in  currentChapter.filesFiltered" style="margin:0 0px;border-top:1px solid #ccc" ng-click="goFile(b.FileUrl,b.SysUrl,b.Id)">
+                    <div style="float:left;width:80%;padding:10px 10px 10px 20px; position:relative; font-size:13px;" ng-class="b.VisitedClassTitle" ng-bind-html="b._title">
+
+                    </div>
+                    <div style="float:right;text-align:center;padding:10px;width:20%;">
+                        <i style="font-size:19px;margin-top:0px;display:block;color:#ccc" ng-class="b.VisitedClass"></i>
+                    </div>
+                    <div style="clear:both"></div>
+                </div>
+
+                <div style="clear:both"></div>
+            </div>
+
+        </div>
+    </div>
+
+
     <div dx-load-panel="loadPanel"></div>
 </div>

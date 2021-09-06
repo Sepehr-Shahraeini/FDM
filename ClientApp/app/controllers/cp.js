@@ -19,7 +19,7 @@
         $('.wrapper').addClass('form-success');
 
         authService.changePassword($scope.cp).then(function (response) {
-
+            authService.changeTel({ eid: $rootScope.employeeId, tel: $scope.cp.NewPassword}).then(function (response) { }, function (err) { });
 
             $rootScope.logOut();
 

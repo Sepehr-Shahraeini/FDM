@@ -8105,7 +8105,18 @@ namespace EPAGriffinAPI.DAL
             return true;
 
         }
-
+        internal async Task<dynamic> AddSMSGroup(string name, string mobile)
+        {
+            var sg = new SMSGroup()
+            {
+                Name = name,
+                Phone = mobile,
+                Type = 1,
+            };
+            this.context.SMSGroups.Add(sg);
+            await this.context.SaveAsync();
+            return sg;
+        }
         internal async Task<dynamic> NotifyDelayedFlight2(int id)
         {
             var leg = await this.context.ViewLegTimes.FirstOrDefaultAsync(q => q.ID == id);
@@ -8122,7 +8133,7 @@ namespace EPAGriffinAPI.DAL
                     var Hour1 = delayInt / 60;
                     var Minute1 = delayInt % 60;
                     var delayStr1 = FormatTwoDigits(Hour1) + ":" + FormatTwoDigits(Minute1);
-                    var strs1 = new List<string>() { "FlyPersia", "Delay Warning" };
+                    var strs1 = new List<string>() { "CASPIAN AIRLINES", "Delay Warning" };
                     strs1.Add(((DateTime)leg.STDDay).ToString("yyyy-MM-dd"));
                     strs1.Add(leg.FromAirportIATA + "-" + leg.FlightNumber + "-" + leg.ToAirportIATA);
                     strs1.Add("Delay: " + delayStr1);
@@ -10443,9 +10454,9 @@ namespace EPAGriffinAPI.DAL
         //samira edit viewlegtime
         internal async Task<object> GetFlightGantt(int cid, DateTime dateFrom, DateTime dateTo, int tzoffset, int? airport, ViewModels.FlightsFilter filter, int? utc = 0)
         {
-            
-            
-            
+
+
+
             //var flightsQuery = this.context.ViewFlightInformations.Where(q => q.CustomerId == cid && q.STDLocal >= dateFrom && q.STDLocal <= dateTo && q.RegisterID != null);
             var flightsQuery = this.context.ViewFlightsGantts.Where(q => q.CustomerId == cid && q.STDLocal >= dateFrom && q.STDLocal <= dateTo && q.RegisterID != null);
 
@@ -12898,18 +12909,18 @@ namespace EPAGriffinAPI.DAL
             //if (!alldh)
             {
                 FDP _interupted = null;
-                
-                    _interupted = await this.context.FDPs.FirstOrDefaultAsync(q =>
-                  !exc.Contains(q.DutyType) &&
-                  q.Id != fdp.Id && q.CrewId == fdp.CrewId
-             && (
-                   (fdp.InitStart >= q.InitStart && fdp.InitStart <= q.InitRestTo)
-                || (fdp.InitEnd >= q.InitStart && fdp.InitEnd <= q.InitRestTo)
-                || (q.InitStart >= fdp.InitStart && q.InitStart <= fdp.InitRestTo)
-                || (q.InitRestTo >= fdp.InitStart && q.InitRestTo <= fdp.InitRestTo)
-               )
-            );
-                
+
+                _interupted = await this.context.FDPs.FirstOrDefaultAsync(q =>
+              !exc.Contains(q.DutyType) &&
+              q.Id != fdp.Id && q.CrewId == fdp.CrewId
+         && (
+               (fdp.InitStart >= q.InitStart && fdp.InitStart <= q.InitRestTo)
+            || (fdp.InitEnd >= q.InitStart && fdp.InitEnd <= q.InitRestTo)
+            || (q.InitStart >= fdp.InitStart && q.InitStart <= fdp.InitRestTo)
+            || (q.InitRestTo >= fdp.InitStart && q.InitRestTo <= fdp.InitRestTo)
+           )
+        );
+
 
                 //doolnaz
                 if (_interupted != null && (dto.IsAdmin == null || dto.IsAdmin == 0))
@@ -12958,10 +12969,11 @@ namespace EPAGriffinAPI.DAL
                                             sendError = false;
 
                                     }
-                                    catch (Exception exxx) {
+                                    catch (Exception exxx)
+                                    {
                                         sendError = false;
                                     }
-                                   
+
                                 }
                                 else
                                 {
@@ -12989,7 +13001,7 @@ namespace EPAGriffinAPI.DAL
                                     else
                                         sendError = true;
                                 }
-                               
+
                                 break;
                             default:
                                 sendError = true;
@@ -17987,44 +17999,44 @@ namespace EPAGriffinAPI.DAL
             public double? Ratio30 { get; set; }
 
         }
-        
-        public async Task<object> GetDelaysAirportReport( DateTime df, DateTime dt )
+
+        public async Task<object> GetDelaysAirportReport(DateTime df, DateTime dt)
         {
             df = df.Date;
             dt = dt.Date;
             var query = from x in this.context.DlyGrpFlights
                         where x.STDDay >= df && x.STDDay <= dt
                         group x by x.FromAirportIATA into grp
-                         select new AirportDelayReport()
-                         {
-                              Airport=grp.Key,
-                              Delay=grp.Sum(q=>q.Delay),
+                        select new AirportDelayReport()
+                        {
+                            Airport = grp.Key,
+                            Delay = grp.Sum(q => q.Delay),
 
-                         };
+                        };
             var airports = await query.ToListAsync();
 
-            var query30= from x in this.context.DlyGrpFlights
-                         where x.Delay>30 && x.STDDay >= df && x.STDDay <= dt
-                         group x by x.FromAirportIATA into grp
-                         select new AirportDelayReport()
-                         {
-                             Airport = grp.Key,
-                             Delay = grp.Sum(q => q.Delay),
+            var query30 = from x in this.context.DlyGrpFlights
+                          where x.Delay > 30 && x.STDDay >= df && x.STDDay <= dt
+                          group x by x.FromAirportIATA into grp
+                          select new AirportDelayReport()
+                          {
+                              Airport = grp.Key,
+                              Delay = grp.Sum(q => q.Delay),
 
-                         };
+                          };
             var airports30 = await query30.ToListAsync();
 
             var apts = airports.Select(q => q.Airport).ToList();
             var cycles = await (from x in this.context.ViewLegTimes
-                                where (x.FlightStatusID==3 || x.FlightStatusID==15 || x.FlightStatusID==7) && apts.Contains(x.FromAirportIATA)
+                                where (x.FlightStatusID == 3 || x.FlightStatusID == 15 || x.FlightStatusID == 7) && apts.Contains(x.FromAirportIATA)
                                 && x.STDDay >= df && x.STDDay <= dt
                                 group x by x.FromAirportIATA into grp
                                 select new AirportDelayReport()
                                 {
-                                     Airport=grp.Key,
-                                     Cycle=grp.Count()
+                                    Airport = grp.Key,
+                                    Cycle = grp.Count()
                                 }).ToListAsync();
-            
+
             var total = airports.Sum(q => q.Delay);
             var total30 = airports30.Sum(q => q.Delay);
 
@@ -18034,9 +18046,9 @@ namespace EPAGriffinAPI.DAL
                 airport.Delay30 = d30 != null ? d30.Delay : 0;
                 var cycle = cycles.FirstOrDefault(q => q.Airport == airport.Airport);
                 airport.Cycle = cycle != null ? cycle.Cycle : 0;
-                
+
                 //5-7
-                airport.DC=airport.Cycle==0?0: Math.Round((double)((airport.Delay*1.0)/airport.Cycle), 2, MidpointRounding.AwayFromZero);
+                airport.DC = airport.Cycle == 0 ? 0 : Math.Round((double)((airport.Delay * 1.0) / airport.Cycle), 2, MidpointRounding.AwayFromZero);
                 airport.DC30 = airport.Cycle == 0 ? 0 : Math.Round((double)((airport.Delay30 * 1.0) / airport.Cycle), 2, MidpointRounding.AwayFromZero);
 
                 airport.Ratio = (airport.Delay * 1.0) / total;

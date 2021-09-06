@@ -1,15 +1,12 @@
-﻿using System;
+﻿using Ionic.Zip;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Web;
 using System.Web.Script.Serialization;
-using Ionic.Zip;
 
 
 namespace WebApp
@@ -24,7 +21,7 @@ namespace WebApp
             {
 
                 string apiUrl = ConfigurationManager.AppSettings["api"] + "odata/library/books/file/" + id;
-              
+
                 File.Delete(archive);
                 object input = new
                 {
@@ -114,7 +111,7 @@ namespace WebApp
             var result = new List<string>();
             foreach (var f in book.Files)
             {
- 
+
                 var fn = HttpContext.Current.Server.MapPath("~/upload/clientsfiles/" + f);
                 //zip.AddFile(fn, book.Title.Replace(" ", "-").Replace("<", "-").Replace(">", "-").Replace(":", "-").Replace("/", "-").Replace("|", "-").Replace("*", "-").Replace("?", "-"));
                 result.Add(fn);
@@ -124,7 +121,7 @@ namespace WebApp
         }
         internal static string getBookArchivedFiles(int id)
         {
-            string apiUrl = ConfigurationManager.AppSettings["api"]+ "odata/library/books/file/" + id;
+            string apiUrl = ConfigurationManager.AppSettings["api"] + "odata/library/books/file/" + id;
 
 
 
@@ -156,7 +153,7 @@ namespace WebApp
 
 
                         var fn = HttpContext.Current.Server.MapPath("~/upload/clientsfiles/" + f);
-                        zip.AddFile(fn, book.Title.Replace(" ","-"). Replace("<", "-").Replace(">", "-").Replace(":", "-").Replace("/", "-").Replace("|", "-").Replace("*", "-").Replace("?", "-"));
+                        zip.AddFile(fn, book.Title.Replace(" ", "-").Replace("<", "-").Replace(">", "-").Replace(":", "-").Replace("/", "-").Replace("|", "-").Replace("*", "-").Replace("?", "-"));
                     }
 
 

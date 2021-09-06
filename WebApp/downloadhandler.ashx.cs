@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
- 
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Web;
-using Ionic.Zip;
 
 namespace WebApp
 {
@@ -102,8 +95,8 @@ namespace WebApp
             }
             catch (Exception ex)
             {
-                  context.Response.ContentType = "text/plain";
-                 context.Response.Write(step +"     "+ex.Message+"   Inner MSG:"+(ex.InnerException!=null?ex.InnerException.Message:"NONE"));
+                context.Response.ContentType = "text/plain";
+                context.Response.Write(step + "     " + ex.Message + "   Inner MSG:" + (ex.InnerException != null ? ex.InnerException.Message : "NONE"));
             }
 
         }

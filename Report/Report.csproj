@@ -129,6 +129,12 @@
     <Compile Include="rptApt.Designer.cs">
       <DependentUpon>rptApt.cs</DependentUpon>
     </Compile>
+    <Compile Include="rptAptDailyCaspian.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="rptAptDailyCaspian.Designer.cs">
+      <DependentUpon>rptAptDailyCaspian.cs</DependentUpon>
+    </Compile>
     <Compile Include="rptAptInt.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -146,6 +152,18 @@
     </Compile>
     <Compile Include="RptCabinTrainingCard.Designer.cs">
       <DependentUpon>RptCabinTrainingCard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="rptCertificates.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="rptCertificates.Designer.cs">
+      <DependentUpon>rptCertificates.cs</DependentUpon>
+    </Compile>
+    <Compile Include="rptCourses.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="rptCourses.Designer.cs">
+      <DependentUpon>rptCourses.cs</DependentUpon>
     </Compile>
     <Compile Include="rptDelay.cs">
       <SubType>Component</SubType>
@@ -248,6 +266,9 @@
     <EmbeddedResource Include="rptApt.resx">
       <DependentUpon>rptApt.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="rptAptDailyCaspian.resx">
+      <DependentUpon>rptAptDailyCaspian.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="rptAptInt.resx">
       <DependentUpon>rptAptInt.cs</DependentUpon>
     </EmbeddedResource>
@@ -256,6 +277,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="RptCabinTrainingCard.resx">
       <DependentUpon>RptCabinTrainingCard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rptCertificates.resx">
+      <DependentUpon>rptCertificates.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rptCourses.resx">
+      <DependentUpon>rptCourses.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="rptDelay.resx">
       <DependentUpon>rptDelay.cs</DependentUpon>

@@ -3162,6 +3162,52 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
 
         return deferred.promise;
     };
+
+
+    var _getNiraConflicts = function (df,dt) {
+
+
+        var deferred = $q.defer();
+        $http.get(serviceBaseAPI + 'api/nira/conflicts/' + df + '/'+dt).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+    var _getOFP = function (id) {
+
+
+        var deferred = $q.defer();
+        $http.get(serviceBaseAPI + 'api/ofp/flight/' + id).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    var _saveOFP = function (entity) {
+        var deferred = $q.defer();
+        $http.post(serviceBaseAPI + 'api/ofp/parse/text', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+    serviceFactory.getOFP = _getOFP;
+    serviceFactory.saveOFP = _saveOFP;
+
+    serviceFactory.getNiraConflicts = _getNiraConflicts;
+
     serviceFactory.getTrainingSessionConvertingErrors = _getTrainingSessionConvertingErrors;
     serviceFactory.getCrewTrainigDuties = _getCrewTrainigDuties;
     serviceFactory.getCrewsLight = _getCrewsLight;

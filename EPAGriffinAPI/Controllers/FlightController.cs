@@ -1964,6 +1964,17 @@ namespace EPAGriffinAPI.Controllers
             //await unitOfWork.SaveAsync();
             return Ok(true);
         }
+
+        [Route("odata/smsgroup/add/{name}/{mobile}")]
+        [AcceptVerbs("POST", "GET")]
+        public async Task<IHttpActionResult> AddSMSGroup(string name,string mobile)
+        {
+            //var result = await unitOfWork.FlightRepository.NotifyFDPCrews(id);
+
+            var result = await unitOfWork.FlightRepository.AddSMSGroup(name,mobile);
+            //await unitOfWork.SaveAsync();
+            return Ok(result);
+        }
         //internal async Task<dynamic> NotifyDelayedFlight2(int id,string from,string to,string no,int h,int m)
         [Route("odata/notify/delay2/{id}/{from}/{to}/{no}/{h}/{m}")]
         [AcceptVerbs("POST", "GET")]

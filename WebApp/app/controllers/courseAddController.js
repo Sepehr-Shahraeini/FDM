@@ -1,7 +1,7 @@
 ﻿'use strict';
-app.controller('courseAddController', ['$scope', '$location', 'courseService', 'authService', '$routeParams', '$rootScope', function ($scope, $location, courseService, authService, $routeParams, $rootScope) {
+app.controller('courseAddController', ['$scope', '$location', 'courseService', 'authService', '$routeParams', '$rootScope', 'trnService', function ($scope, $location, courseService, authService, $routeParams, $rootScope, trnService) {
 
-     
+
 
     $scope.isNew = true;
 
@@ -33,7 +33,8 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
         CaoTypeId: null,
         Recurrent: null,
         Interval: null,
-        CalanderTypeId: null,
+        CalanderTypeId: 12,
+        StatusId:null,
         IsInside: null,
         Quarantine: null,
         DateStartPractical: null,
@@ -57,6 +58,9 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
         CourseRelatedGroups: [],
         CourseCatRates: [],
         CourseAircraftTypes: [],
+
+
+        Sessions: [],
     };
 
 
@@ -88,7 +92,8 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
         $scope.entity.CaoTypeId = null;
         $scope.entity.Recurrent = null;
         $scope.entity.Interval = null;
-        $scope.entity.CalanderTypeId = null;
+        $scope.entity.CalanderTypeId = 12;
+        $scope.entity.StatusId = null;
         $scope.entity.IsInside = null;
         $scope.entity.Quarantine = null;
         $scope.entity.DateStartPractical = null;
@@ -110,9 +115,11 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
         $scope.entity.CourseCatRates = [];
         $scope.entity.CourseAircraftTypes = [];
 
+        $scope.entity.Sessions = [];
+
     };
 
-    $scope.bind = function (data) {
+    $scope.bind = function (data,sessions) {
         $scope.entity.Id = data.Id;
         $scope.entity.CourseTypeId = data.CourseTypeId;
         $scope.entity.DateStart = data.DateStart;
@@ -140,6 +147,7 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
         $scope.entity.Recurrent = data.Recurrent;
         $scope.entity.Interval = data.Interval;
         $scope.entity.CalanderTypeId = data.CalanderTypeId;
+        
         $scope.entity.IsInside = data.IsInside;
         $scope.entity.Quarantine = data.Quarantine;
         $scope.entity.DateStartPractical = data.DateStartPractical;
@@ -160,6 +168,8 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
         $scope.entity.CourseRelatedGroups = data.CourseRelatedGroups;
         $scope.entity.CourseCatRates = data.CourseCatRates;
         $scope.entity.CourseAircraftTypes = data.CourseAircraftTypes;
+
+        $scope.entity.Sessions = sessions;
     };
 
 
@@ -204,17 +214,18 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
     };
 
 
+
     ////////////////////////////
     var tabs = [
         { text: "Main", id: 'main', visible_btn: false },
-        { text: "Aircraft Type", id: 'aircrafttype', visible_btn: false, visible: $scope.type == 'active' },
+        //{ text: "Aircraft Type", id: 'aircrafttype', visible_btn: false, visible: $scope.type == 'active' },
 
-        { text: "Course Type", id: 'coursetype', visible_btn: true, visible: $scope.type == 'active' },
-        { text: "Education", id: 'education', visible_btn: false, visible_btn2: true, visible: $scope.type == 'active' },
+        //{ text: "Course Type", id: 'coursetype', visible_btn: true, visible: $scope.type == 'active' },
+        //{ text: "Education", id: 'education', visible_btn: false, visible_btn2: true, visible: $scope.type == 'active' },
 
-        { text: "Course", id: 'course', visible_btn: false, visible: $scope.type == 'active'},
-        { text: "Group", id: 'group', visible_btn: false, visible: $scope.type == 'active' },
-        { text: "Employee", id: 'employee', visible_btn: false, visible: $scope.type == 'active' },
+        //{ text: "Course", id: 'course', visible_btn: false, visible: $scope.type == 'active' },
+        //{ text: "Group", id: 'group', visible_btn: false, visible: $scope.type == 'active' },
+        //{ text: "Employee", id: 'employee', visible_btn: false, visible: $scope.type == 'active' },
 
 
     ];
@@ -311,7 +322,207 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
             visible: 'loadingVisible'
         }
     };
+    ////////////////////////////
+    $scope.addSession = function () {
+        $scope.popup_session_visible = true;
+    };
+    $scope.removeSession = function () {
+        var dg_selected = $rootScope.getSelectedRow($scope.dg_session_instance);
+        if (!dg_selected) {
+            General.ShowNotify(Config.Text_NoRowSelected, 'error');
+            return;
+        }
+        $scope.entity.Sessions = Enumerable.From($scope.entity.Sessions).Where('$.Key!="' + dg_selected.Key + '"').ToArray();
+    };
+    $scope.dg_session_columns = [
 
+        { dataField: "DateStart", caption: "Date", allowResizing: true, alignment: "left", dataType: 'datetime', format: 'yyyy-MMM-dd EEEE', allowEditing: false, sortIndex: 0, sortOrder: "asc" },
+        { dataField: 'DateStart', caption: 'Start', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, encodeHtml: false, width: 100, format: 'HH:mm', sortIndex: 1, sortOrder: "asc" },
+        { dataField: 'DateEnd', caption: 'End', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, encodeHtml: false, width: 100, format: 'HH:mm', },
+
+    ];
+    $scope.dg_session_selected = null;
+    $scope.dg_session_instance = null;
+    $scope.dg_session = {
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'multiple' },
+
+        noDataText: '',
+        showColumnHeaders: true,
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        filterRow: { visible: false, showOperationChooser: true, },
+        columnAutoWidth: false,
+        columns: $scope.dg_session_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_session_instance)
+                $scope.dg_session_instance = e.component;
+
+        },
+        onSelectionChanged: function (e) {
+            var data = e.selectedRowsData[0];
+
+            if (!data) {
+                $scope.dg_session_selected = null;
+            }
+            else
+                $scope.dg_session_selected = data;
+
+
+        },
+        height: 610,
+        bindingOptions: {
+
+            dataSource: 'entity.Sessions',
+            // height: 'dg_height',
+        },
+        // dataSource:ds
+
+    };
+    $scope.getSessionKey = function (obj) {
+        return moment(obj.DateStart).format('YYYY-MM-DD-HH-mm-') + moment(obj.DateEnd).format('HH-mm');
+    };
+
+    $scope.popup_session_visible = false;
+    $scope.popup_session_title = 'Session';
+    $scope.popup_session = {
+        elementAttr: {
+            //  id: "elementId",
+            class: "popup_session"
+        },
+        shading: true,
+        //position: { my: 'left', at: 'left', of: window, offset: '5 0' },
+        height: 300,
+        width: 350,
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+        toolbarItems: [
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Save', icon: 'check', validationGroup: 'crsession', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
+
+                        var result = arg.validationGroup.validate();
+                        if (!result.isValid) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+                        // moment($scope.selectedDate).format('YYYY-MM-DDTHH:mm:ss')
+                        var date = (new Date($scope.sessionDate)).getDatePartArray();
+                        var start = (new Date($scope.sessionStart)).getTimePartArray();
+                        var end = (new Date($scope.sessionEnd)).getTimePartArray();
+                        var _start = new Date(date[0], date[1], date[2], start[0], start[1], 0, 0);
+                        var _end = new Date(date[0], date[1], date[2], end[0], end[1], 0, 0);
+
+                        var obj = { DateStart: _start, DateEnd: _end };
+                        var exist = Enumerable.From($scope.entity.Sessions).Where(function (x) {
+                            return (new Date(obj.DateStart) >= new Date(x.Start) && new Date(obj.DateStart) <= new Date(x.DateEnd))
+                                ||
+                                (new Date(obj.DateEnd) >= new Date(x.DateStart) && new Date(obj.DateEnd) <= new Date(x.DateEnd));
+                        }).FirstOrDefault();
+
+                        if (exist) {
+                            General.ShowNotify('The value is not valid.', 'error');
+                            return;
+                        }
+                        obj.Key = $scope.getSessionKey(obj);
+                        console.log(obj);
+                        $scope.entity.Sessions.push(obj);
+
+                        $scope.sessionDate = null;
+                        $scope.sessionStart = null;
+                        $scope.sessionEnd = null;
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', }, toolbar: 'bottom' }
+        ],
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onTitleRendered: function (e) {
+
+        },
+        onShowing: function (e) {
+
+        },
+        onShown: function (e) {
+
+
+        },
+        onHiding: function () {
+
+
+            $scope.popup_session_visible = false;
+
+        },
+        bindingOptions: {
+            visible: 'popup_session_visible',
+
+            title: 'popup_session_title',
+
+        }
+    };
+
+    //close button
+    $scope.popup_session.toolbarItems[1].options.onClick = function (e) {
+
+        $scope.popup_session_visible = false;
+
+    };
+
+    $scope.sessionDate = null;
+    $scope.sessionStart = null;
+    $scope.sessionEnd = null;
+    $scope.date_session = {
+        type: "date",
+        width: '100%',
+        //pickerType: 'rollers',
+        interval: 15,
+        onValueChanged: function (arg) {
+
+        },
+        bindingOptions: {
+            value: 'sessionDate',
+
+        }
+    };
+    $scope.start_session = {
+        type: "time",
+        width: '100%',
+        //divargar-ok
+        displayFormat: "HH:mm",
+        interval: 15,
+        onValueChanged: function (arg) {
+
+        },
+        bindingOptions: {
+            value: 'sessionStart',
+
+        }
+    };
+    $scope.end_session = {
+        type: "time",
+        width: '100%',
+        //divargar-ok
+        displayFormat: "HH:mm",
+        interval: 15,
+        onValueChanged: function (arg) {
+
+        },
+        bindingOptions: {
+            value: 'sessionEnd',
+
+        }
+    };
     /////////////////////////////
     $scope.scroll_height = 200;
     $scope.scroll_main = {
@@ -337,7 +548,7 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
                     }
                 }, toolbar: 'bottom', bindingOptions: { visible: 'btn_visible_education', disabled: 'IsMainDisabled' }
             },
-            
+
             {
                 widget: 'dxButton', location: 'before', options: {
                     type: 'default', text: 'Delete', width: 120, icon: 'clear', validationGroup: 'educationadd', bindingOptions: { visible: 'btn_visible_education', }, onClick: function (e) {
@@ -478,12 +689,12 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
             var size = $rootScope.getWindowSize();
 
             $scope.pop_width = size.width;
-            if ($scope.pop_width > 1000)
-                $scope.pop_width = 1000;
+            if ($scope.pop_width > 1100)
+                $scope.pop_width = 1100;
 
-            $scope.pop_height = $(window).height() - 30; //630; //size.height;
+            $scope.pop_height = 780; //$(window).height() - 70; //630; //size.height;
             $scope.dg_height = $scope.pop_height - 133;
-            $scope.scroll_height = $scope.pop_height - 140;
+            $scope.scroll_height = $scope.pop_height - 100;
 
         },
         onShown: function (e) {
@@ -497,13 +708,16 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
 
             if ($scope.tempData != null) {
                 $scope.loadingVisible = true;
-                courseService.getCourse($scope.tempData.Id).then(function (response) {
+                trnService.getCourseViewObject($scope.tempData.Id).then(function (response) {
                     $scope.loadingVisible = false;
-                    $scope.bind(response);
+                     
+                    $scope.bind(response.Data.course, response.Data.sessions);
 
                 }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
             }
 
+            if ($scope.dg_session_instance)
+                $scope.dg_session_instance.refresh();
 
         },
         onHiding: function () {
@@ -550,16 +764,17 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
         $scope.popup_add_visible = false;
     };
 
+     
     //save button
     $scope.popup_add.toolbarItems[12].options.onClick = function (e) {
-       
+
         var result = e.validationGroup.validate();
 
         if (!result.isValid) {
             General.ShowNotify(Config.Text_FillRequired, 'error');
             return;
         }
-
+        var dto = {};
         if ($scope.isNew) {
             $scope.entity.Id = -1;
             $scope.entity.CustomerId = Config.CustomerId;
@@ -569,8 +784,32 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
         if ($scope.type == 'active')
             $scope.entity.IsNotificationEnabled = 1;
 
+
+        dto.Id = $scope.entity.Id;
+        dto.CustomerId = $scope.entity.CustomerId;
+        dto.IsGeneral = $scope.entity.IsGeneral;
+        dto.CourseTypeId = $scope.entity.CourseTypeId;
+        dto.No = $scope.entity.No;
+        dto.Title = $scope.entity.Title;
+        dto.DateStart = moment($scope.entity.DateStart).format('YYYY-MM-DD'); 
+        dto.DateEnd = moment($scope.entity.DateEnd).format('YYYY-MM-DD');
+        dto.OrganizationId = $scope.entity.OrganizationId;
+        dto.Location = $scope.entity.Location;
+        dto.Instructor = $scope.entity.Instructor;
+        dto.TrainingDirector = $scope.entity.TrainingDirector;
+        dto.Duration = $scope.entity.Duration;
+        dto.DurationUnitId = 27;
+        dto.Interval = $scope.entity.Interval;
+        dto.CalanderTypeId = $scope.entity.CalanderTypeId;
+        dto.StatusId = $scope.entity.StatusId;
+        dto.Recurrent = $scope.entity.Recurrent;
+        dto.Remark = $scope.entity.Remark;
+        dto.IsNotificationEnabled = $scope.entity.IsNotificationEnabled;
+        dto.Sessions = Enumerable.From($scope.entity.Sessions).Select('$.Key').ToArray();
+        console.log(dto);
+        
         $scope.loadingVisible = true;
-        courseService.save($scope.entity).then(function (response) {
+        trnService.saveCourse(dto).then(function (response) {
 
             $scope.clearEntity();
 
@@ -1186,9 +1425,9 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
         { dataField: 'NID', caption: 'National Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130 },
         { dataField: 'PID', caption: 'Personnel Id', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130 },
         { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130 },
-        
+
         { dataField: 'Location', caption: 'Department', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 150 },
-       // { dataField: 'CaoCardNumber', caption: 'CAO No.', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130 },
+        // { dataField: 'CaoCardNumber', caption: 'CAO No.', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130 },
         //{ dataField: 'NDTNumber', caption: 'NDT No.', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 130 },
         { dataField: 'DateJoinCompany', caption: 'Join Company', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 130 },
 
@@ -1371,7 +1610,7 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
     };
 
 
-    $scope.sb_DurationUnitId = {
+    $scope.sb_DurationUnitId = { 
         showClearButton: true,
         searchEnabled: true,
         dataSource: $rootScope.getDatasourceOption(26),
@@ -1393,6 +1632,17 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
 
         }
     };
+    $scope.sb_StatusId = {
+        showClearButton: true,
+        searchEnabled: true,
+        dataSource: [{ Id: 1, Title: 'Scheduled' }, { Id: 2, Title: 'In Progress' }, { Id: 3, Title: 'Done' }, { Id: 4, Title: 'Canceled' }],
+        displayExpr: "Title",
+        valueExpr: 'Id',
+        bindingOptions: {
+            value: 'entity.StatusId',
+
+        }
+    };
     $scope.sb_CurrencyId = {
         showClearButton: true,
         searchEnabled: true,
@@ -1405,30 +1655,63 @@ app.controller('courseAddController', ['$scope', '$location', 'courseService', '
 
         }
     };
+    $scope.selectedType = null;
     $scope.sb_CourseTypeId = {
-        dataSource: $rootScope.getDatasourceCourseType(),
+        dataSource: $rootScope.getDatasourceCourseTypeNew(),
         showClearButton: true,
         searchEnabled: true,
         searchExpr: ["Title"],
         valueExpr: "Id",
         displayExpr: "Title",
         onSelectionChanged: function (e) {
-            //oosk
-          //  $scope.category = e.selectedItem ? e.selectedItem.Category : null;
+
+            //if ($scope.isNew) {
+            //    $scope.entity.Title = e.selectedItem ? e.selectedItem.Title : null;
+            //}
+
+            //if (e.selectedItem && e.selectedItem.Interval)
+            //    $scope.entity.Interval = e.selectedItem.Interval;
+            //if (e.selectedItem && e.selectedItem.CalenderTypeId)
+            //    $scope.entity.CalanderTypeId = e.selectedItem.CalenderTypeId;
             if ($scope.isNew) {
-                $scope.entity.Title = e.selectedItem ? e.selectedItem.Title : null;
-            }
-           
-            if (e.selectedItem && e.selectedItem.Interval)
+                if (e.selectedItem && e.selectedItem.Interval)  
                 $scope.entity.Interval = e.selectedItem.Interval;
-            if (e.selectedItem && e.selectedItem.CalenderTypeId)
-                $scope.entity.CalanderTypeId = e.selectedItem.CalenderTypeId;
+                if (e.selectedItem && e.selectedItem.CalenderTypeId)
+                    $scope.entity.CalanderTypeId = e.selectedItem.CalenderTypeId;
+                if (e.selectedItem && e.selectedItem.Duration)
+                    $scope.entity.Duration = e.selectedItem.Duration;
+            }
+            $scope.selectedType = e.selectedItem;
+            $scope.certype = null;
+            $scope.ctgroups = null;
+            if (e.selectedItem) {
+                $scope.certype = e.selectedItem.CertificateType;
+
+                $scope.ctgroups = e.selectedItem.JobGroups;
+            }
+
         },
         bindingOptions: {
             value: 'entity.CourseTypeId',
 
         }
 
+    };
+    $scope.certype = null;
+    $scope.ctgroups = null;
+    $scope.txt_groups = {
+        hoverStateEnabled: false,
+        readOnly: true,
+        bindingOptions: {
+            value: 'ctgroups',
+        }
+    };
+    $scope.txt_certype = {
+        hoverStateEnabled: false,
+        readOnly: true,
+        bindingOptions: {
+            value: 'certype',
+        }
     };
     $scope.sb_CaoTypeId = {
         dataSource: $rootScope.getDatasourceCaoType(),
