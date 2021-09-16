@@ -143,7 +143,7 @@ app.controller('irregularFlightController', ['$scope', '$location', '$routeParam
         },
         onSelectionChanged: function (arg) {
             // $scope.getAverageRouteTime();
-            //frombani
+            
             $scope.entity.ToAirport = null;
             if (!arg.selectedItem) {
                 $scope.ds_toairport = [];
@@ -764,7 +764,7 @@ app.controller('irregularFlightController', ['$scope', '$location', '$routeParam
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', validationGroup: 'irrflight', onClick: function (e) {
 
-                        //bani save flight
+                        //cmnt save flight
                         var result = e.validationGroup.validate();
 
                         if (!result.isValid) {
@@ -866,7 +866,7 @@ app.controller('irregularFlightController', ['$scope', '$location', '$routeParam
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', validationGroup: 'irrlink', onClick: function (e) {
 
-                        //bani save flight
+                        //cmnt save flight
                         var result = e.validationGroup.validate();
 
                         if (!result.isValid) {
@@ -969,7 +969,7 @@ app.controller('irregularFlightController', ['$scope', '$location', '$routeParam
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', validationGroup: 'irrregister', onClick: function (e) {
 
-                        //bani save flight
+                        //cmnt save flight
                         var result = e.validationGroup.validate();
 
                         if (!result.isValid) {

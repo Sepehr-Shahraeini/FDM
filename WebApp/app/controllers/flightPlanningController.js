@@ -1097,7 +1097,7 @@ app.controller('flightPlanningController', ['$scope', '$location', '$routeParams
                         $scope.entity.STD = (new Date($scope.entity.STD)).toUTCString();
                         $scope.entity.STA = (new Date($scope.entity.STA)).toUTCString();
                         //startDate
-                        //fbani
+                         
                         if ($scope.entity.Interval != 100) {
                             $scope.entity.Months = [];
                             $scope.entity.Days = [];

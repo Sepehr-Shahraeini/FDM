@@ -528,7 +528,7 @@ app.controller('rosterDailyController', ['$scope', '$location', '$routeParams', 
                             General.ShowNotify(Config.Text_FillRequired, 'error');
                             return;
                         }
-                        //bani
+                        //cmnt
                         $scope.Notify.ObjectId = -1;
                         $scope.Notify.Message = $scope.Notify.Message.replace(/\r?\n/g, '<br />');
                         var temp = Enumerable.From($scope.recs).Select('{EmployeeId:$.Id,Name:$.Name}').ToArray();

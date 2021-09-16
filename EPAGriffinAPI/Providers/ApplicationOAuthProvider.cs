@@ -339,7 +339,7 @@ namespace EPAGriffinAPI.Providers
         ////////NEW/////
         public override Task GrantRefreshToken(OAuthGrantRefreshTokenContext context)
         {
-            //bani ati
+            
             var originalClient = context.Ticket.Properties.Dictionary["as:client_id"];
             var currentClient = context.ClientId;
 

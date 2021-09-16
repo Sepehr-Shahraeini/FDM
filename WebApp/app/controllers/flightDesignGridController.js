@@ -341,7 +341,7 @@ app.controller('flightDesignGridController', ['$scope', '$location', 'flightServ
         },
         onSelectionChanged: function (arg) {
             // $scope.getAverageRouteTime();
-            //frombani
+            
             $scope.entity.ToAirport = null;
             if (!arg.selectedItem) {
                 $scope.ds_toairport = [];
@@ -601,7 +601,7 @@ app.controller('flightDesignGridController', ['$scope', '$location', 'flightServ
                     type: 'danger', text: '', width: 40, icon: 'remove', onClick: function (e) {
 
 
-                        //bani delete
+                       
                         $scope.dg_selected = $rootScope.getSelectedRow($scope.dg_instance);
                         if (!$scope.dg_selected) {
                             General.ShowNotify(Config.Text_NoRowSelected, 'error');
@@ -635,7 +635,7 @@ app.controller('flightDesignGridController', ['$scope', '$location', 'flightServ
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', onClick: function (arg) {
-                        //bani save
+                        
 
                         if ($scope.apply == true && ($scope.gapsn > 0 || $scope.overlapsn > 0)) {
                             General.ShowNotify(Config.Text_GanttErrors, 'error');
@@ -847,7 +847,7 @@ app.controller('flightDesignGridController', ['$scope', '$location', 'flightServ
 
 
         Flight.processData(newdata);
-        //bani 2
+        
 
         if ($scope.IsNew) {
             console.log('add');
@@ -907,7 +907,7 @@ app.controller('flightDesignGridController', ['$scope', '$location', 'flightServ
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', validationGroup: 'flightplanitemgrid', onClick: function (e) {
                         
-                        //bani save flight
+                        //cmnt save flight
                         var result = e.validationGroup.validate();
 
                         if (!result.isValid) {

@@ -1743,7 +1743,7 @@ app.controller('boardflyController', ['$scope', '$location', '$routeParams', '$r
                     var data = Enumerable.From($scope.dataSource).Where("$.ID==" + _d.ID).FirstOrDefault();
 
                     if (data) {
-                        //u bani
+                       
 
                         $scope.doActionCompleteSave = false;
                         $scope.fillFlight(data, _d);
@@ -3028,7 +3028,7 @@ app.controller('boardflyController', ['$scope', '$location', '$routeParams', '$r
         },
         onSelectionChanged: function (arg) {
             // $scope.getAverageRouteTime();
-            //frombani
+            
             $scope.planEntity.ToAirport = null;
             if (!arg.selectedItem) {
                 $scope.ds_toairport = [];
@@ -10809,7 +10809,7 @@ app.controller('boardflyController', ['$scope', '$location', '$routeParams', '$r
                                 General.ShowNotify("Please select flight crews.", 'error');
                                 return;
                             }
-                            //bani
+                           
                             $scope.Notify.ObjectId = -1;
                             $scope.Notify.FlightId = $scope.flight.ID;
                             $scope.Notify.Message = $scope.Notify.Message.replace(/\r?\n/g, '<br />');
@@ -11319,7 +11319,7 @@ app.controller('boardflyController', ['$scope', '$location', '$routeParams', '$r
                                 General.ShowNotify("Please select flight crews.", 'error');
                                 return;
                             }
-                            //bani
+                            
                             $scope.Notify2.ObjectId = -1;
                             $scope.Notify2.FlightId = $scope.flight.ID;
 
@@ -11329,7 +11329,7 @@ app.controller('boardflyController', ['$scope', '$location', '$routeParams', '$r
                             $.each(temp, function (_i, _d) {
                                 $scope.Notify2.Employees.push(_d.EmployeeId);
                                 $scope.Notify2.Names.push(_d.Name);
-                                //kiro
+                               
 
                             });
 
@@ -11401,7 +11401,7 @@ app.controller('boardflyController', ['$scope', '$location', '$routeParams', '$r
                                 General.ShowNotify("Please select flight crews.", 'error');
                                 return;
                             }
-                            //bani
+                            
                             $scope.Notify2.ObjectId = -1;
                             $scope.Notify2.FlightId = null;
 

@@ -137,7 +137,22 @@ app.factory('notificationService', ['$http', '$q', 'ngAuthSettings', '$rootScope
 
 
     };
-    
+
+
+    var _getSMSHistoryTraining = function () {
+
+        var deferred = $q.defer();
+        $http.get(serviceBaseAPI + 'api/notifications/taining/' ).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    serviceFactory.getSMSHistoryTraining = _getSMSHistoryTraining;
+
     serviceFactory.notify = _notify;
     serviceFactory.notify2 = _notify2;
     serviceFactory.notifyFlight = _notifyFlight;

@@ -1,5 +1,5 @@
 ﻿'use strict';
-app.controller('niraController', ['$scope', '$location', '$routeParams', '$rootScope', 'flightService', 'aircraftService', 'authService', 'notificationService', '$route', function ($scope, $location, $routeParams, $rootScope, flightService, aircraftService, authService, notificationService, $route) {
+app.controller('niraController', ['$scope', '$location', '$routeParams', '$rootScope', 'flightService', 'aircraftService', 'authService', 'notificationService', '$route','$http', function ($scope, $location, $routeParams, $rootScope, flightService, aircraftService, authService, notificationService, $route,$http) {
     $scope.prms = $routeParams.prms;
 
     //$scope.selectedTabIndex = -1;
@@ -107,7 +107,135 @@ app.controller('niraController', ['$scope', '$location', '$routeParams', '$rootS
 
     };
     ////////////////////////////////
-    
+    //9-14
+    $scope.IsSyncVisible = $rootScope.userName.toLowerCase().startsWith('sale.lotfi') || $rootScope.userName.toLowerCase().startsWith('demo') || $rootScope.userName.toLowerCase().startsWith('razbani');
+    $scope.btn_sync = {
+        text: 'Sync',
+        type: 'default',
+          
+        width: 150,
+        validationGroup: 'nirabind',
+        onClick: function (e) {
+            var result = e.validationGroup.validate();
+
+            if (!result.isValid) {
+                General.ShowNotify(Config.Text_FillRequired, 'error');
+                return;
+            }
+            $scope.Sync();
+
+        }
+
+    };
+    $scope.Sync = function () {
+        var _df = moment($scope.dt_from).format('YYYY-MM-DD');
+        var _dt = moment($scope.dt_to).format('YYYY-MM-DD');
+        $scope.loadingVisible = true;
+        $http.get($rootScope.serviceUrl + 'odata/ati/nira/all/'+_df+'/'+_dt).then(function (response) {
+            $scope.loadingVisible = false;
+            General.ShowNotify(Config.Text_SavedOk, 'success');
+            $scope.bindErrors();
+        }, function (err, status) {
+                $scope.loadingVisible = false;
+                General.ShowNotify('Sync. Failed.  ' + Exceptions.getMessage(err), 'error');
+             
+        });
+    };
+    $scope.btn_persiandate = {
+        //text: 'Search',
+        type: 'default',
+        icon: 'event',
+        width: 35,
+        //validationGroup: 'dlasearch',
+        bindingOptions: {},
+        onClick: function (e) {
+
+            $scope.popup_date_visible = true;
+        }
+
+    };
+    $scope.popup_date_visible = false;
+    $scope.popup_date_title = 'Date Picker';
+    var pd1 = null;
+    var pd2 = null;
+    $scope.popup_date = {
+        title: 'Shamsi Date Picker',
+        shading: true,
+        //position: { my: 'left', at: 'left', of: window, offset: '5 0' },
+        height: 200,
+        width: 300,
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+        onTitleRendered: function (e) {
+            // $(e.titleElement).addClass('vahid');
+            // $(e.titleElement).css('background-color', '#f2552c');
+        },
+        onShowing: function (e) {
+
+
+
+
+        },
+        onShown: function (e) {
+
+            pd1 = $(".date1").pDatepicker({
+                format: 'l',
+                autoClose: true,
+                calendar: {
+                    persian: {
+                        locale: 'en'
+                    }
+                },
+                onSelect: function (unix) {
+
+                    //console.log(new Date(unix));
+                    $scope.$apply(function () {
+
+                        $scope.dt_from = new Date(unix);
+                    });
+
+                },
+
+            });
+            pd1.setDate(new Date($scope.dt_from.getTime()));
+            pd2 = $(".date2").pDatepicker({
+                format: 'l',
+                autoClose: true,
+                calendar: {
+                    persian: {
+                        locale: 'en'
+                    }
+                },
+                onSelect: function (unix) {
+                    $scope.$apply(function () {
+                        $scope.dt_to = new Date(unix);
+                    });
+                },
+
+            });
+            pd2.setDate(new Date($scope.dt_to.getTime()));
+
+        },
+        onHiding: function () {
+            pd1.destroy();
+            pd2.destroy();
+            $scope.popup_date_visible = false;
+
+        },
+        showCloseButton: true,
+        bindingOptions: {
+            visible: 'popup_date_visible',
+
+
+
+        }
+    };
     ////////////////////////////////
     $scope.dg_regroute_columns = [
 

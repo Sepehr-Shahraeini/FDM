@@ -1196,7 +1196,7 @@ namespace EPAGriffinAPI.DAL
             var query = from x in this.context.RptDelayMonthlyCals
                         where x.Year <= 1400
                         select x;
-            if (year != -1)
+            if (year != -1)  
                 query = query.Where(q => q.Year == year);
             var items = await query.OrderBy(q => q.Year).ThenBy(q => q.Month).ToListAsync();
 

@@ -1653,7 +1653,7 @@ app.controller('boardTestController', ['$scope', '$location', '$routeParams', '$
                     var data = Enumerable.From($scope.dataSource).Where("$.ID==" + _d.ID).FirstOrDefault();
 
                     if (data) {
-                        //u bani
+                        
 
                         $scope.doActionCompleteSave = false;
                         $scope.fillFlight(data, _d);
@@ -10224,7 +10224,7 @@ app.controller('boardTestController', ['$scope', '$location', '$routeParams', '$
                                 General.ShowNotify("Please select flight crews.", 'error');
                                 return;
                             }
-                            //bani
+                           
                             $scope.Notify.ObjectId = -1;
                             $scope.Notify.FlightId = $scope.flight.ID;
                             $scope.Notify.Message = $scope.Notify.Message.replace(/\r?\n/g, '<br />');
@@ -10734,7 +10734,7 @@ app.controller('boardTestController', ['$scope', '$location', '$routeParams', '$
                                 General.ShowNotify("Please select flight crews.", 'error');
                                 return;
                             }
-                            //bani
+                            
                             $scope.Notify2.ObjectId = -1;
                             $scope.Notify2.FlightId = $scope.flight.ID;
 
@@ -10816,7 +10816,7 @@ app.controller('boardTestController', ['$scope', '$location', '$routeParams', '$
                                 General.ShowNotify("Please select flight crews.", 'error');
                                 return;
                             }
-                            //bani
+                            
                             $scope.Notify2.ObjectId = -1;
                             $scope.Notify2.FlightId = null;
 

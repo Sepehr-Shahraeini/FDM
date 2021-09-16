@@ -82,6 +82,9 @@ namespace EPAGriffinAPI.ViewModels
         public DateTime? RefDate { get; set; }
         public int? RefDays { get; set; }
         public int? CheckTime { get; set; }
+
+        public int? STDHH { get; set; }
+        public int? STDMM { get; set; }
        
 
 

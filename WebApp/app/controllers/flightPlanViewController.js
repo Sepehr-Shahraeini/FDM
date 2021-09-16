@@ -285,7 +285,7 @@ app.controller('flightPlanViewController', ['$scope', '$location', '$routeParams
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'default', text: 'Flights (Gantt)', icon: 'rowfield', width: 200, onClick: function (e) {
-                        //bani gantt
+                        //cmnt gantt
                         $rootScope.$broadcast('InitFlightDesignView', $scope.entity);
                     }
                 }, toolbar: 'bottom'
@@ -293,7 +293,7 @@ app.controller('flightPlanViewController', ['$scope', '$location', '$routeParams
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'default', text: 'Flights (Grid)', icon: 'menu', width: 200, onClick: function (e) {
-                        //bani grid
+                        //cmnt grid
                         $rootScope.$broadcast('InitFlightDesignGridView', $scope.entity);
                     }
                 }, toolbar: 'bottom'

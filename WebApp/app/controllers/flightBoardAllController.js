@@ -920,7 +920,7 @@ app.controller('flightBoardAllController', ['$scope', '$location', '$routeParams
                 $.each(response, function (_i, _d) {
                     var data = Enumerable.From($scope.dataSource).Where("$.ID==" + _d.ID).FirstOrDefault();
                     if (data) {
-                        //u bani
+                         
 
                         $scope.doActionCompleteSave = false;
                         $scope.fillFlight(data, _d);

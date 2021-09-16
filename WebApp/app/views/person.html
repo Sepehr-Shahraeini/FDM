@@ -200,7 +200,7 @@
 
 
         </div>
-        <div dx-data-grid="dg_courses" dx-item-alias="error" id="dg_courses" style="margin-top:10px;">          
+        <div dx-data-grid="dg_courses" dx-item-alias="error" id="dg_courses" style="margin-top:10px;">
         </div>
 
 
@@ -208,7 +208,7 @@
 
     <div id="popup_cer" dx-popup="popup_cer">
         <div class="col-lg-8 padding-0">
-            
+
             <div class="dx-border" dx-select-box="sb_course_type" dx-validator="{validationGroup:'pceradd',  validationRules: [{ type: 'required'}]}"></div>
             <div dx-data-grid="dg_arccourse" dx-item-alias="error" id="dg_arccourse" style="margin-top:10px;">
             </div>
@@ -277,6 +277,40 @@
             </div>
         </div>
         <div style="clear:both"></div>
+    </div>
+
+    <div id="popup_notify2" dx-popup="popup_notify2">
+        <div style="padding:10px 0 0 0">
+            <div class="col-lg-3 padding-0">
+                 
+                <div   dx-data-grid="dg_emp3" dx-item-alias="emp"></div>
+                <!-- <div style="padding:7px;text-align:center" ng-show="countDownVisible">Sent SMS(s) status will be refreshed in <span style="display:inline-block;font-weight:bold;font-size:14px">{{counter}}</span> seconds.</div>-->
+               
+                <div class=" dx-border" style="padding-top:10px">
+                    <!--<div dx-select-box="sb_notification2" dx-validator="{validationGroup:'notmessage2',  validationRules: [{ type: 'required'}]}"></div>-->
+                    <!--<div ng-show="freeSMS" style="margin-top:5px;">
+                        <div class="col-lg-6 padding-0  ">
+                            <div dx-text-box="text_msgrec"></div>
+                        </div>
+                        <div class="col-lg-6 padding-0  " style="padding-left:10px">
+                            <div dx-text-box="text_msgno"></div>
+                        </div>
+                        <div style="clear:both"></div>
+
+                    </div>-->
+                    <div style="margin-top:20px;margin-bottom:5px;font-weight:bold;font-size:14px;">Message</div>
+                    <div dx-text-area="txt_MessageNotify2" dx-validator="{validationGroup:'notmessage2',  validationRules: [{ type: 'required'}]}"></div>
+                </div>
+
+            </div>
+            <div class="col-lg-9 col-md-12 col-sm-12 col-12   padding-0" style="padding-left:10px">
+                <div dx-data-grid="dg_history"></div>
+
+            </div>
+            <div style="clear:both"></div>
+            <div style="padding:7px;text-align:center" ng-show="countDownVisible2">Sent SMS(s) status will be refreshed in <span style="display:inline-block;font-weight:bold;font-size:14px">{{counter2}}</span> seconds.</div>
+        </div>
+
     </div>
 
     <div ng-include="'app/views/personAdd.html'"></div>

@@ -385,7 +385,7 @@ app.controller('flightController', ['$scope', '$location', '$routeParams', '$roo
                         $scope.entity.DateTo = new Date($scope.entity.iDateTo).ToUTC();
                         $scope.entity.DateFirst = new Date($scope.data[0].startDate).ToUTC();
                         //startDate
-                        //fbani
+                        
                         if ($scope.entity.Interval != 100) {
                             $scope.entity.Months = [];
                             $scope.entity.Days = [];

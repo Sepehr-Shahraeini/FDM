@@ -3015,13 +3015,13 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
         return deferred.promise;
     };
 
-    //divargar
+    //divargar 
     var _saveFlightGroup = function (entity) {
         var url = 'odata/flight/group/save';
         if (entity.ID != -1)
             url = 'odata/flight/group/update';
         var deferred = $q.defer();
-
+         
         $http.post($rootScope.serviceUrl + url, entity).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
@@ -3202,6 +3202,20 @@ app.factory('flightService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
 
         return deferred.promise;
     };
+     
+    var _getDelayedFlights = function () {
+        var deferred = $q.defer();
+        $http.get(serviceBase + 'odata/delayed/check/'  + $rootScope.userName).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+    serviceFactory.getDelayedFlights = _getDelayedFlights;
+
 
     serviceFactory.getOFP = _getOFP;
     serviceFactory.saveOFP = _saveOFP;

@@ -771,7 +771,7 @@ namespace EPAGriffinAPI.DAL
                     x.DocumentTypeId = item.DocumentTypeId;
                     x.Title = item.Title;
                     x.Remark = item.Remark;
-                    //bani
+                     
                     while (x.Documents.Count > 0)
                     {
                         var f = x.Documents.First();

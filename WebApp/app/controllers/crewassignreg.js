@@ -3490,7 +3490,7 @@
                 //temp.CrewId = crewid;
                 //$scope.setDefaultPosition(temp);
                 //temp.fdpId = item.Id;
-                ////bani
+                
                 //var dto = { fdp: item.Id, crew: crewid, position: temp.PositionId };
                 //$scope.loadingVisible = true;
                 //flightService.saveAssignFDPToCrew(dto).then(function (response) {

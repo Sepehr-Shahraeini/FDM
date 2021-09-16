@@ -1,5 +1,5 @@
 ﻿'use strict';
-app.controller('boardController', ['$scope', '$location', '$routeParams', '$rootScope', '$timeout', 'flightService', 'weatherService', 'aircraftService', 'authService', 'notificationService', '$route', '$window', 'fbService', '$http', function ($scope, $location, $routeParams, $rootScope, $timeout, flightService, weatherService, aircraftService, authService, notificationService, $route, $window, fbService, $http) {
+app.controller('boardController', ['$scope', '$location', '$routeParams', '$rootScope', '$timeout', 'flightService', 'weatherService', 'aircraftService', 'authService', 'notificationService', '$route', '$window', 'fbService', '$http','$q', function ($scope, $location, $routeParams, $rootScope, $timeout, flightService, weatherService, aircraftService, authService, notificationService, $route, $window, fbService, $http,$q) {
     $scope.prms = $routeParams.prms;
 
     var hourWidth = 85;
@@ -41,6 +41,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
     //divargar-ok
     $scope.IsComm = $rootScope.userName.toLowerCase().startsWith('comm.') || true;
+    $scope.IsComm = false;
     //alert((new Date()).yyyymmddtime(false));
 
     //  return;
@@ -1824,7 +1825,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     var data = Enumerable.From($scope.dataSource).Where("$.ID==" + _d.ID).FirstOrDefault();
 
                     if (data) {
-                        //u bani
+                       
 
                         $scope.doActionCompleteSave = false;
                         $scope.fillFlight(data, _d);
@@ -6223,9 +6224,13 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         var sta = new Date(sta_dates[0], sta_dates[1], sta_dates[2], sta_times[0], sta_times[1], 0, 0);
 
         var _flight = JSON.parse(JSON.stringify($scope.linkEntity));
-
+        //9-8
         _flight.FlightStatusID = 1;
         _flight.STD = (new Date(std)).toUTCString();
+
+        //9-8
+        _flight.STDHH = (new Date(std)).getHours();
+        _flight.STDMM = (new Date(std)).getMinutes();
 
         _flight.STA = (new Date(sta)).toUTCString();
         _flight.SMSNira = $scope.sms_nira_nsf ? 1 : 0;
@@ -6280,7 +6285,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         $scope.loadingVisible = true;
         if (!$scope.IsComm) {
-            flightService.saveFlight(_flight).then(function (response) {
+            flightService.saveFlight(_flight).then(function (response) { 
 
 
 
@@ -6995,7 +7000,16 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                         });
 
                         var allflights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
-                        var flights = Enumerable.From(_nflights).Select('$.ID').ToArray();
+                        var flights = Enumerable.From(_nflights).Select('$.ID').ToArray(); 
+
+                        //9-15
+
+                        var allflightsRegs = Enumerable.From($scope.ati_selectedFlights).Select(function (x) { return x.FlightNumber + '_' + x.Register; }).ToArray().join('*');
+                        var flightsRegs = Enumerable.From(_nflights).Select(function (x) { return x.FlightNumber + '_' + x.Register; }).ToArray().join('*');
+                        var allflightsRegsId = Enumerable.From($scope.ati_selectedFlights).Select(function (x) { return x.ID + '_' + x.Register; }).ToArray().join('*');
+                        var flightsRegsId = Enumerable.From(_nflights).Select(function (x) { return x.ID + '_' + x.Register; }).ToArray().join('*');
+
+
                         var utcflights = Enumerable.From(_utcFlights).Select('$.ID').ToArray();
 
                         console.log('utc', utcflights);
@@ -7028,7 +7042,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                             To: (new Date()).toUTCDateTimeDigits(),
 
 
-                        };
+                        }; 
                         if ($scope.IsComm) {
                             var interval_from_dates = (new Date($scope.time_interval_from_date)).getDatePartArray();
                             var intervalFrom = new Date(interval_from_dates[0], interval_from_dates[1], interval_from_dates[2], 12, 0, 0, 0);
@@ -7064,8 +7078,15 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                             uentity.RefDate = (new Date(uref)).toUTCString();
                             uentity.RefDays = $scope.days_count;
                             //////////////////////////////////
+
                             $scope.loadingVisible = true;
                             flightService.saveFlightRegisterChangeGroup(entity).then(function (response) {
+                                //9-15
+                                var notifyObj = JSON.parse(JSON.stringify(entity));
+                                notifyObj.Remark = $scope.IsComm ? flightsRegs : allflightsRegs;
+                                
+                                $http.post($rootScope.serviceUrl + 'odata/flight/register/change/notify', notifyObj);
+
                                 General.ShowNotify(Config.Text_SavedOk, 'success');
                                 $scope.loadingVisible = false;
                                 $.each(response.flights, function (_i, _flt) {
@@ -7123,6 +7144,14 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                             $scope.loadingVisible = true;
                             flightService.saveFlightRegisterChange2(entity).then(function (response) {
                                 General.ShowNotify(Config.Text_SavedOk, 'success');
+
+                                //9-15
+                                var notifyObj = JSON.parse(JSON.stringify(entity));
+                                notifyObj.Remark = $scope.IsComm ? flightsRegsId : allflightsRegsId;
+
+                                $http.post($rootScope.serviceUrl + 'odata/flight/register/change/notify', notifyObj);
+
+
                                 $scope.loadingVisible = false;
                                 $.each(response.flights, function (_i, _flt) {
                                     var aflt = Enumerable.From($scope.ganttData.flights).Where('$.ID==' + _flt.ID).FirstOrDefault();
@@ -12625,7 +12654,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 General.ShowNotify("Please select flight crews.", 'error');
                                 return;
                             }
-                            //bani
+                           
                             $scope.Notify.ObjectId = -1;
                             $scope.Notify.FlightId = $scope.flight.ID;
                             $scope.Notify.Message = $scope.Notify.Message.replace(/\r?\n/g, '<br />');
@@ -13136,7 +13165,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 General.ShowNotify("Please select flight crews.", 'error');
                                 return;
                             }
-                            //bani
+                          
                             $scope.Notify2.ObjectId = -1;
                             $scope.Notify2.FlightId = $scope.flight.ID;
 
@@ -13218,7 +13247,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 General.ShowNotify("Please select flight crews.", 'error');
                                 return;
                             }
-                            //bani
+                            
                             $scope.Notify2.ObjectId = -1;
                             $scope.Notify2.FlightId = null;
 
@@ -14307,7 +14336,28 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         return moment(dt).format('HHmm');
     };
     //////////////////////////
+    //9-8
     $scope.getFlightClass = function (flt) {
+        if (flt.FlightStatusID==4 && flt.CancelDate) {
+            
+            var dt = moment.utc(new Date(flt.CancelDate)).format('YYYY-MM-DD HH:mm');
+            var dt1 = moment.utc(new Date(flt.CancelDate));
+            var dt2 = moment(new Date(flt.STD));
+           
+            var _dtCNL = new Date(dt1.year(), dt1.month(), dt1.date(), dt1.hour(), dt1.minute(), 0);
+            var _dtSTD = new Date(dt2.year(), dt2.month(), dt2.date(), dt2.hour(), dt2.minute(), 0);
+            var diff = Math.abs(_dtCNL.getTime() - _dtSTD.getTime()) / 3600000;
+            if (diff > 24 * 7)
+                return flt.FlightStatus.toLowerCase();
+            else
+                return 'canceled-t2';
+            //console.log(_dtCNL);
+            //console.log(_dtSTD);
+            //console.log(diff);
+           
+            
+        }
+        else
         return flt.FlightStatus.toLowerCase();
     }
     $scope.getDuration = function (d1, d2) {
@@ -14988,7 +15038,8 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         //2020-11-25
         $scope.utimer = setTimeout(function () {
             //'info' | 'warning' | 'error' | 'success' | 'custom'
-
+            //9-15
+            // flightService.getDelayedFlights().then(function (responsex) { }, function (errx) { });
             //2020-11-24-2
             //////////////////////////
             var dto = {
@@ -15001,7 +15052,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 //yati
                 userid: $rootScope.userId ? $rootScope.userId : -1,
 
-            };
+            }; 
             //noosk
             flightService.getUpdatedFlightsNew(dto).then(function (response) {
 
@@ -15036,7 +15087,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                         $scope.modifyGantt(_flight, res, oldresid);
 
                     }
-
+                     
 
                 });
                 if (response.summary != -1)

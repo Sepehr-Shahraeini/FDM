@@ -1479,7 +1479,7 @@ app.controller('planBoardController', ['$scope', '$location', '$routeParams', '$
                 $.each(response.flights, function (_i, _d) {
                     var data = Enumerable.From($scope.dataSource).Where("$.ID==" + _d.ID).FirstOrDefault();
                     if (data) {
-                        //u bani
+                        
 
                         $scope.doActionCompleteSave = false;
                         $scope.fillFlight(data, _d);
@@ -1745,7 +1745,7 @@ app.controller('planBoardController', ['$scope', '$location', '$routeParams', '$
                     var data = Enumerable.From($scope.dataSource).Where("$.ID==" + _d.ID).FirstOrDefault();
                    
                     if (data) {
-                        //u bani
+                        
 
                         $scope.doActionCompleteSave = false;
                         $scope.fillFlight(data, _d);
@@ -2652,7 +2652,7 @@ app.controller('planBoardController', ['$scope', '$location', '$routeParams', '$
         },
         onSelectionChanged: function (arg) {
             // $scope.getAverageRouteTime();
-            //frombani
+            
             $scope.planEntity.ToId = null;
             if (!arg.selectedItem) {
                 $scope.ds_toairport = [];

@@ -1,5 +1,5 @@
 ﻿'use strict';
-app.controller('personController', ['$scope', '$location', '$routeParams', '$rootScope', 'personService', 'authService', 'notificationService', 'flightService', '$route', 'trnService','$window', function ($scope, $location, $routeParams, $rootScope, personService, authService, notificationService, flightService, $route, trnService,$window) {
+app.controller('personController', ['$scope', '$location', '$routeParams', '$rootScope', 'personService', 'authService', 'notificationService', 'flightService', '$route', 'trnService', '$window', '$timeout', function ($scope, $location, $routeParams, $rootScope, personService, authService, notificationService, flightService, $route, trnService, $window, $timeout) {
     $scope.prms = $routeParams.prms;
     $scope.IsEditable = $rootScope.IsProfileEditable(); //$rootScope.roles.indexOf('Admin') != -1;
     $scope.IsCoursesVisible = $rootScope.roles.indexOf('Admin') != -1 || $rootScope.userName.toLowerCase() == 'abbaspour' || $rootScope.userName.toLowerCase() == 'dehghan';
@@ -605,13 +605,14 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
         //icon: 'plus',
         width: 120,
         onClick: function (e) {
-            var selected = $rootScope.getSelectedRows($scope.dg_instance);
-            if (!selected) {
-                General.ShowNotify(Config.Text_NoRowSelected, 'error');
-                return;
-            }
+            //var selected = $rootScope.getSelectedRows($scope.dg_instance);
+            //if (!selected) {
+            //    General.ShowNotify(Config.Text_NoRowSelected, 'error');
+            //    return;
+            //}
            
-            $scope.popup_sms_visible = true;
+            //$scope.popup_sms_visible = true;
+            $scope.popup_notify2_visible = true;
         },
         bindingOptions: {
            
@@ -2145,6 +2146,502 @@ app.controller('personController', ['$scope', '$location', '$routeParams', '$roo
         $scope.bind();
 
     });
+    ////9-14
+    ////////////////////////////
+    $scope.freeSMS = true;
+
+    $scope.selectedNotificationTypeId2 = -1;
+    $scope.buildMessage = function () {
+        if ($scope.Notify2.TypeId == -1)
+            $scope.Notify2.Message = "";
+
+        switch ($scope.Notify2.TypeId) {
+            //cancel
+            case 10014:
+
+                $scope.Notify2.Message = "Dear #Crew,\n" + "The flight " + $scope.flight.FlightNumber + " " + $scope.flight.FromAirportIATA + "-" + $scope.flight.ToAirportIATA + " is canceled.\n" + $rootScope.userName;
+                break;
+            //delay
+            case 10015:
+
+                $scope.Notify2.Message = "Dear #Crew,\n" + "The flight " + $scope.flight.FlightNumber + " " + $scope.flight.FromAirportIATA + "-" + $scope.flight.ToAirportIATA + " is delayed.\n"
+                    + "New Dep:" + $scope.momenttime($scope.flightOffBlock2) + "\n" + $rootScope.userName;
+                break;
+            case 10016:
+
+                $scope.Notify2.Message = "Dear #Crew,\n";
+                break;
+            case 10020:
+
+                $scope.Notify2.Message = "Dear #Crew,\n";
+                break;
+
+            default: break;
+
+        }
+    };
+    $scope.sb_notification2 = {
+        dataSource: $scope.dsNotificationType2,
+        showClearButton: false,
+        searchEnabled: false,
+
+        searchExpr: ["Title"],
+        valueExpr: "Id",
+        displayExpr: "Title",
+        onValueChanged: function (e) {
+            $scope.buildMessage();
+        },
+        bindingOptions: {
+            value: 'Notify2.TypeId',
+            disabled: 'freeSMS',
+
+        },
+
+
+    };
+    $scope.dsNotificationType2 = [
+        { Id: 10014, Title: 'Cancelling Notification' },
+        { Id: 10015, Title: 'Delay Notification' },
+        { Id: 10016, Title: 'Operation Notification' },
+        { Id: 10020, Title: 'Training Notification' },
+
+    ];
+    $scope.Notify2 = {
+        ModuleId: 3,
+        TypeId: -1,
+
+        SMS: true,
+        Email: true,
+        App: true,
+        Message: null,
+        CustomerId: Config.CustomerId,
+        SenderId: null,
+        Employees: [],
+        Names: [],
+        Dates: [],
+        FDPs: [],
+        Names2: [],
+        Mobiles2: [],
+        Messages2: [],
+    };
+    $scope.txt_MessageNotify2 = {
+        hoverStateEnabled: false,
+        height: 120,
+
+        bindingOptions: {
+            value: 'Notify2.Message',
+            disabled: 'Notify2.TypeId!=10020'
+
+        }
+    };
+     
+    $scope.dg_emp3_columns = [
+
+        { dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90, },
+        
+        // { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 250 },
+        { dataField: 'LastName', caption: 'Last Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 150, sortIndex: 0, sortOrder:'asc' }, 
+        { dataField: 'FirstName', caption: 'First Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 150 },
+        { dataField: 'Mobile', caption: 'Mobile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120, },
+
+
+    ];
+    $scope.dg_history_columns = [
+
+        //{ dataField: 'JobGroup', caption: 'Rank', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100, },
+        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 250 },
+        //  { dataField: 'Mobile', caption: 'Monile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
+
+
+        { dataField: 'Status', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 140 },
+        //{ dataField: 'TypeStr', caption: 'Type', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Message', caption: 'Message', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false,   },
+         
+        //{ dataField: 'RefId', caption: 'Ref', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'DateSent', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 140, /*format: 'EEE MM-dd'*/ format: 'yy-MM-dd HH:mm', sortIndex: 0, sortOrder: "desc" },
+        { dataField: 'Sender', caption: 'Sender', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, fixed: false, fixedPosition: 'left', width: 150 },
+
+    ];
+
+     
+
+
+    $scope.dg_emp3_selected = null;
+    $scope.selectedEmps3 = null;
+    $scope.dg_emp3_instance = null;
+    $scope.dg_emp3_ds = null;
+    $scope.dg_emp3 = {
+        headerFilter: {
+            visible: false
+        },
+        editing: {
+            mode: "cell",
+            allowUpdating: true
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'multiple' },
+
+        columnAutoWidth: false,
+        height: 430,
+
+        columns: $scope.dg_emp3_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_emp3_instance)
+                $scope.dg_emp3_instance = e.component;
+
+        },
+        onRowPrepared: function (e) {
+
+
+
+        },
+        keyExpr: 'Id',
+        onSelectionChanged: function (e) {
+
+
+        },
+
+
+        bindingOptions: {
+            dataSource: 'dg_emp3_ds',
+            selectedRowKeys: 'selectedEmps3',
+        }
+    };
+
+    $scope.dg_history_instance = null;
+    $scope.dg_history_ds = null;
+    $scope.dg_history = {
+        headerFilter: {
+            visible: false
+        },
+        editing: {
+            mode: "cell",
+            allowUpdating: true
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: 603,
+
+        columns: $scope.dg_history_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_history_instance)
+                $scope.dg_history_instance = e.component;
+
+        },
+        onRowPrepared: function (e) {
+
+
+
+        },
+        keyExpr: 'Id',
+        onSelectionChanged: function (e) {
+
+
+        },
+
+
+        bindingOptions: {
+            dataSource: 'dg_history_ds',
+            //selectedRowKeys: 'selectedEmps2',
+        }
+    };
+
+    $scope.countDownVisible2 = false;
+    $scope.counter2 = 30;
+    var stopped2;
+    $scope.countdown2 = function () {
+        $scope.countDownVisible2 = true;
+        stopped2 = $timeout(function () {
+
+            $scope.counter2--;
+            if ($scope.counter2 > 0)
+                $scope.countdown2();
+            else {
+                $scope.stop2();
+                $scope.refreshSMSStatus2();
+            }
+        }, 1000);
+    };
+
+    $scope.start22 = function () {
+        $scope.counter2 = 30;
+        $scope.countDownVisible2 = true;
+        $scope.countdown2();
+    }
+
+    $scope.stop2 = function () {
+        $timeout.cancel(stopped2);
+        $scope.countDownVisible2 = false;
+        $scope.counter2 = 30;
+
+    };
+    $scope.refreshSMSStatus2 = function () {
+        $scope.stop2();
+        var ids = Enumerable.From($scope.dg_history_ds).Where('$.RefId').Select('$.RefId').ToArray();
+        if (!ids || ids.length == 0)
+            return;
+        //goh
+        var dto = { Ids: ids };
+        $scope.loadingVisible = true;
+        flightService.updateSMSStatus(dto).then(function (response) {
+            $scope.loadingVisible = false;
+            $.each(response, function (_i, _d) {
+                var rec = Enumerable.From($scope.dg_history_ds).Where('$.RefId==' + _d.RefId).FirstOrDefault();
+                rec.RefId = _d.RefId;
+                rec.Status = _d.Status;
+
+            });
+
+
+
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+    };
+    $scope.msgrec = null;
+    $scope.text_msgrec = {
+        placeholder: 'Receiver',
+        bindingOptions: {
+            value: 'msgrec'
+        }
+    }
+
+    $scope.msgno = null;
+    $scope.text_msgno = {
+        placeholder: 'Mobile',
+        bindingOptions: {
+            value: 'msgno'
+        }
+    }
+
+
+    $scope.popup_notify2_visible = false;
+    $scope.popup_notify2_title = 'Notify Crew';
+    $scope.popup_notify2 = {
+
+        fullScreen: false,
+        showTitle: true,
+        height: 730,
+        width: $(window).width()-100,
+        toolbarItems: [  
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Refresh Status', icon: 'refresh', onClick: function (e) {
+                        $scope.refreshSMSStatus2();
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Send', icon: 'check', validationGroup: 'notmessage2', onClick: function (e) {
+                        ////////////////
+
+ 
+                          
+
+                            if ($scope.msgrec && $scope.msgno) {
+                                $scope.Notify2.Names2.push($scope.msgrec);
+                                $scope.Notify2.Mobiles2.push($scope.msgno);
+
+                            }
+
+
+                            var result = e.validationGroup.validate();
+                            if (!result.isValid) {
+                                General.ShowNotify(Config.Text_FillRequired, 'error');
+                                return;
+                            }
+
+                            if ((!$scope.selectedEmps3 || $scope.selectedEmps3.length == 0) && ($scope.Notify2.Names2 == null || $scope.Notify2.Names2.length == 0)) {
+                                General.ShowNotify("Please select flight crews.", 'error');
+                                return;
+                            }
+                            var recs = $scope.selectedEmps3 ? Enumerable.From($scope.dg_emp3_ds).Where(function (x) { return $scope.selectedEmps3.indexOf(x.Id) != -1; }).OrderBy('$.Name').ToArray() : null;
+                            if ((!recs || recs.length == 0) && ($scope.Notify2.Names2 == null || $scope.Notify2.Names2.length == 0)) {
+                                General.ShowNotify("Please select flight crews.", 'error');
+                                return;
+                            }
+                             
+                            $scope.Notify2.ObjectId = -1;
+                            $scope.Notify2.FlightId = null;
+
+                            $scope.Notify2.Message = $scope.Notify2.Message;
+                            // if ($scope.msgrec && $scope.msgno) {
+                            //     $scope.Notify2.Messages2.push($scope.Notify2.Message);
+                            // }
+                            var temp = Enumerable.From(recs).Select('{EmployeeId:$.Id,Name:$.Name, FDPItemId:$.FDPItemId}').ToArray();
+
+                            $.each(temp, function (_i, _d) {
+                                $scope.Notify2.Employees.push(_d.EmployeeId);
+                                $scope.Notify2.Names.push(_d.Name);
+                                 
+
+                            });
+
+                            $scope.Notify2.SenderName = $rootScope.userName;
+                            $scope.loadingVisible = true;
+                            notificationService.notifyFlight($scope.Notify2).then(function (response) {
+
+
+
+                                General.ShowNotify(Config.Text_SavedOk, 'success');
+
+
+                                $scope.Notify2.Employees = [];
+                                $scope.Notify2.Dates = [];
+                                $scope.Notify2.Names = [];
+                                $scope.Notify2.FDPs = [];
+                                ///7-20//////////////
+                                $scope.Notify2.Names2 = [],
+                                    $scope.Notify2.Mobiles2 = [],
+                                    $scope.Notify2.Messages2 = [];
+                                //////////////////////
+                                $scope.Notify2.Message = null;
+                                if (!$scope.freeSMS)
+                                    $scope.Notify2.TypeId = -1;
+
+                                $scope.loadingVisible = true;
+                                notificationService.getSMSHistoryTraining().then(function (response) {
+
+                                    $scope.loadingVisible = false;
+                                    $scope.dg_history_ds = response;
+
+                                    $scope.start22();
+
+                                }, function (err) { $scope.loadingVisible = false; $scope.popup_notify_visible = false; General.ShowNotify(err.message, 'error'); });
+
+
+                                // $scope.popup_notify_visible = false;
+
+
+
+
+                            }, function (err) { $scope.loadingVisible = false; $scope.popup_notify_visible = false; General.ShowNotify(err.message, 'error'); });
+
+
+                         
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) {
+                        $scope.popup_notify2_visible = false;
+                    }
+                }, toolbar: 'bottom'
+            }
+        ],
+
+        visible: false,
+        dragEnabled: false,
+        closeOnOutsideClick: false,
+        onShowing: function (e) {
+
+
+
+        },
+        onShown: function (e) {
+            
+            $scope.dg_history_instance.refresh(); 
+            $scope.loadingVisible = true;
+           
+            $scope.Notify2.TypeId = 10020;
+            $scope.buildMessage();
+                if (!$scope.dg_emp3_ds) {
+                    //Config.CustomerId
+                    flightService.getDispatchSmsEmployees(Config.CustomerId).then(function (response) {
+
+                        $scope.dg_emp3_ds = response;
+
+                    }, function (err) { $scope.loadingVisible = false; $scope.popup_notify_visible = false; General.ShowNotify(err.message, 'error'); });
+                }
+
+            notificationService.getSMSHistoryTraining().then(function (response) {
+
+                    $scope.loadingVisible = false;
+                    $scope.dg_history_ds = response;
+
+
+
+                }, function (err) { $scope.loadingVisible = false; $scope.popup_notify_visible = false; General.ShowNotify(err.message, 'error'); });
+
+            
+
+
+            //  $scope.selectedNotificationTypeId2 = 10016;
+
+
+
+        },
+        onHiding: function () {
+             
+            $scope.stop2();
+             
+            if ($scope.dg_emp3_instance)
+                $scope.dg_emp3_instance.clearSelection();
+            if (!$scope.freeSMS)
+                $scope.selectedNotificationTypeId2 = -1;
+            $scope.Notify2 = {
+                ModuleId: $rootScope.moduleId,
+                TypeId: -1,
+
+                SMS: true,
+                Email: true,
+                App: true,
+                Message: null,
+                CustomerId: Config.CustomerId,
+                SenderId: null,
+                Employees: [],
+                Dates: [],
+                Names: [],
+                FDPs: [],
+                Names2: [],
+                Mobiles2: [],
+                Messages2: [],
+            };
+            $scope.popup_notify2_visible = false;
+            // $rootScope.$broadcast('onPersonHide', null);
+        },
+        //position: 'right',
+        bindingOptions: {
+            visible: 'popup_notify2_visible',
+
+            title: 'popup_notify2_title',
+
+        }
+    };
+    //////////////////////////////////////
     //////////////////////////////////////////
     $scope.$on('$viewContentLoaded', function () {
        

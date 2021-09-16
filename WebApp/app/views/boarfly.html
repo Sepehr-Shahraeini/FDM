@@ -2639,40 +2639,7 @@
 
 
                                 </tr>
-                                <!--<tr>
-                                    <td>Capt.</td>
-
-                                    <td>{{jl.cpt.Name}}</td>
-                                    <td>SCCM</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>F/O</td>
-
-                                    <td>{{jl.fo.Name}}</td>
-                                    <td>CCM</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-
-                                    <td></td>
-                                    <td>CCM</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-
-                                    <td></td>
-                                    <td>CCM</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>&nbsp; </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>-->
+                               
 
                             </table>
 
@@ -2737,10 +2704,10 @@
                                         REM. FUEL
 
                                     </div>
-                                    <div style="width:22.7%;float:left; height:40px;padding:11px 0;" class="bo fjl">UP LIFT</div>
+                                    <div style="width:32.6%;float:left; height:40px;padding:11px 0;" class="bo fjl">UP LIFT</div>
                                     <div style="width:15.7%;float:left; height:40px;padding:0 6px;writing-mode:vertical-lr; text-orientation:mixed" class="bo fjl">DEN</div>
-                                    <div style="width:19.8%;float:left; height:40px;padding:11px 0;" class="bo fjl">TOTAL</div>
-                                    <div style="width:19.8%;float:left; height:40px;padding:11px 0;" class="bo fjl">USED</div>
+                                    <div style="width:29.7%;float:left; height:40px;padding:11px 0;" class="bo fjl">TOTAL</div>
+                                    <!--<div style="width:19.8%;float:left; height:40px;padding:11px 0;" class="bo fjl">USED</div>-->
                                 </div>
                             </div>
                             <div style="width:13%; float:left; ">
@@ -2792,10 +2759,10 @@
                             <div style="width:2%; float:left;border-left:1px solid black;" class="fjl bo2 dcell">&nbsp;</div>
                             <!--Fuel-->
                             <div style="width:4%; float:left;border-left:1px solid black;" class="fjl bo2 dcell">&nbsp;</div>
-                            <div style="width:4%; float:left;" class="fjl bo2 dcell">&nbsp;</div>
+                            <div style="width:5.77%; float:left;" class="fjl bo2 dcell">&nbsp;</div>
                             <div style="width:2.88%; float:left;" class="fjl bo2 dcell">&nbsp;</div>
-                            <div style="width:3.55%; float:left;" class="fjl bo2 dcell">&nbsp;</div>
-                            <div style="width:3.54%; float:left;" class="fjl bo2 dcell">&nbsp;</div>
+                            <div style="width:5.32%; float:left;" class="fjl bo2 dcell">&nbsp;</div>
+                           <!-- <div style="width:3.54%; float:left;" class="fjl bo2 dcell">&nbsp;</div>-->
                             <!--Passenger-->
                             <div style="width:3.6%; float:left;border-left:1px solid black;" class="fjl bo2 dcell">&nbsp;</div>
                             <div style="width:2.9%; float:left;" class="fjl bo2 dcell">&nbsp;</div>
@@ -2859,29 +2826,10 @@
                         </div>
                         <!--NEW-->
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     </div>
                     <div style="clear:both"></div>
                     <div class="div2" style="position:relative;padding-left:16px;margin-top:2px;padding-right:10px;text-align:center">
-                        <div style=" float:left;width:17%;padding-right:5px;">
+                        <div style=" float:left;width:24.95%;padding-right:5px;">
                             <div class="dh" style="border:1px solid black;">
                                 <div style="width:6%;height:27px;float:left;writing-mode:tb; text-orientation:mixed;text-align:left;font-size:9px !important;padding:5px 0px 0 0px " class="fjl">LEG</div>
                                 <div style="width:94%; float:left;text-align:center;height:40px;padding:7px 0 !important " class="bob fjl dp">
@@ -2898,86 +2846,21 @@
                             </div>
                             <div style="clear:both"></div>
                         </div>
-                        <div style=" float:left;width:48%;padding-right:5px;">
-                            <div style="border:1px solid black;font-size:12px">RVSM CHECK</div>
-                            <div>
-                                <div class="dr" style=" width:50%;float:left">
-                                    <div>
-                                        <div style="width:10%; float:left;border:1px solid black;border-right:none;border-top:none;  padding:5px 0;font-size:11px" class="fjl bo2 dcell">LEG</div>
-                                        <div style="width:19%; float:left;border:1px solid black;border-right:none;border-top:none; padding:5px 0;font-size:12px" class="fjl bo2 dcell">PHASE</div>
-                                        <div style="width:24.5%; float:left;border:1px solid black;border-right:none;border-top:none; padding:5px 0;font-size:12px" class="fjl bo2 dcell">CPT</div>
-                                        <div style="width:24%; float:left;border:1px solid black;border-right:none;border-top:none; padding:5px 0;font-size:12px" class="fjl bo2 dcell">STBY</div>
-                                        <div style="width:22.5%; float:left;border:1px solid black; border-top:none; padding:5px 0;font-size:12px" class="fjl bo2 dcell">F/O</div>
-                                    </div>
-                                    <div ng-repeat="x in jl.rvsm1">
-                                        <div style="width:10%; float:left;border-left:1px solid black;height:56px;padding:20px 0" class="fjl bo2 dcell">{{x.leg}}</div>
-                                        <div style="width:90%; float:left;border-right:1px solid black;height:56px;padding:0px 0" class="fjl bo2 dcell">
-                                            <div>
-                                                <div style="width:21%; float:left;border-right:1px solid #bbb;border-bottom:1px solid #bbb;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell">GND</div>
-                                                <div style="width:27.6%; float:left;border-right:1px solid #bbb;border-bottom:1px solid #bbb;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell"></div>
-                                                <div style="width:27%; float:left;border-right:1px solid #bbb;border-bottom:1px solid #bbb;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell"></div>
-                                                <div style="width:24.4%; float:left;border-right:none;border-bottom:1px solid #bbb;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell"></div>
-
-                                                <div style="clear:both"></div>
-                                            </div>
-                                            <div>
-                                                <div style="width:21%; float:left;border-right:1px solid #bbb;border-top:none;border-left:none;border-bottom:none; padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell">FLT</div>
-                                                <div style="width:27.6%; float:left;border-right:1px solid #bbb;border-bottom:none;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell"></div>
-                                                <div style="width:27%; float:left;border-right:1px solid #bbb;border-bottom:none;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell"></div>
-                                                <div style="width:24.4%; float:left;border-right:none;border-bottom:none;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell"></div>
-                                                <div style="clear:both"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="dr" style=" width:50%;float:left">
-                                    <div>
-                                        <div style="width:10%; float:left;border:1px solid black;border-right:none;border-top:none;   padding:5px 0;font-size:11px" class="fjl bo2 dcell">LEG</div>
-                                        <div style="width:19%; float:left;border:1px solid black;border-right:none;border-top:none; padding:5px 0;font-size:12px" class="fjl bo2 dcell">PHASE</div>
-                                        <div style="width:24.5%; float:left;border:1px solid black;border-right:none;border-top:none; padding:5px 0;font-size:12px" class="fjl bo2 dcell">CPT</div>
-                                        <div style="width:24%; float:left;border:1px solid black;border-right:none;border-top:none; padding:5px 0;font-size:12px" class="fjl bo2 dcell">STBY</div>
-                                        <div style="width:22.5%; float:left;border:1px solid black; border-top:none; padding:5px 0;font-size:12px" class="fjl bo2 dcell">F/O</div>
-                                    </div>
-                                    <div ng-repeat="x in jl.rvsm2">
-                                        <div style="width:10%; float:left;border-left:1px solid black;height:56px;padding:20px 0" class="fjl bo2 dcell">{{x.leg}}</div>
-                                        <div style="width:90%; float:left;border-right:1px solid black; height:56px;padding:0px 0" class="fjl bo2 dcell">
-                                            <div>
-                                                <div style="width:21%; float:left;border-right:1px solid #bbb;border-bottom:1px solid #bbb;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell">GND</div>
-                                                <div style="width:27.6%; float:left;border-right:1px solid #bbb;border-bottom:1px solid #bbb;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell"></div>
-                                                <div style="width:27%; float:left;border-right:1px solid #bbb;border-bottom:1px solid #bbb;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell"></div>
-                                                <div style="width:24.4%; float:left;border-right:none;border-bottom:1px solid #bbb;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell"></div>
-
-                                                <div style="clear:both"></div>
-                                            </div>
-                                            <div>
-                                                <div style="width:21%; float:left;border-right:1px solid #bbb;border-top:none;border-left:none;border-bottom:none; padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell">FLT</div>
-                                                <div style="width:27.6%; float:left;border-right:1px solid #bbb;border-bottom:none;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell"></div>
-                                                <div style="width:27%; float:left;border-right:1px solid #bbb;border-bottom:none;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell"></div>
-                                                <div style="width:24.4%; float:left;border-right:none;border-bottom:none;border-top:none;border-left:none;  padding:6px 0;font-size:12px;height:28px" class="fjl bo2 dcell"></div>
-                                                <div style="clear:both"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="clear:both"></div>
+                       
+                        <div style=" float:left;width:75%;border:1px solid black;">
+                            <div style="text-align:left;font-size:12px;padding:0px;padding-bottom:0px">
+                                <div style="float:left;padding:3px;">COMMANDER'S NOTES:</div>
+                                
+                                    <div style="float:right;width:195px;height:165px;border-left:1px solid #aaa;padding:3px">Commander's Signature</div>
+                                    <div style="clear:both"></div>
+                                
                             </div>
-
-
-                            <div style="clear:both"></div>
-                        </div>
-                        <div style=" float:left;width:35%;border:1px solid black;">
-                            <div style="text-align:left;font-size:12px;padding:3px;padding-bottom:36px">COMMANDER'S NOTES:</div>
-                            <div>
-                                <div style="float:right;width:195px;height:110px;border:1px solid #aaa;font-size:11px">Commander's Signature</div>
-                                <div style="clear:both"></div>
-                            </div>
-                            <div style="text-align:center;font-size:8px;border-top:1px solid #aaa;height:43px">
+                           
+                            <div style="text-align:center;font-size:10px;border-top:1px solid #aaa;height:43px">
                                 THE FOLLOWING FORM COMPELETED AND ATTACHED
                                 <span style="display:inline-block;margin-left:5px;font-size:8px;">ASR</span><input type="checkbox" style="display:inline-block;border:1px solid #aaa;margin-left:5px;position:relative;top:3px;" />
                                 <span style="display:inline-block;margin-left:10px;font-size:8px;">VOYAGE REPORT</span><input type="checkbox" style="display:inline-block;border:1px solid #aaa;margin-left:5px;position:relative;top:3px;" />
-                                <span style="display:inline-block;margin-left:10px;font-size:8px;">REPOSITIONING</span>
-                                <input type="checkbox" style="display:inline-block;border:1px solid #aaa;margin-left:5px;position:relative;top:3px;" />
-                                <input type="checkbox" style="display:inline-block;border:1px solid #aaa;margin-left:5px;position:relative;top:3px;" />
+                               
                             </div>
                         </div>
 

@@ -1270,7 +1270,7 @@ app.controller('libraryController', ['$scope', '$location', '$routeParams', '$ro
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', onClick: function (e) {
 
-                        //bani
+                        //cmnt
                         $scope.Notify.ObjectId = $scope.dg_selected.Id;
                         $scope.Notify.Message = $scope.Notify.Message.replace(/\r?\n/g, '<br />');
                         var temp = Enumerable.From($scope.selectedEmployees).Select('{EmployeeId:$.EmployeeId,Name:$.Name}').ToArray();

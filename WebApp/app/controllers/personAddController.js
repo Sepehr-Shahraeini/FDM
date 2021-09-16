@@ -3141,7 +3141,15 @@ app.controller('personAddController', ['$scope', '$location', 'personService', '
 
         $scope.loadingVisible = true;
         personService.save($scope.entity).then(function (response) {
+            var jstr = JSON.stringify($scope.entity.Person);
+            var _dto = {
+                Id: 0,
+                User: $rootScope.userName,
+                PersonId: $scope.entity.PersonId,
+                Remark: jstr,
 
+            };
+            personService.saveHistory(_dto);
             $scope.clearEntity();
 
 

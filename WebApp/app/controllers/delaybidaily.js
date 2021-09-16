@@ -3425,7 +3425,7 @@ app.controller('delaybidailyController', ['$scope', '$location', '$routeParams',
 
             });
         });
-        $scope.nowMonth = 1;
+         $scope.nowMonth = 5;
         $scope.yearmonth = [];
         $scope.yearmonth.push(Enumerable.From($scope.ds_yearmonth).Where('$.year==' + $scope.nowYear + ' && $.month==' + $scope.nowMonth).FirstOrDefault());
         setTimeout(function () {

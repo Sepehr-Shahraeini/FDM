@@ -126,7 +126,7 @@ app.controller('flightDesignController', ['$scope', '$location', 'flightService'
             },
             create: function (args) {
                 // renderLables();
-                //bani
+                
                
                 //console.log($scope.tempFlight);
 
@@ -432,7 +432,7 @@ app.controller('flightDesignController', ['$scope', '$location', 'flightService'
         },
         onSelectionChanged: function (arg) {
            // $scope.getAverageRouteTime();
-            //frombani
+            
             $scope.entity.ToAirport = null;
             if (!arg.selectedItem) {
                 $scope.ds_toairport = [];
@@ -702,7 +702,7 @@ app.controller('flightDesignController', ['$scope', '$location', 'flightService'
                     type: 'danger', text: '', width: 40, icon: 'remove', onClick: function (e) {
                        
                         
-                        //bani delete
+                         
                         if (!$scope.selectedFlight) {
                             General.ShowNotify(Config.Text_NoRowSelected, 'error');
                             return;
@@ -746,7 +746,7 @@ app.controller('flightDesignController', ['$scope', '$location', 'flightService'
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', onClick: function (arg) {
-                        //bani save
+                         
                          
                         if ($scope.apply == true && ($scope.gapsn > 0 || $scope.overlapsn>0)) {
                             General.ShowNotify(Config.Text_GanttErrors, 'error');
@@ -988,7 +988,7 @@ app.controller('flightDesignController', ['$scope', '$location', 'flightService'
 
 
         Flight.processData(newdata);
-        //bani 2
+        
 
         if ($scope.IsNew) {
            

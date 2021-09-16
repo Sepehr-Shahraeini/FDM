@@ -2648,6 +2648,7 @@ app.controller('delaykpiController', ['$scope', '$location', '$routeParams', '$r
               
                 $scope.total.categories = Enumerable.From(response.categories).ToArray();
                 $scope.total.categoryNames = Enumerable.From(response.categoryNames).ToArray();
+                 
                 if (!$scope.lateArr) {
                     $scope.total.categories = Enumerable.From($scope.total.categories).Where('$.ICategory!="LATE ARRIVAL"').ToArray();
                     $scope.total.categoryNames = Enumerable.From($scope.total.categoryNames).Where('$!="LATE ARRIVAL"').ToArray();
@@ -2657,7 +2658,7 @@ app.controller('delaykpiController', ['$scope', '$location', '$routeParams', '$r
 
                 $scope.polarTimeDs = [];
                 $.each($scope.categories, function (_i, _d) {
-                    //kiro
+                     
                     _d.id = _i + 1;
                     _d['ArgNum'] = _d.Month;
                     _d['ArgStr'] = _d.MonthName;
@@ -2698,8 +2699,8 @@ app.controller('delaykpiController', ['$scope', '$location', '$routeParams', '$r
 
 
 
-                });
-
+                }); 
+                 
                 $scope.currentCategories = Enumerable.From($scope.categories).Where('$.Month==' + $scope.month + ' && $.Year==' + $scope.year).ToArray();
                 $scope.pastCategories = Enumerable.From($scope.categories).Where('$.Month==' + $scope.getPastMonth() + ' && $.Year==' + $scope.getPastYear()).ToArray();
 
@@ -6100,7 +6101,7 @@ app.controller('delaykpiController', ['$scope', '$location', '$routeParams', '$r
         switch ($scope.year) {
             case 1400:
 
-                $scope.ds_yearmonth = Enumerable.From($scope.ds_month).Where('$.id==1 || $.id==2  ').OrderBy('$.id').ToArray();
+                $scope.ds_yearmonth = Enumerable.From($scope.ds_month).Where('$.id<=6').OrderBy('$.id').ToArray();
                 break;
             case 1399:
                 $scope.ds_yearmonth = Enumerable.From($scope.ds_month).OrderBy('$.id').ToArray();
@@ -6112,8 +6113,13 @@ app.controller('delaykpiController', ['$scope', '$location', '$routeParams', '$r
                 break;
         }
 
-        if ($scope.ds_yearmonth.length > 0)
-            $scope.month = $scope.ds_yearmonth[0].id;
+        if ($scope.ds_yearmonth.length > 0) {
+            //$scope.month = $scope.ds_yearmonth[0].id;
+            //$scope.month = $scope.ds_yearmonth[$scope.ds_yearmonth.length-1].id;
+            $scope.month = 5;
+
+        }
+        //alert('x ' + $scope.month);
     };
     $scope.sb_year = {
 
@@ -6167,6 +6173,7 @@ app.controller('delaykpiController', ['$scope', '$location', '$routeParams', '$r
         // $scope.period = 1;
         $scope.pdate = new persianDate(new Date());
         $scope.month = $scope.pdate.month();
+         
 
         $scope.nowYear = $scope.pdate.year();
         $scope.nowMonth = $scope.pdate.month();

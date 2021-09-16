@@ -771,7 +771,7 @@ app.controller('planController', ['$scope', '$location', '$routeParams', '$rootS
         },
         onSelectionChanged: function (arg) {
             // $scope.getAverageRouteTime();
-            //frombani
+           
             $scope.entity.ToAirport = null;
             if (!arg.selectedItem) {
                 $scope.ds_toairport = [];
@@ -1243,7 +1243,7 @@ app.controller('planController', ['$scope', '$location', '$routeParams', '$rootS
                         $scope.entity.STD = (new Date($scope.entity.STD)).toUTCString();
                         $scope.entity.STA = (new Date($scope.entity.STA)).toUTCString();
                         //startDate
-                        //fbani
+                       
                         if ($scope.entity.Interval != 100) {
                             $scope.entity.Months = [];
                             $scope.entity.Days = [];

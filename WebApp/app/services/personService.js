@@ -154,6 +154,24 @@ app.factory('personService', ['$http', '$q', 'ngAuthSettings', '$rootScope', fun
 
         return deferred.promise;
     };
+
+
+    var _saveHistory = function (entity) {
+
+
+        var deferred = $q.defer();
+        $http.post(serviceBaseAPI + 'api/person/history/save/' ,entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+            deferred.reject(Exceptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    };
+
+
+    serviceFactory.saveHistory = _saveHistory;
     serviceFactory.getCrewLight = _getCrewLight;
 
     serviceFactory.getEmployee = _getEmployee;

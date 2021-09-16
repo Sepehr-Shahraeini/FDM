@@ -345,9 +345,9 @@ namespace EPAGriffinAPI.Controllers
         [Route("odata/forma/year/{year}")]
 
         // [Authorize]
-        public async Task<IHttpActionResult> GetFormAReportYear(int year )
+        public async Task<IHttpActionResult> GetFormAReportYear(int year)
         {
-            var result = await unitOfWork.FlightRepository.GetFormAReportYear(year );
+            var result = await unitOfWork.FlightRepository.GetFormAReportYear(year);
             return new CustomActionResult(HttpStatusCode.OK, result);
         }
 
@@ -461,10 +461,10 @@ namespace EPAGriffinAPI.Controllers
         [Route("odata/delays/report/airports")]
         [EnableQuery]
         // [Authorize]
-        public async Task<IHttpActionResult> GetDelaysAirportReport( DateTime df, DateTime dt )
+        public async Task<IHttpActionResult> GetDelaysAirportReport(DateTime df, DateTime dt)
         {
-             
-            var result = await unitOfWork.FlightRepository.GetDelaysAirportReport( df, dt );
+
+            var result = await unitOfWork.FlightRepository.GetDelaysAirportReport(df, dt);
             return new CustomActionResult(HttpStatusCode.OK, result);
         }
 
@@ -498,11 +498,11 @@ namespace EPAGriffinAPI.Controllers
         [Route("odata/citypair/yearly/report")]
         [EnableQuery]
         // [Authorize]
-        public IQueryable<ViewFinYearlyRoute> GetCityPairYearlyReport(int year )
+        public IQueryable<ViewFinYearlyRoute> GetCityPairYearlyReport(int year)
         {
 
             var query = from x in unitOfWork.FlightRepository.GetViewFinYearlyRoute()
-                        where x.Year == year 
+                        where x.Year == year
                         select x;
 
 
@@ -1785,6 +1785,15 @@ namespace EPAGriffinAPI.Controllers
             return Ok(result);
         }
 
+        [Route("odata/delayed/check/{user}")]
+        [AcceptVerbs("POST", "GET")]
+        public async Task<IHttpActionResult> GetDelayedCheck(string user)
+        {
+
+            var result = await unitOfWork.FlightRepository.FindDelayedFlights(user);
+            return Ok(result);
+        }
+
         [Route("odata/board/summary/total/{cid}/{year}/{month}/{day}/{year2}/{month2}/{day2}")]
         [AcceptVerbs("POST", "GET")]
         public async Task<IHttpActionResult> GetBoardSummaryTotal(int cid, int year, int month, int day, int year2, int month2, int day2)
@@ -1965,13 +1974,24 @@ namespace EPAGriffinAPI.Controllers
             return Ok(true);
         }
 
-        [Route("odata/smsgroup/add/{name}/{mobile}")]
+        [Route("odata/smsgroup/add/{name}/{mobile}/{type}")]
         [AcceptVerbs("POST", "GET")]
-        public async Task<IHttpActionResult> AddSMSGroup(string name,string mobile)
+        public async Task<IHttpActionResult> AddSMSGroup(string name, string mobile,int type)
         {
             //var result = await unitOfWork.FlightRepository.NotifyFDPCrews(id);
 
-            var result = await unitOfWork.FlightRepository.AddSMSGroup(name,mobile);
+            var result = await unitOfWork.FlightRepository.AddSMSGroup(name, mobile,type);
+            //await unitOfWork.SaveAsync();
+            return Ok(result);
+        }
+
+        [Route("odata/smsgroup/delete/{mobile}/{type}")]
+        [AcceptVerbs("POST", "GET")]
+        public async Task<IHttpActionResult> AddSMSGroup(  string mobile, int type)
+        {
+            //var result = await unitOfWork.FlightRepository.NotifyFDPCrews(id);
+
+            var result = await unitOfWork.FlightRepository.DeleteSMSGroup( mobile, type);
             //await unitOfWork.SaveAsync();
             return Ok(result);
         }
@@ -3016,7 +3036,7 @@ namespace EPAGriffinAPI.Controllers
                                  Legs = grp.Count(),
                                  BlockTime = grp.Sum(q => q.BlockTime),
                                  FlightTime = grp.Sum(q => q.FlightTime),
-                                 FlightTimeActual=grp.Sum(q=>q.FlightTimeActual),
+                                 FlightTimeActual = grp.Sum(q => q.FlightTimeActual),
                                  FixTime = grp.Sum(q => q.FixTime),
                                  SITATime = grp.Sum(q => q.SITATime),
 
@@ -4888,7 +4908,7 @@ namespace EPAGriffinAPI.Controllers
 
             var beginDate = ((DateTime)dto.RefDate).Date;
             var endDate = ((DateTime)dto.RefDate).Date.AddDays((int)dto.RefDays).Date.AddHours(23).AddMinutes(59).AddSeconds(59);
-            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => fresult.fltIds .Contains(q.ID)
+            var fg = await unitOfWork.FlightRepository.GetViewFlightGantts().Where(q => fresult.fltIds.Contains(q.ID)
              && q.STDDay >= beginDate && q.STDDay <= endDate
             ).ToListAsync();
             var flights = new List<ViewFlightsGanttDto>();
@@ -5023,11 +5043,11 @@ namespace EPAGriffinAPI.Controllers
 
                 foreach (var x in fresult.offIds)
                     await unitOfWork.FlightRepository.NotifyNira((int)x, dto.userName);
-               // foreach (var x in dto.)
-               //     await unitOfWork.FlightRepository.NotifyNira((int)x, dto.userName);
+                // foreach (var x in dto.)
+                //     await unitOfWork.FlightRepository.NotifyNira((int)x, dto.userName);
             }
 
-            
+
 
 
 
@@ -5351,7 +5371,7 @@ namespace EPAGriffinAPI.Controllers
             var validate = unitOfWork.FlightRepository.ValidateFlight(dto);
             if (validate.Code != HttpStatusCode.OK)
                 return validate;
-
+            var nowOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now).TotalMinutes;
             var stdHours = ((DateTime)dto.STD).Hour;
             var stdMinutes = ((DateTime)dto.STD).Minute;
             var staHours = ((DateTime)dto.STA).Hour;
@@ -5423,8 +5443,13 @@ namespace EPAGriffinAPI.Controllers
 
 
                 ViewModels.FlightDto.Fill(entity, dto);
+                var _fltDate = new DateTime(dt.Year, dt.Month, dt.Day);
+                var fltOffset = -1 * TimeZoneInfo.Local.GetUtcOffset(_fltDate).TotalMinutes;
                 entity.FlightGroupID = flightGroup;
-                entity.STD = new DateTime(dt.Year, dt.Month, dt.Day, stdHours, stdMinutes, 0);
+                var _std = new DateTime(dt.Year, dt.Month, dt.Day, (int)dto.STDHH, (int)dto.STDMM, 0);
+                _std = _std.AddMinutes(fltOffset);
+                entity.STD = _std;
+
                 entity.STA = ((DateTime)entity.STD).AddMinutes(duration);
                 entity.ChocksOut = entity.STD;
                 entity.ChocksIn = entity.STA;
@@ -5607,14 +5632,24 @@ namespace EPAGriffinAPI.Controllers
                     changeLog.User = dto.UserName;
 
                     var oldSTD = (DateTime)entity.STD;
+
+
+
                     var newSTD = new DateTime(oldSTD.Year, oldSTD.Month, oldSTD.Day, stdHours, stdMinutes, 0);
                     var newSTA = newSTD.AddMinutes(duration);
                     if (oldSTD.AddMinutes(270).Date != newSTD.AddMinutes(270).Date)
                         entity.FlightDate = oldSTD;
                     ViewModels.FlightDto.FillForGroupUpdate(entity, dto);
                     //entity.FlightGroupID = flightGroup;
-                    entity.STD = newSTD;
-                    entity.STA = newSTA;
+
+                    var _fltDate = new DateTime(oldSTD.Year, oldSTD.Month, oldSTD.Day);
+                    var fltOffset = -1 * TimeZoneInfo.Local.GetUtcOffset(_fltDate).TotalMinutes;
+                    var _std = new DateTime(oldSTD.Year, oldSTD.Month, oldSTD.Day, (int)dto.STDHH, (int)dto.STDMM, 0);
+                    _std = _std.AddMinutes(fltOffset);
+
+
+                    entity.STD = _std; //newSTD;
+                    entity.STA = _std.AddMinutes(duration); //newSTA;
                     entity.ChocksOut = entity.STD;
                     entity.ChocksIn = entity.STA;
                     entity.Takeoff = entity.STD;
@@ -6763,6 +6798,21 @@ namespace EPAGriffinAPI.Controllers
 
         }
 
+        [Route("odata/flight/register/change/notify")]
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> PostNotifyFlightRegisterChangeGroup(ViewModels.FlightRegisterChangeLogDto dto)
+        {
+            if (dto == null)
+                return Exceptions.getNullException(ModelState);
+            if (!ModelState.IsValid)
+            {
+
+                return Exceptions.getModelValidationException(ModelState);
+            }
+            var result = await unitOfWork.FlightRepository.NotifyChangeFlightRegisterGroup(dto);
+            return Ok(result);
+        }
+
         //magu2-16
         [Route("odata/flight/register/change/group")]
         //dooltopoli
@@ -6792,7 +6842,7 @@ namespace EPAGriffinAPI.Controllers
             if (result.data != null)
             {
                 var obj = result.data as List<object>;
-                if (obj !=null && obj.Count == 1)
+                if (obj != null && obj.Count == 1)
                 {
                     _flts = obj[0] as List<int>;
                 }
@@ -6820,7 +6870,7 @@ namespace EPAGriffinAPI.Controllers
                         _flts = obj[5] as List<int>;
                     }
                 }
-                
+
             }
 
             // await unitOfWork.FlightRepository.NotifyNira((int)obj.FlightId,obj.UserName);
@@ -7426,7 +7476,7 @@ namespace EPAGriffinAPI.Controllers
         {
             var userId = Convert.ToInt32(dto.userId);
             string flightIds = Convert.ToString(dto.flightIds);
-            
+
             var code = Convert.ToString(dto.code);
             var result = await unitOfWork.FlightRepository.saveFDPNoCrew2(userId, flightIds.Split('_').Select(q => Convert.ToInt32(q)).ToList(), code);
 
@@ -7931,6 +7981,19 @@ namespace EPAGriffinAPI.Controllers
             return Ok(result);
         }
 
+        [Route("odata/sms/send/{mobile}/{name}/{text}")]
+        //qool
+        [AcceptVerbs("GET")]
+        public async Task<IHttpActionResult> GetSMS(string mobile,string name,string text)
+        {
+            // return Ok(client);
+          
+
+            var result =  unitOfWork.FlightRepository.SendSMS(mobile,text,name);
+
+            return Ok(result);
+        }
+
         [Route("odata/sms/status")]
         //qool
         [AcceptVerbs("POST")]
@@ -8051,14 +8114,15 @@ namespace EPAGriffinAPI.Controllers
         [Route("odata/ati/nira/all/{dfrom}/{dto}")]
         [EnableQuery]
         //looi
-        public async Task<IHttpActionResult> GetNieaAll(string dfrom,string dto)
+        public async Task<IHttpActionResult> GetNieaAll(string dfrom, string dto)
         ///(DateTime from, DateTime to, int id, int? airline = null, int? status = null, int? fromAirport = null, int? toAirport = null)
         {
-            var fprts = dfrom.Split('-').Select(q=>Convert.ToInt32(q)).ToList();
+            var fprts = dfrom.Split('-').Select(q => Convert.ToInt32(q)).ToList();
             var tprts = dto.Split('-').Select(q => Convert.ToInt32(q)).ToList();
             var dtfrom = new DateTime(fprts[0], fprts[1], fprts[2]);
             var dtto = new DateTime(tprts[0], tprts[1], tprts[2]);
             var result = await unitOfWork.FlightRepository.AllNira(dtfrom, dtto);
+            //var result = 100;
             return Ok(result);
 
         }
@@ -8131,7 +8195,7 @@ namespace EPAGriffinAPI.Controllers
             //}
             //using (StreamWriter _detailogwriter = new StreamWriter(HttpContext.Current.Server.MapPath("~/sela/detaillog.json"), true))
             //{
-                
+
             //    var c = 0;
             //    foreach (var str in logs)
             //    {

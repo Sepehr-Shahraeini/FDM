@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientApp", "ClientApp\Clie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Report", "Report\Report.csproj", "{894472CB-A68E-4E73-B443-A8ADB7F38136}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APTasks", "APTasks\APTasks.csproj", "{6CC35D99-B426-4DA3-BB8C-49A678D3E49E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{894472CB-A68E-4E73-B443-A8ADB7F38136}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{894472CB-A68E-4E73-B443-A8ADB7F38136}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{894472CB-A68E-4E73-B443-A8ADB7F38136}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CC35D99-B426-4DA3-BB8C-49A678D3E49E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CC35D99-B426-4DA3-BB8C-49A678D3E49E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CC35D99-B426-4DA3-BB8C-49A678D3E49E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CC35D99-B426-4DA3-BB8C-49A678D3E49E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

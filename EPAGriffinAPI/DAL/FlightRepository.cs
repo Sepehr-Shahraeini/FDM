@@ -734,7 +734,7 @@ namespace EPAGriffinAPI.DAL
 
             return true;
         }
-        //ati bani
+        //ati  
         internal async Task<bool> ApproveFlightPlanRegisters(int pid)
         {
             var plan = await this.context.FlightPlans.SingleAsync(q => q.Id == pid);
@@ -4130,8 +4130,146 @@ namespace EPAGriffinAPI.DAL
 
             return new CustomActionResult(HttpStatusCode.OK, result);
         }
+        class fltprt
+        {
+            public string no { get; set; }
+            public string type { get; set; }
+            public string reg { get; set; }
+            public int id { get; set; }
+        }
+        //9-15
+        public async Task<CustomActionResult> NotifyChangeFlightRegisterGroup(ViewModels.FlightRegisterChangeLogDto dto)
+        {
+            if (dto.intervalFrom != null)
+            {
+                var result = true;
+                var _intervalTo = (DateTime)dto.intervalTo;
+                var now7 = DateTime.Now.Date.AddDays(8);
+                if (_intervalTo > now7)
+                    _intervalTo = now7;
+                var intervalDays = GetInvervalDates((int)dto.interval, (DateTime)dto.intervalFrom, (DateTime)dto.intervalTo, dto.days).Select(q => (Nullable<DateTime>)q).ToList();
+                var newResisgerObj = await this.context.ViewMSNs.FirstOrDefaultAsync(q => q.ID == dto.NewRegisterId);
+                var baseFlights = await this.context.FlightInformations.Where(q => dto.Flights.Contains(q.ID)).ToListAsync();
+                var fltNumbers = baseFlights.Select(q => q.FlightNumber).ToList();
+                var flights = await (from x in this.context.ViewLegTimes
+                                     where fltNumbers.Contains(x.FlightNumber) && intervalDays.Contains(x.STDDay)
+                                     orderby x.STD
+                                     select x).ToListAsync();
+                if (flights.Count > 0)
+                {
+                    var prts = new List<string>() { "CASPIAN AIRLINES", "Register(s) Changed" }; 
+                    var olds = new List<fltprt>();
+                    var oldStr = dto.Remark.Split('*');
+                    foreach (var x in oldStr)
+                    {
+                        var _oldReg = x.Split('_')[1].Split('-')[1];
+                        var _oldType = x.Split('_')[1].Split('-')[0];
+                        var _no = x.Split('_')[0];
+                        olds.Add(new fltprt()
+                        {
+                            no = _no,
+                            reg = _oldReg,
+                            type = _oldType
+                        });
+                        //var _flt = flights.FirstOrDefault(q => q.ID == id);
+                        //if (_flt!=null)
+                        //{
+                        //    prts.Add("FLT: " + _flt.FlightNumber + " " + _flt.AircraftType + "-" + _flt.Register + " (" + oldType + "-" + oldReg + ")");
+                        //}
+                    }
+
+                    foreach (var _flt in flights)
+                    {
+                        var oldrec = olds.FirstOrDefault(q => q.no == _flt.FlightNumber);
+                        var str = "FLT: " + ((DateTime)_flt.STDLocal).ToString("ddd yyyy/MM/dd") + " " + _flt.FlightNumber + " " + _flt.AircraftType + "-" + _flt.Register;
+                        if (oldrec != null)
+                            str += " (" + oldrec.type + "-" + oldrec.reg + ")";
+                        prts.Add(str);
+                    }
+                    var text1 = String.Join("\n", prts);
+                    var recs = await this.context.SMSGroups.Where(q => q.Type == 2).ToListAsync();
+                    foreach (var rec in recs)
+                    {
+                        try
+                        {
+                            Magfa m = new Magfa();
+                            var result10 = m.enqueue(1, rec.Phone, text1)[0];
+                        }
+                        catch (Exception exx)
+                        {
+
+                        }
+
+                    }
+                    return new CustomActionResult(HttpStatusCode.OK, flights.Count + " flights found");
+                }
+                else
+                    return new CustomActionResult(HttpStatusCode.OK, "no flights found");
+            }
+            else
+            {
+                var olds = new List<fltprt>();
+                var oldStr = dto.Remark.Split('*');
+                foreach (var x in oldStr)
+                {
+                    var _oldReg = x.Split('_')[1].Split('-')[1];
+                    var _oldType = x.Split('_')[1].Split('-')[0];
+                    var _id =Convert.ToInt32( x.Split('_')[0]);
+                    olds.Add(new fltprt()
+                    {
+                        id = _id,
+                        reg = _oldReg,
+                        type = _oldType
+                    });
+                    
+                }
+
+                var _fltIds = olds.Select(q => q.id).ToList();
+                var flights = await (from x in this.context.ViewLegTimes
+                                     where _fltIds.Contains(x.ID) 
+                                     orderby x.STD
+                                     select x).ToListAsync();
+                if (flights.Count > 0)
+                {
+                    var prts = new List<string>() { "CASPIAN AIRLINES", "Register(s) Changed" };
+                    foreach (var _flt in flights)
+                    {
+                        var oldrec = olds.FirstOrDefault(q => q.id == _flt.ID);
+                        var str = "FLT: " + ((DateTime)_flt.STDLocal).ToString("ddd yyyy/MM/dd") + " " + _flt.FlightNumber + " " + _flt.AircraftType + "-" + _flt.Register;
+                        if (oldrec != null)
+                            str += " (" + oldrec.type + "-" + oldrec.reg + ")";
+                        prts.Add(str);
+                    }
+                    var text1 = String.Join("\n", prts);
+                    var recs = await this.context.SMSGroups.Where(q => q.Type == 2).ToListAsync();
+                    foreach (var rec in recs)
+                    {
+                        try
+                        {
+                            Magfa m = new Magfa();
+                            var result10 = m.enqueue(1, rec.Phone, text1)[0];
+                        }
+                        catch (Exception exx)
+                        {
+
+                        }
+
+                    }
+                    return new CustomActionResult(HttpStatusCode.OK, flights.Count + " flights found");
 
 
+                }
+                else
+                    return new CustomActionResult(HttpStatusCode.OK, "no flights found");
+
+            }
+         
+
+
+
+
+
+        }
 
         public async Task<CustomActionResult> ChangeFlightRegisterGroup(ViewModels.FlightRegisterChangeLogDto dto)
         {
@@ -8105,129 +8243,31 @@ namespace EPAGriffinAPI.DAL
             return true;
 
         }
-        internal async Task<dynamic> AddSMSGroup(string name, string mobile)
+        internal async Task<dynamic> AddSMSGroup(string name, string mobile,int type)
         {
             var sg = new SMSGroup()
             {
                 Name = name,
                 Phone = mobile,
-                Type = 1,
+                Type = type,
             };
             this.context.SMSGroups.Add(sg);
             await this.context.SaveAsync();
             return sg;
         }
-        internal async Task<dynamic> NotifyDelayedFlight2(int id)
+
+        internal async Task<dynamic> DeleteSMSGroup( string mobile, int type)
         {
-            var leg = await this.context.ViewLegTimes.FirstOrDefaultAsync(q => q.ID == id);
-            var delay = (((DateTime)leg.ChocksOut) - ((DateTime)leg.STD)).TotalMinutes;
-            if (delay >= 20 && leg.FlightStatusID != 3 && leg.FlightStatusID != 15)
-            {
-                var his = await this.context.DelayNotifieds.FirstOrDefaultAsync(q => q.FlightId == id && q.Delay == delay);
-                if (his == null)
-                {
-                    var delayInt = Convert.ToInt32(Math.Round(delay));
-                    his = new DelayNotified() { FlightId = id, Delay = delayInt };
-                    this.context.DelayNotifieds.Add(his);
+            var obj = this.context.SMSGroups.Where(q => q.Phone == mobile && q.Type == type).FirstOrDefault();
+            if (obj == null)
+                return 0;
+            this.context.SMSGroups.Remove(obj);
 
-                    var Hour1 = delayInt / 60;
-                    var Minute1 = delayInt % 60;
-                    var delayStr1 = FormatTwoDigits(Hour1) + ":" + FormatTwoDigits(Minute1);
-                    var strs1 = new List<string>() { "CASPIAN AIRLINES", "Delay Warning" };
-                    strs1.Add(((DateTime)leg.STDDay).ToString("yyyy-MM-dd"));
-                    strs1.Add(leg.FromAirportIATA + "-" + leg.FlightNumber + "-" + leg.ToAirportIATA);
-                    strs1.Add("Delay: " + delayStr1);
-                    strs1.Add("STD: " + ((DateTime)leg.STDLocal).ToString("HH:mm"));
-                    strs1.Add("STA: " + ((DateTime)leg.STALocal).ToString("HH:mm"));
-                    strs1.Add("BlockOff: " + ((DateTime)leg.DepartureLocal).ToString("HH:mm"));
-                    var text1 = String.Join("\n", strs1);
-                    var recs = await this.context.SMSGroups.Where(q => q.Type == 1).ToListAsync();
-                    foreach (var rec in recs)
-                    {
-                        Magfa m = new Magfa();
-                        var result10 = m.enqueue(1, rec.Phone, text1)[0];
-                    }
-                    await this.context.SaveAsync();
-                }
-            }
-
-            return true;
-
-
-
-            //var offset = 270;
-
-            //var flight = await this.context.ViewFlightABS.Where(q => q.ID == id).FirstOrDefaultAsync();
-            //var delays = await this.context.ViewFlightDelays.Where(q => q.FlightId == id).ToListAsync();
-            //var total = delays.Select(q => (int)q.DelayHH * 60 + (int)q.DelayMM).Sum();
-            //var Hour = total / 60;
-            //var Minute = total % 60;
-            //var delayStr = FormatTwoDigits(Hour) + ":" + FormatTwoDigits(Minute);
-
-            //var strs = new List<string>() { "تاخیر پرواز زیر از 20 دقیقه گذشته است" };
-            //strs.Add(flight.FromAirportIATA + "-" + flight.FlightNumber + "-" + flight.ToAirportIATA);
-            //strs.Add("Delay: " + delayStr);
-            //var std = ((DateTime)flight.STD).AddMinutes(offset);
-            //var sta = ((DateTime)flight.STA).AddMinutes(offset);
-            //DateTime? offblock = null;
-            //if (flight.ChocksOut != null)
-            //{
-            //    offblock = ((DateTime)flight.ChocksOut).AddMinutes(offset);
-            //}
-
-            //strs.Add("Scheduled Dep.: " + std.Hour.ToString().PadLeft(2, '0') + ":" + std.Minute.ToString().PadLeft(2, '0'));
-            //strs.Add("Scheduled Arr.: " + sta.Hour.ToString().PadLeft(2, '0') + ":" + sta.Minute.ToString().PadLeft(2, '0'));
-            //if (offblock != null)
-            //    strs.Add("Off Block: " + ((DateTime)offblock).Hour.ToString().PadLeft(2, '0') + ":" + ((DateTime)offblock).Minute.ToString().PadLeft(2, '0'));
-
-            //var text = String.Join("\n", strs);
-
-            //var nos = new Dictionary<string, string>();
-            //nos.Add("Admin1", "09306678047");
-            //nos.Add("Admin2", "09124449584");
-            //////razbani
-            ////nos.Add("Razbani", "09123938451");
-            //////daghigh
-            ////nos.Add("DaghighKia", "09124500273");
-            //////ashrafi
-            ////nos.Add("Ashrafi", "09121965762");
-            //////fazeli
-            ////nos.Add("Fazeli", "09121323295");
-            //////rahimi
-            ////nos.Add("Rahimi", "09121506016");
-            //////bagheri
-            ////nos.Add("Bagheri", "09125205832");
-            //////bakhshi
-            ////nos.Add("BakhshiZadeh", "09122587968");
-            //////abbasi
-            ////nos.Add("Abbasi", "09132710177");
-
-            //foreach (var x in nos)
-            //{
-            //    Magfa m = new Magfa();
-            //    var result9 = m.enqueue(1, x.Value, text)[0];
-
-
-            //    //this.context.SMSHistories.Add(new SMSHistory()
-            //    //{
-            //    //    DateSent = DateTime.Now,
-            //    //    RecMobile = x.Value,
-            //    //    RecName = x.Key,
-            //    //    Ref = result9.ToString(),
-            //    //    Text = text,
-            //    //    TypeId = 2,
-            //    //});
-            //}
-
-            //return true;
-
+             
+            await this.context.SaveAsync();
+            return 1;
         }
-        public class delayNotification
-        {
-            public int Id { get; set; }
-            public int delay { get; set; }
 
-        }
 
         // public static List<delayNotification> 
         internal async Task<dynamic> NotifyDelayedFlight2(int id, string from, string to, string no, int hh, int mm)
@@ -8491,7 +8531,7 @@ namespace EPAGriffinAPI.DAL
             return true;
         }
 
-
+        //9-14
         internal async Task<bool> SendSMSGroup(List<string> mobiles, List<string> names, string text, string sender)
         {
             Magfa m = new Magfa();
@@ -10155,6 +10195,144 @@ namespace EPAGriffinAPI.DAL
             }
             return functionReturnValue;
         }
+        //09-07
+        internal async Task<dynamic> NotifyDelayedFlight2(int id)
+        {
+            var leg = await this.context.ViewLegTimes.FirstOrDefaultAsync(q => q.ID == id);
+            var delay = (((DateTime)leg.ChocksOut) - ((DateTime)leg.STD)).TotalMinutes;
+            if (delay >= 30 && leg.FlightStatusID != 3 && leg.FlightStatusID != 15)
+            {
+                var his = await this.context.DelayNotifieds.FirstOrDefaultAsync(q => q.FlightId == id && q.Delay == delay);
+                if (his == null)
+                {
+                    var delayInt = Convert.ToInt32(Math.Round(delay));
+                    his = new DelayNotified() { FlightId = id, Delay = delayInt };
+                    this.context.DelayNotifieds.Add(his);
+
+                    var Hour1 = delayInt / 60;
+                    var Minute1 = delayInt % 60;
+                    var delayStr1 = FormatTwoDigits(Hour1) + ":" + FormatTwoDigits(Minute1);
+                    var strs1 = new List<string>() { "CASPIAN AIRLINES", "Delay Warning" };
+                    strs1.Add(((DateTime)leg.STDDay).ToString("yyyy-MM-dd"));
+                    strs1.Add(leg.FromAirportIATA + "-" + leg.FlightNumber + "-" + leg.ToAirportIATA);
+                    strs1.Add("Delay: " + delayStr1);
+                    strs1.Add("STD: " + ((DateTime)leg.STDLocal).ToString("HH:mm"));
+                    strs1.Add("STA: " + ((DateTime)leg.STALocal).ToString("HH:mm"));
+                    strs1.Add("BlockOff: " + ((DateTime)leg.DepartureLocal).ToString("HH:mm"));
+                    var text1 = String.Join("\n", strs1);
+                    var recs = await this.context.SMSGroups.Where(q => q.Type == 1).ToListAsync();
+                    foreach (var rec in recs)
+                    {
+                        Magfa m = new Magfa();
+                        var result10 = m.enqueue(1, rec.Phone, text1)[0];
+                    }
+                    await this.context.SaveAsync();
+                }
+            }
+
+            return true;
+
+
+
+        }
+
+        internal async Task<dynamic> FindDelayedFlights( string user)
+        {
+            if (user.ToLower().StartsWith("dis") || user.ToLower().StartsWith("demo"))
+            {
+                var now = DateTime.UtcNow;
+                var nowDay = now.Date;
+                var legs = await this.context.ViewLegTimes.Where(q => q.STDDay == nowDay && q.FlightStatusID == 1 && q.STD < now).Select(q => q.ID).ToListAsync();
+                string result = "";
+                if (legs.Count() > 0)
+                    result=await NotifyDelayedFlightList(legs);
+                return result;
+            }
+            else
+                return "-";
+           
+        }
+
+        internal async Task<dynamic> NotifyDelayedFlightList(List<int> ids)
+        {
+            var legs = await this.context.ViewLegTimes.Where(q => ids.Contains(q.ID)).Select(q => new
+            {
+                q.ID,
+                q.FlightStatusID,
+                q.STD,
+                q.FromAirportIATA,
+                q.ToAirportIATA,
+                q.FlightNumber,
+                q.STDDay,
+                q.STDLocal,
+                q.STALocal,
+                 
+            }).ToListAsync();
+            var now = DateTime.UtcNow;
+            List<string> _flts = new List<string>();
+            _flts.Add(legs.Count + " Flight(s) Found.");
+            foreach (var leg in legs)
+            {
+                var id = leg.ID;
+                //var leg = await this.context.ViewLegTimes.FirstOrDefaultAsync(q => q.ID == id);
+                var delay = (now - ((DateTime)leg.STD)).TotalMinutes;
+                if (delay >= 30 && leg.FlightStatusID ==1)
+                {
+
+                    //var his = await this.context.DelayNotifieds.FirstOrDefaultAsync(q => q.FlightId == id && q.Delay == delay);
+                    var _his = await this.context.DelayNotifieds.OrderByDescending(q => q.Id).FirstOrDefaultAsync(q => q.FlightId == id);
+                    if (_his == null || (_his != null && delay >= _his.Delay + 10))
+                    {
+                        var delayInt = Convert.ToInt32(Math.Round(delay));
+                        var his = new DelayNotified() { FlightId = id, Delay = delayInt };
+                        this.context.DelayNotifieds.Add(his);
+
+                        var Hour1 = delayInt / 60;
+                        var Minute1 = delayInt % 60;
+                        var delayStr1 = FormatTwoDigits(Hour1) + ":" + FormatTwoDigits(Minute1);
+                        var strs1 = new List<string>() { "CASPIAN AIRLINES", "Delay Warning" };
+                        strs1.Add(((DateTime)leg.STDDay).ToString("yyyy-MM-dd"));
+                        strs1.Add(leg.FromAirportIATA + "-" + leg.FlightNumber + "-" + leg.ToAirportIATA);
+                        strs1.Add("Delay: " + delayStr1);
+                        strs1.Add("STD: " + ((DateTime)leg.STDLocal).ToString("HH:mm"));
+                        strs1.Add("STA: " + ((DateTime)leg.STALocal).ToString("HH:mm"));
+                        //strs1.Add("BlockOff: " + ((DateTime)leg.DepartureLocal).ToString("HH:mm"));
+                        var text1 = String.Join("\n", strs1);
+                        _flts.Add(leg.FlightNumber + "  " + delayStr1);
+                        var recs = await this.context.SMSGroups.Where(q => q.Type == 1).ToListAsync();
+                        foreach (var rec in recs)
+                        {
+                            try
+                            {
+                                Magfa m = new Magfa();
+                                var result10 = m.enqueue(1, rec.Phone, text1)[0];
+                            }
+                            catch(Exception xxx)
+                            {
+                                _flts.Add("Sending Message Falied. " + rec + "  " + leg.FlightNumber);
+                            }
+                           
+                        }
+                        
+                    }
+
+                }
+            }
+
+            await this.context.SaveAsync();
+            var _result =  String.Join(", ", _flts);
+            return _result;
+
+
+
+        }
+        public class delayNotification
+        {
+            public int Id { get; set; }
+            public int delay { get; set; }
+
+        }
+
         internal async Task<object> GetBoardSummary(DateTime date)
         {
             var summary = await this.context.ViewBoardSummaries.Where(q => q.Date == date).FirstOrDefaultAsync();
@@ -10201,6 +10379,7 @@ namespace EPAGriffinAPI.DAL
                 BlockTimeStr = blockTimeStr,
 
             };
+            
             return result;
 
         }

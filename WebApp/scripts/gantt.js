@@ -328,7 +328,7 @@ $(function () {
         self.gantt_datasource = ko.observable([]);
         self.selectedTask = ko.observable();
         self.selectedTaskData = ko.observable();
-        //bani
+        //cmnt
         self.gantt_option = {
             ////////////////addDialogFields: [
             ////////////////   // { field: "from", editType: "stringedit", displayInGeneralTab: true },

@@ -276,7 +276,7 @@ app.controller('personbookController', ['$scope', '$location', '$routeParams', '
                 widget: 'dxButton', location: 'after', options: {
                     type: 'success', text: 'Save', icon: 'check', onClick: function (e) {
 
-                        //bani
+                        //cmnt
                         //$scope.Notify.ObjectId = $scope.dg_selected.Id;
                       //  $scope.Notify.Employees = Enumerable.From($scope.selectedEmployees).Select('$.Id').ToArray();
                         $scope.Notify.Employees.push($scope.selectedEmployees.Id);
