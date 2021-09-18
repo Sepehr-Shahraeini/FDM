@@ -728,7 +728,6 @@ warning 6002: The table/view 'ppa_fly.dbo._SC' does not have a primary key defin
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="FlightId" Type="int" Nullable="false" />
           <Property Name="Delay" Type="int" />
-         <Property Name="TypeId" Type="int" />
         </EntityType>
         <EntityType Name="Document">
           <Key>
@@ -43409,7 +43408,6 @@ warning 6002: The table/view 'ppa_fly.dbo.ViewWeek' does not have a primary key 
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="FlightId" Type="Int32" Nullable="false" />
           <Property Name="Delay" Type="Int32" />
-          <Property Name="TypeId" Type="Int32" />
         </EntityType>
         <EntityType Name="SMSGroup">
           <Key>
@@ -57940,7 +57938,6 @@ warning 6002: The table/view 'ppa_fly.dbo.ViewWeek' does not have a primary key 
           <EntitySetMapping Name="DelayNotifieds">
             <EntityTypeMapping TypeName="EPAGRIFFINModel.DelayNotified">
               <MappingFragment StoreEntitySet="DelayNotified">
-                <ScalarProperty Name="TypeId" ColumnName="TypeId" />
                 <ScalarProperty Name="Delay" ColumnName="Delay" />
                 <ScalarProperty Name="FlightId" ColumnName="FlightId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />

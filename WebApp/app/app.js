@@ -602,8 +602,11 @@ app.config(function ($routeProvider) {
 //var serviceBase = 'http://fleet.caspianairlines.com/api/';
 var serviceBaseAPI = 'http://localhost:12271/';
 var serviceBaseTRN = 'http://localhost:4000/';
+//var webBase = 'http://localhost:30000/';
+//var serviceBase =  'http://localhost:58908/';
 var webBase = 'http://localhost:30000/';
-var serviceBase =  'http://localhost:58908/';
+var serviceBase =  'http://localhost:8888/';
+var serviceBase2 =  'https://localhost:5001/';
  //var webBase = 'http://localhost:30273/';
 
 

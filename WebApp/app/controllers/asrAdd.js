@@ -1,41 +1,21 @@
 'use strict';
-app.controller('asrAddController', ['$scope', '$location', 'flightService', 'authService', '$routeParams', '$rootScope', '$window', '$http','$q',function ($scope, $location, flightService, authService, $routeParams, $rootScope, $window,$http,$q) {
+app.controller('asrAddController', ['$scope', '$location', 'flightBagService', 'authService', '$routeParams', '$rootScope', '$window', function ($scope, $location, flightBagService, authService, $routeParams, $rootScope, $window) {
     $scope.isNew = true;
+    $scope.isEditable = false;
+    $scope.isLockVisible = false;
     $scope.isContentVisible = false;
     $scope.isFullScreen = false;
     var detector = new MobileDetect(window.navigator.userAgent);
 
     //if (detector.mobile() && !detector.tablet())
-        $scope.isFullScreen = true;
+    $scope.isFullScreen = true;
 
 
 
     ////////////////////////
-    var _getASR = function (id) {
-
-        var deferred = $q.defer();
-        $http.get('https://fleet.caspianairlines.com/fbservicea/api/asr/flight/' + id).then(function (response) {
-            deferred.resolve(response.data);
-        }, function (err, status) {
-
-            deferred.reject(Exceptions.getMessage(err));
-        });
-
-        return deferred.promise;
-    };
-    $scope.bindASR = function (id) {
-        $scope.loadingVisible = true;
-        _getASR(id).then(function (response) {
-            $scope.loadingVisible = false;
-            $scope.ASR = response.Data;
-            alert('x');
-            console.log('ASR', $scope.ASR);
-
-        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
-    };
     $scope.popup_add_visible = false;
-    $scope.popup_height = $(window).height()  ;
-    $scope.popup_width = 1200;
+    $scope.popup_height = $(window).height() - 100;
+    $scope.popup_width = 700;
     $scope.popup_add_title = 'AIR SAFETY REPORT';
     $scope.popup_instance = null;
 
@@ -45,8 +25,60 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         showTitle: true,
 
         toolbarItems: [
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Sign', icon: 'fas fa-signature', onClick: function (e) {
+                        if ($rootScope.getOnlineStatus()) {
+                            //$scope.entity.Id
+                            var data = { FlightId: $scope.entity.FlightId, documentType: 'asr' };
 
-            
+                            $rootScope.$broadcast('InitSignAdd', data);
+                        }
+                        else {
+                            General.ShowNotify("You are OFFLINE.Please check your internet connection", 'error');
+                        }
+
+                    }
+                }, toolbar: 'bottom'
+            },
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'default', text: 'Save', icon: 'check', validationGroup: 'asradd', onClick: function (e) {
+
+                        var result = e.validationGroup.validate();
+
+                        if (!result.isValid) {
+                            General.ShowNotify(Config.Text_FillRequired, 'error');
+                            return;
+                        }
+                        //alert($scope.entity.Id);
+                        //db.getCount('ASRs', function (n) {
+                        //    n = n + 1;
+                        //    n = -1 * n;
+                        //    $scope.entity.Id = n;
+
+                        //});
+                        $scope.entity.User = $rootScope.userTitle;
+
+                        $scope.loadingVisible = true;
+                        flightBagService.saveASR($scope.entity).then(function (response2) {
+                            $scope.loadingVisible = false;
+                            if (response2.IsSuccess) {
+                                General.ShowNotify(Config.Text_SavedOk, 'success');
+                                console.log('ASR', response2.Data);
+                                $scope.popup_add_visible = false;
+                            }
+
+
+                        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+
+
+
+                    }
+                }, toolbar: 'bottom'
+            },
             {
                 widget: 'dxButton', location: 'after', options: {
                     type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) {
@@ -101,54 +133,145 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         fullScreen:false,
         bindingOptions: {
             visible: 'popup_add_visible',
-           // fullScreen: 'isFullScreen',
+            //fullScreen: 'isFullScreen',
             title: 'popup_add_title',
             height: 'popup_height',
-            width: 'popup_width'
+            width: 'popup_width',
+            'toolbarItems[0].visible': 'isLockVisible',
+            'toolbarItems[1].visible': 'isEditable',
 
         }
     };
 
     /////////////////////////////////
-  
+
 
     /////////////////////////////////
     $scope.flight = null;
     $scope.fill = function (data) {
         $scope.entity = data;
     };
+    $scope.isLockVisible = false;
     $scope.bind = function () {
         $scope.entity.FlightId = $scope.tempData.FlightId;
 
+        //if ($rootScope.getOnlineStatus()) {
+
+        //    flightBagService.checkLock($scope.entity.FlightId, 'asr').then(function (response) {
+        //        $scope.isLockVisible = false;
+        //        if (response.IsSuccess && response.Data.canLock) {
+        //            $scope.isLockVisible = true;
+        //        }
+        //    }, function (err) { });
+        //}
+
         $scope.loadingVisible = true;
 
-        
+        flightBagService.epGetASRByFlight($scope.entity.FlightId).then(function (response2) {
 
-             
-            
+            $scope.loadingVisible = false;
+            //$scope.isEditable = (diff <= 24);
 
-            $scope.loadingVisible = true;
-           
-        _getASR($scope.entity.FlightId).then(function (response2) {
-               
-                $scope.loadingVisible = false;
+            $scope.flight = response2.Data;
 
-                 
+            if (!response2.Data) {
+                $scope.entity.Id = -1;
+                $scope.isNew = true;
 
-                        $scope.isNew = false;
-                        $scope.fill(response2.Data);
-                    
-                
 
-                //console.log('ASR',response2.Data);
+            }
+            else {
+                if (response2.Data.JLSignedBy) {
+                    $scope.isEditable = false;
+                    $scope.url_sign = signFiles + response.Data.PICId + ".jpg";
+                    $scope.PIC = response.Data.PIC;
+                    $scope.signDate = moment(new Date(response.Data.JLDatePICApproved)).format('YYYY-MM-DD HH:mm');
+                }
+                if (response2.Data.Alert) {
+                    General.Confirm("The report updated by " + response2.Data.Alert + ". Would you like to get edited report?", function (res) {
+                        if (res) {
 
-            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+                            //var dto = { Id: $scope.ati_flight.ID, };
+                            $scope.loadingVisible = true;
+                            flightBagService.epReplaceASR(response2.Data.server).then(function (res) {
 
-            
-            
+                                $scope.isNew = false;
+                                $scope.fill(res);
+                                $scope.loadingVisible = false;
+
+
+                            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+                        }
+                        else {
+                            $scope.$apply(function () {
+                                $scope.isNew = false;
+
+
+                                $scope.fill(response2.Data);
+                            });
+
+                        }
+                    });
+                }
+                else {
+
+                    $scope.isNew = false;
+                    $scope.fill(response2.Data);
+                }
+            }
+
+            //console.log('ASR',response2.Data);
+
+
+
+        $scope.entity.FlightNo = response2.Data.FlightNumber;
+        $scope.entity.Date = new Date(response2.Data.STDDay);
+        $scope.entity.ACReg = response2.Data.Register;
+        $scope.entity.Route = response2.Data.FromAirportIATA + ' - ' + response2.Data.ToAirportIATA
+        $scope.entity.FlightNo = response2.Data.FlightNumber
+        $scope.FlightNo = {
+            min: 0,
+            bindingOptions: {
+                value: 'entity.FlightNo',
+            }
+        };
+
+        $scope.Date = {
+            min: 0,
+            bindingOptions: {
+                value: 'entity.Date',
+            }
+        };
+
+        $scope.Route = {
+            min: 0,
+            bindingOptions: {
+                value: 'entity.Route',
+            }
+        };
+
+        $scope.ACType = {
+            min: 0,
+            bindingOptions: {
+                value: 'entity.ACType',
+            }
+        };
+
+        $scope.ACReg = {
+            min: 0,
+            bindingOptions: {
+                value: 'entity.ACReg',
+            }
+        };
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+
+    }, function (err) {
+        $scope.loadingVisible = false; General.ShowNotify(err.message, 'error');
     };
     ////////////////////////////////
-    $scope.scroll_asradd_height = $(window).height() - 130;
+    $scope.scroll_asradd_height = $(window).height() - 215;
     $scope.scroll_asradd = {
         width: '100%',
         bounceEnabled: false,
@@ -177,10 +300,10 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         Id: -1,
         IsSecurityEvent: false,
         IsAirproxATC: false,
-        IsTCASRA:false,
+        IsTCASRA: false,
         IsWakeTur: false,
         IsBirdStrike: false,
-        IsOthers:false,
+        IsOthers: false,
 
     };
     $scope.txt_OccurrenceDate = {
@@ -253,7 +376,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         { id: 100044, title: 'TCAS RA' },
         { id: 100045, title: 'WAKE TURBULENCE' },
         { id: 100046, title: 'BIRD STRIKE' },
-        
+
     ];
     $scope.sb_EventType = {
         showClearButton: true,
@@ -267,21 +390,21 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         }
     };
     ///////////////////////////
-    
-   
-   
+
+
+
 
     $scope.dsDayNightStatus = [
         { id: 100180, title: 'Day' },
         { id: 100181, title: 'Night' },
-       
+
     ];
     $scope.sb_DayNightStatus = {
         showClearButton: true,
         searchEnabled: false,
         dataSource: $scope.dsDayNightStatus,
         displayExpr: 'title',
-        placeholder:'Day/Night',
+        placeholder: 'Day/Night',
         valueExpr: 'id',
         bindingOptions: {
             value: 'entity.DayNightStatusId'
@@ -298,7 +421,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
 
     $scope.txt_fuel = {
         hoverStateEnabled: false,
-        min:0,
+        min: 0,
         bindingOptions: {
             value: 'entity.FuelJettisoned',
         }
@@ -360,15 +483,15 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         { id: 100038, title: 'HOLDING' },
         { id: 100039, title: 'APPROACH(BELOW 1500FT)' },
         { id: 100040, title: 'LANDING' },
-        
+
     ];
     $scope.sb_flightPhase = {
         showClearButton: true,
         searchEnabled: false,
         dataSource: $scope.dsFlightPhase,
         displayExpr: 'title',
-        placeholder:'TOWING/PARKING/...',
-        valueExpr:'id',
+        placeholder: 'TOWING/PARKING/...',
+        valueExpr: 'id',
         bindingOptions: {
             value: 'entity.FlightPhaseId'
 
@@ -377,7 +500,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
 
     ////////////////////////////////
 
-    
+
 
     $scope.txt_airport = {
         hoverStateEnabled: false,
@@ -433,7 +556,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         searchEnabled: false,
         dataSource: $scope.dsMET,
         displayExpr: 'title',
-        placeholder:'IMC/VMC',
+        placeholder: 'IMC/VMC',
         valueExpr: 'id',
         bindingOptions: {
             value: 'entity.METId'
@@ -452,7 +575,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         searchEnabled: false,
         dataSource: $scope.dsSignificantWxType,
         displayExpr: 'title',
-        placeholder:'MODERATE/SEVERE',
+        placeholder: 'MODERATE/SEVERE',
         valueExpr: 'id',
         bindingOptions: {
             value: 'entity.SigxWXTypeId'
@@ -468,18 +591,18 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         { id: 100060, title: 'HAIL' },
         { id: 100061, title: 'STANDING - WATER' },
         { id: 100062, title: 'WINDSHEAR' },
-      
+
     ];
     $scope.sb_SignificantWx = {
         showClearButton: true,
         searchEnabled: false,
         dataSource: $scope.dsSignificantWx,
         displayExpr: 'title',
-        placeholder:'RAIN/SNOW/...',
+        placeholder: 'RAIN/SNOW/...',
         valueExpr: 'id',
         bindingOptions: {
             value: 'entity.SigxWXId'
-            
+
         }
     };
     ////////////////////////////////
@@ -500,14 +623,14 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         { id: 100066, title: 'ICE' },
         { id: 100067, title: 'SNOW' },
         { id: 100068, title: 'SLUSH' },
-      
+
     ];
     $scope.sb_RunwayCondition = {
         showClearButton: true,
         searchEnabled: false,
         dataSource: $scope.dsRunwayCondition,
         displayExpr: 'title',
-        placeholder:'DRY/WET/...',
+        placeholder: 'DRY/WET/...',
         valueExpr: 'id',
         bindingOptions: {
             value: 'entity.RunwayConditionId'
@@ -599,7 +722,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         { id: 100183, title: 'AIRMISS' },
         { id: 100184, title: 'ATC INCIDENT' },
         { id: 100185, title: 'TCAS RA' },
-        
+
     ];
     $scope.sb_IncidentType = {
         showClearButton: true,
@@ -637,7 +760,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
     $scope.dsAvoidingAction = [
         { value: true, title: 'YES' },
         { value: false, title: 'NO' },
-       ];
+    ];
     $scope.sb_AvoidingAction = {
         showClearButton: true,
         searchEnabled: false,
@@ -699,7 +822,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
     $scope.dsTCASAlert = [
         { id: 100074, title: 'RA' },
         { id: 100075, title: 'TA' },
-        { id: 100076, title: 'None' }, 
+        { id: 100076, title: 'None' },
     ];
     $scope.sb_TCASAlert = {
         showClearButton: true,
@@ -769,7 +892,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         }
     };
     $scope.txt_ClearedAltitude = {
-        min:0,
+        min: 0,
         hoverStateEnabled: false,
         bindingOptions: {
             value: 'entity.AATClearedAltitude',
@@ -803,7 +926,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         { id: 100078, title: 'Left' },
         { id: 100079, title: 'Right' },
         { id: 100080, title: 'No' },
-     ];
+    ];
     $scope.sb_Turning = {
         showClearButton: true,
         searchEnabled: false,
@@ -848,12 +971,12 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
 
         }
     };
-    
+
     $scope.dsExtendedCenterlinePos = [
         { id: 100087, title: 'Left' },
         { id: 100088, title: 'Right' },
         { id: 100089, title: 'On' },
-       
+
     ];
     $scope.sb_ExtendedCenterlinePos = {
         showClearButton: true,
@@ -867,12 +990,12 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
 
         }
     };
-    
+
     $scope.dsAttitudeChange = [
         { id: 100091, title: 'Pitch' },
         { id: 100092, title: 'Roll' },
         { id: 100093, title: 'Yaw' },
-       
+
     ];
     $scope.sb_AttitudeChange = {
         showClearButton: true,
@@ -897,7 +1020,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         { value: true, title: 'YES' },
         { value: false, title: 'NO' },
     ];
-    $scope.sb_IsBuffet= {
+    $scope.sb_IsBuffet = {
         showClearButton: true,
         searchEnabled: false,
         dataSource: $scope.dsBuffet,
@@ -998,7 +1121,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
         { id: 100099, title: '2-10' },
         { id: 100100, title: '11-100' },
         { id: 100101, title: 'More' },
-  
+
     ];
     $scope.sb_NrSeen = {
         showClearButton: true,
@@ -1107,21 +1230,33 @@ app.controller('asrAddController', ['$scope', '$location', 'flightService', 'aut
     }
 
 
-    
+
 
     ////////////////////////////////
     $scope.tempData = null;
+    $scope.$on('onSign', function (event, prms) {
+
+        if (prms.doc == 'asr')
+            flightBagService.signDocLocal(prms, prms.doc).then(function (response) {
+                $scope.isEditable = false;
+                $scope.isLockVisible = false;
+                $scope.url_sign = signFiles + prms.PICId + ".jpg";
+                $scope.PIC = prms.PIC;
+                $scope.signDate = moment(new Date(prms.JLDatePICApproved)).format('YYYY-MM-DD HH:mm');
+            }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+    });
     $scope.$on('InitAsrAdd', function (event, prms) {
 
 
         $scope.tempData = null;
 
-       
 
-            
-            $scope.tempData = prms;
-           
-         
+
+
+        $scope.tempData = prms;
+
+
         $scope.popup_add_visible = true;
 
     });

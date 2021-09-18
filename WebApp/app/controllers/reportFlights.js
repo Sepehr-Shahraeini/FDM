@@ -1,7 +1,7 @@
 ﻿'use strict';
 app.controller('reportFlightsController', ['$scope', '$location', '$routeParams', '$rootScope', 'flightService', 'aircraftService', 'authService', 'notificationService', '$route', function ($scope, $location, $routeParams, $rootScope, flightService, aircraftService, authService, notificationService, $route) {
     $scope.prms = $routeParams.prms;
-	var isTaxiVisible=false;
+    var isTaxiVisible=false;
 	 if ($rootScope.userName.toLowerCase() == 'ashrafi')
 		 isTaxiVisible=true;
     $scope.btn_search = {
@@ -29,6 +29,116 @@ app.controller('reportFlightsController', ['$scope', '$location', '$routeParams'
         }
 
     };
+    $scope.btn_asr = {
+        text: 'ASR',
+        type: 'default',
+        //icon: 'search',
+        width: '100%', //37,
+
+        onClick: function (e) {
+
+            var flt = $rootScope.getSelectedRow($scope.dg_flight_instance);
+            if (!flt) {
+                General.ShowNotify(Config.Text_NoRowSelected, 'error');
+                return;
+            }
+            var data = { FlightId: flt.ID };
+
+            $rootScope.$broadcast('InitAsrAdd', data);
+
+        },
+        bindingOptions: {
+            disabled: 'IsLegLocked'
+        }
+    };
+    $scope.btn_vr = {
+        text: 'Voyage Report',
+        type: 'default',
+        //icon: 'search',
+        width: '100%', //37,
+
+        onClick: function (e) {
+            var flt = $rootScope.getSelectedRow($scope.dg_flight_instance);
+            if (!flt) {
+                General.ShowNotify(Config.Text_NoRowSelected, 'error');
+                return;
+            }
+            var data = { FlightId: flt.ID };
+
+            $rootScope.$broadcast('InitVrAdd', data);
+
+        },
+        bindingOptions: {
+            disabled: 'IsLegLocked'
+        }
+    };
+    $scope.btn_dr = {
+        text: 'Dispatch Release',
+        type: 'default',
+        //icon: 'search',
+        width: '100%', //37,
+
+        onClick: function (e) {
+         
+            var flt = $rootScope.getSelectedRow($scope.dg_flight_instance);
+            if (!flt) {
+                General.ShowNotify(Config.Text_NoRowSelected, 'error');
+                return;
+            }
+            var data = { FlightId: flt.ID };
+
+            $rootScope.$broadcast('InitDrAdd', data);
+
+           
+
+        },
+        bindingOptions: {
+            disabled: 'IsLegLocked'
+        }
+    };
+    $scope.btn_ofp = {
+        text: 'OFP',
+        type: 'default',
+        //icon: 'search',
+        width: '100%', //37,
+
+        onClick: function (e) {
+            var flt = $rootScope.getSelectedRow($scope.dg_flight_instance);
+            if (!flt) {
+                General.ShowNotify(Config.Text_NoRowSelected, 'error');
+                return;
+            }
+            var data = { FlightId: flt.ID };
+
+            $rootScope.$broadcast('InitOFPAdd', data);
+
+        },
+        bindingOptions: {
+            disabled: 'IsLegLocked'
+        }
+    };
+      $scope.btn_log = {
+        text: 'Log',
+        type: 'default',
+        //icon: 'search',
+        width: '100%', //37,
+
+        onClick: function (e) {
+            var flt = $rootScope.getSelectedRow($scope.dg_flight_instance);
+            if (!flt) {
+                General.ShowNotify(Config.Text_NoRowSelected, 'error');
+                return;
+            }
+            var data = { FlightId: flt.ID };
+
+            $rootScope.$broadcast('InitLogAdd', data);
+
+        },
+        bindingOptions: {
+            disabled: 'IsLegLocked'
+        }
+    };
+
     $scope.btn_persiandate = {
         //text: 'Search',
         type: 'default',

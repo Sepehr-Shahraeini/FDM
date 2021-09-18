@@ -112,6 +112,7 @@
     <Content Include="app\controllers\delayCodesController.js" />
     <Content Include="app\controllers\delayReport.js" />
     <Content Include="app\controllers\documentAddController.js" />
+    <Content Include="app\controllers\drAdd.js" />
     <Content Include="app\controllers\employeeSelectController.js" />
     <Content Include="app\controllers\employeeSelectCourse.js" />
     <Content Include="app\controllers\fdps.js" />
@@ -176,10 +177,12 @@
     <Content Include="app\controllers\libraryController.js" />
     <Content Include="app\controllers\locationAddController.js" />
     <Content Include="app\controllers\locationController.js" />
+    <Content Include="app\controllers\logAdd.js" />
     <Content Include="app\controllers\mlistAddController.js" />
     <Content Include="app\controllers\mlistController.js" />
     <Content Include="app\controllers\nira.js" />
     <Content Include="app\controllers\notificationController.js" />
+    <Content Include="app\controllers\ofpAdd.js" />
     <Content Include="app\controllers\optionAddController.js" />
     <Content Include="app\controllers\optionController.js" />
     <Content Include="app\controllers\organizationAddController.js" />
@@ -216,12 +219,14 @@
     <Content Include="app\controllers\training.js" />
     <Content Include="app\controllers\usersController.js" />
     <Content Include="app\controllers\verify.js" />
+    <Content Include="app\controllers\vrAdd.js" />
     <Content Include="app\services\activityService.js" />
     <Content Include="app\services\aircraftService.js" />
     <Content Include="app\services\airportService.js" />
     <Content Include="app\services\biService.js" />
     <Content Include="app\services\courseService.js" />
     <Content Include="app\services\fbService.js" />
+    <Content Include="app\services\flightBagService.js" />
     <Content Include="app\services\flightService.js" />
     <Content Include="app\services\generalService.js" />
     <Content Include="app\services\jobgroupService.js" />
@@ -267,6 +272,7 @@
     <Content Include="app\views\delayAirportReport.html" />
     <Content Include="app\views\delaybidaily.html" />
     <Content Include="app\views\delaybiKPI.html" />
+    <Content Include="app\views\drAdd.html" />
     <Content Include="app\views\employeeSelectCourse.html" />
     <Content Include="app\views\formayearly.html" />
     <Content Include="app\views\formmovaledyearly.html" />
@@ -338,11 +344,13 @@
     <Content Include="app\views\libraryAdd.html" />
     <Content Include="app\views\location.html" />
     <Content Include="app\views\locationAdd.html" />
+    <Content Include="app\views\logAdd.html" />
     <Content Include="app\views\menu.html" />
     <Content Include="app\views\mlist.html" />
     <Content Include="app\views\mlistAdd.html" />
     <Content Include="app\views\nira.html" />
     <Content Include="app\views\notification.html" />
+    <Content Include="app\views\ofpAdd.html" />
     <Content Include="app\views\option.html" />
     <Content Include="app\views\optionadd.html" />
     <Content Include="app\views\Organization.html" />
@@ -379,6 +387,7 @@
     <Content Include="app\views\training.html" />
     <Content Include="app\views\users.html" />
     <Content Include="app\views\verify.html" />
+    <Content Include="app\views\vrAdd.html" />
     <Content Include="content\css\bootstrap-4.min.css" />
     <Content Include="content\css\bootstrap.min.css" />
     <Content Include="content\css\core-ui.css" />

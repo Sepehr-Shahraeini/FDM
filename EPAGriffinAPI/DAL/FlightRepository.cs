@@ -10196,17 +10196,17 @@ namespace EPAGriffinAPI.DAL
             return functionReturnValue;
         }
         //09-07
-        internal async Task<dynamic> NotifyDelayedFlight2(int id,bool force=false)
+        internal async Task<dynamic> NotifyDelayedFlight2(int id)
         {
             var leg = await this.context.ViewLegTimes.FirstOrDefaultAsync(q => q.ID == id);
             var delay = (((DateTime)leg.ChocksOut) - ((DateTime)leg.STD)).TotalMinutes;
             if (delay >= 30 && leg.FlightStatusID != 3 && leg.FlightStatusID != 15)
             {
-                var his = await this.context.DelayNotifieds.FirstOrDefaultAsync(q => q.FlightId == id && q.Delay == delay && q.TypeId==2);
-                if (his == null || force)
+                var his = await this.context.DelayNotifieds.FirstOrDefaultAsync(q => q.FlightId == id && q.Delay == delay);
+                if (his == null)
                 {
                     var delayInt = Convert.ToInt32(Math.Round(delay));
-                    his = new DelayNotified() { FlightId = id, Delay = delayInt,TypeId=2 };
+                    his = new DelayNotified() { FlightId = id, Delay = delayInt };
                     this.context.DelayNotifieds.Add(his);
 
                     var Hour1 = delayInt / 60;
@@ -10220,7 +10220,7 @@ namespace EPAGriffinAPI.DAL
                     strs1.Add("STA: " + ((DateTime)leg.STALocal).ToString("HH:mm"));
                     strs1.Add("BlockOff: " + ((DateTime)leg.DepartureLocal).ToString("HH:mm"));
                     var text1 = String.Join("\n", strs1);
-                    var recs = await this.context.SMSGroups.Where(q => q.Type == 3).ToListAsync();
+                    var recs = await this.context.SMSGroups.Where(q => q.Type == 1).ToListAsync();
                     foreach (var rec in recs)
                     {
                         Magfa m = new Magfa();
@@ -10236,16 +10236,13 @@ namespace EPAGriffinAPI.DAL
 
         }
 
-        internal async Task<dynamic> FindDelayedFlights( string user,bool force=false)
+        internal async Task<dynamic> FindDelayedFlights( string user)
         {
             if (user.ToLower().StartsWith("dis") || user.ToLower().StartsWith("demo"))
             {
                 var now = DateTime.UtcNow;
                 var nowDay = now.Date;
-                var status = new List<int?>() {2,3,6,7,8,9,14,15,4 };
-                var legs = await this.context.ViewLegTimes.Where(q => q.STDDay == nowDay 
-                && (!status.Contains( q.FlightStatusID)   )
-                && q.STD < now).Select(q => q.ID).ToListAsync();
+                var legs = await this.context.ViewLegTimes.Where(q => q.STDDay == nowDay && q.FlightStatusID == 1 && q.STD < now).Select(q => q.ID).ToListAsync();
                 string result = "";
                 if (legs.Count() > 0)
                     result=await NotifyDelayedFlightList(legs);
@@ -10256,7 +10253,7 @@ namespace EPAGriffinAPI.DAL
            
         }
 
-        internal async Task<dynamic> NotifyDelayedFlightList(List<int> ids,bool force=false)
+        internal async Task<dynamic> NotifyDelayedFlightList(List<int> ids)
         {
             var legs = await this.context.ViewLegTimes.Where(q => ids.Contains(q.ID)).Select(q => new
             {
@@ -10279,15 +10276,15 @@ namespace EPAGriffinAPI.DAL
                 var id = leg.ID;
                 //var leg = await this.context.ViewLegTimes.FirstOrDefaultAsync(q => q.ID == id);
                 var delay = (now - ((DateTime)leg.STD)).TotalMinutes;
-                if (delay >= 30 && (leg.FlightStatusID ==1 || leg.FlightStatusID == 5 || leg.FlightStatusID == 20 || leg.FlightStatusID == 21 || leg.FlightStatusID == 22 || leg.FlightStatusID == 23 || leg.FlightStatusID == 24 || leg.FlightStatusID == 25))
+                if (delay >= 30 && leg.FlightStatusID ==1)
                 {
 
                     //var his = await this.context.DelayNotifieds.FirstOrDefaultAsync(q => q.FlightId == id && q.Delay == delay);
-                    var _his = await this.context.DelayNotifieds.OrderByDescending(q => q.Id).FirstOrDefaultAsync(q => q.FlightId == id && q.TypeId==1);
-                    if (_his == null /*|| (_his != null && delay >= _his.Delay + 10)*/ || force)
+                    var _his = await this.context.DelayNotifieds.OrderByDescending(q => q.Id).FirstOrDefaultAsync(q => q.FlightId == id);
+                    if (_his == null || (_his != null && delay >= _his.Delay + 10))
                     {
                         var delayInt = Convert.ToInt32(Math.Round(delay));
-                        var his = new DelayNotified() { FlightId = id, Delay = delayInt,TypeId=1 };
+                        var his = new DelayNotified() { FlightId = id, Delay = delayInt };
                         this.context.DelayNotifieds.Add(his);
 
                         var Hour1 = delayInt / 60;

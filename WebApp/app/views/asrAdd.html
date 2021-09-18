@@ -1,11 +1,11 @@
 <style>
     .ctd {
-        border: 1px solid darkgray;
+        border: 1px solid #eee;
         text-align: center;
     }
 
     .ctd-empty {
-        border: 0px solid darkgray;
+        border: 0px solid #eee;
         text-align: center;
     }
 
@@ -20,9 +20,8 @@
     .ctd-selected {
         background-color: red;
     }
-   
 </style>
-<div ng-controller="asrAddController" class="_asradd">
+<div ng-controller="asrAddController">
     <div id="popup_add" dx-popup="popup_add" class="no-padding">
         <div style="padding:5px;">
 
@@ -152,7 +151,7 @@
                     </tr>
 
                     <tr>
-                        <td style="padding:7px;text-align:left;" colspan="5"><div dx-text-area="ActualWX"  ></div></td>
+                        <td style="padding:7px;text-align:left;" colspan="5"><div dx-text-area="ActualWX"></div></td>
                     </tr>
                 </table>
 
@@ -160,7 +159,7 @@
 
                     <tr>
                         <td style="padding: 7px;text-align:left;width:30px;font-weight: bold" colspan="2"> RUNWAY CONDTION:</td>
-                        <td style="padding:7px;text-align:left;" colspan="3"><div dx-select-box="sb_RunwayCondition" ></div></td>
+                        <td style="padding:7px;text-align:left;" colspan="3"><div dx-select-box="sb_RunwayCondition"></div></td>
                     </tr>
 
                 </table>
@@ -195,7 +194,7 @@
                             EVENT SUMMARY
                         </td>
                     </tr>
-                    <tr><td style="padding:7px;text-align:left;" colspan="2"><div dx-text-area="Summary" ></div></td> </tr>
+                    <tr><td style="padding:7px;text-align:left;" colspan="2"><div dx-text-area="Summary"></div></td> </tr>
 
                 </table>
 
@@ -207,7 +206,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding:7px;text-align:left;" colspan="2"><div dx-text-area="Result" ></div></td>
+                        <td style="padding:7px;text-align:left;" colspan="2"><div dx-text-area="Result"></div></td>
                     </tr>
 
                 </table>
@@ -218,7 +217,7 @@
                             OTHER INFORMATION AND SUGGESTIONS FOR PREVENTETIVE ACTIONS:
                         </td>
                     </tr>
-                    <tr><td style="padding:7px;text-align:left;" colspan="2"><div dx-text-area="OthersInfo"  ></div></td> </tr>
+                    <tr><td style="padding:7px;text-align:left;" colspan="2"><div dx-text-area="OthersInfo"></div></td> </tr>
 
                 </table>
                 <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
@@ -292,8 +291,8 @@
                     </tr>
                 </table>
                 <table id="tblAbove" style="margin-top:10px;border:0px solid #eee;color:black" class="dx-border">
-                    <caption style="text-align:center; color:black">VIEW FROM ABOVE</caption>
-                    <tr ng-repeat="r in rows" style="border:0px solid #eee" class="ctr" ng-style="{ 'height' : (tdWidth-30)+'px' }">
+                    <caption style="text-align:center; color:white">VIEW FROM ABOVE</caption>
+                    <tr ng-repeat="r in rows" style="border:0px solid #eee" class="ctr" ng-style="{ 'height' : tdWidth+'px' }">
                         <td ng-repeat="c in columns" ng-click="tableAboveClicked(r , c)" ng-class="getTdClass(c,r)" ng-style="{ 'width' : tdWidth+'px' }">
                             <span style="font-size:11px;" ng-show="c==-100 && r!=-100">{{r}}</span>
                             <span style="font-size:11px;" ng-show="c!=-100 && r==-100">{{c}}</span>
@@ -302,8 +301,8 @@
                 </table>
 
                 <table id="tblAstern" style="margin-top:10px;border:0px solid #eee;color:black" class="dx-border">
-                    <caption style="text-align:center; color:black">VIEW FROM ASTERN</caption>
-                    <tr ng-repeat="r in rows" style="border:0px solid #eee" class="ctr" ng-style="{ 'height' : (tdWidth-30)+'px' }">
+                    <caption style="text-align:center; color:white">VIEW FROM ASTERN</caption>
+                    <tr ng-repeat="r in rows" style="border:0px solid #eee" class="ctr" ng-style="{ 'height' :                                                                                                                  p16+'px' }">
                         <td ng-repeat="c in columns" ng-click="tableAsternClicked(r , c)" ng-class="getAsClass(c,r)" ng-style="{ 'width' : tdWidth+'px' }">
                             <span style="font-size:11px;" ng-show="c==-100 && r!=-100">{{r}}</span>
                             <span style="font-size:11px;" ng-show="c!=-100 && r==-100">{{c}}</span>
@@ -349,17 +348,17 @@
                         <td style="padding: 7px;text-align:left;font-weight: bold" colspan="4">What made you suspect wake turbulence?</td>
 
                     </tr>
-                    <tr><td style="padding:7px;text-align:left;" colspan="4"><div dx-text-area="Suspect"  ></div></td> </tr>
+                    <tr><td style="padding:7px;text-align:left;" colspan="4"><div dx-text-area="Suspect"></div></td> </tr>
                     <tr>
                         <td style="padding: 7px;text-align:left;font-weight: bold" colspan="4">Describe any vertical acceleration</td>
 
                     </tr>
-                    <tr><td style="padding:7px;text-align:left;" colspan="4"><div dx-text-area="Acceleration"  ></div></td> </tr>
+                    <tr><td style="padding:7px;text-align:left;" colspan="4"><div dx-text-area="Acceleration"></div></td> </tr>
                     <tr>
                         <td style="padding: 7px;text-align:left;font-weight: bold" colspan="4">Give details of preceding A/C (Type Call Sign)</td>
 
                     </tr>
-                    <tr><td style="padding:7px;text-align:left;" colspan="4"><div dx-text-area="Details"  ></div></td> </tr>
+                    <tr><td style="padding:7px;text-align:left;" colspan="4"><div dx-text-area="Details"></div></td> </tr>
                     <tr>
                         <td style="padding: 7px;text-align:left;font-weight: bold" colspan="2">Were you aware of other A/C before incident?</td>
                         <td style="padding:7px;text-align:left;" colspan="2"><div dx-select-box="sb_Aware" class="center"></div></td>
@@ -398,12 +397,29 @@
                         <td style="padding: 7px;text-align:left;font-weight: bold" colspan="4">Describe Impact Points And Damage OverLeaf</td>
 
                     </tr>
-                    <tr><td style="padding:7px;text-align:left;" colspan="4"><div dx-text-area="Impact"  ></div></td> </tr>
+                    <tr><td style="padding:7px;text-align:left;" colspan="4"><div dx-text-area="Impact"></div></td> </tr>
 
                 </table>
 
 
                 <div style="clear:both"></div>
+                <table ng-show="url_sign" style="width:100%;margin-top:10px;border:1px solid #eee;">
+                    <tr>
+                        <td style="padding:10px;border-bottom:1px solid #eeee;text-align:center" colspan="3">
+                            <div ng-show="url_sign" style="text-align:center;font-size:14px;padding:0px;">The document signed and approved by</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:25%;"></td>
+                        <td style="width:50%; text-align:center;padding:10px">
+
+                            <div ng-show="url_sign" style="text-align:center;font-size:16px;padding:5px;">{{PIC}}</div>
+                            <div ng-show="url_sign" style="text-align:center;font-size:16px;padding:5px;">{{signDate}}</div>
+                            <img style="height:auto;display: block; width: 50%;margin:0 auto 0 auto" ng-show="url_sign" ng-src="{{url_sign}}" />
+                        </td>
+                        <td style="width:25%;"></td>
+                    </tr>
+                </table>
             </div>
             <div style="clear:both"></div>
         </div>

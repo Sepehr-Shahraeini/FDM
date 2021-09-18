@@ -17,6 +17,5 @@ namespace EPAGriffinAPI.Models
         public int Id { get; set; }
         public int FlightId { get; set; }
         public Nullable<int> Delay { get; set; }
-        public Nullable<int> TypeId { get; set; }
     }
 }

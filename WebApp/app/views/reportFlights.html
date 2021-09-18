@@ -199,6 +199,11 @@
                     <td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_IP"></div></td>
                     <td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_CPT"></div></td>
                     <td style="width:130px;text-align:left;padding-right:5px"><div dx-button="btn_search"></div></td>
+                    <td style="width:130px;text-align:left;padding-right:5px"><div dx-button="btn_vr"></div></td>
+                    <td style="width:130px;text-align:left;padding-right:5px"><div dx-button="btn_dr"></div></td>
+                    <td style="width:130px;text-align:left;padding-right:5px"><div dx-button="btn_ofp"></div></td>
+                    <td style="width:130px;text-align:left;padding-right:5px"><div dx-button="btn_asr"></div></td>
+                    <td style="width:130px;text-align:left;padding-right:5px"><div dx-button="btn_log"></div></td>
 
                     <td></td>
 
@@ -237,6 +242,10 @@
     <div dx-load-panel="loadPanel"></div>
 
 
-
+    <div ng-include="'app/views/logAdd.html?vx=2'"></div>
+    <div ng-include="'app/views/drAdd.html?vx=2'"></div>
+    <div ng-include="'app/views/asrAdd.html?vx=2'"></div>
+    <div ng-include="'app/views/vrAdd.html?vx=2'"></div>
+    <div ng-include="'app/views/ofpAdd.html?vx=2'"></div>
 
 </div>
