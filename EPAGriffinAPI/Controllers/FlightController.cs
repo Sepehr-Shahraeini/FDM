@@ -1794,6 +1794,15 @@ namespace EPAGriffinAPI.Controllers
             return Ok(result);
         }
 
+        [Route("odata/delayed/check/force/{user}")]
+        [AcceptVerbs("POST", "GET")]
+        public async Task<IHttpActionResult> GetDelayedCheckForce(string user)
+        {
+
+            var result = await unitOfWork.FlightRepository.FindDelayedFlights(user,true);
+            return Ok(result);
+        }
+
         [Route("odata/board/summary/total/{cid}/{year}/{month}/{day}/{year2}/{month2}/{day2}")]
         [AcceptVerbs("POST", "GET")]
         public async Task<IHttpActionResult> GetBoardSummaryTotal(int cid, int year, int month, int day, int year2, int month2, int day2)
@@ -1969,7 +1978,18 @@ namespace EPAGriffinAPI.Controllers
         {
             //var result = await unitOfWork.FlightRepository.NotifyFDPCrews(id);
 
-            var result = await unitOfWork.FlightRepository.NotifyDelayedFlight2(id);
+            var result = await unitOfWork.FlightRepository.NotifyDelayedFlight2(id,false);
+            //await unitOfWork.SaveAsync();
+            return Ok(true);
+        }
+
+        [Route("odata/notify/delay2/force/{id}")]
+        [AcceptVerbs("POST", "GET")]
+        public async Task<IHttpActionResult> NotifyDelayedFlight2Force(int id)
+        {
+            //var result = await unitOfWork.FlightRepository.NotifyFDPCrews(id);
+
+            var result = await unitOfWork.FlightRepository.NotifyDelayedFlight2(id, true);
             //await unitOfWork.SaveAsync();
             return Ok(true);
         }
