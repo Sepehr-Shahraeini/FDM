@@ -36,6 +36,9 @@ Config.Text_DiversionReason = 'Diversion Reason Error';
 Config.Text_RampReason = 'Returning To Ramp Reason Error';
 Config.Text_StatusTime = 'Status Time Error';
 Config.Text_DiversionAltAirport = 'Alternate Airport Error';
+Config.Text_Locked = 'Selected Recorde Is Locked';
+Config.Text_Permision = 'You Dont Have Permision To Delete The Row';
+Config.Text_UnableToLock = 'Unable To Lock Cause Some Recored Are Not Validated';
 Config.LocalData = {};
 
 

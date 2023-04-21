@@ -1,9 +1,9 @@
-﻿    
+﻿
 var app = angular.module('GriffinApp', ['ngRoute', 'LocalStorageModule', 'angular-loading-bar', 'dx', 'ngSanitize', 'ngAnimate']).config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
     cfpLoadingBarProvider.includeSpinner = false;
 }]);
- 
- 
+
+
 app.config(function ($routeProvider) {
     var version = 0.912;
     //ati new 2
@@ -12,15 +12,15 @@ app.config(function ($routeProvider) {
         templateUrl: "/app/views/firstlogin.html"
     });
 
-    
-     
+
+
     $routeProvider.when("/apps", {
         controller: "appsController",
         templateUrl: "/app/views/apps.html?v=" + version
     });
     $routeProvider.when("/home", {
         controller: "homeController",
-        templateUrl: "/app/views/home.html?v="+version
+        templateUrl: "/app/views/home.html?v=" + version
     });
     $routeProvider.when("/home/:year/:month/:day", {
         controller: "homeController",
@@ -32,7 +32,7 @@ app.config(function ($routeProvider) {
         templateUrl: "/app/views/login.html"
     });
 
-    
+
 
     $routeProvider.when("/signup", {
         controller: "signupController",
@@ -87,6 +87,21 @@ app.config(function ($routeProvider) {
         controller: "jobgroupController",
         templateUrl: "/app/views/jobgroup.html"
     });
+	
+	 $routeProvider.when("/fdm/ops", {
+        controller: "fdmOpsController",
+        templateUrl: "/app/views/fdmOps.html"
+    })
+
+    $routeProvider.when("/fdm/qa", {
+        controller: "fdmQAController",
+        templateUrl: "/app/views/fdmQA.html"
+    });
+
+    $routeProvider.when("/fdm/crew/report/:crewId", {
+        controller: "fdmCrewReportController",
+        templateUrl: "/app/views/fdmCrewReport.html"
+    });
 
     $routeProvider.when("/person", {
         controller: "personController",
@@ -95,13 +110,13 @@ app.config(function ($routeProvider) {
     $routeProvider.when("/person/crew", {
         controller: "personController",
         templateUrl: "/app/views/person.html",
-        isCrew:true,
+        isCrew: true,
     });
     $routeProvider.when("/person/course", {
         controller: "personcourseController",
         templateUrl: "/app/views/personcourse.html"
     });
-     
+
     $routeProvider.when("/person/book", {
         controller: "personbookController",
         templateUrl: "/app/views/personbook.html"
@@ -172,7 +187,7 @@ app.config(function ($routeProvider) {
     $routeProvider.when("/library", {
         controller: "libraryController",
         templateUrl: "/app/views/library.html",
-        isDocument:false,
+        isDocument: false,
     });
     $routeProvider.when("/library/people", {
         controller: "libraryController",
@@ -187,7 +202,7 @@ app.config(function ($routeProvider) {
     $routeProvider.when("/option/:parent", {
         controller: "optionController",
         templateUrl: "/app/views/option.html",
-         
+
     });
 
     $routeProvider.when("/document", {
@@ -206,7 +221,7 @@ app.config(function ($routeProvider) {
         templateUrl: "/app/views/personmisc.html",
         TypeId: 75,
     });
-   
+
     $routeProvider.when("/journal", {
         controller: "journalController",
         templateUrl: "/app/views/journal.html",
@@ -220,23 +235,23 @@ app.config(function ($routeProvider) {
     $routeProvider.when("/notification", {
         controller: "notificationController",
         templateUrl: "/app/views/notification.html",
-        
+
     });
     $routeProvider.when("/flight", {
         controller: "flightController",
         templateUrl: "/app/views/flight.html",
 
     });
-   
 
 
-    
+
+
 
 
     $routeProvider.when("/flight/archive", {
         controller: "flightListController",
         templateUrl: "/app/views/flightlist.html",
-        type:-1,
+        type: -1,
 
     });
     $routeProvider.when("/flight/archive/:airport", {
@@ -246,14 +261,14 @@ app.config(function ($routeProvider) {
 
     });
 
-    
+
     $routeProvider.when("/maintenance/flights/irregular", {
         controller: "irregularFlightController",
         templateUrl: "/app/views/irregularflight.html",
         type: 2,
 
     });
-    
+
     $routeProvider.when("/flight/plans/closed", {
         controller: "flightPlanViewController",
         templateUrl: "/app/views/flightplanview.html",
@@ -276,13 +291,13 @@ app.config(function ($routeProvider) {
     $routeProvider.when("/commercial/plans/permits", {
         //controller: "flightPlanViewController",
         //templateUrl: "/app/views/flightplanview.html",
-         controller: "flightPlanPermitController",
+        controller: "flightPlanPermitController",
         templateUrl: "/app/views/flightplanpermit.html",
         //type: 50,
 
     });
     $routeProvider.when("/commercial/plans/crew", {
-         
+
         controller: "flightPlanCrewController",
         templateUrl: "/app/views/flightPlanCrew.html",
         //type: 50,
@@ -334,7 +349,7 @@ app.config(function ($routeProvider) {
         controller: "crewReportController",
         templateUrl: "/app/views/crewReport.html"
     });
-    
+
     $routeProvider.when("/fuel/report", {
         controller: "fuelReportController",
         templateUrl: "/app/views/fuelReport.html"
@@ -454,7 +469,7 @@ app.config(function ($routeProvider) {
         templateUrl: "/app/views/delayreport.html"
     });
 
-    $routeProvider.when("/citypair", { 
+    $routeProvider.when("/citypair", {
         controller: "citypairController",
         templateUrl: "/app/views/citypair.html"
     });
@@ -504,7 +519,7 @@ app.config(function ($routeProvider) {
     $routeProvider.when("/reg/flights/monthly", {
         controller: "regFlightsMonthlyController",
         templateUrl: "/app/views/regflightmonthly.html",
-        
+
     });
 
     $routeProvider.when("/reg/flights/monthly/:yy/:mm", {
@@ -583,9 +598,72 @@ app.config(function ($routeProvider) {
         templateUrl: "/app/views/asrreport.html"
     });
 
+    $routeProvider.when("/fdm", {
+        controller: "fdmController",
+        templateUrl: "/app/views/fdm.html"
+    });
+
+    $routeProvider.when("/fdm/dashboard", {
+        controller: "fdmDashboardController",
+        templateUrl: "/app/views/fdmDashboard.html"
+    });
+
+    $routeProvider.when("/fdm/dashboard/cpt", {
+        controller: "fdmDashboardPilotController",
+        templateUrl: "/app/views/fdmDashboardPilot.html"
+    });
+
+    $routeProvider.when("/fdm/dashboard/cpt/monthly/:crewId/:jobGroup/:yt/:yf/:mt/:mf", {
+        controller: "fdmDashboardPilotMonthlyController",
+        templateUrl: "/app/views/fdmDashboardPilotMonthly.html"
+    });
+
+    $routeProvider.when("/fdm/dashboard/fo", {
+        controller: "fdmFoDashboardController",
+        templateUrl: "/app/views/fdmFoDashboard.html"
+    });
+
+    $routeProvider.when("/fdm/dashboard/fo/monthly", {
+        controller: "fdmFoDashboardMonthlyController",
+        templateUrl: "/app/views/fdmFoDashboardMonthly.html"
+    });
+
+    $routeProvider.when("/fdm/dashboard/reg", {
+        controller: "fdmRegDailyController",
+        templateUrl: "/app/views/fdmRegDaily.html"
+    });
+
+    $routeProvider.when("/fdm/dashboard/reg/monthly", {
+        controller: "fdmRegMonthlyController",
+        templateUrl: "/app/views/fdmRegMonthly.html"
+    });
+
+    $routeProvider.when("/fdm/dashboard/cpt/new", {
+        controller: "fdmDashboardCptNew",
+        templateUrl: "/app/views/fdmDashboardCptNew.html"
+    });
+
+    $routeProvider.when("/match", {
+        controller: "matchListController",
+        templateUrl: "/app/views/matchList.html"
+    });
+
+    $routeProvider.when("/map", {
+        controller: "mapController",
+        templateUrl: "/app/views/map.html"
+    });
+
+
+    $routeProvider.when("/sql", {
+        controller: "sqlQueryController",
+        templateUrl: "/app/views/sqlQuery.html"
+    });
+
+
+
     $routeProvider.otherwise({ redirectTo: "/home" });
 
-});   
+});
 
 ////var serviceBase = 'http://grfn.api.epatrin.ir/';
 ////var webBase = 'http://grfn.epatrin.ir/';
@@ -604,26 +682,32 @@ var serviceBaseAPI = 'http://localhost:12271/';
 var serviceBaseTRN = 'http://localhost:4000/';
 //var webBase = 'http://localhost:30000/';
 //var serviceBase =  'http://localhost:58908/';
-var webBase = 'http://localhost:30000/';
-var serviceBase =  'http://localhost:8888/';
-var serviceBase2 =  'https://localhost:5001/';
- //var webBase = 'http://localhost:30273/';
+var webBase = 'https://fdm.apatlas.com/';
+//var webBase = 'http://localhost:30000/';
+//var serviceBase = 'https://epagriffinapi.apatlas.com/';
+var serviceBase = 'http://localhost:8888/';
+
+//var serviceBase = 'http://localhost:8888/';
+var serviceBase2 = 'https://localhost:5001/';
+var apiFdm = 'http://localhost:22554/';
+//var serviceBase3 = 'https://test.apatlas.com/';
+//var webBase = 'http://localhost:30273/';
 
 
 
-    //'http://localhost:58908/';
-    //'http://localhost:40654/';
-   
-    //'http://localhost:10707/';
+//'http://localhost:58908/';
+//'http://localhost:40654/';
+
+//'http://localhost:10707/';
 //'http://ngauthenticationapi.azurewebsites.net/';
 app.constant('ngAuthSettings', {
     apiServiceBaseUri: serviceBase,
     clientId: 'ngAuthApp'
 });
- 
+
 //app.config(function ($httpProvider) {
 app.config(['$httpProvider', function ($httpProvider) {
-   
+
     $httpProvider.interceptors.push('authInterceptorService');
 }]);
 
@@ -793,19 +877,19 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
     }
     ////////////////////////////////
     $rootScope.reportServer = "https://localhost:44350/frmreportview.aspx";
-    
+
     ////////////////////////////////
     $rootScope.startingBIYear = 1398;
     ////////////////////////////////
     persianDate.toLocale('en');
-   
+
     $rootScope.$on('$viewContentLoaded', function () {
         //ati12
         if (authService.IsAuthurized() && $rootScope.EmailConfirmed != "True") {
             $rootScope.navigatefirstlogin();
             return;
         }
-           
+
         $templateCache.removeAll();
     });
     $rootScope.serviceUrl = serviceBase;
@@ -850,34 +934,34 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         document.getElementById("mySidenav").style.width = "0";
     };
     $rootScope.navigate = function (target, key) {
-        
-        var rec = Enumerable.From(Config.MenuItems).Where('$.moduleId==' + $rootScope.moduleId + ' && $.key=="' +  key + '"').FirstOrDefault();
-        activityService.hitMenu(key, target, 'Visiting ' + $rootScope.module+' > '+rec.title);
-         
-        $location.path(target); 
-       
-       
+
+        var rec = Enumerable.From(Config.MenuItems).Where('$.moduleId==' + $rootScope.moduleId + ' && $.key=="' + key + '"').FirstOrDefault();
+        activityService.hitMenu(key, target, 'Visiting ' + $rootScope.module + ' > ' + rec.title);
+
+        $location.path(target);
+
+
     };
     $rootScope.navigateairport = function (iata) {
 
-        
 
-        $location.path("/dispatch/flights/"+iata+"/0");
+
+        $location.path("/dispatch/flights/" + iata + "/0");
 
 
     };
-    $rootScope.navigatehomedate = function (y,m,d) {
+    $rootScope.navigatehomedate = function (y, m, d) {
 
 
 
-        $location.path("/home/" + y + "/"+m+"/"+d);
+        $location.path("/home/" + y + "/" + m + "/" + d);
 
 
     };
 
     //ati new
-    $rootScope.navigatehome  = function ( ) {
-          $location.path("/home"  );
+    $rootScope.navigatehome = function () {
+        $location.path("/home");
     };
 
     //ati new 2
@@ -896,8 +980,8 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
 
 
         }
-       
-       
+
+
         if (key == 'flight_board_ceo') {
             if (authService.getCEO())
                 return true;
@@ -907,24 +991,24 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         if (key == 'flight_board') {
             if (authService.getCEO())
                 return false;
-           
+
 
         }
         var exist = Enumerable.From($rootScope.claims).Where('$.page=="' + key + '"').FirstOrDefault();
-        
+
         if (!exist) {
             switch (module) {
                 case 3:
                     exist = Enumerable.From($rootScope.claims).Where('$.page=="flight_admin"').FirstOrDefault();
-                    
+
                     break;
                 case 2:
                     exist = Enumerable.From($rootScope.claims).Where('$.page=="learning_admin"').FirstOrDefault();
-                    
+
                     break;
                 case 1:
                     exist = Enumerable.From($rootScope.claims).Where('$.page=="base_admin"').FirstOrDefault();
-                     
+
                     break;
                 default:
                     break;
@@ -933,7 +1017,7 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         }
         //alert(exist ? true : false);
         var result = exist ? true : false;
-      //  if (result)
+        //  if (result)
         //    console.log(module+'  '+key);
         return result;
     };
@@ -957,15 +1041,15 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
 
         if ($rootScope.roles && $rootScope.roles.length == 1 && ($rootScope.roles[0] == 'Transport' || $rootScope.roles[0] == 'Station'))
             return true;
-         
-         var arr = Enumerable.From($rootScope.claims).Select('$.page').Distinct().ToArray();
 
-        return arr.length==1 && arr[0]!='flight_admin' ? true : false;
-        
+        var arr = Enumerable.From($rootScope.claims).Select('$.page').Distinct().ToArray();
+
+        return arr.length == 1 && arr[0] != 'flight_admin' ? true : false;
+
 
     };
     $rootScope.HasAccessToFlightPocket = function () {
-         
+
         var exist = Enumerable.From($rootScope.roleClaims).Where('$.indexOf("FlightPocket")!=-1').FirstOrDefault();
         return exist ? true : false;
     };
@@ -988,10 +1072,10 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
     $rootScope.detector = new MobileDetect(window.navigator.userAgent);
     if ($rootScope.detector.mobile())
         $rootScope.headerHeight = 55;
-    
+
     /////////////////////////////////////
 
-    
+
     authService.fillAuthData();
     authService.fillModuleData();
 
@@ -1006,24 +1090,24 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
 
         try {
             DevExpress.ui.themes.current($rootScope.theme);
-            $rootScope.headerClasses = ['app-headerx', 'wrapper-bubble', 'col-lg-12', 'col-md-12', 'col-sm-12', 'col-xs-12', 'hidden-xs', 'hidden-md', 'hidden-sm','hidden-xsm'];
+            $rootScope.headerClasses = ['app-headerx', 'wrapper-bubble', 'col-lg-12', 'col-md-12', 'col-sm-12', 'col-xs-12', 'hidden-xs', 'hidden-md', 'hidden-sm', 'hidden-xsm'];
             $rootScope.headerClasses.push($rootScope.class);
             //ati 1-14
-            $rootScope.headerClassesMobile = ['app-headerx-mobile', 'wrapper-bubble', 'col-lg-12', 'col-md-12', 'col-sm-12', 'col-xs-12','col-xsm-12', 'hidden-lg', ];
+            $rootScope.headerClassesMobile = ['app-headerx-mobile', 'wrapper-bubble', 'col-lg-12', 'col-md-12', 'col-sm-12', 'col-xs-12', 'col-xsm-12', 'hidden-lg',];
             $rootScope.headerClassesMobile.push($rootScope.class);
         }
         catch (e) {
             //alert(e);
         }
-       
+
     };
     /////////////////////////////
-    $rootScope.getWindowSize  = function ( ) {
+    $rootScope.getWindowSize = function () {
         var w = -1;
         var h = -1;
-        var w = $(window).width()  ;
-        var h = $(window).height()  ;
-        
+        var w = $(window).width();
+        var h = $(window).height();
+
 
         return { width: w, height: h };
     };
@@ -1045,16 +1129,16 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
             return null;
         var rows = instance.getSelectedRowsData();
         if (rows && rows.length > 0)
-            return rows ;
+            return rows;
         return null;
     };
     $rootScope.getNextDate = function (interval, ctype, date) {
-         
+
         if (!interval || !ctype || !date)
             return null;
         ctype = Number(ctype);
         var nextDate = new Date(date);
-         
+
         //year
         if (ctype == 12) {
             nextDate = nextDate.setFullYear(nextDate.getFullYear() + interval);
@@ -1074,7 +1158,7 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
     };
     $rootScope.$on('$routeChangeSuccess', function () {
         $rootScope.history.push($location.$$path);
-       
+
     });
     //////////////////////////////////////////////
     $rootScope.DateBoxFormat = "dd-MMM-yyyy";
@@ -1086,12 +1170,12 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                url: $rootScope.serviceUrl + 'odata/options/'+pid,
-              //  key: "Id",
-               // keyType: "Int32",
-                version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/options/' + pid,
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    version: 4
+                }),
             //filter: ['ParentId', '=', pid],
             sort: ['OrderIndex', 'Title'],
         });
@@ -1106,7 +1190,7 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
                     // keyType: "Int32",
                     // version: 4
                 }),
-             filter: ['Id', '<>', 86],
+            filter: ['Id', '<>', 86],
             sort: ['OrderIndex', 'Title'],
         });
     };
@@ -1114,12 +1198,12 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                url: $rootScope.serviceUrl + 'odata/options/personcoursestatus'  ,
-                //  key: "Id",
-                // keyType: "Int32",
-                // version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/options/personcoursestatus',
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    // version: 4
+                }),
             //filter: ['ParentId', '=', pid],
             sort: ['OrderIndex', 'Title'],
         });
@@ -1128,12 +1212,12 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                url: $rootScope.serviceUrl + 'odata/cities/country/' + cid,
-                //  key: "Id",
-                // keyType: "Int32",
-                  version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/cities/country/' + cid,
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    version: 4
+                }),
             //filter: ['ParentId', '=', pid],
             sort: ['City'],
         });
@@ -1143,7 +1227,7 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
             store:
 
                 new DevExpress.data.ODataStore({
-                    url: $rootScope.serviceUrl + 'odata/airports/all'  ,
+                    url: $rootScope.serviceUrl + 'odata/airports/all',
                     //  key: "Id",
                     // keyType: "Int32",
                     version: 4
@@ -1171,12 +1255,12 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
             store:
 
                 new DevExpress.data.ODataStore({
-                    url: $rootScope.serviceUrl + 'odata/flights/routes/airline/'+id,
+                    url: $rootScope.serviceUrl + 'odata/flights/routes/airline/' + id,
                     //  key: "Id",
                     // keyType: "Int32",
                     version: 4
                 }),
-             
+
             sort: ['FromAirportIATA'],
         });
     };
@@ -1198,12 +1282,12 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                url: $rootScope.serviceUrl + 'odata/locations/' + Config.CustomerId,
-                //  key: "Id",
-                // keyType: "Int32",
-                // version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/locations/' + Config.CustomerId,
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    // version: 4
+                }),
             //filter: ['ParentId', '=', pid],
             sort: ['FullCode'],
         });
@@ -1212,17 +1296,17 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                url: $rootScope.serviceUrl + 'odata/aircrafttypes/all'  ,
-                //  key: "Id",
-                // keyType: "Int32",
-                version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/aircrafttypes/all',
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    version: 4
+                }),
             //filter: ['ParentId', '=', pid],
-            sort: ['Manufacturer','Type'],
+            sort: ['Manufacturer', 'Type'],
         });
     };
-    $rootScope.getDatasourceAuthors= function () {
+    $rootScope.getDatasourceAuthors = function () {
         return new DevExpress.data.DataSource({
             store:
 
@@ -1233,19 +1317,19 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
                     version: 4
                 }),
             //filter: ['ParentId', '=', pid],
-            sort: ['Name' ],
+            sort: ['Name'],
         });
     };
     $rootScope.getDatasourceCourseType = function () {
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                url: $rootScope.serviceUrl + 'odata/courses/types',
-                //  key: "Id",
-                // keyType: "Int32",
-                version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/courses/types',
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    version: 4
+                }),
             //filter: ['ParentId', '=', pid],
             sort: ['Title'],
         });
@@ -1254,12 +1338,12 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                url: $rootScope.serviceUrl + 'odata/base/caotypes',
-                //  key: "Id",
-                // keyType: "Int32",
-                version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/base/caotypes',
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    version: 4
+                }),
             //filter: ['ParentId', '=', pid],
             sort: ['Title'],
         });
@@ -1268,12 +1352,12 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                url: $rootScope.serviceUrl + 'odata/base/airlines',
-                //  key: "Id",
-                // keyType: "Int32",
-                version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/base/airlines',
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    version: 4
+                }),
             //filter: ['ParentId', '=', pid],
             sort: ['Title'],
         });
@@ -1282,12 +1366,12 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                url: $rootScope.serviceUrl + 'odata/base/ratingorganization',
-                //  key: "Id",
-                // keyType: "Int32",
-                version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/base/ratingorganization',
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    version: 4
+                }),
             //filter: ['ParentId', '=', pid],
             sort: ['Title'],
         });
@@ -1306,7 +1390,7 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
             sort: ['Title'],
         });
     };
-    
+
     $rootScope.getDatasourceJournals = function () {
         return new DevExpress.data.DataSource({
             store:
@@ -1325,12 +1409,12 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                url: $rootScope.serviceUrl + 'odata/base/currencies',
-                //  key: "Id",
-                // keyType: "Int32",
-                version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/base/currencies',
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    version: 4
+                }),
             //filter: ['ParentId', '=', pid],
             sort: ['Title'],
         });
@@ -1339,12 +1423,12 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                    url: $rootScope.serviceUrl + 'odata/base/jobgroups/'+ Config.CustomerId,
-                //  key: "Id",
-                // keyType: "Int32",
-                version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/base/jobgroups/' + Config.CustomerId,
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    version: 4
+                }),
             //filter: ['ParentId', '=', pid],
             sort: ['FullCode'],
         });
@@ -1373,7 +1457,7 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
                     url: $rootScope.serviceUrl + 'odata/flights/actypes/' + cid,
                     version: 4
                 }),
-            
+
             sort: ['Title'],
         });
     };
@@ -1423,7 +1507,7 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
                     // keyType: "Int32",
                     version: 4
                 }),
-          
+
             sort: ['Title'],
         });
     };
@@ -1446,14 +1530,14 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                url: $rootScope.serviceUrl + 'odata/crew/ip'  ,
-                //  key: "Id",
-                // keyType: "Int32",
-                version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/crew/ip',
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    version: 4
+                }),
             //filter: ['ParentId', '=', pid],
-            sort: ['ScheduleName' ],
+            sort: ['ScheduleName'],
         });
     };
     //vahid new
@@ -1461,12 +1545,12 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         return new DevExpress.data.DataSource({
             store:
 
-            new DevExpress.data.ODataStore({
-                url: $rootScope.serviceUrl + 'odata/crew/captain',
-                //  key: "Id",
-                // keyType: "Int32",
-                version: 4
-            }),
+                new DevExpress.data.ODataStore({
+                    url: $rootScope.serviceUrl + 'odata/crew/captain',
+                    //  key: "Id",
+                    // keyType: "Int32",
+                    version: 4
+                }),
             //filter: ['ParentId', '=', pid],
             sort: ['ScheduleName'],
         });
@@ -1492,10 +1576,10 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
             store:
 
                 new DevExpress.data.ODataStore({
-                    url: serviceBaseTRN + 'api/course/types/query', 
+                    url: serviceBaseTRN + 'api/course/types/query',
                     //  key: "Id",
                     // keyType: "Int32" ,
-                    
+
                 }),
             //filter: ['ParentId', '=', pid],
             sort: ['Title'],
@@ -1512,7 +1596,7 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
 
             + "</div>";
         return tmpl;
-       
+
     };
     $rootScope.getSbTemplateRouteTo = function (data) {
         var tmpl =
@@ -1550,7 +1634,7 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
     $rootScope.getSbTemplateLocation2 = function (data) {
         var tmpl =
             "<div>" + data.TitleFormated
-             
+
 
 
             + "</div>";
@@ -1589,23 +1673,23 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         '#86af49',
         '#ffff4d',
         '#3399ff',
-        
+
         '#feb236',
         '#b5e7a0',
         '#d64161',
         '#00ff00',
-       
 
-       
+
+
 
         '#bdcebe',
-       
+
         '#c1946a',
         '#034f84',
         '#c94c4c',
         '#92a8d1',
         '#50394c',
-        
+
         '#4040a1',
         '#622569',
         '#eeac99',
@@ -1625,8 +1709,8 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
 
     $rootScope.colorSet2 = [
         '#0099cc',
-       // '#66b3ff',
-       
+        // '#66b3ff',
+
         '#00cc99',
         '#cc0052',
         '#cc7a00',
@@ -1673,7 +1757,7 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
 
         '#ff99ff',
         '#66ffe0',
-         
+
     ];
     $rootScope.colorSetChart2 = [
         '#4dffd2',
@@ -1722,33 +1806,33 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
 
     $rootScope.colorSetRed = [
         '#ff3300',
-        
+
 
         '#e68a00',
-        
+
 
 
         '#ff33cc',
-       
+
 
         '#802000',
-        
+
 
         '#e6e600',
         '#800060',
 
     ];
     $rootScope.colorSetGreen = [
-        '#00cc00', 
+        '#00cc00',
         '#339966',
-         
-        
+
+
         '#00cca3',
 
-        
+
         '#006666',
 
-       
+
         '#00ccff',
 
 
@@ -1761,14 +1845,14 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
         '#b3b3cc',
         '#b3cccc',
         '#666666',
-        
+
 
     ];
-    $rootScope.getColorFromSetRed  = function (n) {
+    $rootScope.getColorFromSetRed = function (n) {
         //0 based
-        if (n > $rootScope.colorSetRed .length - 1)
-            n = n % ($rootScope.colorSetRed .length - 1);
-        return $rootScope.colorSetRed [n];
+        if (n > $rootScope.colorSetRed.length - 1)
+            n = n % ($rootScope.colorSetRed.length - 1);
+        return $rootScope.colorSetRed[n];
     };
     $rootScope.getColorFromSetGreen = function (n) {
         //0 based
@@ -1924,6 +2008,5 @@ app.run(['authService', 'activityService', '$rootScope', '$location', '$template
     /* eslint-enable */
 
 }(this));
- 
- 
- 
+
+

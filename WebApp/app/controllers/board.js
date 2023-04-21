@@ -1,5 +1,5 @@
 ﻿'use strict';
-app.controller('boardController', ['$scope', '$location', '$routeParams', '$rootScope', '$timeout', 'flightService', 'weatherService', 'aircraftService', 'authService', 'notificationService', '$route', '$window', 'fbService', '$http','$q', function ($scope, $location, $routeParams, $rootScope, $timeout, flightService, weatherService, aircraftService, authService, notificationService, $route, $window, fbService, $http,$q) {
+app.controller('boardController', ['$scope', '$location', '$routeParams', '$rootScope', '$timeout', 'flightService', 'weatherService', 'aircraftService', 'authService', 'notificationService', '$route', '$window', 'fbService', '$http', '$q', function ($scope, $location, $routeParams, $rootScope, $timeout, flightService, weatherService, aircraftService, authService, notificationService, $route, $window, fbService, $http, $q) {
     $scope.prms = $routeParams.prms;
 
     var hourWidth = 85;
@@ -1825,7 +1825,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                     var data = Enumerable.From($scope.dataSource).Where("$.ID==" + _d.ID).FirstOrDefault();
 
                     if (data) {
-                       
+
 
                         $scope.doActionCompleteSave = false;
                         $scope.fillFlight(data, _d);
@@ -2116,7 +2116,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
         ],
 
         visible: false,
-         
+
         closeOnOutsideClick: false,
         onTitleRendered: function (e) {
 
@@ -2213,7 +2213,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 General.ShowNotify(Config.Text_SavedOk, 'success');
                                 $scope.popup_ofp_visible = false;
                             }
-                            
+
 
 
                         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
@@ -5028,6 +5028,21 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     };
 
 
+    $scope.btn_upload = {
+        text: 'upload',
+        type: 'success',
+
+
+
+
+        onClick: function (e) {
+
+            $scope.popup_upload_visible = true;
+
+        }
+
+    };
+
 
     $scope.IsOffBlockReadOnly = false;
     $scope.IsTakeOffReadOnly = false;
@@ -6285,7 +6300,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         $scope.loadingVisible = true;
         if (!$scope.IsComm) {
-            flightService.saveFlight(_flight).then(function (response) { 
+            flightService.saveFlight(_flight).then(function (response) {
 
 
 
@@ -7000,7 +7015,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                         });
 
                         var allflights = Enumerable.From($scope.ati_selectedFlights).Select('$.ID').ToArray();
-                        var flights = Enumerable.From(_nflights).Select('$.ID').ToArray(); 
+                        var flights = Enumerable.From(_nflights).Select('$.ID').ToArray();
 
                         //9-15
 
@@ -7042,7 +7057,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                             To: (new Date()).toUTCDateTimeDigits(),
 
 
-                        }; 
+                        };
                         if ($scope.IsComm) {
                             var interval_from_dates = (new Date($scope.time_interval_from_date)).getDatePartArray();
                             var intervalFrom = new Date(interval_from_dates[0], interval_from_dates[1], interval_from_dates[2], 12, 0, 0, 0);
@@ -7084,7 +7099,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 //9-15
                                 var notifyObj = JSON.parse(JSON.stringify(entity));
                                 notifyObj.Remark = $scope.IsComm ? flightsRegs : allflightsRegs;
-                                
+
                                 $http.post($rootScope.serviceUrl + 'odata/flight/register/change/notify', notifyObj);
 
                                 General.ShowNotify(Config.Text_SavedOk, 'success');
@@ -12654,7 +12669,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 General.ShowNotify("Please select flight crews.", 'error');
                                 return;
                             }
-                           
+
                             $scope.Notify.ObjectId = -1;
                             $scope.Notify.FlightId = $scope.flight.ID;
                             $scope.Notify.Message = $scope.Notify.Message.replace(/\r?\n/g, '<br />');
@@ -13165,7 +13180,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 General.ShowNotify("Please select flight crews.", 'error');
                                 return;
                             }
-                          
+
                             $scope.Notify2.ObjectId = -1;
                             $scope.Notify2.FlightId = $scope.flight.ID;
 
@@ -13247,7 +13262,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                                 General.ShowNotify("Please select flight crews.", 'error');
                                 return;
                             }
-                            
+
                             $scope.Notify2.ObjectId = -1;
                             $scope.Notify2.FlightId = null;
 
@@ -14338,12 +14353,12 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
     //////////////////////////
     //9-8
     $scope.getFlightClass = function (flt) {
-        if (flt.FlightStatusID==4 && flt.CancelDate) {
-            
+        if (flt.FlightStatusID == 4 && flt.CancelDate) {
+
             var dt = moment.utc(new Date(flt.CancelDate)).format('YYYY-MM-DD HH:mm');
             var dt1 = moment.utc(new Date(flt.CancelDate));
             var dt2 = moment(new Date(flt.STD));
-           
+
             var _dtCNL = new Date(dt1.year(), dt1.month(), dt1.date(), dt1.hour(), dt1.minute(), 0);
             var _dtSTD = new Date(dt2.year(), dt2.month(), dt2.date(), dt2.hour(), dt2.minute(), 0);
             var diff = Math.abs(_dtCNL.getTime() - _dtSTD.getTime()) / 3600000;
@@ -14354,11 +14369,11 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
             //console.log(_dtCNL);
             //console.log(_dtSTD);
             //console.log(diff);
-           
-            
+
+
         }
         else
-        return flt.FlightStatus.toLowerCase();
+            return flt.FlightStatus.toLowerCase();
     }
     $scope.getDuration = function (d1, d2) {
         //
@@ -15052,7 +15067,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                 //yati
                 userid: $rootScope.userId ? $rootScope.userId : -1,
 
-            }; 
+            };
             //noosk
             flightService.getUpdatedFlightsNew(dto).then(function (response) {
 
@@ -15087,7 +15102,7 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
                         $scope.modifyGantt(_flight, res, oldresid);
 
                     }
-                     
+
 
                 });
                 if (response.summary != -1)
@@ -15884,6 +15899,284 @@ app.controller('boardController', ['$scope', '$location', '$routeParams', '$root
 
         }
     };
+    /////////////popup upload////////////
+    $scope.formatDateYYYYMMDD = function (dt) {
+        return moment(dt).format('YYYY-MM-DD');
+    };
+
+
+    $scope.df = "2021-01-01";
+    $scope.dt = "2021-12-31";
+    $scope.popup_upload_visible = false;
+    $scope.popup_upload_title = 'upload';
+    $scope.freeSaved = false;
+    $scope.popup_upload_height = $scope.IsComm ? 790 : 580;
+    $scope.popup_upload = {
+        elementAttr: {
+
+            class: "popup_upload"
+        },
+        shading: true,
+
+        width: 1060,
+        fullScreen: false,
+        showTitle: true,
+        dragEnabled: true,
+        toolbarItems: [
+
+            {
+                widget: 'dxDateBox', location: 'before', options: {
+                    width: 150,
+                    height: 38,
+                    onValueChanged: function (e) {
+                        $scope.df = $scope.formatDateYYYYMMDD(e.value);
+                    },
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxDateBox', location: 'before', options: {
+                    width: 150,
+                    height: 38,
+                    padding: 1,
+                    onValueChanged: function (e) {
+                        $scope.dt = $scope.formatDateYYYYMMDD(e.value);
+                    },
+                }, toolbar: 'bottom'
+            },
+
+            {
+                widget: 'dxButton', location: 'after', options: {
+                    type: 'success', text: 'Save', icon: 'check', validationGroup: 'fblink', bindingOptions: { disabled: 'IsApproved' }, onClick: function (arg) {
+                        $http.get('http://localhost:9090/api/save/flights/' + $scope.name).then(function (response) {
+                            console.log(response);
+                            
+                        });                     
+                    }
+                }, toolbar: 'bottom'
+            },
+
+
+
+
+
+        ],
+
+        visible: false,
+
+        closeOnOutsideClick: false,
+
+        bindingOptions: {
+            visible: 'popup_upload_visible',
+            height: 'popup_upload_height',
+            title: 'popup_upload_title',
+
+        }
+    };
+
+    $scope.popup_upload.toolbarItems[1].options.onClick = function (e) {
+
+        $scope.popup_upload_visible = false;
+
+    };
+    //////////////upload////////////////
+
+    $scope.value = [];
+    $scope.excelFiles = [];
+    $scope.fileName = null;
+    $scope.uploader_document = {
+        uploadUrl: 'http://localhost:9090/api/uploadfile' + '?t=clientfiles',
+        uploadMode: 'instantly',
+        accept: '.xlsx',
+        multiple: false,
+        uploadMethod: 'POST',
+        labelText: '',
+
+        onUploadStarted: function (res) {
+            $scope.loadingVisible = true;
+            $scope.name = res.file.name.replace('.xlsx', '');
+            $scope.excelFiles.push({ fileName: res.file.name});
+            console.log($scope.excelFiles);
+        },
+
+
+        onUploaded: function (e) {
+
+            $http.get('http://localhost:9090/api/import/flights/' + $scope.name + '/' + $scope.df + '/' + $scope.dt).then(function (response) {
+                console.log($scope.df, $scope.dt);
+                $scope.dg_upload_ds = response.data;
+                $scope.loadingVisible = false;
+            });
+            
+        },
+
+
+        bindingOptions: {
+            value: 'value',
+        },
+
+    };
+
+    ////////////////datagrid////////////
+
+    $scope.dg_upload_columns = [
+
+        {
+            cellTemplate: function (container, options) {
+                $("<div style='text-align:center'/>")
+                    .html(options.rowIndex + 1)
+                    .appendTo(container);
+            }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+        },
+
+        { dataField: 'Day', caption: 'Day', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+        { dataField: 'Register', caption: 'Register', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+        { dataField: 'No', caption: 'Flight Number', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+        { dataField: 'From', caption: 'From', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+        { dataField: 'To', caption: 'To', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+        { dataField: 'STDX', caption: 'STD', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+        { dataField: 'STAX', caption: 'STA', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+
+    ];
+    $scope.dg_upload_selected = null;
+    $scope.dg_upload_instance = null;
+    $scope.dg_upload_ds = null;
+    $scope.dg_upload = {
+        wordWrapEnabled: true,
+        rowAlternationEnabled: true,
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: 460,
+
+        columns: $scope.dg_upload_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_upload_instance)
+                $scope.dg_upload_instance = e.component;
+
+        },
+        onSelectionChanged: function (e) {
+            var data = e.selectedRowsData[0];
+
+            if (!data) {
+                $scope.dg_upload_selected = null;
+            }
+            else
+                $scope.dg_upload_selected = data;
+
+
+        },
+        bindingOptions: {
+            dataSource: 'dg_upload_ds'
+        },
+        columnChooser: {
+            enabled: false
+        },
+
+    };
+
+    $scope.deleteFile = function (bid) {
+
+        General.Confirm("Are you sure?", function (res) {
+            if (res) {
+
+                $scope.excelFiles = [];
+                $scope.value = [];
+                //libraryService.deleteBookFile({ id: bid.data.Id }).then(function (response) {
+                //    $scope.entity.BookFiles = Enumerable.From($scope.entity.BookFiles).Where('$.Id!=' + bid.data.Id).OrderBy('$.SysUrl').ToArray();
+                //    $scope.dg_file_ds = Enumerable.From($scope.dg_file_ds).Where('$.Id!=' + bid.data.Id).ToArray();
+                //    $scope.dg_file_instance.refresh();
+                //}, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+            }
+        });
+    };
+
+
+    $scope.dg_file_columns = [
+        { dataField: "fileName", caption: "Title", allowResizing: true, alignment: "left", dataType: 'string', allowEditing: false, },
+        {
+            dataField: "Id", caption: '',
+            width: 70,
+            allowFiltering: false,
+            allowSorting: false,
+            cellTemplate: 'deleteFileTemplate',
+
+        },
+
+    ];
+    $scope.dg_file_selected = null;
+    $scope.dg_file_instance = null;
+    $scope.dg_file_ds = null;
+    
+    $scope.dg_file = {
+        editing: {
+            mode: "row",
+            allowUpdating: false,
+            allowDeleting: false,
+        },
+
+        onRowRemoved: function (e) {
+
+
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'multiple' },
+
+        noDataText: '',
+        height: 79.43,
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        filterRow: { visible: false, showOperationChooser: true, },
+        columnAutoWidth: false,
+        columns: $scope.dg_file_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_file_instance)
+                $scope.dg_file_instance = e.component;
+
+        },
+        onSelectionChanged: function (e) {
+            var data = e.selectedRowsData[0];
+
+            if (!data) {
+                $scope.dg_file_selected = null;
+            }
+            else
+                $scope.dg_file_selected = data;
+
+
+        },
+        bindingOptions: {
+            dataSource: 'excelFiles',     
+            
+        },
+        
+    };
+
+
     ///////////////////////
     $scope.IsGNTVisible = false;
     $scope.delayCodes = null;

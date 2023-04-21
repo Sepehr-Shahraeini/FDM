@@ -4,12 +4,12 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
     $scope.IsEditable = $rootScope.IsLibraryEditable();
     $scope.IsEditableDoc = $rootScope.IsDocEditable();
     $scope._IsEditable = $scope.IsEditable || $scope.IsEditableDoc;
-    
+
     $scope.IsExposedDisabled = true;
 
     $scope.entity = {
         Id: -1,
-        Issue:null,
+        Issue: null,
         Title: null,
         ISBN: null,
         DateRelease: null,
@@ -49,8 +49,8 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
         Edition: null,
         DateEffective: null,
         FolderId: null,
-        BookKey:null,
-       
+        BookKey: null,
+
     };
 
     $scope.clearEntity = function () {
@@ -105,10 +105,10 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
 
         $scope.chapter_ds = [];
         $scope.dg_file_ds = null;
-         
+
         $scope.expandedRow = [];
-       
-      //  $scope.entity.FolderId = null;
+
+        //  $scope.entity.FolderId = null;
     };
 
     $scope.bind = function (data) {
@@ -163,7 +163,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
         $scope.entity.BookKey = data.BookKey;
 
         $scope.bookKey = data.BookKey;
-        
+
         $scope.chapter_ds = data.Chapters;
         $scope.expandedRow = Enumerable.From(data.Chapters).Select('$.Id').ToArray();
 
@@ -178,7 +178,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
         //{ text: "Aircraft Types", id: 'actypes', visible_btn: true, visible: true },
         //{ text: "Groups", id: 'groups', visible_btn: false, visible_btn2: true, visible: true },
 
-       // { text: "Educations", id: 'educations', visible_btn: false, visible: true },
+        // { text: "Educations", id: 'educations', visible_btn: false, visible: true },
 
         { text: "Employees", id: 'employees', visible_btn: false, visible: true },
 
@@ -227,21 +227,21 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
                 clearInterval(myVar);
             }, 10);
 
-           // $scope.btn_visible_aircrafttype = newValue == 2;
+            // $scope.btn_visible_aircrafttype = newValue == 2;
 
             $scope.btn_visible_file = newValue == 1;
             $scope.btn_visible_education = newValue == 4;
             //$scope.btn_visible_course = newValue == 4;
-           // $scope.btn_visible_group = newValue == 3;
-            $scope.btn_visible_employee = newValue ==2;
+            // $scope.btn_visible_group = newValue == 3;
+            $scope.btn_visible_employee = newValue == 2;
 
-           
+
 
 
 
         }
         catch (e) {
-           // console.log(e);
+            // console.log(e);
         }
 
     });
@@ -308,7 +308,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
     };
     $scope.number_Lessons = {
         hoverStateEnabled: false,
-        min:1,
+        min: 1,
         bindingOptions: {
             value: 'entity.NumberOfLessens',
         }
@@ -339,7 +339,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
         dataSource: $rootScope.getDatasourceOption(87),
         displayExpr: "Title",
         valueExpr: 'Id',
-      
+
         bindingOptions: {
             value: 'entity.LanguageId',
 
@@ -357,7 +357,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
                 $scope.entity.DateDeadline = null;
                 $scope.entity.Duration = null;
                 $scope.entity.LanguageId = null;
-                
+
                 $scope.entity.NumberOfLessens = null;
                 //  $scope.entity.TypeId = null;
                 $scope.entity.JournalId = null;
@@ -367,7 +367,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
                 $scope.entity.Sender = null;
                 $scope.entity.No = null;
                 $scope.DOI = null;
-               
+
                 $scope.entity.INSPECAccessionNumber = null;
             }
             if (e.selectedItem.Id == 84) {
@@ -442,7 +442,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
         }
     };
 
-    
+
     $scope.sb_publisher_instance = null;
     $scope.sb_Publisher = {
         dataSource: $rootScope.getDatasourcePublishers(),
@@ -513,7 +513,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
 
         }
     };
-    
+
     $scope.txt_Duration = {
         hoverStateEnabled: false,
         bindingOptions: {
@@ -581,7 +581,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
             value: 'entity.DateConference',
         }
     };
-    
+
     $scope.chb_Exposed = {
 
         text: 'Exposed',
@@ -590,7 +590,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
             disabled: 'IsExposedDisabled',
         }
     };
-     
+
     /////////////////////////////
     $scope.img_url = 'content/images/image.png';
     $scope.uploaderValueImage = [];
@@ -821,8 +821,8 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
             $scope.entity.Id = -1;
 
         $scope.entity.DateRelease = new Date($scope.entity.DateRelease).ToUTC();
-        $scope.entity.BookKey = $scope.bookKey  ;
-        
+        $scope.entity.BookKey = $scope.bookKey;
+
         $scope.loadingVisible = true;
         libraryService.save($scope.entity).then(function (response) {
 
@@ -838,8 +838,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
             $scope.loadingVisible = false;
             if (!$scope.isNew)
                 $scope.popup_add_visible = false;
-            else
-            { $scope.bookKey = $scope.generateINT(); $rootScope.$broadcast('onFolderAdd', null); }
+            else { $scope.bookKey = $scope.generateINT(); $rootScope.$broadcast('onFolderAdd', null); }
 
 
 
@@ -865,12 +864,12 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
 
         },
         onUploaded: function (e) {
-           
-             
-             
-            
+
+
+
+
             var id = ($scope.entity.BookFiles.length + 1) * -1;
-            var item = { Id: id, Title: e.request.responseText, FileUrl: e.request.responseText, Remark: '', DocumentId: -1, BookId: $scope.entity.Id,ChapterId:$scope.selectedChapterId };
+            var item = { Id: id, Title: e.request.responseText, FileUrl: e.request.responseText, Remark: '', DocumentId: -1, BookId: $scope.entity.Id, ChapterId: $scope.selectedChapterId };
             item.SysUrl = e.file.name; //$scope.uploaderValueDocument[0].name;
             item.FileType = e.file.type;// $scope.uploaderValueDocument[0].type;
             $scope.entity.BookFiles.push(item);
@@ -878,8 +877,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
             $scope.fillFileDs();
             console.log(e);
             console.log($scope.uploaderValueDocument);
-             console.log('*******************************');
-             
+            console.log('*******************************');
 
         },
         onContentReady: function (e) {
@@ -944,7 +942,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
 
     ///////////////////////////
     $scope.dg_group_columns = [
-        { dataField: "Type", caption: "Type", allowResizing: true, alignment: "center", dataType: 'string', allowEditing: false,width:200 },
+        { dataField: "Type", caption: "Type", allowResizing: true, alignment: "center", dataType: 'string', allowEditing: false, width: 200 },
         { dataField: "Title", caption: "Title", allowResizing: true, alignment: "left", dataType: 'string', allowEditing: false, },
         //{ dataField: 'FullCode', caption: 'Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, encodeHtml: false, width: 200, sortIndex: 0, sortOrder: "asc" },
 
@@ -984,11 +982,11 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
 
 
         },
-        height:350,
+        height: 350,
         bindingOptions: {
 
             dataSource: 'entity.BookRelatedGroups',
-           // height: 'dg_height',
+            // height: 'dg_height',
         },
         // dataSource:ds
 
@@ -1096,7 +1094,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
     };
     ///////////////////////////////
     $scope.deleteBookFile = function (bid) {
-         
+
         General.Confirm("Are you sure?", function (res) {
             if (res) {
                 libraryService.deleteBookFile({ id: bid.data.Id }).then(function (response) {
@@ -1111,16 +1109,16 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
     $scope.dg_file_columns = [
         //{ dataField: "Remark", caption: "Remark", allowResizing: true, alignment: "left", dataType: 'string', allowEditing: true },
         //{ dataField: "FileUrl", caption: "Uploaded", allowResizing: true, alignment: "left", dataType: 'string', allowEditing: false, width: 200 },
-        { dataField: "SysUrl", caption: "Title", allowResizing: true, alignment: "left", dataType: 'string', allowEditing: false,   },
-      //  { dataField: "FileType", caption: "File Type", allowResizing: true, alignment: "left", dataType: 'string', allowEditing: false, width: 150 },
-      {
-          dataField: "Id", caption: '',
-          width: 70,
-          allowFiltering: false,
-          allowSorting: false,
-          cellTemplate: 'deleteFileTemplate',
+        { dataField: "SysUrl", caption: "Title", allowResizing: true, alignment: "left", dataType: 'string', allowEditing: false, },
+        //  { dataField: "FileType", caption: "File Type", allowResizing: true, alignment: "left", dataType: 'string', allowEditing: false, width: 150 },
+        {
+            dataField: "Id", caption: '',
+            width: 70,
+            allowFiltering: false,
+            allowSorting: false,
+            cellTemplate: 'deleteFileTemplate',
 
-      },
+        },
 
     ];
     $scope.dg_file_selected = null;
@@ -1139,8 +1137,8 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
             allowDeleting: false,
         },
         onRowRemoved: function (e) {
-            
-           
+
+
         },
         showRowLines: true,
         showColumnLines: true,
@@ -1196,7 +1194,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
         bindingOptions: {
             value: 'entity.FolderId',
 
-           
+
         }
     };
     //////////////////////////////
@@ -1233,13 +1231,13 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
                 General.ShowNotify(Config.Text_NoRowSelected, 'error');
                 return;
             }
-            
+
             $scope.chapter = $scope.chapter_selected.Title;
-             $scope.chapterId = null;
-             if ($scope.chapter_selected.ParentId)
-                 $scope.chapterId = $scope.chapter_selected.ParentId;
-             $scope.IsEditChapter = true;
-             $scope.popup_chapter_visible = true;
+            $scope.chapterId = null;
+            if ($scope.chapter_selected.ParentId)
+                $scope.chapterId = $scope.chapter_selected.ParentId;
+            $scope.IsEditChapter = true;
+            $scope.popup_chapter_visible = true;
         }
 
     };
@@ -1288,8 +1286,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
         onSelectionChanged: function (e) {
             if (!e.selectedItem)
                 $scope.chapter_instance.clearSelection();
-            else
-            {
+            else {
                 var keys = [];
                 keys.push(e.selectedItem.Id);
                 $scope.chapter_instance.selectRows(keys, false);
@@ -1333,9 +1330,9 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
     /////////////////
     $scope.chapter_columns = [
 
-       { dataField: 'Title', caption: 'Title', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, encodeHtml: false },
-       // { dataField: 'FullCode', caption: 'Code', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, encodeHtml: false, width: 200, sortIndex: 0, sortOrder: "asc" },
-      // { dataField: 'Items', caption: 'Items', allowResizing: true, alignment: 'center', dataType: 'string', width: 100, allowEditing: false },
+        { dataField: 'Title', caption: 'Title', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, encodeHtml: false },
+        // { dataField: 'FullCode', caption: 'Code', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, encodeHtml: false, width: 200, sortIndex: 0, sortOrder: "asc" },
+        // { dataField: 'Items', caption: 'Items', allowResizing: true, alignment: 'center', dataType: 'string', width: 100, allowEditing: false },
         { dataField: 'Files', caption: 'Files', allowResizing: true, alignment: 'center', dataType: 'string', width: 100, allowEditing: false },
     ];
 
@@ -1377,16 +1374,16 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
             if (!data) {
                 $scope.chapter_selected = null;
                 $scope.selectedChapterId = null;
-               
-               // $scope.dg_book_ds = null;
+
+                // $scope.dg_book_ds = null;
             }
             else {
                 $scope.chapter_selected = data;
                 $scope.selectedChapterId = data.Id;
-                
-               // $scope.dg_book_ds = null;
-               // $scope.$broadcast('getFilterQuery', null);
-                 
+
+                // $scope.dg_book_ds = null;
+                // $scope.$broadcast('getFilterQuery', null);
+
             }
 
 
@@ -1423,7 +1420,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
 
         var ms = d.getMilliseconds();
         var s = d.getSeconds();
-        return  year.toString() + month.toString() + day.toString() + h.toString() + min.toString() + s.toString() + ms.toString();
+        return year.toString() + month.toString() + day.toString() + h.toString() + min.toString() + s.toString() + ms.toString();
     };
     //////////////////////
     $scope.popup_chapter_visible = false;
@@ -1447,12 +1444,12 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
                             General.ShowNotify(Config.Text_FillRequired, 'error');
                             return;
                         }
-                         
+
                         var dto = {
                             Id: -1,
                             ParentId: $scope.chapterId,
                             Title: $scope.chapter,
-                            BookKey:$scope.bookKey,
+                            BookKey: $scope.bookKey,
                             //sook
                         };
                         if ($scope.IsEditChapter)
@@ -1460,7 +1457,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
 
 
                         console.log(dto);
-                        
+
                         $scope.loadingVisible = true;
                         libraryService.saveChapter(dto).then(function (response) {
                             //jook
@@ -1497,7 +1494,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
                                 console.log($scope.chapter_ds);
                                 $scope.expandedRow.push(response.Id);
                                 $scope.selectedChapterId = response.Id;
-                               // $scope.fillFileDs();
+                                // $scope.fillFileDs();
                             }
                             else {
                                 var row = Enumerable.From($scope.chapter_ds).Where('$.Id==' + response.Id).FirstOrDefault();
@@ -1511,7 +1508,7 @@ app.controller('libraryAddController', ['$scope', '$location', 'libraryService',
                                 row.Items = response.Items;
                                 // $scope.tree_selected = JSON.parse(JSON.stringify(response));
                                 $scope.chapter_ds = Enumerable.From($scope.chapter_ds).OrderBy('$.Fullcode').ToArray();
-                                 
+
                                 $scope.chapter_instance.refresh();
                                 $scope.popup_chapter_visible = false;
                             }

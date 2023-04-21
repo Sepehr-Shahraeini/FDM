@@ -1,0 +1,1 @@
+"Id"	"Severity"	"EventName"	"Value"	"Minor"	"Major"	"Critical"	"Duration"	"TDDatetime"	"P1"	"P2"	"Phase"	"StateName"	"Context"	"TORunway"	"TDRunway"	"Type"	"TODatetime"	"Units"	"ValueName"	"FlightId"	"PFLR"	"Limit"	"Date"

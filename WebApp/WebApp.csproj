@@ -115,6 +115,21 @@
     <Content Include="app\controllers\drAdd.js" />
     <Content Include="app\controllers\employeeSelectController.js" />
     <Content Include="app\controllers\employeeSelectCourse.js" />
+    <Content Include="app\controllers\fdm.js" />
+    <Content Include="app\controllers\fdmCrewReportController.js" />
+    <Content Include="app\controllers\fdmDashboardController.js" />
+    <Content Include="app\controllers\fdmDashboardCptNew.js" />
+    <Content Include="app\controllers\fdmDashboardPilot.js" />
+    <Content Include="app\controllers\fdmDashboardPilotMonthly.js" />
+    <Content Include="app\controllers\FDMFoDashboard.js" />
+    <Content Include="app\controllers\FDMFoDashboardMonthly.js" />
+    <Content Include="app\controllers\fdmOpsController.js" />
+    <Content Include="app\controllers\fdmQAController.js" />
+    <Content Include="app\controllers\flightBoardController - Copy.js" />
+    <Content Include="app\controllers\mapController.js" />
+    <Content Include="app\controllers\matchList.js" />
+    <Content Include="app\controllers\fdmRegDaily.js" />
+    <Content Include="app\controllers\fdmRegMonthly.js" />
     <Content Include="app\controllers\fdps.js" />
     <Content Include="app\controllers\filterController.js" />
     <Content Include="app\controllers\finMonthlyReport.js" />
@@ -208,6 +223,7 @@
     <Content Include="app\controllers\rosterReport.js" />
     <Content Include="app\controllers\routeAddController.js" />
     <Content Include="app\controllers\routeController.js" />
+    <Content Include="app\controllers\sqlQueryController.js" />
     <Content Include="app\controllers\statDelayController.js" />
     <Content Include="app\controllers\studyFieldSelectController.js" />
     <Content Include="app\controllers\tblDelay.js" />
@@ -226,6 +242,7 @@
     <Content Include="app\services\biService.js" />
     <Content Include="app\services\courseService.js" />
     <Content Include="app\services\fbService.js" />
+    <Content Include="app\services\fdmService.js" />
     <Content Include="app\services\flightBagService.js" />
     <Content Include="app\services\flightService.js" />
     <Content Include="app\services\generalService.js" />
@@ -274,6 +291,20 @@
     <Content Include="app\views\delaybiKPI.html" />
     <Content Include="app\views\drAdd.html" />
     <Content Include="app\views\employeeSelectCourse.html" />
+    <Content Include="app\views\fdm.html" />
+    <Content Include="app\views\fdmCrewReport.html" />
+    <Content Include="app\views\fdmDashboard.html" />
+    <Content Include="app\views\fdmDashboardCptNew.html" />
+    <Content Include="app\views\fdmFoDashboard.html" />
+    <Content Include="app\views\fdmDashboardPilot.html" />
+    <Content Include="app\views\fdmDashboardPilotMonthly.html" />
+    <Content Include="app\views\fdmFoDashboardMonthly.html" />
+    <Content Include="app\views\fdmOps.html" />
+    <Content Include="app\views\fdmQA.html" />
+    <Content Include="app\views\map.html" />
+    <Content Include="app\views\matchList.html" />
+    <Content Include="app\views\fdmRegDaily.html" />
+    <Content Include="app\views\fdmRegMonthly.html" />
     <Content Include="app\views\formayearly.html" />
     <Content Include="app\views\formmovaledyearly.html" />
     <Content Include="app\views\jobgroupSelectSimple.html" />
@@ -375,6 +406,7 @@
     <Content Include="app\views\rosterReport.html" />
     <Content Include="app\views\route.html" />
     <Content Include="app\views\routeAdd.html" />
+    <Content Include="app\views\sqlQuery.html" />
     <Content Include="app\views\statDelay.html" />
     <Content Include="app\views\studyFieldSelect.html" />
     <Content Include="app\views\tblDelay.html" />
@@ -388,6 +420,7 @@
     <Content Include="app\views\users.html" />
     <Content Include="app\views\verify.html" />
     <Content Include="app\views\vrAdd.html" />
+    <Content Include="app\views\_fdmDashboard.html" />
     <Content Include="content\css\bootstrap-4.min.css" />
     <Content Include="content\css\bootstrap.min.css" />
     <Content Include="content\css\core-ui.css" />
@@ -493,6 +526,7 @@
     <Content Include="content\fonts\woff\IRANSansWeb_UltraLight.woff" />
     <Content Include="content\fonts\SourceSansPro-ExtraLight.ttf" />
     <Content Include="content\fonts\SourceSansPro-Light.ttf" />
+    <Content Include="content\images\airplaneMark.png" />
     <Content Include="download.aspx" />
     <Content Include="filehandler.ashx" />
     <Content Include="downloadhandler.ashx" />
@@ -518,6 +552,7 @@
     <Content Include="scripts\persian-date.min.js" />
     <Content Include="scripts\persian-datepicker.min.js" />
     <Content Include="scripts\properties.js" />
+    <Content Include="scripts\zingchart.min.js" />
     <Content Include="selection.html" />
   </ItemGroup>
   <ItemGroup>

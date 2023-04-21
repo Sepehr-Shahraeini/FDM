@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -11,7 +12,10 @@
     <link href="content/css/w3.css" rel="stylesheet" />
     <link href="content/css/ionicons.css" rel="stylesheet" />
     <link href="content/css/fontawsome2.css" rel="stylesheet" />
-   <link href="content/css/dx.common.css" rel="stylesheet" /> 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+          integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+          crossorigin="" />
+    <link href="content/css/dx.common.css" rel="stylesheet" />
     <!--<link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/19.2.7/css/dx.common.css">-->
     <link rel="dx-theme" data-theme="material.teal-light" href="content/css/material.teal-light.custom.css" data-active="false" />
     <link rel="dx-theme" data-theme="material.purple-light" href="content/css/material.purple-light.custom.css" data-active="false" />
@@ -39,6 +43,8 @@
 
     <script src="scripts/jquery-3.1.0.js"></script>
 
+
+
     <script src="scripts/jszip.min.js"></script>
     <script src="scripts/angular-1.7.2.js"></script>
 
@@ -55,8 +61,10 @@
 
     <script src="scripts/knockout.js"></script>
     <script src="scripts/jsrender.min.js"></script>
-
-
+    <script src="scripts/zingchart.min.js" defer></script>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+            integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+            crossorigin=""></script>
     <!--<script src="scripts/jquery.validate.min.js"></script>
     <script src="scripts/jquery.validate.unobtrusive.min.js"></script>-->
     <!-- <script src="scripts/ejtotal.js" type="text/javascript"></script>-->
@@ -70,7 +78,7 @@
     <script src="scripts/mobile-detect.min.js"></script>
     <!-- <script type="text/javascript" src="scripts/persian-date.min.js"></script>-->
     <script type="text/javascript" src="scripts/dx.all.js"></script>
-    <script src="https://unpkg.com/devextreme-aspnet-data@2.6.1/js/dx.aspnet.data.js"></script>
+    <!-- <script src="https://unpkg.com/devextreme-aspnet-data@2.6.1/js/dx.aspnet.data.js"></script>-->
     <!--<script type="text/javascript" src="https://cdn3.devexpress.com/jslib/19.2.7/js/dx.all.js"></script>-->
     <!--<script type="text/javascript" src="scripts/ionicons.js"></script>-->
     <!--<script type="text/javascript" src="scripts/chart-bundle.js"></script>
@@ -92,7 +100,7 @@
 
     <script src="scripts/persian-date.min.js"></script>
     <script src="scripts/persian-datepicker.min.js"></script>
-    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+    <!--<script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>-->
 
     <script src="scripts/custom-tooltip.js"></script>
     <script src="scripts/config.js"></script>
@@ -128,6 +136,7 @@
     <script src="app/services/statService.js"></script>
     <script src="app/services/biService.js"></script>
     <script src="app/services/flightBagService.js"></script>
+    <script src="app/services/fdmService.js"></script>
 
     <script src="app/services/trainingService.js"></script>
 
@@ -325,6 +334,24 @@
     <script src="app/controllers/ofpAdd.js"></script>
     <script src="app/controllers/vrAdd.js"></script>
     <script src="app/controllers/logAdd.js"></script>
+    <script src="app/controllers/fdm.js"></script>
+    <script src="app/controllers/fdmDashboardController.js"></script>
+    <script src="app/controllers/fdmDashboardPilot.js"></script>
+    <script src="app/controllers/fdmDashboardPilotMonthly.js"></script>
+    <script src="app/controllers/fdmFoDashboardMonthly.js"></script>
+    <script src="app/controllers/FDMFoDashboard.js"></script>
+    <script src="app/controllers/fdmRegDaily.js"></script>
+    <script src="app/controllers/fdmRegMonthly.js"></script>
+    <script src="app/controllers/matchList.js"></script>
+    <script src="app/controllers/sqlQueryController.js"></script>
+
+    <script src="app/controllers/FDMFoDashboard.js"></script>
+    <script src="app/controllers/fdmDashboardCptNew.js"></script>
+    <script src="app/controllers/fdmOpsController.js"></script>
+    <script src="app/controllers/fdmQAController.js"></script>
+    <script src="app/controllers/fdmCrewReportController.js"></script>
+    <script src="app/controllers/mapController.js"></script>
+
     <script src="app/services/fbservice.js"></script>
     <!--<script src="app/_part1.js?v=100"></script>
     <script src="app/_part2.js?v=100"></script>
