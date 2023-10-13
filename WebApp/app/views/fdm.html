@@ -271,7 +271,7 @@
                     <div id="md" class="tabc">
                         <div dx-data-grid="dg_md" id="dg_md" class="content" style="overflow-y:hidden" dx-item-alias="row">
                             <div data-options="dxTemplate:{ name:'deleteMDTemplate' }">
-                                <a  ng-click="deleteRow(row)" href="" class='w3-button w3-block w3-red' style=' margin:0 auto 0px auto;text-decoration:none;padding:5px 5px !important; text-align:center'>Delete</a>
+                                <a ng-click="deleteRow(row)" href="" class='w3-button w3-block w3-red' style=' margin:0 auto 0px auto;text-decoration:none;padding:5px 5px !important; text-align:center'>Delete</a>
                             </div>
                         </div>
                     </div>
@@ -305,18 +305,19 @@
                 <tr>
 
                     <!--<td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-date-box="date_from"></div></td>
-                    <td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-date-box="date_to"></div></td>-->
+    <td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-date-box="date_to"></div></td>-->
                     <!--<td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_Status"></div></td>
-                    <td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_IP"></div></td>
-                    <td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_CPT"></div></td>-->
+    <td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_IP"></div></td>
+    <td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_CPT"></div></td>-->
                     <td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_yf" dx-validator="{validationGroup:'finmrpt',  validationRules: [{ type: 'required'}]}"></div></td>
-                   <!-- <td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_yt" dx-validator="{validationGroup:'finmrpt',  validationRules: [{ type: 'required'}]}"></div></td>-->
+                    <!-- <td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_yt" dx-validator="{validationGroup:'finmrpt',  validationRules: [{ type: 'required'}]}"></div></td>-->
                     <td style="width:150px;text-align:right;padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_month" dx-validator="{validationGroup:'finmrpt',  validationRules: [{ type: 'required'}]}"></div></td>
 
                     <td style="width:130px;text-align:left;padding-right:5px"><div dx-button="btn_search"></div></td>
                     <td style="width:140px;text-align:left;margin-left: 0 !important">
                         <div id="uploader_document" dx-file-uploader="uploader_document"></div>
                     </td>
+                    <td style="width:130px;text-align:left;padding-right:5px"><div dx-button="updateFDMTBL"></div></td>
 
 
                     <td></td>

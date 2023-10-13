@@ -1,0 +1,80 @@
+﻿﻿﻿
+<style>
+
+    .ctd {
+        border: 1px solid #ccc;
+        text-align: center;
+    }
+
+    .ctd-empty {
+        border: 0px solid #ccc;
+        text-align: center;
+    }
+
+    .ctr {
+        /*height:30px;*/
+    }
+
+    .ctd-center {
+        background-color: lightseagreen;
+    }
+
+    .ctd-selected {
+        background-color: red;
+    }
+
+    .ht.selected {
+        background: #00ffaa !important;
+        color: black !important;
+    }
+</style>
+<div ng-controller="qaReferController">
+    <div style='padding:0 5px 0 5px'>
+        <div style='border:1px solid #eee;'>
+            <table style='width:100%;margin-bottom:5px'>
+                <tr>
+                    <td style='width:25%;border-right:1px solid white'>
+                        <div style='padding:7px;background:#009999;color:white;text-align:center;font-weight:bold' class='ht selected' ng-click="ht_click($event,'followup')">FOLLOWUP</div>
+                    </td>
+                    <td style='width:25%;border-right:1px solid white'>
+                        <div style='padding:7px;background:#009999;color:white;text-align:center;font-weight:bold' class='ht' ng-click="ht_click($event,'comments')">COMMENTS</div>
+                    </td>
+                    <td style='width:25%;border-right:1px solid white'>
+                        <div style='padding:7px;background:#009999;color:white;text-align:center;font-weight:bold' class='ht' ng-click="ht_click($event,'attachments')">ATTACHMENTS</div>
+                    </td>
+                    <td style='width:25%;border-right:0px solid white'>
+                        <div style='padding:7px;background:#009999;color:white;text-align:center;font-weight:bold' class='ht' ng-click="ht_click($event,'actions')">ACTIONS</div>
+                    </td>
+                </tr>
+            </table>
+
+
+            <!--<div id="scroll_referre" dx-scroll-view="scroll_referre">
+
+            </div>-->
+
+            <div id='followup' class='ht_content'>
+                <div dx-tree-list="referred_list"></div>
+                <div style='margin-top:5px;padding:7px;border-top:1px solid #ccc;background:#eee'>Note</div>
+                <div dx-text-area="txt_referComment" class='dx-border'></div>
+            </div>
+            <div id='comments' style='display:none' class='ht_content'>
+                <div dx-data-grid="dg_comment" id="dg_comment" class="content" style="overflow-y:hidden" dx-item-alias="row"></div>
+                <div>
+                    <div style='margin-top:5px;padding:5px;'>
+                        <div style='padding:5px 0 5px 0'>New Comment</div>
+                        <div dx-text-box="txt_comment" class="col-lg-11 dx-border"></div>
+                        <div class="col-lg-1" style="display: inline-block;padding: 0px;float:right;text-align:center">
+                            <div dx-button="btn_send"></div>
+                        </div>
+                        <div style='clear:both'></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div dx-load-panel="loadPanel"></div>
+</div>

@@ -117,9 +117,16 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
 
     $scope.isContentVisible = false;
     $scope.bind = function () {
+
+
+        $scope.ymf = $scope.yf.toString() + $scope.mf.toString().padStart(2, '0');
+        $scope.ymt = $scope.yt.toString() + $scope.mt.toString().padStart(2, '0');
+        $scope.ymf = parseInt($scope.ymf);
+        $scope.ymt = parseInt($scope.ymt);
+
         $scope.isContentVisible = true;
 
-        fdmService.getFDMRegMonthly($scope.yf, $scope.yt, $scope.mf, $scope.mt, $scope.reg).then(function (response) {
+        fdmService.getFDMRegMonthly($scope.ymf, $scope.ymt, $scope.reg).then(function (response) {
             $scope.ds_regEventsMonthly = response.Data.data;
             $scope.ds_regEventsMonthlyGeneral = response.Data;
 
@@ -134,14 +141,14 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
 
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
-        fdmService.getFDMRegCptMonthly($scope.yf, $scope.yt, $scope.mf, $scope.mt, $scope.reg).then(function (response) {
+        fdmService.getFDMRegCptMonthly($scope.ymf, $scope.ymt, $scope.reg).then(function (response) {
             console.log(response);
             $scope.ds_regCprEventsMonthly = response.Data;
             console.log($scope.ds_regCprEventsMonthly);
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
 
-        fdmService.getRegEventsMonthly($scope.yf, $scope.yt, $scope.mf, $scope.mt, $scope.reg).then(function (response) {
+        fdmService.getRegEventsMonthly($scope.ymf, $scope.ymt, $scope.reg).then(function (response) {
             $scope.ds_regEventsNameMonthly = response.Data;
             $scope.arr = [];
             $.each($scope.ds_regEventsNameMonthly, function (_i, _d) {
@@ -190,7 +197,7 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
         placeholder: 'Year',
         showClearButton: false,
         searchEnabled: false,
-        dataSource: [2018, 2019, 2020, 2021, 2022],
+        dataSource: [2021, 2022, 2023],
 
         onSelectionChanged: function (arg) {
 
@@ -206,7 +213,7 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
         placeholder: 'Year',
         showClearButton: false,
         searchEnabled: false,
-        dataSource: [2018, 2019, 2020, 2021, 2022],
+        dataSource: [2021, 2022, 2023],
 
         onSelectionChanged: function (arg) {
 
@@ -254,26 +261,26 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
     };
 
     var registers = [
-        {Id : 0, Title:'KPA',},
-        {Id : 1, Title:'KPB',},
-        {Id : 2, Title:'CPU',},
-        {Id : 3, Title:'CPD',},
-        {Id : 4, Title: 'CPX',},
-        {Id : 5, Title:'CAR',},
-        {Id : 6, Title:'CAP',},
-        {Id : 7, Title:'CAS',},
-        {Id : 8, Title:'CPV',}
+        { Id: 0, Title: 'KPA', },
+        { Id: 1, Title: 'KPB', },
+        { Id: 2, Title: 'CPU', },
+        { Id: 3, Title: 'CPD', },
+        { Id: 4, Title: 'CPX', },
+        { Id: 5, Title: 'CAR', },
+        { Id: 6, Title: 'CAP', },
+        { Id: 7, Title: 'CAS', },
+        { Id: 8, Title: 'CPV', }
     ]
 
     $scope.reg = null;
-   
+
     $scope.sb_reg = {
         placeholder: 'Register',
         searchEnabled: false,
         showClearButton: false,
         dataSource: registers,
         displayExpr: 'Title',
-        valueExpr:'Title',
+        valueExpr: 'Title',
         bindingOptions: {
             value: 'reg',
         }
@@ -295,6 +302,37 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
 
     /////////////// Charts ////////////////
 
+
+    ///COLORS //////////////
+    var lowColor = '#00cc99';
+    var medColor = '#ff9933';
+    var highColor = '#ff1a1a';
+    var scoreColor = '#bfc3c4 ';
+    var totalEvent = '#b3b300 ';
+    var totalFlight = '#999966 ';
+    /////////////////////////
+
+    $scope.convertYearMonth = function (ym) {
+
+        var yearMonth = String(ym)
+        var year = yearMonth.substring(0, 4);
+        var month = yearMonth.substring(4);
+
+        $.each(MonthDataSource, function (_i, _d) {
+            if (_d.Id == parseInt(month) - 1)
+                $scope._title = _d.Title
+        });
+
+        return $scope._title + " (" + year + ")";
+    }
+    ///SIZES/////////////////
+    $scope.chrt_size = { height: 600, width: $(window).width() - 100 };
+    $scope.chrt_sizeXS = { height: 600, width: $(window).width() - 15 };
+    $scope.treeChrt_size = { height: 600, width: $(window).width() - 60 };
+    $scope.treeChrt_sizeXS = { height: 600, width: $(window).width() };
+    $scope.pie_size = { height: 400 };
+
+
     $scope.formatDateYYYYMMDD = function (dt) {
         return moment(dt).format('YYYY-MM-DD');
     };
@@ -309,8 +347,455 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
 
     }
 
+    $scope.eventsMonthlyChart = {
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'YearMonth',
+            label: {
+                visible: false,
+            },
+
+        },
+        panes: [{
+            name: 'topPane',
+
+        },
+        {
+            name: 'midPane',
+
+        },
+        {
+            name: 'bottomPane',
+
+        }
+        ],
+        series: [
+
+            { valueField: 'HighScore', name: 'HighScore', color: highColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumScore', name: 'MediumScore', color: medColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowScore', name: 'LowScore', color: lowColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Scores', name: 'Score', color: scoreColor, pane: 'topPane', type: 'spline', stack: 'total' },
+            { valueField: 'FlightCount', name: 'Flights', color: totalFlight, pane: 'midPane', barWidth: 50, type: 'bar' },
+            { valueField: 'HighCount', name: 'High', color: highColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumCount', name: 'Medium', color: medColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowCount', name: 'Low', color: lowColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'EventsCount', name: 'TotalEvent', color: totalEvent, pane: 'bottomPane', type: 'spline', stack: 'total' },
+
+
+
+        ],
+        title: 'Monthly Events',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+        valueAxis: [
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores',
+                },
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Flights',
+                },
+            },
+
+            {
+                height: '80%',
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Events',
+                },
+            }],
+
+        argumentAxis: { // or valueAxis, or commonAxisSettings
+            tickInterval: 1,
+            label: {
+                customizeText: function (d) {
+                    return $scope.convertYearMonth(this.value);
+
+                },
+            }
+
+        },
+
+        bindingOptions:
+        {
+            dataSource: 'ds_regEventsMonthly',
+            size: 'chrt_size'
+        },
+    };
+
+    $scope.eventsMonthlyChartXS = {
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'YearMonth',
+            label: {
+                visible: false,
+            },
+
+        },
+        panes: [{
+            name: 'topPane',
+
+        },
+        {
+            name: 'midPane',
+
+        },
+        {
+            name: 'bottomPane',
+
+        }
+        ],
+        series: [
+
+            { valueField: 'HighScore', name: 'HighScore', color: highColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumScore', name: 'MediumScore', color: medColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowScore', name: 'LowScore', color: lowColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Score', name: 'Score', color: scoreColor, pane: 'topPane', type: 'spline', stack: 'total' },
+            { valueField: 'FlightCount', name: 'Flights', color: totalFlight, pane: 'midPane', barWidth: 50, type: 'bar' },
+            { valueField: 'HighCount', name: 'High', color: highColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumCount', name: 'Medium', color: medColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowCount', name: 'Low', color: lowColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'EventsCount', name: 'TotalEvent', color: totalEvent, pane: 'bottomPane', type: 'spline', stack: 'total' },
+
+        ],
+        title: 'Monthly Events',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+        valueAxis: [
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores',
+                },
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Flights',
+                },
+            },
+
+            {
+                height: '80%',
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Events',
+                },
+            }],
+
+        argumentAxis: { // or valueAxis, or commonAxisSettings
+            tickInterval: 1,
+            label: {
+                customizeText: function (d) {
+                    return $scope.convertYearMonth(this.value);
+
+                },
+            }
+        },
+
+        bindingOptions:
+        {
+            dataSource: 'monthlyDataChart',
+            size: 'chrt_sizeXS'
+        },
+    };
+
+    $scope.scoresMonthlyChart = {
+        palette: 'Vintage',
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            format: {
+                type: "fixedPoint",
+                precision: 2
+            },
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'YearMonth',
+            type: 'bar',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+            label: {
+                visible: false,
+                precision: 2
+            },
+        },
+        panes: [{
+            name: 'topPane',
+        },
+        {
+            name: 'midPane',
+        },
+        {
+            name: 'bottomPane',
+        }],
+        series: [
+            { valueField: 'ScorePerEvent', name: 'ScorePerEvent', pane: 'topPane', barWidth: 50 },
+            { valueField: 'EventPerFlight', name: 'EventPerFlight', pane: 'midPane', barWidth: 50 },
+            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', pane: 'bottomPane', barWidth: 50 },
+
+        ],
+        title: 'Events & Scores per Flight By Month ',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+        valueAxis: {
+            tickInterval: 0.1,
+
+        },
+        valueAxis: [
+
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Score Per Event',
+                },
+
+                //constantLines: [{
+                //    value: 1.5,
+                //    color: '#fc3535',
+                //    dashStyle: 'dash',
+                //    width: 2,
+                //    label: { visible: false },
+                //    //bindingOptions:
+                //    //{
+                //    //    value: 'cptAverage'
+                //    //},
+                //}],
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Event Per Flight',
+                },
+            },
+
+            {
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores Per Flight',
+                },
+            },
+
+
+
+
+        ],
+        argumentAxis: {
+            tickInterval: 1,
+            label: {
+                customizeText: function (d) {
+                    return $scope.convertYearMonth(this.value);
+
+                },
+            }
+        },
+        bindingOptions:
+        {
+            dataSource: 'ds_regEventsMonthly',
+            size: 'chrt_size'
+        },
+    };
+
+
+
+    $scope.scoresMonthlyChartXS = {
+        palette: 'Vintage',
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            format: {
+                type: "fixedPoint",
+                precision: 2
+            },
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'YearMonth',
+            type: 'bar',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+            label: {
+                visible: false,
+                precision: 2
+            },
+        },
+        panes: [{
+            name: 'topPane',
+        },
+        {
+            name: 'midPane',
+        },
+        {
+            name: 'bottomPane',
+        }],
+        series: [
+            { valueField: 'ScorePerEvent', name: 'ScorePerEvent', pane: 'topPane', barWidth: 50 },
+            { valueField: 'EventPerFlight', name: 'EventPerFlight', pane: 'midPane', barWidth: 50 },
+            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', pane: 'bottomPane', barWidth: 50 },
+
+        ],
+        title: 'Events & Scores per Flight By Month ',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+        valueAxis: [
+
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Score Per Event',
+                },
+
+                //constantLines: [{
+                //    value: 1.5,
+                //    color: '#fc3535',
+                //    dashStyle: 'dash',
+                //    width: 2,
+                //    label: { visible: false },
+                //    //bindingOptions:
+                //    //{
+                //    //    value: 'cptAverage'
+                //    //},
+                //}],
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Event Per Flight',
+                },
+            },
+
+            {
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores Per Flight',
+                },
+            },
+
+
+
+
+        ],
+        argumentAxis: {
+            tickInterval: 1,
+            label: {
+                customizeText: function (d) {
+                    return $scope.convertYearMonth(this.value);
+
+                },
+            }
+        },
+        bindingOptions:
+        {
+            dataSource: 'ds_regEventsMonthly',
+            size: 'chrt_sizeXS'
+        },
+    };
+
+
     $scope.regEventsMonthlyChart = {
-        size: { height: 650, width: $(window).width() - 60 },
+        palette: 'Office',
+
         tooltip: {
             enabled: true,
             location: 'edge',
@@ -322,87 +807,119 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
         },
         commonSeriesSettings: {
             argumentField: 'Month',
-            type: 'stackedbar',
+            type: 'bar',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+
+        },
+        panes: [{
+            name: 'topPane',
 
         },
 
-        palette: 'bright',
+        {
+            name: 'midPane',
+        },
 
+        {
+            name: 'bottomPane',
+        }],
         series: [
 
-            { valueField: 'LowCount', name: 'Low', color: lowColor, barWidth: 40 },
-            { valueField: 'MediumCount', name: 'Medium', color: medColor, barWidth: 40 },
-            { valueField: 'HighCount', name: 'High', color: highColor, barWidth: 40 },
+            { valueField: 'HighScore', name: 'HighScore', color: highColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumScore', name: 'MediumScore', color: medColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowScore', name: 'LowScore', color: lowColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Score', name: 'Score', color: scoreColor, pane: 'topPane', type: 'scatter', stack: 'total' },
+            { valueField: 'FlightCount', name: 'Flights', color: totalFlight, pane: 'midPane', barWidth: 50 },
+            { valueField: 'HighCount', name: 'High', color: highColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumCount', name: 'Medium', color: medColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowCount', name: 'Low', color: lowColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'EventsCount', name: 'TotalEvent', color: totalEvent, pane: 'bottomPane', type: 'scatter', stack: 'total' },
 
         ],
-        title: 'Events',
+        title: 'Scores & Events By Month',
         legend: {
             verticalAlignment: 'bottom',
             horizontalAlignment: 'center',
         },
         export: {
-            enabled: false,
+            enabled: true,
         },
         onPointClick(e) {
             e.target.select();
         },
-
-        argumentAxis: { // or valueAxis, or commonAxisSettings
-            label: {
-                overlappingBehavior: "rotate",
-
-            }
-        },
-        valueAxis: [{
-            grid: {
-                visible: true,
-            }
-        }],
         argumentAxis: {
             tickInterval: 1,
             label: {
-                customizeText: function () {
-
-                    return $scope.monthConvert(this.value);
+                customizeText: function (d) {
+                    return $scope.convertYearMonth(this.value);
 
                 },
             }
         },
+        valueAxis: [
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores',
+                },
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Flights',
+                },
+            },
+
+            {
+                height: '80%',
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Events',
+                },
+            }],
 
 
         bindingOptions:
         {
-            dataSource: 'ds_regEventsMonthly'
+            dataSource: 'ds_regEventsMonthly',
+            size: 'chrt_size'
         },
+
     };
 
     $scope.eventsChart = {
-        size: {
-            height: 414,
-        },
-        palette: [lowColor, medColor, highColor],
+        type: "doughnut",
 
+        palette: ['#00cc99', '#ff9933', '#ff1a1a'],
         series: [
             {
                 argumentField: 'level',
                 valueField: 'Count',
                 label: {
                     visible: true,
-                    //customizeText(arg) {
-                    //    return `${arg.argumentText} (${arg.valueText})`;
-                    //},
                     connector: {
                         visible: true,
                         width: 1,
                     },
                     customizeText(arg) {
-                        return arg.percentText;
+                        return arg.value;
                     },
-                    position: 'columns',
                 },
+
             },
         ],
-
+        title: 'Events',
         export: {
             enabled: false,
         },
@@ -416,11 +933,21 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
 
             toggleVisibility(e.component.getAllSeries()[0].getPointsByArg(arg)[0]);
         },
+        legend: {
+            //verticalAlignment: 'bottom',
+            //horizontalAlignment: 'center',
+            verticalAlignment: 'top',
+            horizontalAlignment: 'right',
+            itemTextPosition: 'right',
 
+        },
         bindingOptions:
         {
-            dataSource: 'ds_regTotalEvents'
+            dataSource: 'ds_regTotalEvents',
+            'size': 'pie_size'
         },
+
+
     };
 
     $scope.scoresChart = {

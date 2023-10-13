@@ -199,7 +199,7 @@
 
             <tr style="margin-top:5px">
                 <td class="dx-border center col-xs-7" colspan="2" dx-select-box="sb_cpt"></td>
-                <td class=" center col-xs-5" colspan="2" style="margin-left:10px" dx-button="btn_search" ></td>
+                <td class=" center col-xs-5" colspan="2" style="margin-left:10px" dx-button="btn_search"></td>
 
             </tr>
         </table>
@@ -260,11 +260,11 @@
                         <div style="width: 100%">
                             <div class="chartBox col-lg-6" style="height: 100%;border-right: none !important">
                                 <p style="text-align: center; font-size: 16px; padding-top: 5px">Events per flight</p>
-                                <p style="text-align: center; font-size: 30px">{{ds_cptEventsGeneral.EventPerFlight.toFixed(0)}}%</p>
+                                <p style="text-align: center; font-size: 30px">{{ds_cptEventsGeneral.EventPerFlight.toFixed(2)}}</p>
                             </div>
                             <div class="chartBox col-lg-6" style="height:100%">
                                 <p style="text-align: center; font-size: 16px; padding-top: 5px">Score per flight</p>
-                                <p style="text-align: center; font-size: 30px">{{ds_cptEventsGeneral.ScorePerFlight.toFixed(0)}}%</p>
+                                <p style="text-align: center; font-size: 30px">{{ds_cptEventsGeneral.ScorePerFlight.toFixed(2)}}</p>
                             </div>
                         </div>
                     </div>
@@ -296,6 +296,15 @@
 
 
                         <div id="cptRouteChart" dx-chart="cptRouteChart"></div>
+                    </div>
+                </div>
+
+                <div style="clear:both"></div>
+
+
+                <div class='col-lg-12' style='padding: 10px 2px 10px 2px'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="eventPerFlightRoute" dx-chart="eventPerFlightRoute"></div>
                     </div>
                 </div>
 
@@ -374,11 +383,11 @@
                 <div class="col-md-3 col-sm-3 col-xs-3 generalInfo chartBox" style='width: 24%; height: 150px; padding: 0 !important; margin-left: 5px '>
                     <div class="chartBox" style="height: 75px">
                         <p style="font-size: 16px; padding-top: 5px; padding-left: 14px;margin-bottom: 0!important">Events per flight</p>
-                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.EventPerFlight.toFixed(0)}}%</p>
+                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.EventPerFlight.toFixed(2)}}</p>
                     </div>
                     <div class="chartBox" style="height: 75px">
                         <p style="font-size: 16px; padding-top: 5px; padding-left: 14px;margin-bottom: 0!important">Score per flight</p>
-                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.ScorePerFlight.toFixed(0)}}%</p>
+                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.ScorePerFlight.toFixed(2)}}</p>
                     </div>
                 </div>
 
@@ -427,6 +436,14 @@
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
 
                         <div id="cptRouteChartXS" dx-chart="cptRouteChartXS"></div>
+                    </div>
+                </div>
+
+                <div style="clear:both"></div>
+
+                <div class='col-sm-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="eventPerFlightRoute" dx-chart="eventPerFlightRoute"></div>
                     </div>
                 </div>
 
@@ -506,11 +523,11 @@
                 <div class="col-md-3 col-sm-3 col-xs-3 generalInfo chartBox" style='width:24%;height:150px;padding:0 !important'>
                     <div class="chartBox" style="height: 75px">
                         <p style="font-size: 16px; padding-top: 5px; padding-left: 14px;margin-bottom: 0!important">Events per flight</p>
-                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.EventPerFlight.toFixed(0)}}%</p>
+                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.EventPerFlight.toFixed(2)}}</p>
                     </div>
                     <div class="chartBox" style="height: 75px">
                         <p style="font-size: 16px; padding-top: 5px; padding-left: 14px;margin-bottom: 0!important">Score per flight</p>
-                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.ScorePerFlight.toFixed(0)}}%</p>
+                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.ScorePerFlight.toFixed(2)}}</p>
                     </div>
                 </div>
                 <div style="clear:both"></div>
@@ -560,6 +577,15 @@
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
 
                         <div id="cptRouteChartXS" dx-chart="cptRouteChartXS"></div>
+                    </div>
+                </div>
+
+                <div style="clear:both"></div>
+
+
+                <div class='col-md-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="eventPerFlightRoute" dx-chart="eventPerFlightRoute"></div>
                     </div>
                 </div>
 
@@ -635,11 +661,11 @@
                 <div class="col-xs-6 generalInfo chartBox" style='width:49%;height:150px;padding:0 !important'>
                     <div class="chartBox" style="height: 75px">
                         <p style="font-size: 16px; padding-top: 5px; padding-left: 14px;margin-bottom: 0!important">Events per flight</p>
-                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.EventPerFlight.toFixed(0)}}</p>
+                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.EventPerFlight.toFixed(2)}}</p>
                     </div>
                     <div class="chartBox" style="height: 75px">
                         <p style="font-size: 16px; padding-top: 5px; padding-left: 14px;margin-bottom: 0!important">Score per flight</p>
-                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.ScorePerFlight.toFixed(0)}}</p>
+                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.ScorePerFlight.toFixed(2)}}</p>
                     </div>
                 </div>
                 <div style="clear:both"></div>
@@ -684,6 +710,15 @@
                 <div class='col-xs-12' style='padding: 10px 2px 10px 2px'>
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
                         <div id="cptRouteChartXS" dx-chart="cptRouteChartXS"></div>
+                    </div>
+                </div>
+
+                <div style="clear:both"></div>
+
+
+                <div class='col-xs-12' style='padding: 10px 2px 10px 2px'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="eventPerFlightRoute" dx-chart="eventPerFlightRoute"></div>
                     </div>
                 </div>
 

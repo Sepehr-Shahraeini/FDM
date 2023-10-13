@@ -4,8 +4,10 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
     var medColor = '#ffcc66';
     var highColor = '#ff1a1a';
 
-    $scope._crewId = parseInt($routeParams.crewId);
-    $scope._jobGroup = $routeParams.jobGroup;
+    //$scope._crewId = parseInt($routeParams.crewId);
+    //$scope._jobGroup = $routeParams.jobGroup;
+
+    $scope._crewId = null;
 
     $scope.clearPopup = function () {
         $scope.isGround = false;
@@ -90,7 +92,17 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
         }
     };
 
+    $scope.yt = new Date().getFullYear();
+    $scope.mt = new Date().getMonth();
 
+    if ($scope.mt - 6 < 0) {
+        $scope.result = $scope.mt - 6;
+        $scope.yf = $scope.yt - 1;
+        $scope.mf = 12 + $scope.result
+    } else {
+        $scope.yf = $scope.yt;
+        $scope.mf = $scope.mt - 6;
+    }
 
 
 
@@ -581,10 +593,10 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
     //    $scope.mf = $scope.mt - 6;
     //}
 
-    $scope.yt = parseInt($routeParams.yt);
-    $scope.yf = parseInt($routeParams.yf);
-    $scope.mt = parseInt($routeParams.mt);
-    $scope.mf = parseInt($routeParams.mf);
+    //$scope.yt = parseInt($routeParams.yt);
+    //$scope.yf = parseInt($routeParams.yf);
+    //$scope.mt = parseInt($routeParams.mt);
+    //$scope.mf = parseInt($routeParams.mf);
 
     $scope.sb_yf = {
         placeholder: 'Year',
@@ -658,7 +670,9 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
     $scope.sb_cpt = {
         placeholder: 'Captian',
         showClearButton: false,
-        searchEnabled: false,
+        searchEnabled: true,
+        searchModeOption: 'contains',
+        searchExprOption: 'Title',
         width: 215,
         displayExpr: 'Title',
         valueExpr: 'Id',
@@ -992,11 +1006,11 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
             location: 'edge',
             format: {
                 type: "fixedPoint",
-                precision: 0
+                precision: 2
             },
             customizeTooltip(arg) {
                 return {
-                    text: arg.seriesName + ': ' + arg.valueText + '%',//`${arg.seriesName} years: ${arg.valueText}`,
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
                 };
             },
         },
@@ -1013,20 +1027,20 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
 
         panes: [{
             name: 'topPane',
-
         },
-
-
+        {
+            name: 'midPane',
+        },
         {
             name: 'bottomPane',
         }],
         series: [
-            { valueField: 'ScorePerEvent', name: 'EventPerFlight', pane: 'topPane' },
-            { valueField: 'EventPerFlight', name: 'EventPerFlight', pane: 'bottomPane' },
-            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', pane: 'bottomPane' },
+            { valueField: 'ScorePerEvent', name: 'ScorePerEvent', pane: 'topPane', barWidth: 50 },
+            { valueField: 'EventPerFlight', name: 'EventPerFlight', pane: 'midPane', barWidth: 50 },
+            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', pane: 'bottomPane', barWidth: 50 },
 
         ],
-        title: 'Events & Scores per Flight By Month(%) ',
+        title: 'Events & Scores per Flight By Month',
         legend: {
             verticalAlignment: 'bottom',
             horizontalAlignment: 'center',
@@ -1061,6 +1075,15 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
                 //}],
             },
 
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Event Per Flight',
+                },
+            },
 
             {
                 pane: 'bottomPane',
@@ -1068,7 +1091,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
                     visible: true,
                 },
                 title: {
-                    text: 'Events & Scores Per Flight',
+                    text: 'Scores Per Flight',
                 },
             },
 
@@ -1076,6 +1099,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
 
 
         ],
+
         argumentAxis: { // or valueAxis, or commonAxisSettings
             tickInterval: 1,
             label: {
@@ -1102,11 +1126,11 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
             location: 'edge',
             format: {
                 type: "fixedPoint",
-                precision: 0
+                precision: 2
             },
             customizeTooltip(arg) {
                 return {
-                    text: arg.seriesName + ': ' + arg.valueText + '%',//`${arg.seriesName} years: ${arg.valueText}`,
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
                 };
             },
         },
@@ -1123,20 +1147,20 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
 
         panes: [{
             name: 'topPane',
-
         },
-
-
+        {
+            name: 'midPane',
+        },
         {
             name: 'bottomPane',
         }],
         series: [
-            { valueField: 'ScorePerEvent', name: 'EventPerFlight', pane: 'topPane' },
-            { valueField: 'EventPerFlight', name: 'EventPerFlight', pane: 'bottomPane' },
-            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', pane: 'bottomPane' },
+            { valueField: 'ScorePerEvent', name: 'ScorePerEvent', pane: 'topPane', barWidth: 50 },
+            { valueField: 'EventPerFlight', name: 'EventPerFlight', pane: 'midPane', barWidth: 50 },
+            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', pane: 'bottomPane', barWidth: 50 },
 
         ],
-        title: 'Events & Scores per Flight By Month(%) ',
+        title: 'Events & Scores per Flight By Month',
         legend: {
             verticalAlignment: 'bottom',
             horizontalAlignment: 'center',
@@ -1171,6 +1195,15 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
                 //}],
             },
 
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Event Per Flight',
+                },
+            },
 
             {
                 pane: 'bottomPane',
@@ -1178,7 +1211,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
                     visible: true,
                 },
                 title: {
-                    text: 'Events & Scores Per Flight',
+                    text: 'Scores Per Flight',
                 },
             },
 
@@ -1186,6 +1219,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
 
 
         ],
+
         argumentAxis: { // or valueAxis, or commonAxisSettings
             tickInterval: 1,
             label: {
@@ -1424,12 +1458,22 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
 
             },
         },
+        panes: [{
+            name: 'topPane',
+        },
+        {
+            name: 'midPane',
+        },
+        {
+            name: 'bottomPane',
+        }],
         series: [
-            { valueField: 'EventPerFlight', name: 'EventPerFlight', barWidth: 40 },
-            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', barWidth: 40 },
+            { valueField: 'ScorePerEvent', name: 'ScorePerEvent', pane: 'topPane', barWidth: 50 },
+            { valueField: 'EventPerFlight', name: 'EventPerFlight', pane: 'midPane', barWidth: 50 },
+            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', pane: 'bottomPane', barWidth: 50 },
 
         ],
-        title: 'Events & Scores per Flight By Month(%) ',
+        title: 'Events & Scores per Flight By Register',
         legend: {
             verticalAlignment: 'bottom',
             horizontalAlignment: 'center',
@@ -1440,10 +1484,55 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
         onPointClick(e) {
             e.target.select();
         },
-        valueAxis: {
-            tickInterval: 0.1,
+        valueAxis: [
 
-        },
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Score Per Event',
+                },
+
+                //constantLines: [{
+                //    value: 1.5,
+                //    color: '#fc3535',
+                //    dashStyle: 'dash',
+                //    width: 2,
+                //    label: { visible: false },
+                //    //bindingOptions:
+                //    //{
+                //    //    value: 'cptAverage'
+                //    //},
+                //}],
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Event Per Flight',
+                },
+            },
+
+            {
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores Per Flight',
+                },
+            },
+
+
+
+
+        ],
+
 
         bindingOptions:
         {
@@ -1477,12 +1566,22 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
 
             },
         },
+        panes: [{
+            name: 'topPane',
+        },
+        {
+            name: 'midPane',
+        },
+        {
+            name: 'bottomPane',
+        }],
         series: [
-            { valueField: 'EventPerFlight', name: 'EventPerFlight', barWidth: 40 },
-            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', barWidth: 40 },
+            { valueField: 'ScorePerEvent', name: 'ScorePerEvent', pane: 'topPane', barWidth: 50 },
+            { valueField: 'EventPerFlight', name: 'EventPerFlight', pane: 'midPane', barWidth: 50 },
+            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', pane: 'bottomPane', barWidth: 50 },
 
         ],
-        title: 'Events & Scores per Flight By Month(%) ',
+        title: 'Events & Scores per Flight By Register',
         legend: {
             verticalAlignment: 'bottom',
             horizontalAlignment: 'center',
@@ -1493,10 +1592,55 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
         onPointClick(e) {
             e.target.select();
         },
-        valueAxis: {
-            tickInterval: 0.1,
+        valueAxis: [
 
-        },
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Score Per Event',
+                },
+
+                //constantLines: [{
+                //    value: 1.5,
+                //    color: '#fc3535',
+                //    dashStyle: 'dash',
+                //    width: 2,
+                //    label: { visible: false },
+                //    //bindingOptions:
+                //    //{
+                //    //    value: 'cptAverage'
+                //    //},
+                //}],
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Event Per Flight',
+                },
+            },
+
+            {
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores Per Flight',
+                },
+            },
+
+
+
+
+        ],
+
         argumentAxis: {
             tickInterval: 1,
             label: {
@@ -1671,7 +1815,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
     };
 
 
-   
+
 
 
 
@@ -2835,16 +2979,12 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
                     text: 'Events',
                 },
             }],
-        //argumentAxis: { // or valueAxis, or commonAxisSettings
-        //    tickInterval: 1,
-        //    label: {
-        //        customizeText: function (d) {
-        //            return $scope.convertYearMonth(this.value);
-
-        //        },
-        //    }
-
-        //},
+        argumentAxis: { // or valueAxis, or commonAxisSettings
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: -90
+            }
+        },
 
         bindingOptions:
         {
@@ -2937,10 +3077,12 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
                     text: 'Events',
                 },
             }],
-        //argumentAxis: { // or valueAxis, or commonAxisSettings
-         
-
-        //},
+        argumentAxis: { // or valueAxis, or commonAxisSettings
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: -90
+            }
+        },
 
         bindingOptions:
         {
@@ -2949,6 +3091,229 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
         },
     };
 
+    $scope.eventPerFlightRoute = {
+        palette: 'Vintage',
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            format: {
+                type: "fixedPoint",
+                precision: 2
+            },
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'Route',
+            type: 'bar',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+            label: {
+                visible: false,
+                precision: 2
+            },
+        },
+        panes: [{
+            name: 'topPane',
+        },
+        {
+            name: 'midPane',
+        },
+        {
+            name: 'bottomPane',
+        }],
+        series: [
+            { valueField: 'ScorePerEvent', name: 'ScorePerEvent', pane: 'topPane', barWidth: 50 },
+            { valueField: 'EventPerFlight', name: 'EventPerFlight', pane: 'midPane', barWidth: 50 },
+            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', pane: 'bottomPane', barWidth: 50 },
+
+        ],
+        title: 'Events & Scores per Flight By Route ',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+        valueAxis: [
+
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Score Per Event',
+                },
+
+                //constantLines: [{
+                //    value: 1.5,
+                //    color: '#fc3535',
+                //    dashStyle: 'dash',
+                //    width: 2,
+                //    label: { visible: false },
+                //    //bindingOptions:
+                //    //{
+                //    //    value: 'cptAverage'
+                //    //},
+                //}],
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Event Per Flight',
+                },
+            },
+
+            {
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores Per Flight',
+                },
+            },
+
+
+
+
+        ],
+        argumentAxis: {
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: -90
+            }
+        },
+        bindingOptions:
+        {
+            dataSource: 'ds_cptRoute',
+            size: 'chrt_size'
+        },
+    };
+
+    $scope.eventPerFlightRouteXS = {
+        palette: 'Vintage',
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            format: {
+                type: "fixedPoint",
+                precision: 2
+            },
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'Route',
+            type: 'bar',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+            label: {
+                visible: false,
+
+            },
+        },
+        panes: [{
+            name: 'topPane',
+        },
+        {
+            name: 'midPane',
+        },
+        {
+            name: 'bottomPane',
+        }],
+        series: [
+            { valueField: 'ScorePerEvent', name: 'ScorePerEvent', pane: 'topPane', barWidth: 50 },
+            { valueField: 'EventPerFlight', name: 'EventPerFlight', pane: 'midPane', barWidth: 50 },
+            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', pane: 'bottomPane', barWidth: 50 },
+
+        ],
+        title: 'Events & Scores per Flight By Route ',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+        valueAxis: [
+
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Score Per Event',
+                },
+
+                //constantLines: [{
+                //    value: 1.5,
+                //    color: '#fc3535',
+                //    dashStyle: 'dash',
+                //    width: 2,
+                //    label: { visible: false },
+                //    //bindingOptions:
+                //    //{
+                //    //    value: 'cptAverage'
+                //    //},
+                //}],
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Event Per Flight',
+                },
+            },
+
+            {
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores Per Flight',
+                },
+            },
+
+
+
+
+        ],
+        argumentAxis: {
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: -90
+            }
+        },
+        bindingOptions:
+        {
+            dataSource: 'ds_cptRoute',
+            size: 'chrt_sizeXS'
+        },
+    };
 
 
 

@@ -1,0 +1,204 @@
+﻿'use strict';
+app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$rootScope', function ($scope, qaService, $routeParams, $rootScope) {
+
+    $scope.isNotLocked = true;
+
+    $scope.popup_operation_visible = false;
+    $scope.popup_height = $(window).height() - 100;
+    $scope.popup_width = 1500;
+    $scope.popup_operation_title = $rootScope.Title;
+    $scope.popup_instance = null;
+    $scope.isFullScreen = true;
+
+    $scope.popup_operation = {
+
+
+        showTitle: true,
+
+        toolbarItems: [
+
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Referre', onClick: function (e) {
+
+                        $rootScope.$broadcast('InitQAEmployee', { Type: $scope.tempData.Type, Id: $scope.tempData.Id, Category: $scope.tempData.Category });
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Action', onClick: function (e) {
+
+                    }
+                }, toolbar: 'bottom'
+            },
+            {
+                widget: 'dxButton', location: 'before', options: {
+                    type: 'default', text: 'Close The Report', validationGroup: 'result', onClick: function (e) {
+
+                        $scope.loadingVisible = true;
+
+                        $scope.entity.Category = $scope.tempData.Category;
+                        $scope.entity.Id = $scope.tempData.Id;
+                        $scope.entity.Type = $scope.tempData.Type;
+                        $scope.entity.EmployeeId = $scope.tempData.EmployeeId;
+                        $scope.entity.isResponsible = $scope.isResponsible;
+                        
+                        qaService.acceptQA($scope.entity).then(function (response) {
+                            $scope.loadingVisible = false;
+                            General.ShowNotify(Config.Text_QAAccept, 'success');
+
+                            if ($scope.isResponsible == true) {
+
+                                if (response.IsSuccess == true && $scope.tempData.Category == 'open') {
+                                    var row = Enumerable.From($rootScope.dg_open_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
+                                    row.Status = "Closed";
+                                    row.EmployeeStatus = "Closed";
+                                    row.Status = 1;
+                                    $rootScope.dg_determined_ds.push(row);
+                                    $rootScope.dg_open_ds = Enumerable.From($rootScope.dg_open_ds).Where(function (x) {
+                                        return x.Id != $scope.entity.Id;
+                                    }).ToArray();
+                                }
+
+                                if (response.IsSuccess == true && $scope.tempData.Category == 'new') {
+                                    var row = Enumerable.From($rootScope.dg_new_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
+                                    row.Status = "Closed";
+                                    row.EmployeeStatus = "Closed";
+                                    row.Status = 1;
+                                    $rootScope.dg_determined_ds.push(row);
+                                    $rootScope.dg_new_ds = Enumerable.From($rootScope.dg_new_ds).Where(function (x) {
+                                        return x.Id != $scope.entity.Id;
+                                    }).ToArray();
+                                }
+                            } else {
+                                if (response.IsSuccess == true && $scope.tempData.Category == 'open') {
+                                    var row = Enumerable.From($rootScope.dg_open_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
+                                    row.Status = "Closed";
+                                    row.EmployeeStatus = "Closed";
+                                    $rootScope.dg_determined_ds.push(row);
+                                    $rootScope.dg_open_ds = Enumerable.From($rootScope.dg_open_ds).Where(function (x) {
+                                        return x.Id != $scope.entity.Id;
+                                    }).ToArray();
+                                }
+
+                                if (response.IsSuccess == true && $scope.tempData.Category == 'new') {
+                                    var row = Enumerable.From($rootScope.dg_new_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
+                                    row.Status = "Closed";
+                                    row.EmployeeStatus = "Closed";
+                                    $rootScope.dg_determined_ds.push(row);
+                                    $rootScope.dg_new_ds = Enumerable.From($rootScope.dg_new_ds).Where(function (x) {
+                                        return x.Id != $scope.entity.Id;
+                                    }).ToArray();
+                                }
+                            }
+
+
+                        });
+                    }
+                }, toolbar: 'bottom'
+            },
+
+        ],
+
+        visible: false,
+        dragEnabled: true,
+        closeOnOutsideClick: false,
+        onShowing: function (e) {
+            $rootScope.IsRootSyncEnabled = false;
+            $scope.popup_instance.repaint();
+
+
+        },
+        onShown: function (e) {
+
+            if ($scope.isNew) {
+                $scope.isContentVisible = true;
+            }
+            if ($scope.tempData != null)
+                $scope.bind();
+
+            //$rootScope.referred_list_instance.repaint();
+            //$rootScope.$broadcast('InitTest', $scope.tempData);
+
+
+
+        },
+        onHiding: function () {
+            $scope.entity = {
+                Id: -1,
+                EventTitleIds: [],
+
+            };
+            $scope.entity.Result = null;
+            $scope.popup_operation_visible = false;
+        },
+        onContentReady: function (e) {
+            if (!$scope.popup_instance)
+                $scope.popup_instance = e.component;
+
+        },
+        // fullScreen:false,
+        bindingOptions: {
+            visible: 'popup_operation_visible',
+            fullScreen: 'isFullScreen',
+            title: 'popup_operation_title',
+            height: 'popup_height',
+            width: 'popup_width',
+            'toolbarItems[0].visible': 'isNotLocked',
+            'toolbarItems[1].visible': 'isNotLocked',
+            'toolbarItems[2].visible': 'isNotLocked',
+
+        }
+    };
+
+    $scope.bind = function () {
+        qaService.getIsResponsible($scope.tempData.EmployeeId, $scope.tempData.Type, $scope.tempData.Id).then(function (response) {
+            if (response.IsSuccess == true)
+                $scope.isResponsible = true
+
+        });
+    }
+
+
+
+    $scope.$on('InitOperationPopup', function (event, prms) {
+        $scope.tempData = prms;
+
+        $scope.Type = $scope.tempData.Type;
+
+        $scope.popup_operation_visible = true;
+    });
+
+    $scope.cabinLoaded = function () {
+        $rootScope.$broadcast('InitQACabin', $scope.tempData);
+    }
+
+    $scope.cateringLoaded = function () {
+        $rootScope.$broadcast('InitQACatering', $scope.tempData);
+    }
+
+    $scope.securityLoaded = function () {
+        $rootScope.$broadcast('InitQASecurity', $scope.tempData);
+    }
+
+    $scope.maintenanceLoaded = function () {
+        $rootScope.$broadcast('InitQAMaintenance', $scope.tempData);
+    }
+
+    $scope.dispatchLoaded = function () {
+        $rootScope.$broadcast('InitQADispatch', $scope.tempData);
+    }
+
+    $scope.groundLoaded = function () {
+        $rootScope.$broadcast('InitQAGround', $scope.tempData);
+    }
+
+    $scope.voluntaryLoaded = function () {
+        $rootScope.$broadcast('InitVHR', $scope.tempData);
+    }
+
+
+}]);
+
+

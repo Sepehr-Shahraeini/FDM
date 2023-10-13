@@ -40,9 +40,9 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
 
 
     /////////////////////
-    var _getFdmEventsName = function (ymf, ymt) {
+    var _getFdmEventsName = function (ymf, ymt, ACType) {
         var deferred = $q.defer();
-        $http.get(apiFdm + "api/fdm/dashboard/eventname/" + ymf + "/" + ymt).then(function (response) {
+        $http.get(apiFdm + "api/fdm/dashboard/eventname/" + ymf + "/" + ymt + "/" + ACType).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
             // deferred.reject(Exeptions.getMessage(err));
@@ -51,7 +51,7 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
         return deferred.promise;
     }
 
-
+    
 
     ////////////
     var _getFdmRegisterEvent = function (df, dt) {
@@ -69,9 +69,9 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
 
 
     ////////////////
-    var _getTopCpt = function (ymf, ymt) {
+    var _getTopCpt = function (ymf, ymt,ACType) {
         var deferred = $q.defer();
-        $http.get(apiFdm + "api/get/fdm/top/cpt/" + ymf + "/" + ymt).then(function (response) {
+        $http.get(apiFdm + "api/get/fdm/top/cpt/" + ymf + "/" + ymt + "/" + ACType).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
             // deferred.reject(Exeptions.getMessage(err));
@@ -80,9 +80,10 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
         return deferred.promise;
     }
 
-    var _compareTopCpt = function (ymf, ymt) {
+ 
+    var _compareTopCpt = function (ymf, ymt, ACType) {
         var deferred = $q.defer();
-        $http.get(apiFdm + "api/fdm/compare/top/cpt/" + ymf + "/" + ymt).then(function (response) {
+        $http.get(apiFdm + "api/fdm/compare/top/cpt/" + ymf + "/" + ymt + "/" + ACType).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
             // deferred.reject(Exeptions.getMessage(err));
@@ -91,9 +92,9 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
         return deferred.promise;
     }
 
-     var _compareTopRegister = function (ymf, ymt) {
+    var _compareTopRegister = function (ymf, ymt,ACType) {
         var deferred = $q.defer();
-         $http.get(apiFdm + "api/fdm/compare/top/register/" + ymf + "/" + ymt).then(function (response) {
+        $http.get(apiFdm + "api/fdm/compare/top/register/" + ymf + "/" + ymt + "/" + ACType).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
             // deferred.reject(Exeptions.getMessage(err));
@@ -101,6 +102,8 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
 
         return deferred.promise;
     }
+
+ 
 
     var _getTopCpt2 = function (yf, yt, mf, mt) {
         var deferred = $q.defer();
@@ -140,9 +143,9 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
 
 
     ////////////////////
-    var _getEventsDaily = function (df, dt) {
+    var _getEventsDaily = function (df, dt, ACType) {
         var deferred = $q.defer();
-        $http.get(apiFdm + "api/fdm/dashboard/all/events/" + df + "/" + dt).then(function (response) {
+        $http.get(apiFdm + "api/fdm/dashboard/all/events/" + df + "/" + dt + "/" + ACType).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
             // deferred.reject(Exeptions.getMessage(err));
@@ -151,6 +154,8 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
         return deferred.promise;
     }
 
+
+ 
 
 
     //////////////
@@ -384,9 +389,9 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
 
 
     ////////////////
-    var _getRegEventsMonthly = function (yf, yt, mf, mt, id) {
+    var _getRegEventsMonthly = function (ymf, ymt, id) {
         var deferred = $q.defer();
-        $http.get(apiFdm + "api/fdm/register/events/monthly/" + yf + "/" + yt + "/" + mf + "/" + mt + "/" + id).then(function (response) {
+        $http.get(apiFdm + "api/fdm/register/events/monthly/" + ymf + "/" + ymt + "/" + id).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
             // deferred.reject(Exeptions.getMessage(err));
@@ -508,9 +513,9 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
     //}
 
     ///////////////
-    var _getFDMRegMonthly = function (yf, yt, mf, mt, reg) {
+    var _getFDMRegMonthly = function (ymf, ymt, reg) {
         var deferred = $q.defer();
-        $http.get(apiFdm + "api/fdm/register/monthly/" + yf + "/" + yt + "/" + mf + "/" + mt + "/" + reg).then(function (response) {
+        $http.get(apiFdm + "api/fdm/register/monthly/" + ymf + "/" + ymt + "/" + reg).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
             // deferred.reject(Exeptions.getMessage(err));
@@ -519,9 +524,9 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
         return deferred.promise;
     }
 
-    var _getEvetnByRegMonthly = function (yf, mf) {
+    var _getEvetnByRegMonthly = function (yf, mf, ACType) {
         var deferred = $q.defer();
-        $http.get(apiFdm + "api/fdm/register/monthly/" + yf + "/" + mf).then(function (response) {
+        $http.get(apiFdm + "api/fdm/register/byMonth/" + yf + "/" + mf + "/" + ACType).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
             // deferred.reject(Exeptions.getMessage(err));
@@ -530,6 +535,7 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
         return deferred.promise;
     }
 
+ 
     //var _getFDMRegCptDaily = function (df, dt, reg) {
     //    var deferred = $q.defer();
     //    $http.get(apiFdm + "api/fdm/register/cpt/daily/" + df + "/" + dt + "/" + reg).then(function (response) {
@@ -542,9 +548,9 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
     //}
 
     ////////////////////
-    var _getFDMRegCptMonthly = function (yf, yt, mf, mt, reg) {
+    var _getFDMRegCptMonthly = function (ymf, ymt, reg) {
         var deferred = $q.defer();
-        $http.get(apiFdm + "api/fdm/register/cpt/monthly/" + yf + "/" + yt + "/" + mf + "/" + mt + "/" + reg).then(function (response) {
+        $http.get(apiFdm + "api/fdm/register/cpt/monthly/" + ymf + "/" + ymt + "/" + reg).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
             // deferred.reject(Exeptions.getMessage(err));
@@ -662,9 +668,9 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
 
 
     ///////////////
-    var _fdmDashboardMonthly = function (year, month) {
+    var _fdmDashboardMonthly = function (year, month, ACType) {
         var deferred = $q.defer();
-        $http.get(apiFdm + "api/fdm/dashboard/monthly/" + year + "/" + month + 1).then(function (response) {
+        $http.get(apiFdm + "api/fdm/dashboard/monthly/" + year + "/" + month + "/" + ACType).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
             // deferred.reject(Exeptions.getMessage(err));
@@ -672,6 +678,8 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
         });
         return deferred.promise;
     }
+
+  
 
     //////////////
     var _DeleteEvent = function (id) {
@@ -696,15 +704,17 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
         return deferred.promise;
     }
 
-    var _FDMRoute= function (ymf, ymt) {
+    var _FDMRoute = function (ymf, ymt, ACType) {
         var deferred = $q.defer();
-        $http.get(apiFdm + "api/fdm/route/" + ymf + "/" + ymt).then(function (response) {
+        $http.get(apiFdm + "api/fdm/route/" + ymf + "/" + ymt + "/" + ACType).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
 
         });
         return deferred.promise;
     }
+
+    
 
 
     var _lockMDFDM = function (year, month, usr) {
@@ -729,6 +739,15 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
     var _FDMAVG = function () {
         var deferred = $q.defer();
         $http.get(apiFdm + "api/fdm/avg").then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+
+        });
+        return deferred.promise;
+    }
+    var _updateFDMTBL = function () {
+        var deferred = $q.defer();
+        $http.get(apiFdm + "api/fdm/update/fdmtbl").then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
 
@@ -810,6 +829,7 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
     serviceFactory.getFDMFoMonthly2 = _getFDMFoMonthly2;
     serviceFactory.getFoEventsMonthly2 = _getFoEventsMonthly2;
     serviceFactory.getCptAirport = _getCptAirport;
+    serviceFactory.updateFDMTBL = _updateFDMTBL;
 
 
     return serviceFactory;

@@ -39,6 +39,9 @@ Config.Text_DiversionAltAirport = 'Alternate Airport Error';
 Config.Text_Locked = 'Selected Recorde Is Locked';
 Config.Text_Permision = 'You Dont Have Permision To Delete The Row';
 Config.Text_UnableToLock = 'Unable To Lock Cause Some Recored Are Not Validated';
+Config.Text_QAAccept = 'Selected Form Is Successfully Accepted';
+Config.Text_QAReject = 'Selected Form Is Successfully Rejected';
+Config.Text_QARefer = 'Selected Form Is Successfully Referred';
 Config.LocalData = {};
 
 

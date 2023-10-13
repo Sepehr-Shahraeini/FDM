@@ -608,12 +608,22 @@ app.config(function ($routeProvider) {
         templateUrl: "/app/views/fdmDashboard.html"
     });
 
+    $routeProvider.when("/fdm/dashboard/md", {
+        controller: "fdmDashboardMD",
+        templateUrl: "/app/views/fdmDashboardMD.html"
+    });
+
+    $routeProvider.when("/fdm/dashboard/boeing", {
+        controller: "fdmDashboardBoeing",
+        templateUrl: "/app/views/fdmDashboardBoeing.html"
+    });
+
     $routeProvider.when("/fdm/dashboard/cpt", {
         controller: "fdmDashboardPilotController",
         templateUrl: "/app/views/fdmDashboardPilot.html"
     });
 
-    $routeProvider.when("/fdm/dashboard/cpt/monthly/:crewId/:jobGroup/:yt/:yf/:mt/:mf", {
+    $routeProvider.when("/fdm/dashboard/cpt/monthly", {
         controller: "fdmDashboardPilotMonthlyController",
         templateUrl: "/app/views/fdmDashboardPilotMonthly.html"
     });
@@ -659,6 +669,24 @@ app.config(function ($routeProvider) {
         templateUrl: "/app/views/sqlQuery.html"
     });
 
+    $routeProvider.when("/qa/dashboard", {
+        controller: "qaDashboard",
+        templateUrl: "app/views/qaDashboard.html"
+    });
+
+
+    $routeProvider.when("/qa/status/:type", {
+        controller: "qaReportStatus",
+        templateUrl: "app/views/qaReportStatus.html"
+    });
+
+
+    $routeProvider.when("/qa/report", {
+        controller: "qaReports",
+        templateUrl: "app/views/qaReport.html"
+    });
+
+   
 
 
     $routeProvider.otherwise({ redirectTo: "/home" });
@@ -690,6 +718,7 @@ var serviceBase = 'http://localhost:8888/';
 //var serviceBase = 'http://localhost:8888/';
 var serviceBase2 = 'https://localhost:5001/';
 var apiFdm = 'http://localhost:22554/';
+var apiQA = 'http://localhost:9063/';
 //var serviceBase3 = 'https://test.apatlas.com/';
 //var webBase = 'http://localhost:30273/';
 

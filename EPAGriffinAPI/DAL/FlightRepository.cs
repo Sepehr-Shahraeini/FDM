@@ -72,10 +72,6 @@ namespace EPAGriffinAPI.DAL
         {
             return this.GetQuery<ViewFlightCrewNewX>();
         }
-        public IQueryable<ViewFDPLog> GetViewFDPLog()
-        {
-            return this.GetQuery<ViewFDPLog>();
-        }
 
         public IQueryable<Coord> GetCoords()
         {
@@ -137,10 +133,6 @@ namespace EPAGriffinAPI.DAL
         {
             return this.GetQuery<ViewRosterSheet>();
         }
-        public IQueryable<ViewRosterReportFP> GetViewRosterReportFP()
-        {
-            return this.GetQuery<ViewRosterReportFP>();
-        }
         public IQueryable<ViewRosterReport> GetViewRosterReport()
         {
             return this.GetQuery<ViewRosterReport>();
@@ -185,10 +177,6 @@ namespace EPAGriffinAPI.DAL
         {
             return this.GetQuery<ViewCrew>();
         }
-        public IQueryable<ViewDispatchSMSEmployee> GetViewDispatchSMSEmployee()
-        {
-            return this.GetQuery<ViewDispatchSMSEmployee>();
-        }
         public IQueryable<ViewCrewCode> GetViewCrewCode()
         {
             return this.GetQuery<ViewCrewCode>();
@@ -210,10 +198,6 @@ namespace EPAGriffinAPI.DAL
         public IQueryable<ViewFinMonthlyRoute> GetViewFinMonthlyRoute()
         {
             return this.GetQuery<ViewFinMonthlyRoute>();
-        }
-        public IQueryable<ViewFinYearlyRoute> GetViewFinYearlyRoute()
-        {
-            return this.GetQuery<ViewFinYearlyRoute>();
         }
 
         public IQueryable<ViewFinMonthlyPersian> GetViewFinMonthlyPersian()
@@ -734,7 +718,7 @@ namespace EPAGriffinAPI.DAL
 
             return true;
         }
-        //ati  
+        //ati bani
         internal async Task<bool> ApproveFlightPlanRegisters(int pid)
         {
             var plan = await this.context.FlightPlans.SingleAsync(q => q.Id == pid);
@@ -1730,31 +1714,6 @@ namespace EPAGriffinAPI.DAL
             return new CustomActionResult(HttpStatusCode.OK, "");
         }
         //zati
-        //kakoli
-        public List<DateTime> GetInvervalDates(int type, DateTime start, DateTime end, List<int> days = null)
-        {
-            List<DateTime> result = new List<DateTime>();
-            var minDate = start.Date;
-            var maxDate = end.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
-            while (minDate <= maxDate)
-            {
-                switch (type)
-                {
-                    case 1:
-                        result.Add(minDate);
-                        break;
-                    case 2:
-                        var d = (int)minDate.DayOfWeek;
-                        if (days.IndexOf(d) != -1)
-                            result.Add(minDate);
-                        break;
-                    default:
-                        break;
-                }
-                minDate = minDate.AddDays(1);
-            }
-            return result;
-        }
         public void CreatePlanCalendar(int id, Models.FlightPlan plan, List<int> months, List<int> days)
         {
             if (id != -1)
@@ -1928,82 +1887,7 @@ namespace EPAGriffinAPI.DAL
             }
 
         }
-        //09-19
-        public class ShiftFlightsDto
-        {
-            public List<int> ids { get; set; }
-            public int hour { get; set; }
-            public int minute { get; set; }
-            public int register { get; set; }
-            public string userName { get; set; }
-            public int nira { get; set; }
-            public int sign { get; set; }
-        }
-        public async Task<CustomActionResult> ShiftFlights(ShiftFlightsDto dto)
-        {
-            var flights = await this.context.FlightInformations.Where(q => dto.ids.Contains(q.ID)).ToListAsync();
-            var legs = await this.context.ViewLegTimes.Where(q => dto.ids.Contains(q.ID)).ToListAsync();
-            foreach (var flight in flights)
-            {
-                var leg = legs.FirstOrDefault(q => q.ID == flight.ID);
-                if (leg != null)
-                {
-                    var changeLog = new FlightChangeHistory()
-                    {
-                        Date = DateTime.Now,
-                        FlightId = flight.ID,
 
-                    };
-                    changeLog.User = dto.userName + " " + (dto.nira == 1 ? "1" : "0");
-                    changeLog.OldFlightNumer = leg.FlightNumber;
-                    changeLog.OldFromAirportId = leg.FromAirport;
-                    changeLog.OldToAirportId = leg.ToAirport;
-                    changeLog.OldSTD = leg.STD;
-                    changeLog.OldSTA = leg.STA;
-                    changeLog.OldStatusId = leg.FlightStatusID;
-                    changeLog.OldRegister = leg.RegisterID;
-                    changeLog.OldOffBlock = leg.ChocksOut;
-                    changeLog.OldOnBlock = leg.ChocksIn;
-                    changeLog.OldTakeOff = leg.Takeoff;
-                    changeLog.OldLanding = leg.Landing;
-
-                    var mm = (dto.sign) * (dto.hour * 60 + dto.minute);
-                    var dtoSTD = ((DateTime)flight.STD).AddMinutes(mm);
-                    var dtoSTA = ((DateTime)flight.STA).AddMinutes(mm);
-                    var tzoffset = Helper.GetTimeOffset((DateTime)dtoSTD);
-                    var oldSTD = ((DateTime)flight.STD).AddMinutes(tzoffset).Date;
-                    var newSTD = ((DateTime)dtoSTD).AddMinutes(tzoffset).Date;
-                    if (oldSTD != newSTD)
-                    {
-                        flight.FlightDate = oldSTD;
-                    }
-                    flight.STD = dtoSTD;
-                    flight.STA = dtoSTA;
-                    flight.ChocksIn = null;
-                    flight.ChocksOut = null;
-                    flight.Takeoff = null;
-                    flight.Landing = null;
-                    changeLog.NewFlightNumber = flight.FlightNumber;
-                    changeLog.NewFromAirportId = flight.FromAirportId;
-                    changeLog.NewToAirportId = flight.ToAirportId;
-                    changeLog.NewSTD = flight.STD;
-                    changeLog.NewSTA = flight.STA;
-                    changeLog.NewStatusId = flight.FlightStatusID;
-                    changeLog.NewRegister = flight.RegisterID;
-                    changeLog.NewOffBlock = flight.ChocksOut;
-                    changeLog.NewOnBlock = flight.ChocksIn;
-                    changeLog.NewTakeOff = flight.Takeoff;
-                    changeLog.NewLanding = flight.Landing;
-
-                    this.context.FlightChangeHistories.Add(changeLog);
-
-
-                }
-
-            }
-            return new CustomActionResult(HttpStatusCode.OK, "");
-        }
-        //9-23
         public async Task<CustomActionResult> UpdatePlanItemFlight(ViewModels.FlightPlanningDto dto)
         {
 
@@ -2040,11 +1924,8 @@ namespace EPAGriffinAPI.DAL
             flight.FromAirportId = dto.FromAirport;
             flight.ToAirportId = dto.ToAirport;
 
-            var old_tzoffset = Helper.GetTimeOffset((DateTime)flight.STD);
-            var new_tzoffset = Helper.GetTimeOffset((DateTime)dto.STD);
-
-            var oldSTD = ((DateTime)flight.STD).AddMinutes(old_tzoffset).Date;
-            var newSTD = ((DateTime)dto.STD).AddMinutes(new_tzoffset).Date;
+            var oldSTD = ((DateTime)flight.STD).AddMinutes(270).Date;
+            var newSTD = ((DateTime)dto.STD).AddMinutes(270).Date;
             if (oldSTD != newSTD)
             {
                 flight.FlightDate = oldSTD;
@@ -2336,8 +2217,7 @@ namespace EPAGriffinAPI.DAL
 
         public CustomActionResult UpdateDelays(ViewModels.FlightSaveDto dto)
         {
-            if (!string.IsNullOrEmpty(dto.UserName) && dto.UserName.ToLower().StartsWith("aps."))
-                return new CustomActionResult(HttpStatusCode.OK, "");
+
             var currentDelays = this.context.FlightDelays.Where(q => q.FlightId == dto.ID);
             this.context.FlightDelays.RemoveRange(currentDelays);
             foreach (var x in dto.Delays)
@@ -2475,9 +2355,8 @@ namespace EPAGriffinAPI.DAL
             public string Mobile { get; set; }
 
         }
-        //magu2-17
         public async Task<bool> UpdateFlightJLog(int id, DateTime? offblock, DateTime? onblock, DateTime? takeoff, DateTime? landing, int? pflr
-            , double? _FuelArrival, double? _FuelDeparture, double? _UsedFuel, int? unitId, double? _FPFuel
+            , double? _FuelArrival, double? _FuelDeparture, double? _UsedFuel, int? unitId
             )
         {
             var flight = await this.context.FlightInformations.FirstOrDefaultAsync(q => q.ID == id);
@@ -2491,351 +2370,13 @@ namespace EPAGriffinAPI.DAL
             flight.FuelArrival = (decimal)_FuelArrival;
             flight.FuelDeparture = (decimal)_FuelDeparture;
             flight.UsedFuel = (decimal)_UsedFuel;
-            flight.FPFuel = (decimal)_FPFuel;
             flight.FuelUnitID = unitId;
 
             return true;
 
 
         }
-        public /*async Task<object>*/object CreateMVTMessage(int flightId, string userName)
-        {
-            new Thread(async () =>
-           {
-               using (var _context = new EPAGRIFFINEntities())
-               {
-                   var flight = await _context.ViewLegTimes.FirstOrDefaultAsync(f => f.ID == flightId);
-                   string caoMSGEmail = ConfigurationManager.AppSettings["email_cao_message"];
-                   string fnPrefix = ConfigurationManager.AppSettings["flightno"];
-                   //new Thread(async () =>
-                   //new Thread( () =>
-                   //{
-
-                   if (flight != null && (flight.FlightStatusID == 2 || flight.FlightStatusID == 3 || flight.FlightStatusID == 15))
-                   {
-                       if (flight.FlightStatusID == 2)
-                       {
-                           var msgAD = await _context.MVTs.OrderByDescending(q => q.Id).FirstOrDefaultAsync(q => q.FlightId == flightId && (q.Type == "AD" || q.Type == "AD COR"));
-                           var delays = await _context.ViewFlightDelayCodes.Where(q => q.FlightId == flightId).OrderBy(q => q.Code).Select(q => new { q.Code, q.HH, q.MM }).ToListAsync();
-                           string dl = "";
-                           if (delays.Count > 0)
-                           {
-                               var dlcode = new List<string>();
-                               var dlvalue = new List<string>();
-                               foreach (var x in delays)
-                               {
-                                   dlcode.Add(x.Code);
-                                   dlvalue.Add((x.HH ?? 0).ToString().PadLeft(2, '0') + (x.MM ?? 0).ToString().PadLeft(2, '0'));
-                               }
-                               dl = "DL" + string.Join("/", dlcode) + "/" + string.Join("/", dlvalue);
-
-                           }
-                           if (msgAD == null)
-                           {
-                               #region AD New
-                               msgAD = new MVT()
-                               {
-                                   Bag = "BAG " + flight.BaggageWeight.ToString() + "KG",
-                                   DateCreate = DateTime.Now,
-                                   DayOfMonth = flight.Takeoff == null ? ((DateTime)flight.STD).Day : ((DateTime)flight.Takeoff).Day,
-                                   //ETA = ((DateTime)flight.Landing).ToString("HHmm"),
-                                   ETA = flight.Landing,
-                                   FlightId = flight.ID,
-                                   FlightNo = fnPrefix + flight.FlightNumber,
-                                   FromIATA = flight.FromAirportIATA,
-                                   OffBlock = flight.ChocksOut,
-                                   OnBlock = flight.ChocksIn,
-                                   Pax = ((flight.PaxAdult ?? 0) + (flight.PaxChild ?? 0)).ToString().PadLeft(3, '0') + "+" + (flight.PaxInfant ?? 0).ToString().PadLeft(2, '0'),
-                                   Register = "EP-" + flight.Register,
-                                   TakeOff = flight.Takeoff,
-                                   ToIATA = flight.ToAirportIATA,
-                                   Type = "AD",
-                                   UserName = userName,
-                                   SendTo = caoMSGEmail,
-
-
-
-
-                               };
-                               //if (!string.IsNullOrEmpty(dl))
-                               {
-                                   msgAD.DL = dl;
-                               }
-                               var msg = new List<string>();
-                               msg.Add("MVT");
-                               msg.Add(msgAD.FlightNo + "/" + msgAD.DayOfMonth.ToString().PadLeft(2, '0') + "." + msgAD.Register + "." + msgAD.FromIATA);
-                               msg.Add("AD" + ((DateTime)msgAD.OffBlock).ToString("HHmm") + "/" + ((DateTime)msgAD.TakeOff).ToString("HHmm")
-                                   + " EA " + ((DateTime)msgAD.ETA).ToString("HHmm") + msgAD.ToIATA);
-                               if (!string.IsNullOrEmpty(msgAD.DL))
-                               {
-                                   msg.Add(msgAD.DL);
-                               }
-                               msg.Add("PX" + msgAD.Pax);
-                               msg.Add(msgAD.Bag);
-                               msgAD.Message = string.Join("\r\n", msg);
-
-                               _context.MVTs.Add(msgAD);
-                               await _context.SaveAsync();
-
-                               EPAGriffinAPI.Email mail = new Email();
-                               mail.SendEmailMVT(msgAD.Message, "MVT AD " + fnPrefix + " " + flight.FlightNumber + " ON " + ((DateTime)flight.Takeoff).ToString("dd MMM yyyy"));
-                               #endregion
-                           }
-                           else
-                           if (msgAD != null && (msgAD.OffBlock != flight.ChocksOut || msgAD.TakeOff != flight.Takeoff || msgAD.ETA != flight.Landing || msgAD.DL != dl))
-                           {
-                               //revision
-                               #region AD Cor
-
-                               msgAD.Bag = "BAG " + flight.BaggageWeight.ToString() + "KG";
-                               msgAD.DateCreate = DateTime.Now;
-                               msgAD.DayOfMonth = flight.Takeoff == null ? ((DateTime)flight.STD).Day : ((DateTime)flight.Takeoff).Day;
-                               //ETA = ((DateTime)flight.Landing).ToString("HHmm"),
-                               msgAD.ETA = flight.Landing;
-                               msgAD.FlightId = flight.ID;
-                               msgAD.FlightNo = fnPrefix + flight.FlightNumber;
-                               msgAD.FromIATA = flight.FromAirportIATA;
-                               msgAD.OffBlock = flight.ChocksOut;
-                               msgAD.OnBlock = flight.ChocksIn;
-                               msgAD.Pax = ((flight.PaxAdult ?? 0) + (flight.PaxChild ?? 0)).ToString().PadLeft(3, '0') + "+" + (flight.PaxInfant ?? 0).ToString().PadLeft(2, '0');
-                               msgAD.Register = "EP-" + flight.Register;
-                               msgAD.TakeOff = flight.Takeoff;
-                               msgAD.ToIATA = flight.ToAirportIATA;
-                               msgAD.Type = "AD COR";
-                               msgAD.UserName = userName;
-                               msgAD.SendTo = caoMSGEmail;
-
-
-
-
-
-                               //if (!string.IsNullOrEmpty(dl))
-                               {
-                                   msgAD.DL = dl;
-                               }
-                               var msg = new List<string>();
-                               msg.Add("COR");
-                               msg.Add("MVT");
-                               msg.Add(msgAD.FlightNo + "/" + msgAD.DayOfMonth.ToString().PadLeft(2, '0') + "." + msgAD.Register + "." + msgAD.FromIATA);
-                               msg.Add("AD" + ((DateTime)msgAD.OffBlock).ToString("HHmm") + "/" + ((DateTime)msgAD.TakeOff).ToString("HHmm")
-                                   + " EA " + ((DateTime)msgAD.ETA).ToString("HHmm") + msgAD.ToIATA);
-                               if (!string.IsNullOrEmpty(msgAD.DL))
-                               {
-                                   msg.Add(msgAD.DL);
-                               }
-                               msg.Add("PX" + msgAD.Pax);
-                               msg.Add(msgAD.Bag);
-                               msgAD.Message = string.Join("\r\n", msg);
-
-                               _context.MVTs.Add(msgAD);
-                               await _context.SaveAsync();
-
-                               EPAGriffinAPI.Email mail = new Email();
-                               mail.SendEmailMVT(msgAD.Message, "MVT AD COR " + fnPrefix + " " + flight.FlightNumber + " ON " + ((DateTime)flight.Takeoff).ToString("dd MMM yyyy"));
-                               #endregion
-                           }
-                       }
-
-
-                       if (flight.FlightStatusID == 3 || flight.FlightStatusID == 15)
-                       {
-                           var msgAD = await _context.MVTs.OrderByDescending(q => q.Id).FirstOrDefaultAsync(q => q.FlightId == flightId && (q.Type == "AA" || q.Type == "AA COR"));
-
-                           if (msgAD == null)
-                           {
-                               #region AA New
-                               msgAD = new MVT()
-                               {
-                                   Bag = "BAG " + flight.BaggageWeight.ToString() + "KG",
-                                   DateCreate = DateTime.Now,
-                                   DayOfMonth = flight.Takeoff == null ? ((DateTime)flight.STD).Day : ((DateTime)flight.Takeoff).Day,
-                                   //ETA = ((DateTime)flight.Landing).ToString("HHmm"),
-                                   ETA = flight.Landing,
-                                   FlightId = flight.ID,
-                                   FlightNo = fnPrefix + flight.FlightNumber,
-                                   FromIATA = flight.FromAirportIATA,
-                                   OffBlock = flight.ChocksOut,
-                                   OnBlock = flight.ChocksIn,
-                                   Pax = ((flight.PaxAdult ?? 0) + (flight.PaxChild ?? 0)).ToString().PadLeft(3, '0') + "+" + (flight.PaxInfant ?? 0).ToString().PadLeft(2, '0'),
-                                   Register = "EP-" + flight.Register,
-                                   TakeOff = flight.Takeoff,
-                                   ToIATA = flight.ToAirportIATA,
-                                   Type = "AA",
-                                   UserName = userName,
-                                   SendTo = caoMSGEmail,
-
-
-
-
-                               };
-
-                               var msg = new List<string>();
-                               msg.Add("MVT");
-                               msg.Add(msgAD.FlightNo + "/" + msgAD.DayOfMonth.ToString().PadLeft(2, '0') + "." + msgAD.Register + "." + msgAD.ToIATA);
-                               msg.Add("AA" + ((DateTime)msgAD.ETA).ToString("HHmm") + "/" + ((DateTime)msgAD.OnBlock).ToString("HHmm"));
-                               msg.Add("SI NIL");
-
-                               msgAD.Message = string.Join("\r\n", msg);
-
-                               _context.MVTs.Add(msgAD);
-                               await _context.SaveAsync();
-
-                               EPAGriffinAPI.Email mail = new Email();
-                               mail.SendEmailMVT(msgAD.Message, "MVT AA " + fnPrefix + " " + flight.FlightNumber + " ON " + ((DateTime)flight.Takeoff).ToString("dd MMM yyyy"));
-                               #endregion
-                           }
-                           else
-                           if (msgAD != null && (msgAD.OnBlock != flight.ChocksIn || msgAD.ETA != flight.Landing))
-                           {
-                               //revision
-                               #region AD Cor
-
-                               msgAD.Bag = "BAG " + flight.BaggageWeight.ToString() + "KG";
-                               msgAD.DateCreate = DateTime.Now;
-                               msgAD.DayOfMonth = flight.Takeoff == null ? ((DateTime)flight.STD).Day : ((DateTime)flight.Takeoff).Day;
-                               //ETA = ((DateTime)flight.Landing).ToString("HHmm"),
-                               msgAD.ETA = flight.Landing;
-                               msgAD.FlightId = flight.ID;
-                               msgAD.FlightNo = fnPrefix + flight.FlightNumber;
-                               msgAD.FromIATA = flight.FromAirportIATA;
-                               msgAD.OffBlock = flight.ChocksOut;
-                               msgAD.Pax = ((flight.PaxAdult ?? 0) + (flight.PaxChild ?? 0)).ToString().PadLeft(3, '0') + "+" + (flight.PaxInfant ?? 0).ToString().PadLeft(2, '0');
-                               msgAD.Register = "EP-" + flight.Register;
-                               msgAD.TakeOff = flight.Takeoff;
-                               msgAD.ToIATA = flight.ToAirportIATA;
-                               msgAD.Type = "AA COR";
-                               msgAD.UserName = userName;
-                               msgAD.SendTo = caoMSGEmail;
-                               msgAD.OnBlock = flight.ChocksIn;
-
-
-
-
-
-
-                               var msg = new List<string>();
-                               msg.Add("COR");
-                               msg.Add("MVT");
-                               msg.Add(msgAD.FlightNo + "/" + msgAD.DayOfMonth.ToString().PadLeft(2, '0') + "." + msgAD.Register + "." + msgAD.ToIATA);
-                               msg.Add("AA" + ((DateTime)msgAD.ETA).ToString("HHmm") + "/" + ((DateTime)msgAD.OnBlock).ToString("HHmm"));
-                               msg.Add("SI NIL");
-
-                               msgAD.Message = string.Join("\r\n", msg);
-
-                               _context.MVTs.Add(msgAD);
-                               await _context.SaveAsync();
-
-                               EPAGriffinAPI.Email mail = new Email();
-                               mail.SendEmailMVT(msgAD.Message, "MVT AA COR " + fnPrefix + " " + flight.FlightNumber + " ON " + ((DateTime)flight.Takeoff).ToString("dd MMM yyyy"));
-                               #endregion
-                           }
-                       }
-                   }
-                   //}).Start();
-
-               }
-           }).Start();
-            return true;
-        }
         //baba
-        public async Task<object> GetFlightGUID(int id)
-        {
-            var guid = await this.context.FlightInformations.Where(q => q.ID == id).Select(q => q.GUID).FirstOrDefaultAsync();
-            return guid;
-        }
-        public class selaDataTag
-        {
-            public string info { get; set; }
-            public string RType { get; set; }
-            public string name { get; set; }
-        }
-        public class selaProccess
-        {
-            public string name { get; set; }
-            public string info { get; set; }
-            public List<selaDataTag> data_tags { get; set; }
-
-        }
-        public async Task<object> CreateSela()
-        {
-            var logs = await this.context.LOGs.ToListAsync();
-            var grouped = (from x in logs
-                           group x by new { x.table } into grp
-                           select new selaProccess()
-                           {
-                               name = "insert_" + grp.Key.table.ToLower(),
-                               info = "This process responsible for " + grp.Key.table.ToLower() + " creation.",
-                               data_tags = grp.Select(q => new selaDataTag() { RType = q.Rtype, name = q.name, info = q.info }).ToList(),
-                               //items =grp.Select(q=>new { q.Rtype,q.name,q.info }).ToList()
-                           }).ToList();
-            var groupedEdit = (from x in logs
-                               group x by new { x.table } into grp
-                               select new selaProccess()
-                               {
-                                   name = "edit_" + grp.Key.table.ToLower(),
-                                   info = "This process responsible for " + grp.Key.table.ToLower() + " editing.",
-                                   data_tags = grp.Select(q => new selaDataTag() { RType = q.Rtype, name = q.name, info = q.info }).ToList(),
-                                   //items =grp.Select(q=>new { q.Rtype,q.name,q.info }).ToList()
-                               }).ToList();
-            var groupedDelete = (from x in logs
-                                 where x.name.ToLower() == "id"
-                                 orderby x.table, x.name
-                                 group x by new { x.table } into grp
-                                 select new selaProccess()
-                                 {
-                                     name = "delete_" + grp.Key.table.ToLower(),
-                                     info = "This process responsible for " + grp.Key.table.ToLower() + " deleting.",
-                                     data_tags = grp.Select(q => new selaDataTag() { RType = q.Rtype, name = q.name, info = q.info }).ToList(),
-                                     //items =grp.Select(q=>new { q.Rtype,q.name,q.info }).ToList()
-                                 }).ToList();
-            var lst = new List<string>();
-            foreach (var x in grouped)
-            {
-                var str = "\"" + x.name + "\"";
-                lst.Add(str + ":" + JsonConvert.SerializeObject(x));
-
-
-
-            }
-            foreach (var x in groupedEdit)
-            {
-                var str = "\"" + x.name + "\"";
-                lst.Add(str + ":" + JsonConvert.SerializeObject(x));
-
-
-
-            }
-            foreach (var x in groupedDelete)
-            {
-                var str = "\"" + x.name + "\"";
-                lst.Add(str + ":" + JsonConvert.SerializeObject(x));
-
-
-
-            }
-            using (StreamWriter _detailogwriter = new StreamWriter(HttpContext.Current.Server.MapPath("~/" + "sela.json"), true))
-            {
-                _detailogwriter.WriteLine("{" + "\r\n");
-                _detailogwriter.WriteLine("\"" + "application" + "\"" + ":" + "{" + "\r\n");
-                _detailogwriter.WriteLine("\"" + "name" + "\"" + ":" + "\"" + "amanat" + "\"" + "," + "\r\n");
-                _detailogwriter.WriteLine("\"" + "version" + "\"" + ":" + "\"" + "1.1.0" + "\"" + "\r\n");
-                _detailogwriter.WriteLine("}," + "\r\n");
-                _detailogwriter.WriteLine("\"" + "processes" + "\"" + ":" + "{" + "\r\n");
-                foreach (var str in lst)
-                {
-                    if (str != lst.Last())
-                        _detailogwriter.WriteLine(str + "," + "\r\n");
-                    else
-                        _detailogwriter.WriteLine(str + "\r\n");
-                }
-                _detailogwriter.WriteLine("}" + "\r\n");
-
-                _detailogwriter.WriteLine("}" + "\r\n");
-            }
-
-            return true;
-        }
-
         public async Task<CustomActionResult> UpdateFlightLog(ViewModels.FlightSaveDto dto)
         {
             List<int?> offCrewIds = new List<int?>();
@@ -2898,7 +2439,7 @@ namespace EPAGriffinAPI.DAL
             changeLog.OldLanding = flight.Landing;
 
             //////////////////////////////////////////////////////////////
-            flight.GUID = Guid.NewGuid();
+
             flight.DateCreate = DateTime.Now.ToUniversalTime();
             flight.FlightStatusUserId = dto.UserId;
             flight.ChocksIn = dto.ChocksIn;
@@ -3193,545 +2734,6 @@ namespace EPAGriffinAPI.DAL
 
             });
         }
-        public class DtoLogRemark
-        {
-            public int ID { get; set; }
-            public string UserName { get; set; }
-            public string DepartureRemark { get; set; }
-        }
-        public async Task<CustomActionResult> UpdateFlightLogRemark(DtoLogRemark dto)
-        {
-
-            var flight = await this.context.FlightInformations.FirstOrDefaultAsync(q => q.ID == dto.ID);
-
-            var leg = await this.context.ViewLegTimes.FirstOrDefaultAsync(q => q.ID == dto.ID);
-            if (flight == null)
-                return new CustomActionResult(HttpStatusCode.NotFound, "");
-
-            //////////////////////////////////////////////////////////////
-            var changeLog = new FlightChangeHistory()
-            {
-                Date = DateTime.Now,
-                FlightId = flight.ID,
-                User = dto.UserName,
-
-            };
-            changeLog.OldFlightNumer = leg.FlightNumber;
-            changeLog.OldFromAirportId = leg.FromAirport;
-            changeLog.OldToAirportId = leg.ToAirport;
-            changeLog.OldSTD = flight.STD;
-            changeLog.OldSTA = flight.STA;
-            changeLog.OldStatusId = flight.FlightStatusID;
-            changeLog.OldRegister = leg.RegisterID;
-            changeLog.OldOffBlock = flight.ChocksOut;
-            changeLog.OldOnBlock = flight.ChocksIn;
-            changeLog.OldTakeOff = flight.Takeoff;
-            changeLog.OldLanding = flight.Landing;
-
-            //////////////////////////////////////////////////////////////
-            flight.GUID = Guid.NewGuid();
-            flight.DateCreate = DateTime.Now.ToUniversalTime();
-            flight.DepartureRemark = dto.DepartureRemark;
-
-
-
-            ////////////////////////////////////////
-            changeLog.NewFlightNumber = leg.FlightNumber;
-            changeLog.NewFromAirportId = leg.FromAirport;
-            changeLog.NewToAirportId = flight.ToAirportId;
-            changeLog.NewSTD = flight.STD;
-            changeLog.NewSTA = flight.STA;
-            changeLog.NewStatusId = flight.FlightStatusID;
-            changeLog.NewRegister = leg.RegisterID;
-            changeLog.NewOffBlock = flight.ChocksOut;
-            changeLog.NewOnBlock = flight.ChocksIn;
-            changeLog.NewTakeOff = flight.Takeoff;
-            changeLog.NewLanding = flight.Landing;
-
-            this.context.FlightChangeHistories.Add(changeLog);
-            ////////////////////////////////////////
-
-
-
-            return new CustomActionResult(HttpStatusCode.OK, new updateLogResult()
-            {
-
-                flight = flight.ID,
-
-
-            });
-        }
-
-        public class cnlregs
-        {
-            public List<int> fids { get; set; }
-            public int reason { get; set; }
-            public string userName { get; set; }
-            public int? userId { get; set; }
-            public string remark { get; set; }
-            public int? reg { get; set; }
-            public DateTime? intervalFrom { get; set; }
-            public DateTime? intervalTo { get; set; }
-            public List<int> days { get; set; }
-            public int? interval { get; set; }
-            public DateTime? RefDate { get; set; }
-            public int? RefDays { get; set; }
-        }
-
-        public class offcrew
-        {
-            public int? flightId { get; set; }
-            public List<int?> crews { get; set; }
-        }
-        public async Task<CustomActionResult> CancelFlights(cnlregs dto)
-        {
-            // List<int?> offCrewIds = new List<int?>();
-            var flights = await this.context.FlightInformations.Where(q => dto.fids.Contains(q.ID)).ToListAsync();
-            var legs = await this.context.ViewLegTimes.Where(q => dto.fids.Contains(q.ID)).ToListAsync();
-            foreach (var fid in dto.fids)
-            {
-                var flight = flights.FirstOrDefault(q => q.ID == fid);
-                var leg = legs.FirstOrDefault(q => q.ID == fid);
-
-                var changeLog = new FlightChangeHistory()
-                {
-                    Date = DateTime.Now,
-                    FlightId = flight.ID,
-                    User = dto.userName,
-
-                };
-                changeLog.OldFlightNumer = leg.FlightNumber;
-                changeLog.OldFromAirportId = leg.FromAirport;
-                changeLog.OldToAirportId = leg.ToAirport;
-                changeLog.OldSTD = flight.STD;
-                changeLog.OldSTA = flight.STA;
-                changeLog.OldStatusId = flight.FlightStatusID;
-                changeLog.OldRegister = leg.RegisterID;
-                changeLog.OldOffBlock = flight.ChocksOut;
-                changeLog.OldOnBlock = flight.ChocksIn;
-                changeLog.OldTakeOff = flight.Takeoff;
-                changeLog.OldLanding = flight.Landing;
-
-                //////////////////////////////////////////////////////////////
-
-                flight.DateCreate = DateTime.Now.ToUniversalTime();
-                flight.FlightStatusUserId = dto.userId;
-
-
-                flight.FlightStatusID = 4;
-
-                var cnlMsn = await this.context.Ac_MSN.Where(q => q.Register == "CNL").Select(q => q.ID).FirstOrDefaultAsync();
-                flight.RegisterID = cnlMsn;
-                flight.CancelDate = DateTime.Now;
-                flight.CancelReasonId = dto.reason;
-                flight.DepartureRemark += (!string.IsNullOrEmpty(flight.DepartureRemark) ? "\r\n" : "") + dto.remark + "(CNL REMARK BY:" + dto.userName + ")";
-                //2020-11-24
-
-
-
-
-                if (flight.FlightStatusID != null && /*dto.UserId != null*/ !string.IsNullOrEmpty(dto.userName))
-                    this.context.FlightStatusLogs.Add(new FlightStatusLog()
-                    {
-                        FlightID = flight.ID,
-
-                        Date = DateTime.Now.ToUniversalTime(),
-                        FlightStatusID = (int)flight.FlightStatusID,
-
-                        UserId = dto.userId != null ? (int)dto.userId : 128000,
-                        Remark = dto.userName,
-                    });
-
-
-                UpdateFirstLastFlights(flight.ID);
-
-
-
-                ////////////////////////////////////////
-                changeLog.NewFlightNumber = leg.FlightNumber;
-                changeLog.NewFromAirportId = leg.FromAirport;
-                changeLog.NewToAirportId = flight.ToAirportId;
-                changeLog.NewSTD = flight.STD;
-                changeLog.NewSTA = flight.STA;
-                changeLog.NewStatusId = flight.FlightStatusID;
-                changeLog.NewRegister = leg.RegisterID;
-                changeLog.NewOffBlock = flight.ChocksOut;
-                changeLog.NewOnBlock = flight.ChocksIn;
-                changeLog.NewTakeOff = flight.Takeoff;
-                changeLog.NewLanding = flight.Landing;
-
-                this.context.FlightChangeHistories.Add(changeLog);
-            }
-
-
-            //var notifiedDelay = flight.NotifiedDelay;
-            //var leg = await this.context.ViewLegTimes.FirstOrDefaultAsync(q => q.ID == dto.ID);
-            //if (flight == null)
-            //    return new CustomActionResult(HttpStatusCode.NotFound, "");
-
-            //////////////////////////////////////////////////////////////
-
-            ////////////////////////////////////////
-
-            bool sendNira = false;
-            var nullfids = dto.fids.Select(q => (Nullable<int>)q).ToList();
-
-            var offCrewIds = (from q in this.context.ViewFlightCrewNews
-                              where nullfids.Contains(q.FlightId)
-                              group q by q.FlightId into grp
-                              select new offcrew() { flightId = grp.Key, crews = grp.Select(w => w.CrewId).ToList() }
-
-                             ).ToList();
-
-
-            //hoda
-
-            return new CustomActionResult(HttpStatusCode.OK, new updateLogResult()
-            {
-                sendNira = sendNira,
-                flight = -1, //flight.ID,
-                //offIds = offCrewIds
-                offcrews = offCrewIds,
-
-            });
-        }
-
-        public async Task<CustomActionResult> CancelFlightsGroup(cnlregs dto)
-        {
-            // List<int?> offCrewIds = new List<int?>();
-            var intervalDays = GetInvervalDates((int)dto.interval, (DateTime)dto.intervalFrom, (DateTime)dto.intervalTo, dto.days).Select(q => (Nullable<DateTime>)q).ToList();
-            var baseFlights = await this.context.FlightInformations.Where(q => dto.fids.Contains(q.ID)).ToListAsync();
-            var fltNumbers = baseFlights.Select(q => q.FlightNumber).ToList();
-            var fltIds = new List<int>();
-            fltIds = baseFlights.Select(q => q.ID).ToList();
-
-            var _flightIds = await (from x in this.context.ViewLegTimes
-                                    where fltNumbers.Contains(x.FlightNumber) && intervalDays.Contains(x.STDDay)
-                                    select x.ID).ToListAsync();
-            fltIds = fltIds.Concat(_flightIds).Distinct().ToList();
-
-            var flights = await this.context.FlightInformations.Where(q => fltIds.Contains(q.ID)).ToListAsync();
-            var legs = await this.context.ViewLegTimes.Where(q => fltIds.Contains(q.ID)).ToListAsync();
-            foreach (var fid in fltIds)
-            {
-                var flight = flights.FirstOrDefault(q => q.ID == fid);
-                var leg = legs.FirstOrDefault(q => q.ID == fid);
-
-                var changeLog = new FlightChangeHistory()
-                {
-                    Date = DateTime.Now,
-                    FlightId = flight.ID,
-                    User = dto.userName,
-
-                };
-                changeLog.OldFlightNumer = leg.FlightNumber;
-                changeLog.OldFromAirportId = leg.FromAirport;
-                changeLog.OldToAirportId = leg.ToAirport;
-                changeLog.OldSTD = flight.STD;
-                changeLog.OldSTA = flight.STA;
-                changeLog.OldStatusId = flight.FlightStatusID;
-                changeLog.OldRegister = leg.RegisterID;
-                changeLog.OldOffBlock = flight.ChocksOut;
-                changeLog.OldOnBlock = flight.ChocksIn;
-                changeLog.OldTakeOff = flight.Takeoff;
-                changeLog.OldLanding = flight.Landing;
-
-                //////////////////////////////////////////////////////////////
-
-                flight.DateCreate = DateTime.Now.ToUniversalTime();
-                flight.FlightStatusUserId = dto.userId;
-
-
-                flight.FlightStatusID = 4;
-
-                var cnlMsn = await this.context.Ac_MSN.Where(q => q.Register == "CNL").Select(q => q.ID).FirstOrDefaultAsync();
-                flight.RegisterID = cnlMsn;
-                flight.CancelDate = DateTime.Now;
-                flight.CancelReasonId = dto.reason;
-                flight.DepartureRemark += (!string.IsNullOrEmpty(flight.DepartureRemark) ? "\r\n" : "") + dto.remark + "(CNL REMARK BY:" + dto.userName + ")";
-                //2020-11-24
-
-
-
-
-                if (flight.FlightStatusID != null && /*dto.UserId != null*/ !string.IsNullOrEmpty(dto.userName))
-                    this.context.FlightStatusLogs.Add(new FlightStatusLog()
-                    {
-                        FlightID = flight.ID,
-
-                        Date = DateTime.Now.ToUniversalTime(),
-                        FlightStatusID = (int)flight.FlightStatusID,
-
-                        UserId = dto.userId != null ? (int)dto.userId : 128000,
-                        Remark = dto.userName,
-                    });
-
-
-                UpdateFirstLastFlights(flight.ID);
-
-
-
-                ////////////////////////////////////////
-                changeLog.NewFlightNumber = leg.FlightNumber;
-                changeLog.NewFromAirportId = leg.FromAirport;
-                changeLog.NewToAirportId = flight.ToAirportId;
-                changeLog.NewSTD = flight.STD;
-                changeLog.NewSTA = flight.STA;
-                changeLog.NewStatusId = flight.FlightStatusID;
-                changeLog.NewRegister = leg.RegisterID;
-                changeLog.NewOffBlock = flight.ChocksOut;
-                changeLog.NewOnBlock = flight.ChocksIn;
-                changeLog.NewTakeOff = flight.Takeoff;
-                changeLog.NewLanding = flight.Landing;
-
-                this.context.FlightChangeHistories.Add(changeLog);
-            }
-
-
-            //var notifiedDelay = flight.NotifiedDelay;
-            //var leg = await this.context.ViewLegTimes.FirstOrDefaultAsync(q => q.ID == dto.ID);
-            //if (flight == null)
-            //    return new CustomActionResult(HttpStatusCode.NotFound, "");
-
-            //////////////////////////////////////////////////////////////
-
-            ////////////////////////////////////////
-
-            bool sendNira = false;
-            var nullfids = dto.fids.Select(q => (Nullable<int>)q).ToList();
-
-            var offCrewIds = (from q in this.context.ViewFlightCrewNews
-                              where nullfids.Contains(q.FlightId)
-                              group q by q.FlightId into grp
-                              select new offcrew() { flightId = grp.Key, crews = grp.Select(w => w.CrewId).ToList() }
-
-                             ).ToList();
-
-
-            //hoda
-
-            return new CustomActionResult(HttpStatusCode.OK, new updateLogResult()
-            {
-                sendNira = sendNira,
-                flight = -1, //flight.ID,
-                //offIds = offCrewIds
-                offcrews = offCrewIds,
-                fltIds = fltIds
-
-            });
-        }
-        public async Task<CustomActionResult> ActiveFlights(cnlregs dto)
-        {
-            // List<int?> offCrewIds = new List<int?>();
-            var flights = await this.context.FlightInformations.Where(q => dto.fids.Contains(q.ID)).ToListAsync();
-            var legs = await this.context.ViewLegTimes.Where(q => dto.fids.Contains(q.ID)).ToListAsync();
-            foreach (var fid in dto.fids)
-            {
-                var flight = flights.FirstOrDefault(q => q.ID == fid);
-                var leg = legs.FirstOrDefault(q => q.ID == fid);
-
-                var changeLog = new FlightChangeHistory()
-                {
-                    Date = DateTime.Now,
-                    FlightId = flight.ID,
-                    User = dto.userName,
-
-                };
-                changeLog.OldFlightNumer = leg.FlightNumber;
-                changeLog.OldFromAirportId = leg.FromAirport;
-                changeLog.OldToAirportId = leg.ToAirport;
-                changeLog.OldSTD = flight.STD;
-                changeLog.OldSTA = flight.STA;
-                changeLog.OldStatusId = flight.FlightStatusID;
-                changeLog.OldRegister = leg.RegisterID;
-                changeLog.OldOffBlock = flight.ChocksOut;
-                changeLog.OldOnBlock = flight.ChocksIn;
-                changeLog.OldTakeOff = flight.Takeoff;
-                changeLog.OldLanding = flight.Landing;
-
-                //////////////////////////////////////////////////////////////
-
-                flight.DateCreate = DateTime.Now.ToUniversalTime();
-                flight.FlightStatusUserId = dto.userId;
-
-
-                flight.FlightStatusID = 1;
-
-                //var cnlMsn = await this.context.Ac_MSN.Where(q => q.Register == "CNL").Select(q => q.ID).FirstOrDefaultAsync();
-                flight.RegisterID = dto.reg;
-                flight.CancelDate = null;
-                flight.CancelReasonId = null;
-                flight.DepartureRemark += (!string.IsNullOrEmpty(flight.DepartureRemark) ? "\r\n" : "") + dto.remark + "(ACTV REMARK BY:" + dto.userName + ")";
-                //2020-11-24
-
-
-
-
-                if (flight.FlightStatusID != null && /*dto.UserId != null*/ !string.IsNullOrEmpty(dto.userName))
-                    this.context.FlightStatusLogs.Add(new FlightStatusLog()
-                    {
-                        FlightID = flight.ID,
-
-                        Date = DateTime.Now.ToUniversalTime(),
-                        FlightStatusID = (int)flight.FlightStatusID,
-
-                        UserId = dto.userId != null ? (int)dto.userId : 128000,
-                        Remark = dto.userName,
-                    });
-
-                //kak4
-
-                ////////////////////////////////////////
-                changeLog.NewFlightNumber = leg.FlightNumber;
-                changeLog.NewFromAirportId = leg.FromAirport;
-                changeLog.NewToAirportId = flight.ToAirportId;
-                changeLog.NewSTD = flight.STD;
-                changeLog.NewSTA = flight.STA;
-                changeLog.NewStatusId = flight.FlightStatusID;
-                changeLog.NewRegister = leg.RegisterID;
-                changeLog.NewOffBlock = flight.ChocksOut;
-                changeLog.NewOnBlock = flight.ChocksIn;
-                changeLog.NewTakeOff = flight.Takeoff;
-                changeLog.NewLanding = flight.Landing;
-
-                this.context.FlightChangeHistories.Add(changeLog);
-            }
-
-
-
-
-            bool sendNira = true;
-            var nullfids = dto.fids.Select(q => (Nullable<int>)q).ToList();
-
-
-
-            //hoda
-
-            return new CustomActionResult(HttpStatusCode.OK, new updateLogResult()
-            {
-                sendNira = sendNira,
-                flight = -1, //flight.ID,
-                             //offIds = offCrewIds
-                offIds = nullfids
-
-
-            });
-        }
-
-
-        //magu38
-        public async Task<CustomActionResult> ActiveFlightsGroup(cnlregs dto)
-        {
-            // List<int?> offCrewIds = new List<int?>();
-            var intervalDays = GetInvervalDates((int)dto.interval, (DateTime)dto.intervalFrom, (DateTime)dto.intervalTo, dto.days).Select(q => (Nullable<DateTime>)q).ToList();
-            var baseFlights = await this.context.FlightInformations.Where(q => dto.fids.Contains(q.ID)).ToListAsync();
-            var fltNumbers = baseFlights.Select(q => q.FlightNumber).ToList();
-            var fltIds = new List<int>();
-            fltIds = baseFlights.Select(q => q.ID).ToList();
-
-            var _flightIds = await (from x in this.context.ViewLegTimes
-                                    where fltNumbers.Contains(x.FlightNumber) && intervalDays.Contains(x.STDDay)
-                                    select x.ID).ToListAsync();
-            fltIds = fltIds.Concat(_flightIds).Distinct().ToList();
-
-            var flights = await this.context.FlightInformations.Where(q => fltIds.Contains(q.ID)).ToListAsync();
-            var legs = await this.context.ViewLegTimes.Where(q => fltIds.Contains(q.ID)).ToListAsync();
-            /////////////////////////////////
-            //var flights = await this.context.FlightInformations.Where(q => dto.fids.Contains(q.ID)).ToListAsync();
-            // var legs = await this.context.ViewLegTimes.Where(q => dto.fids.Contains(q.ID)).ToListAsync();
-            foreach (var fid in fltIds)
-            {
-                var flight = flights.FirstOrDefault(q => q.ID == fid);
-                var leg = legs.FirstOrDefault(q => q.ID == fid);
-
-                var changeLog = new FlightChangeHistory()
-                {
-                    Date = DateTime.Now,
-                    FlightId = flight.ID,
-                    User = dto.userName,
-
-                };
-                changeLog.OldFlightNumer = leg.FlightNumber;
-                changeLog.OldFromAirportId = leg.FromAirport;
-                changeLog.OldToAirportId = leg.ToAirport;
-                changeLog.OldSTD = flight.STD;
-                changeLog.OldSTA = flight.STA;
-                changeLog.OldStatusId = flight.FlightStatusID;
-                changeLog.OldRegister = leg.RegisterID;
-                changeLog.OldOffBlock = flight.ChocksOut;
-                changeLog.OldOnBlock = flight.ChocksIn;
-                changeLog.OldTakeOff = flight.Takeoff;
-                changeLog.OldLanding = flight.Landing;
-
-                //////////////////////////////////////////////////////////////
-
-                flight.DateCreate = DateTime.Now.ToUniversalTime();
-                flight.FlightStatusUserId = dto.userId;
-
-
-                flight.FlightStatusID = 1;
-
-                //var cnlMsn = await this.context.Ac_MSN.Where(q => q.Register == "CNL").Select(q => q.ID).FirstOrDefaultAsync();
-                flight.RegisterID = dto.reg;
-                flight.CancelDate = null;
-                flight.CancelReasonId = null;
-                flight.DepartureRemark += (!string.IsNullOrEmpty(flight.DepartureRemark) ? "\r\n" : "") + dto.remark + "(ACTV REMARK BY:" + dto.userName + ")";
-                //2020-11-24
-
-
-
-
-                if (flight.FlightStatusID != null && /*dto.UserId != null*/ !string.IsNullOrEmpty(dto.userName))
-                    this.context.FlightStatusLogs.Add(new FlightStatusLog()
-                    {
-                        FlightID = flight.ID,
-
-                        Date = DateTime.Now.ToUniversalTime(),
-                        FlightStatusID = (int)flight.FlightStatusID,
-
-                        UserId = dto.userId != null ? (int)dto.userId : 128000,
-                        Remark = dto.userName,
-                    });
-
-                //kak4
-
-                ////////////////////////////////////////
-                changeLog.NewFlightNumber = leg.FlightNumber;
-                changeLog.NewFromAirportId = leg.FromAirport;
-                changeLog.NewToAirportId = flight.ToAirportId;
-                changeLog.NewSTD = flight.STD;
-                changeLog.NewSTA = flight.STA;
-                changeLog.NewStatusId = flight.FlightStatusID;
-                changeLog.NewRegister = leg.RegisterID;
-                changeLog.NewOffBlock = flight.ChocksOut;
-                changeLog.NewOnBlock = flight.ChocksIn;
-                changeLog.NewTakeOff = flight.Takeoff;
-                changeLog.NewLanding = flight.Landing;
-
-                this.context.FlightChangeHistories.Add(changeLog);
-            }
-
-
-
-
-            bool sendNira = true;
-            //var nullfids = dto.fids.Select(q => (Nullable<int>)q).ToList();
-
-            var nullfids = fltIds.Select(q => (Nullable<int>)q).ToList();
-
-
-            //hoda
-
-            return new CustomActionResult(HttpStatusCode.OK, new updateLogResult()
-            {
-                sendNira = sendNira,
-                flight = -1, //flight.ID,
-                             //offIds = offCrewIds
-                offIds = nullfids
-
-
-            });
-        }
         public IQueryable<ViewFlightsGantt> GetViewFlightGantts()
         {
             return this.GetQuery<ViewFlightsGantt>();
@@ -3741,8 +2743,6 @@ namespace EPAGriffinAPI.DAL
             public bool sendNira { get; set; }
             public int flight { get; set; }
             public List<int?> offIds { get; set; }
-            public List<int> fltIds { get; set; }
-            public List<offcrew> offcrews { get; set; }
         }
         public async Task<CustomActionResult> UpdateFlightFuelDeparture(ViewModels.FlightSaveDto dto)
         {
@@ -4011,389 +3011,6 @@ namespace EPAGriffinAPI.DAL
                 result = new List<object>() { fdpstr, fdpitemstr, crewStr, fltStr, typeChangeDtoList };
 
             }
-            //if (!isvalid)
-            //   return new CustomActionResult(HttpStatusCode.NotAcceptable, "Conflict Error");
-
-            return new CustomActionResult(HttpStatusCode.OK, result);
-        }
-
-        public async Task<CustomActionResult> ChangeFlightRegister2(ViewModels.FlightRegisterChangeLogDto dto)
-        {
-            object result = null;
-            List<int?> changedTypes = new List<int?>();
-
-            var newResisgerObj = await this.context.ViewMSNs.FirstOrDefaultAsync(q => q.ID == dto.NewRegisterId);
-            // var newreg = await this.context.Ac_MSN.FirstOrDefaultAsync(q => q.ID == dto.NewRegisterId);
-            var flights = await this.context.FlightInformations.Where(q => dto.Flights.Contains(q.ID)).ToListAsync();
-            var legs = await this.context.ViewLegTimes.Where(q => dto.Flights.Contains(q.ID)).ToListAsync();
-            if (flights == null || flights.Count == 0)
-            {
-                result = "Flights Not Found";
-                return new CustomActionResult(HttpStatusCode.NotFound, result);
-            }
-
-            var isvalid = true;
-            var typeChangeDtoList = new List<TypeChangeDto>();
-
-            foreach (var x in flights)
-            {
-
-
-                var y = legs.FirstOrDefault(q => q.ID == x.ID);
-                if (y.AircraftType[0] != newResisgerObj.AircraftType[0])
-                {
-                    changedTypes.Add(y.ID);
-                    typeChangeDtoList.Add(new TypeChangeDto()
-                    {
-                        Date = ((DateTime)y.STDLocal).ToString("dd-MMM-yyyy"),
-                        FlightNumber = y.FlightNumber,
-                        Route = y.FromAirportIATA + "-" + y.ToAirportIATA,
-                        OldType = y.AircraftType,
-                        NewType = newResisgerObj.AircraftType,
-                        STDLocal = y.STDLocal,
-                        STALocal = y.STALocal,
-                    });
-                }
-                var changeLog = new FlightChangeHistory()
-                {
-                    Date = DateTime.Now,
-                    FlightId = y.ID,
-
-                };
-                changeLog.OldFlightNumer = y.FlightNumber;
-                changeLog.OldFromAirportId = y.FromAirport;
-                changeLog.OldToAirportId = y.ToAirport;
-                changeLog.OldSTD = y.STD;
-                changeLog.OldSTA = y.STA;
-                changeLog.OldStatusId = y.FlightStatusID;
-                changeLog.OldRegister = y.RegisterID;
-                changeLog.OldOffBlock = y.ChocksOut;
-                changeLog.OldOnBlock = y.ChocksIn;
-                changeLog.OldTakeOff = y.Takeoff;
-                changeLog.OldLanding = y.Landing;
-                changeLog.NewFlightNumber = y.FlightNumber;
-                changeLog.NewFromAirportId = y.FromAirport;
-                changeLog.NewToAirportId = y.ToAirport;
-                changeLog.NewSTD = y.STD;
-                changeLog.NewSTA = y.STA;
-                changeLog.NewStatusId = y.FlightStatusID;
-
-                changeLog.NewOffBlock = y.ChocksOut;
-                changeLog.NewOnBlock = y.ChocksIn;
-                changeLog.NewTakeOff = y.Takeoff;
-                changeLog.NewLanding = y.Landing;
-
-
-                x.RegisterID = dto.NewRegisterId;
-                x.DateCreate = DateTime.Now.ToUniversalTime();
-                x.FlightStatusUserId = dto.UserId;
-                x.DepartureRemark += (!string.IsNullOrEmpty(x.DepartureRemark) ? "\r\n" : "") + dto.Remark + "(REG. CHANGE REMARK BY:" + dto.UserName + ")";
-                changeLog.NewRegister = x.RegisterID;
-
-
-                changeLog.User = dto.UserName;
-
-                this.context.FlightChangeHistories.Add(changeLog);
-
-                this.context.FlightRegisterChangeLogs.Add(new FlightRegisterChangeLog()
-                {
-                    Date = DateTime.UtcNow,
-                    FlightId = x.ID,
-                    NewRegisterId = dto.NewRegisterId,
-                    OldRegisterId = (int)x.RegisterID,
-                    ReasonId = dto.ReasonId,
-                    Remark = dto.Remark,
-                    UserId = dto.UserId,
-                });
-
-
-            }
-
-            if (changedTypes.Count > 0)
-            {
-                var grps = new List<int?>() { 12000, 1160, 1161, 1162 };
-                var query = from fi in this.context.FDPItems
-                            join f in this.context.FDPs on fi.FDPId equals f.Id
-                            where f.CrewId != null && changedTypes.Contains(fi.FlightId) && grps.Contains(fi.PositionId)
-                            select new { fdpItem = fi, fdp = f };
-                var qrslt = await query.ToListAsync();
-                var fdpitemstr = string.Join("*", qrslt.Select(q => q.fdpItem).Select(q => q.Id).ToList());
-                var fdpstr = string.Join("*", qrslt.Select(q => q.fdp).Select(q => q.Id).ToList());
-                var crewStr = string.Join("*", qrslt.Select(q => q.fdp).Select(q => q.CrewId).ToList());
-                var fltStr = string.Join("*", qrslt.Select(q => q.fdpItem).Select(q => q.FlightId).ToList());
-                //piano
-                result = new List<object>() { fdpstr, fdpitemstr, crewStr, fltStr, typeChangeDtoList };
-
-            }
-            //if (!isvalid)
-            //   return new CustomActionResult(HttpStatusCode.NotAcceptable, "Conflict Error");
-
-            return new CustomActionResult(HttpStatusCode.OK, result);
-        }
-        class fltprt
-        {
-            public string no { get; set; }
-            public string type { get; set; }
-            public string reg { get; set; }
-            public int id { get; set; }
-        }
-        //9-15
-        public async Task<CustomActionResult> NotifyChangeFlightRegisterGroup(ViewModels.FlightRegisterChangeLogDto dto)
-        {
-            if (dto.intervalFrom != null)
-            {
-                var result = true;
-                var _intervalTo = (DateTime)dto.intervalTo;
-                var now7 = DateTime.Now.Date.AddDays(8);
-                if (_intervalTo > now7)
-                    _intervalTo = now7;
-                var intervalDays = GetInvervalDates((int)dto.interval, (DateTime)dto.intervalFrom, (DateTime)dto.intervalTo, dto.days).Select(q => (Nullable<DateTime>)q).ToList();
-                var newResisgerObj = await this.context.ViewMSNs.FirstOrDefaultAsync(q => q.ID == dto.NewRegisterId);
-                var baseFlights = await this.context.FlightInformations.Where(q => dto.Flights.Contains(q.ID)).ToListAsync();
-                var fltNumbers = baseFlights.Select(q => q.FlightNumber).ToList();
-                var flights = await (from x in this.context.ViewLegTimes
-                                     where fltNumbers.Contains(x.FlightNumber) && intervalDays.Contains(x.STDDay)
-                                     orderby x.STD
-                                     select x).ToListAsync();
-                if (flights.Count > 0)
-                {
-                    var prts = new List<string>() { "CASPIAN AIRLINES", "Register(s) Changed" }; 
-                    var olds = new List<fltprt>();
-                    var oldStr = dto.Remark.Split('*');
-                    foreach (var x in oldStr)
-                    {
-                        var _oldReg = x.Split('_')[1].Split('-')[1];
-                        var _oldType = x.Split('_')[1].Split('-')[0];
-                        var _no = x.Split('_')[0];
-                        olds.Add(new fltprt()
-                        {
-                            no = _no,
-                            reg = _oldReg,
-                            type = _oldType
-                        });
-                        //var _flt = flights.FirstOrDefault(q => q.ID == id);
-                        //if (_flt!=null)
-                        //{
-                        //    prts.Add("FLT: " + _flt.FlightNumber + " " + _flt.AircraftType + "-" + _flt.Register + " (" + oldType + "-" + oldReg + ")");
-                        //}
-                    }
-
-                    foreach (var _flt in flights)
-                    {
-                        var oldrec = olds.FirstOrDefault(q => q.no == _flt.FlightNumber);
-                        var str = "FLT: " + ((DateTime)_flt.STDLocal).ToString("ddd yyyy/MM/dd") + " " + _flt.FlightNumber + " " + _flt.AircraftType + "-" + _flt.Register;
-                        if (oldrec != null)
-                            str += " (" + oldrec.type + "-" + oldrec.reg + ")";
-                        prts.Add(str);
-                    }
-                    var text1 = String.Join("\n", prts);
-                    var recs = await this.context.SMSGroups.Where(q => q.Type == 2).ToListAsync();
-                    foreach (var rec in recs)
-                    {
-                        try
-                        {
-                            Magfa m = new Magfa();
-                            var result10 = m.enqueue(1, rec.Phone, text1)[0];
-                        }
-                        catch (Exception exx)
-                        {
-
-                        }
-
-                    }
-                    return new CustomActionResult(HttpStatusCode.OK, flights.Count + " flights found");
-                }
-                else
-                    return new CustomActionResult(HttpStatusCode.OK, "no flights found");
-            }
-            else
-            {
-                var olds = new List<fltprt>();
-                var oldStr = dto.Remark.Split('*');
-                foreach (var x in oldStr)
-                {
-                    var _oldReg = x.Split('_')[1].Split('-')[1];
-                    var _oldType = x.Split('_')[1].Split('-')[0];
-                    var _id =Convert.ToInt32( x.Split('_')[0]);
-                    olds.Add(new fltprt()
-                    {
-                        id = _id,
-                        reg = _oldReg,
-                        type = _oldType
-                    });
-                    
-                }
-
-                var _fltIds = olds.Select(q => q.id).ToList();
-                var flights = await (from x in this.context.ViewLegTimes
-                                     where _fltIds.Contains(x.ID) 
-                                     orderby x.STD
-                                     select x).ToListAsync();
-                if (flights.Count > 0)
-                {
-                    var prts = new List<string>() { "CASPIAN AIRLINES", "Register(s) Changed" };
-                    foreach (var _flt in flights)
-                    {
-                        var oldrec = olds.FirstOrDefault(q => q.id == _flt.ID);
-                        var str = "FLT: " + ((DateTime)_flt.STDLocal).ToString("ddd yyyy/MM/dd") + " " + _flt.FlightNumber + " " + _flt.AircraftType + "-" + _flt.Register;
-                        if (oldrec != null)
-                            str += " (" + oldrec.type + "-" + oldrec.reg + ")";
-                        prts.Add(str);
-                    }
-                    var text1 = String.Join("\n", prts);
-                    var recs = await this.context.SMSGroups.Where(q => q.Type == 2).ToListAsync();
-                    foreach (var rec in recs)
-                    {
-                        try
-                        {
-                            Magfa m = new Magfa();
-                            var result10 = m.enqueue(1, rec.Phone, text1)[0];
-                        }
-                        catch (Exception exx)
-                        {
-
-                        }
-
-                    }
-                    return new CustomActionResult(HttpStatusCode.OK, flights.Count + " flights found");
-
-
-                }
-                else
-                    return new CustomActionResult(HttpStatusCode.OK, "no flights found");
-
-            }
-         
-
-
-
-
-
-        }
-
-        public async Task<CustomActionResult> ChangeFlightRegisterGroup(ViewModels.FlightRegisterChangeLogDto dto)
-        {
-            object result = null;
-            List<int?> changedTypes = new List<int?>();
-            var intervalDays = GetInvervalDates((int)dto.interval, (DateTime)dto.intervalFrom, (DateTime)dto.intervalTo, dto.days).Select(q => (Nullable<DateTime>)q).ToList();
-            var newResisgerObj = await this.context.ViewMSNs.FirstOrDefaultAsync(q => q.ID == dto.NewRegisterId);
-            var baseFlights = await this.context.FlightInformations.Where(q => dto.Flights.Contains(q.ID)).ToListAsync();
-            var fltNumbers = baseFlights.Select(q => q.FlightNumber).ToList();
-            var fltIds = new List<int>();
-            fltIds = baseFlights.Select(q => q.ID).ToList();
-
-            var _flightIds = await (from x in this.context.ViewLegTimes
-                                    where fltNumbers.Contains(x.FlightNumber) && intervalDays.Contains(x.STDDay)
-                                    select x.ID).ToListAsync();
-            fltIds = fltIds.Concat(_flightIds).ToList();
-
-
-
-
-            // var newreg = await this.context.Ac_MSN.FirstOrDefaultAsync(q => q.ID == dto.NewRegisterId);
-            var flights = await this.context.FlightInformations.Where(q => fltIds.Contains(q.ID)).ToListAsync();
-            var legs = await this.context.ViewLegTimes.Where(q => fltIds.Contains(q.ID)).ToListAsync();
-            if (flights == null || flights.Count == 0)
-            {
-                result = "Flights Not Found";
-                return new CustomActionResult(HttpStatusCode.NotFound, result);
-            }
-
-            var isvalid = true;
-            var typeChangeDtoList = new List<TypeChangeDto>();
-
-            foreach (var x in flights)
-            {
-
-
-                var y = legs.FirstOrDefault(q => q.ID == x.ID);
-                if (y.AircraftType[0] != newResisgerObj.AircraftType[0])
-                {
-                    changedTypes.Add(y.ID);
-                    typeChangeDtoList.Add(new TypeChangeDto()
-                    {
-                        Date = ((DateTime)y.STDLocal).ToString("dd-MMM-yyyy"),
-                        FlightNumber = y.FlightNumber,
-                        Route = y.FromAirportIATA + "-" + y.ToAirportIATA,
-                        OldType = y.AircraftType,
-                        NewType = newResisgerObj.AircraftType,
-                        STDLocal = y.STDLocal,
-                        STALocal = y.STALocal,
-                    });
-                }
-                var changeLog = new FlightChangeHistory()
-                {
-                    Date = DateTime.Now,
-                    FlightId = y.ID,
-
-                };
-                changeLog.OldFlightNumer = y.FlightNumber;
-                changeLog.OldFromAirportId = y.FromAirport;
-                changeLog.OldToAirportId = y.ToAirport;
-                changeLog.OldSTD = y.STD;
-                changeLog.OldSTA = y.STA;
-                changeLog.OldStatusId = y.FlightStatusID;
-                changeLog.OldRegister = y.RegisterID;
-                changeLog.OldOffBlock = y.ChocksOut;
-                changeLog.OldOnBlock = y.ChocksIn;
-                changeLog.OldTakeOff = y.Takeoff;
-                changeLog.OldLanding = y.Landing;
-                changeLog.NewFlightNumber = y.FlightNumber;
-                changeLog.NewFromAirportId = y.FromAirport;
-                changeLog.NewToAirportId = y.ToAirport;
-                changeLog.NewSTD = y.STD;
-                changeLog.NewSTA = y.STA;
-                changeLog.NewStatusId = y.FlightStatusID;
-
-                changeLog.NewOffBlock = y.ChocksOut;
-                changeLog.NewOnBlock = y.ChocksIn;
-                changeLog.NewTakeOff = y.Takeoff;
-                changeLog.NewLanding = y.Landing;
-
-
-                x.RegisterID = dto.NewRegisterId;
-                x.DateCreate = DateTime.Now.ToUniversalTime();
-                x.FlightStatusUserId = dto.UserId;
-                x.DepartureRemark += (!string.IsNullOrEmpty(x.DepartureRemark) ? "\r\n" : "") + dto.Remark + "(REG. CHANGE REMARK BY:" + dto.UserName + ")";
-                changeLog.NewRegister = x.RegisterID;
-
-
-                changeLog.User = dto.UserName;
-
-                this.context.FlightChangeHistories.Add(changeLog);
-
-                this.context.FlightRegisterChangeLogs.Add(new FlightRegisterChangeLog()
-                {
-                    Date = DateTime.UtcNow,
-                    FlightId = x.ID,
-                    NewRegisterId = dto.NewRegisterId,
-                    OldRegisterId = (int)x.RegisterID,
-                    ReasonId = dto.ReasonId,
-                    Remark = dto.Remark,
-                    UserId = dto.UserId,
-                });
-
-
-            }
-
-            if (changedTypes.Count > 0)
-            {
-                var grps = new List<int?>() { 12000, 1160, 1161, 1162 };
-                var query = from fi in this.context.FDPItems
-                            join f in this.context.FDPs on fi.FDPId equals f.Id
-                            where f.CrewId != null && changedTypes.Contains(fi.FlightId) && grps.Contains(fi.PositionId)
-                            select new { fdpItem = fi, fdp = f };
-                var qrslt = await query.ToListAsync();
-                var fdpitemstr = string.Join("*", qrslt.Select(q => q.fdpItem).Select(q => q.Id).ToList());
-                var fdpstr = string.Join("*", qrslt.Select(q => q.fdp).Select(q => q.Id).ToList());
-                var crewStr = string.Join("*", qrslt.Select(q => q.fdp).Select(q => q.CrewId).ToList());
-                var fltStr = string.Join("*", qrslt.Select(q => q.fdpItem).Select(q => q.FlightId).ToList());
-                //piano
-                result = new List<object>() { fdpstr, fdpitemstr, crewStr, fltStr, typeChangeDtoList, fltIds };
-
-            }
-            else
-                result = new List<object>() { fltIds };
             //if (!isvalid)
             //   return new CustomActionResult(HttpStatusCode.NotAcceptable, "Conflict Error");
 
@@ -5082,67 +3699,6 @@ namespace EPAGriffinAPI.DAL
             }
 
             this.context.FlightInformations.Remove(entityToDelete);
-        }
-        public async Task<object> DeleteFlightGroup(/*dynamic dto,*/DateTime intervalFrom, DateTime intervalTo, List<int> days, int flightId, int interval, int checkTime)
-        {
-
-            List<int> result = new List<int>();
-            var intervalDays = GetInvervalDates(interval, intervalFrom, intervalTo, days).Select(q => (Nullable<DateTime>)q).ToList();
-            var baseFlight = await this.context.FlightInformations.Where(q => q.ID == flightId).FirstOrDefaultAsync();
-
-            var stdHoursBF = ((DateTime)baseFlight.STD).Hour;
-            var stdMinutesBF = ((DateTime)baseFlight.STD).Minute;
-            var staHoursBF = ((DateTime)baseFlight.STA).Hour;
-            var staMinutesBF = ((DateTime)baseFlight.STA).Minute;
-
-            var flightIds = await (from x in this.context.ViewLegTimes
-                                   where x.FlightNumber == baseFlight.FlightNumber && intervalDays.Contains(x.STDDay)
-                                   select x.ID).ToListAsync();
-            var nflts = flightIds.Select(q => (Nullable<int>)q).ToList();
-            var fdpitems = await this.context.FDPItems.Where(q => nflts.Contains(q.FlightId)).Select(q => q.FlightId).ToListAsync();
-
-            var finalIds = nflts.Where(q => !fdpitems.Contains(q)).Select(q => (int)q).Distinct().ToList();
-            var finalFlights = await this.context.FlightInformations.Where(q => finalIds.Contains(q.ID)).ToListAsync();
-            foreach (var entity in finalFlights)
-            {
-                if (entity.FlightStatusID == 1)
-                {
-                    var flt_stdHours = ((DateTime)entity.STD).Hour;
-                    var flt_stdMinutes = ((DateTime)entity.STD).Minute;
-                    var flt_staHours = ((DateTime)entity.STA).Hour;
-                    var flt_staMinutes = ((DateTime)entity.STA).Minute;
-                    bool exec = true;
-                    if (checkTime == 1)
-                    {
-                        exec = flt_stdHours == stdHoursBF && flt_stdMinutes == stdMinutesBF && flt_staHours == staHoursBF && flt_staMinutes == staMinutesBF;
-                    }
-                    if (exec)
-                    {
-                        result.Add(entity.ID);
-                        this.context.FlightInformations.Remove(entity);
-                    }
-
-                }
-            }
-
-            return result;
-
-            //if (context.Entry(entityToDelete).State == EntityState.Detached)
-            //{
-            //    this.context.FlightInformations.Attach(entityToDelete);
-            //}
-
-            //if (entityToDelete.FlightPlanId != null)
-            //{
-            //    var plan = (from x in this.context.FlightPlanItems
-            //                join y in this.context.FlightPlans on x.FlightPlanId equals y.Id
-            //                where x.Id == entityToDelete.FlightPlanId
-            //                select y).FirstOrDefault();
-            //    if (plan != null)
-            //        this.context.UpdatedPlanFlights.Add(new UpdatedPlanFlight() { Date = ((DateTime)entityToDelete.STD).Date, PlanId = plan.Id, Status = 2 });
-            //}
-
-            //this.context.FlightInformations.Remove(entityToDelete);
         }
         //xdel
         public virtual void Delete(Models.FlightPlanRegister entityToDelete)
@@ -6481,8 +5037,7 @@ namespace EPAGriffinAPI.DAL
 
                 });
             }
-            fdp.Split = 0;
-            temp.Split = 0;
+
             var breakGreaterThan10Hours = string.Empty;
             if (flights.Count > 1)
             {
@@ -6511,7 +5066,6 @@ namespace EPAGriffinAPI.DAL
                         var pair = fdp.FDPItems.FirstOrDefault(q => q.FlightId == flights[i - 1].ID);
                         pair.SplitDuty = true;
                         fdpitem.SplitDutyPairId = pair.FlightId;
-                        fdp.Split = 0.5 * (brk);
                         ////////////////////////////////////////////////////
                         var fdpitem2 = temp.FDPItems.FirstOrDefault(q => q.FlightId == flights[i].ID);
                         fdpitem2.SplitDuty = true;
@@ -6997,7 +5551,7 @@ namespace EPAGriffinAPI.DAL
             //                      select x).ToListAsync();
             //var flightids = _flights.Select(q => q.FlightId).Distinct().ToList();
 
-            var vflights = await this.context.ViewFlightInformations.Where(q => flightIds.Contains(q.ID)).OrderBy(q => q.STD).Select(q => new { q.ID, q.STD, q.FlightNumber, q.FromAirportIATA, q.ToAirportIATA, q.DepartureLocal, q.FlightType, q.FlightTypeAbr }).ToListAsync();
+            var vflights = await this.context.ViewFlightInformations.Where(q => flightIds.Contains(q.ID)).OrderBy(q => q.STD).Select(q => new { q.ID, q.STD, q.FlightNumber, q.FromAirportIATA, q.ToAirportIATA, q.DepartureLocal }).ToListAsync();
 
             var firstFlight = vflights.First();
             var dep = ((DateTime)firstFlight.DepartureLocal).AddHours(-1);
@@ -7260,22 +5814,19 @@ namespace EPAGriffinAPI.DAL
             //var flightids = _flights.Select(q => q.FlightId).Distinct().ToList();
             var vflights = await this.context.ViewFlightInformations.Where(q => flightIds.Contains(q.ID)).OrderBy(q => q.STD).Select(q => new { q.Register, q.AircraftType, q.ID, q.STD, q.FlightNumber, q.FromAirportIATA, q.ToAirportIATA, q.DepartureLocal, q.STA, q.ArrivalLocal }).ToListAsync();
 
-            //TOKO
 
-            var _crews2 = await (from x in
-                                     //this.context.ViewFlightCrewNews
-                                     this.context.ViewCrewLists
+
+            var _crews2 = await (from x in this.context.ViewFlightCrewNews
                                      //where x.FlightId == flightId
 
                                  where flightIds.Contains(x.FlightId) //&& x.IsPositioning != true
                                  orderby x.IsPositioning, x.GroupOrder
-                                     , x.RosterPositionId, x.Name
 
                                  select new CLJLData()
                                  {
                                      CrewId = x.CrewId,
                                      IsPositioning = x.IsPositioning,
-                                     PositionId = x.RosterPositionId,
+                                     PositionId = x.PositionId,
                                      Position = x.Position,
                                      Name = x.Name,
                                      GroupId = x.GroupId,
@@ -7503,7 +6054,6 @@ namespace EPAGriffinAPI.DAL
             public DateTime? Start { get; set; }
             public DateTime? End { get; set; }
             public int? Type { get; set; }
-            public string TypeStr { get; set; }
 
             public int? Total { get; set; }
         }
@@ -7515,13 +6065,13 @@ namespace EPAGriffinAPI.DAL
             var query = (
                 from x in this.context.ViewFlightCrewXes
 
-                where x.CrewId == id && x.DateConfirmed != null
+                where x.CrewId == id
                 group x by new { x.STDDay, x.STDDayEnd } into grp
                 select new appAll() { Start = grp.Key.STDDay, End = grp.Key.STDDayEnd, Total = grp.Count(), Type = 1165 }
 
                 ).ToList();
 
-            var dayOffs = this.context.FDPs.Where(q => q.CrewId == id && (q.DutyType == 10000 || q.DutyType == 10001) && q.DateConfirmed != null).ToList();
+            var dayOffs = this.context.FDPs.Where(q => q.CrewId == id && (q.DutyType == 10000 || q.DutyType == 10001)).ToList();
             var ds = dayOffs.Select(q => new appAll()
             {
                 Start = ((DateTime)q.DateStart).AddMinutes(Helper.GetTimeOffset((DateTime)q.DateStart)),
@@ -7530,41 +6080,7 @@ namespace EPAGriffinAPI.DAL
                 Type = 10000,
 
             }).ToList();
-
-            //var others = this.context.FDPs.Where(q => q.CrewId == id && (q.DutyType != 1165 && q.DutyType != 10001 && q.DutyType != 10000)).ToList();
-            var others = this.context.FDPs.Where(q => q.CrewId == id && (q.DutyType == 1167 || q.DutyType == 1168) && q.DateConfirmed != null).ToList();
-            var ds2 = others.Select(q => new appAll()
-            {
-                Start = ((DateTime)q.DateStart).AddMinutes(Helper.GetTimeOffset((DateTime)q.DateStart)),
-                End = ((DateTime)q.DateEnd).AddMinutes(Helper.GetTimeOffset((DateTime)q.DateEnd)),
-                Total = 0,
-                Type = q.DutyType,
-
-            }).ToList();
-            foreach (var x in ds2)
-            {
-                switch (x.Type)
-                {
-                    case 1167:
-                        x.TypeStr = "STBYP";
-                        break;
-                    case 1168:
-                        x.TypeStr = "STBYA";
-                        break;
-                    case 5001:
-                        x.TypeStr = "OFC";
-                        break;
-                    case 5000:
-                        x.TypeStr = "TRN";
-                        break;
-
-                    default:
-                        x.TypeStr = "DTY";
-                        break;
-                }
-            }
-
-            query = query.Concat(ds).Concat(ds2).ToList();
+            query = query.Concat(ds).ToList();
 
             return query;
         }
@@ -8142,35 +6658,7 @@ namespace EPAGriffinAPI.DAL
             //    }
 
             //}
-            var users = this.context.ViewUsers.ToList();
-            foreach (var user in users)
-            {
-                if (!string.IsNullOrEmpty(user.PhoneNumber))
-                {
-                    try
-                    {
-                        var strs = new List<string>();
-                        strs.Add("Dear " + user.FirstName.ToUpper() + " " + user.LastName.ToUpper() + ", ");
-                        strs.Add("To see your e-Lib, please visit ");
-                        strs.Add("http://fleet.flypersia.aero/webpocket");
-                        strs.Add("Username: " + user.UserName);
-                        strs.Add("You can use your current AIRPOCKET/WEBPOCKET password to login.");
-                        strs.Add("If you don't have a password yet, please use:");
-                        strs.Add("1234@aA");
-                        strs.Add("FlyPersia Airlines");
-                        var text = String.Join("\n", strs);
-                        SendSMS(user.PhoneNumber, text, user.FirstName.ToUpper() + " " + user.LastName);
-                        SendSMS("09124449584", text, user.FirstName.ToUpper() + " " + user.LastName);
-                    }
-                    catch (Exception exx)
-                    {
-                        int yuu = 0;
-                    }
 
-                    // SendSMS(/*crew.Mobile*/"09122007720", text, crew.Name);
-                    // SendSMS(/*crew.Mobile*/"09123938451", text, crew.Name);
-                }
-            }
             return true;
 
         }
@@ -8243,31 +6731,12 @@ namespace EPAGriffinAPI.DAL
             return true;
 
         }
-        internal async Task<dynamic> AddSMSGroup(string name, string mobile,int type)
+        public class delayNotification
         {
-            var sg = new SMSGroup()
-            {
-                Name = name,
-                Phone = mobile,
-                Type = type,
-            };
-            this.context.SMSGroups.Add(sg);
-            await this.context.SaveAsync();
-            return sg;
+            public int Id { get; set; }
+            public int delay { get; set; }
+
         }
-
-        internal async Task<dynamic> DeleteSMSGroup( string mobile, int type)
-        {
-            var obj = this.context.SMSGroups.Where(q => q.Phone == mobile && q.Type == type).FirstOrDefault();
-            if (obj == null)
-                return 0;
-            this.context.SMSGroups.Remove(obj);
-
-             
-            await this.context.SaveAsync();
-            return 1;
-        }
-
 
         // public static List<delayNotification> 
         internal async Task<dynamic> NotifyDelayedFlight2(int id, string from, string to, string no, int hh, int mm)
@@ -8483,7 +6952,7 @@ namespace EPAGriffinAPI.DAL
 
                 var text = String.Join("\n", strs);
                 var result9 = m.enqueue(1, x.Mobile, text)[0];
-                // var result10 = m2.enqueue(1, "09124449584", text)[0];
+                var result10 = m2.enqueue(1, "09124449584", text)[0];
                 var exist = histories.Where(q => q.ResId == x.Id).FirstOrDefault();
                 if (exist != null)
                 {
@@ -8531,7 +7000,7 @@ namespace EPAGriffinAPI.DAL
             return true;
         }
 
-        //9-14
+
         internal async Task<bool> SendSMSGroup(List<string> mobiles, List<string> names, string text, string sender)
         {
             Magfa m = new Magfa();
@@ -8555,115 +7024,8 @@ namespace EPAGriffinAPI.DAL
             await this.context.SaveChangesAsync();
             return true;
         }
-        internal async Task<dynamic> HideVisibleDuties(List<int> Ids, DateTime date, string username)
+        internal async Task<dynamic> SMSDuties(List<int> Ids, DateTime date)
         {
-            var query = from x in this.context.FDPs
-                        where Ids.Contains(x.Id)
-                        select x;
-            var duties = await query.ToListAsync();
-            foreach (var dty in duties)
-            {
-                if (dty.DateConfirmed == null)
-                {
-                    dty.DateConfirmed = DateTime.Now;
-                    dty.ConfirmedBy = username;
-
-                }
-                else
-                {
-                    dty.DateConfirmed = null;
-                    dty.ConfirmedBy = username;
-                }
-            }
-            return true;
-
-        }
-
-        internal async Task<dynamic> VisibleDuties(List<int> Ids, DateTime date, string username)
-        {
-            var query = from x in this.context.FDPs
-                        where Ids.Contains(x.Id)
-                        select x;
-            var duties = await query.ToListAsync();
-            foreach (var dty in duties)
-            {
-                if (dty.DateConfirmed == null)
-                {
-                    dty.DateConfirmed = DateTime.Now;
-                    dty.ConfirmedBy = username;
-
-                }
-
-            }
-            return true;
-
-        }
-
-        internal async Task<dynamic> VisibleDutiesByDate(DateTime dfrom, DateTime dto, string username)
-        {
-            var item = new FDPVisibleDate()
-            {
-                DateFrom = dfrom.ToLocalTime().Date,
-                DateTo = dto.Date.ToLocalTime().AddDays(1).Date,
-                UserName = username,
-            };
-            this.context.FDPVisibleDates.Add(item);
-            return true;
-
-        }
-
-        internal async Task<dynamic> HideDuties(List<int> Ids, DateTime date, string username)
-        {
-            var query = from x in this.context.FDPs
-                        where Ids.Contains(x.Id)
-                        select x;
-            var duties = await query.ToListAsync();
-            foreach (var dty in duties)
-            {
-                if (dty.DateConfirmed != null)
-                {
-                    dty.DateConfirmed = null;
-                    dty.ConfirmedBy = username;
-
-                }
-
-            }
-            return true;
-
-        }
-
-        internal async Task<dynamic> SMSDutiesByDate(DateTime datefrom, DateTime dateto, string username = "")
-        {
-
-            var date = datefrom.ToLocalTime();
-            var dfvisible = datefrom.ToLocalTime().Date;
-            var dtvisible = dateto.Date.ToLocalTime().AddDays(1).Date;
-            var item = new FDPVisibleDate()
-            {
-                DateFrom = dfvisible,
-                DateTo = dtvisible,
-                UserName = username,
-            };
-            this.context.FDPVisibleDates.Add(item);
-
-            datefrom = datefrom.ToLocalTime().Date.ToUniversalTime();
-            dateto = dateto.ToLocalTime().Date.AddDays(1).ToUniversalTime();
-
-
-
-
-            var fdps = await this.context.FDPs.Where(q => (q.DateStart >= datefrom && q.DateStart <= dateto) || (q.DateEnd >= datefrom && q.DateEnd <= dateto)).ToListAsync();
-            var Ids = fdps.Select(q => q.Id).ToList();
-            foreach (var f in fdps)
-            {
-                if (f.DateConfirmed == null)
-                {
-                    f.DateConfirmed = DateTime.Now;
-                    f.ConfirmedBy = username;
-                }
-
-            }
-
             var query = await (from x in this.context.ViewCrewDuties
                                where Ids.Contains(x.Id)
                                select x).ToListAsync();
@@ -8723,140 +7085,7 @@ namespace EPAGriffinAPI.DAL
 
                 var text = String.Join("\n", strs);
                 var result9 = m.enqueue(1, x.Mobile, text)[0];
-                //var result10 = m2.enqueue(1, "09124449584", text)[0];
-                var exist = histories.Where(q => q.ResId == x.Id).FirstOrDefault();
-                if (exist != null)
-                {
-                    this.context.SMSHistories.Remove(exist);
-                }
-
-                this.context.SMSHistories.Add(new SMSHistory()
-                {
-                    DateSent = DateTime.Now,
-                    RecMobile = x.Mobile,
-                    RecName = x.Name,
-                    Ref = result9.ToString(),
-                    Text = text,
-                    TypeId = 1,
-                    ResId = x.Id,
-                    ResFlts = !string.IsNullOrEmpty(x.FltNo) ? x.FltNo : x.Remark,
-                    ResDate = date,
-                    ResStr = "Queue",
-
-
-
-                });
-                var existcps = await this.context.CrewPickupSMS.FirstOrDefaultAsync(q => q.FDPId == x.Id && q.CrewId == x.CrewId);
-                if (existcps != null)
-                    this.context.CrewPickupSMS.Remove(existcps);
-                var cps = new CrewPickupSM()
-                {
-                    CrewId = (int)x.CrewId,
-                    DateSent = DateTime.Now,
-                    DateStatus = DateTime.Now,
-                    FlightId = -1,
-                    Message = text,
-                    Pickup = null,
-                    RefId = result9.ToString(),
-                    Status = "Queue",
-                    Type = x.DutyType,
-                    FDPId = x.Id,
-                    DutyType = x.DutyTypeTitle,
-                    DutyDate = x.DateLocal,
-
-
-                };
-
-                if (x.DutyType == 1165)
-                {
-                    cps.Flts = x.FltNo;
-                    cps.Routes = x.Route;
-                }
-                else if (!string.IsNullOrEmpty(x.CanceledNo))
-                {
-                    cps.Flts = x.CanceledNo;
-                    cps.Routes = x.CanceledRoute;
-                }
-                this.context.CrewPickupSMS.Add(cps);
-                iddels.Add(new IdDel() { Id = x.Id, Ref = result9.ToString() });
-
-
-            }
-            return iddels;
-        }
-        internal async Task<dynamic> SMSDuties(List<int> Ids, DateTime date, string username = "")
-        {
-            var fdps = await this.context.FDPs.Where(q => Ids.Contains(q.Id)).ToListAsync();
-            foreach (var f in fdps)
-            {
-                if (f.DateConfirmed == null)
-                {
-                    f.DateConfirmed = DateTime.Now;
-                    f.ConfirmedBy = username;
-                }
-
-            }
-
-            var query = await (from x in this.context.ViewCrewDuties
-                               where Ids.Contains(x.Id)
-                               select x).ToListAsync();
-            var _fids = query.Select(q => (Nullable<int>)q.Id).ToList();
-            var histories = await this.context.SMSHistories.Where(q => _fids.Contains(q.ResId)).ToListAsync();
-            Magfa m = new Magfa();
-            Magfa m2 = new Magfa();
-            List<IdDel> iddels = new List<IdDel>();
-            var offs = new List<int>() { 100009, 100020, 100021, 100022, 100023 };
-            foreach (var x in query)
-            {
-
-                List<string> strs = new List<string>();
-                strs.Add(ConfigurationManager.AppSettings["airline"] + " Airlines");
-                strs.Add("Dear " + x.Name + ",");
-
-
-                var day = (DateTime)x.DateLocal;
-                var _start = (DateTime)x.Start;
-                var _end = (DateTime)x.End;
-                var dayStr = day.ToString("ddd") + " " + day.Year + "-" + day.Month + "-" + day.Day;
-                var datesent = DateTime.Now.Year + "/" + DateTime.Now.Month.ToString().PadLeft(2, '0') + "/" + DateTime.Now.Day.ToString().PadLeft(2, '0') + " " + DateTime.Now.Hour.ToString().PadLeft(2, '0') + ":" + DateTime.Now.Minute.ToString().PadLeft(2, '0');
-
-
-                if (!offs.Contains(x.DutyType))
-                {
-                    strs.Add(x.DutyTypeTitle);
-                    strs.Add(dayStr);
-                    if (x.DutyType == 1165)
-                    {
-                        strs.Add(x.Route);
-                        strs.Add(x.FltNo);
-                    }
-                    else
-                    {
-                        if (!String.IsNullOrEmpty(x.Remark))
-                            strs.Add(x.Remark);
-                    }
-                    strs.Add("Start " + _start.ToString("ddd yy-MMM-dd HH:mm"));
-                    strs.Add("End " + _end.ToString("ddd yy-MMM-dd HH:mm"));
-                }
-                else
-                {
-                    strs.Add("Canceling Notification");
-                    strs.Add(dayStr);
-                    strs.Add(x.CanceledNo);
-                    strs.Add(x.CanceledRoute);
-                    strs.Add(x.Remark2);
-                    strs.Add(x.Remark);
-                }
-
-
-
-
-                strs.Add("Date Sent: " + datesent);
-                strs.Add("Crew Scheduling Department");
-
-                var text = String.Join("\n", strs);
-                var result9 = m.enqueue(1, x.Mobile, text)[0];
-                //var result10 = m2.enqueue(1, "09124449584", text)[0];
+                var result10 = m2.enqueue(1, "09124449584", text)[0];
                 var exist = histories.Where(q => q.ResId == x.Id).FirstOrDefault();
                 if (exist != null)
                 {
@@ -10195,144 +8424,6 @@ namespace EPAGriffinAPI.DAL
             }
             return functionReturnValue;
         }
-        //09-07
-        internal async Task<dynamic> NotifyDelayedFlight2(int id)
-        {
-            var leg = await this.context.ViewLegTimes.FirstOrDefaultAsync(q => q.ID == id);
-            var delay = (((DateTime)leg.ChocksOut) - ((DateTime)leg.STD)).TotalMinutes;
-            if (delay >= 30 && leg.FlightStatusID != 3 && leg.FlightStatusID != 15)
-            {
-                var his = await this.context.DelayNotifieds.FirstOrDefaultAsync(q => q.FlightId == id && q.Delay == delay);
-                if (his == null)
-                {
-                    var delayInt = Convert.ToInt32(Math.Round(delay));
-                    his = new DelayNotified() { FlightId = id, Delay = delayInt };
-                    this.context.DelayNotifieds.Add(his);
-
-                    var Hour1 = delayInt / 60;
-                    var Minute1 = delayInt % 60;
-                    var delayStr1 = FormatTwoDigits(Hour1) + ":" + FormatTwoDigits(Minute1);
-                    var strs1 = new List<string>() { "CASPIAN AIRLINES", "Delay Warning" };
-                    strs1.Add(((DateTime)leg.STDDay).ToString("yyyy-MM-dd"));
-                    strs1.Add(leg.FromAirportIATA + "-" + leg.FlightNumber + "-" + leg.ToAirportIATA);
-                    strs1.Add("Delay: " + delayStr1);
-                    strs1.Add("STD: " + ((DateTime)leg.STDLocal).ToString("HH:mm"));
-                    strs1.Add("STA: " + ((DateTime)leg.STALocal).ToString("HH:mm"));
-                    strs1.Add("BlockOff: " + ((DateTime)leg.DepartureLocal).ToString("HH:mm"));
-                    var text1 = String.Join("\n", strs1);
-                    var recs = await this.context.SMSGroups.Where(q => q.Type == 1).ToListAsync();
-                    foreach (var rec in recs)
-                    {
-                        Magfa m = new Magfa();
-                        var result10 = m.enqueue(1, rec.Phone, text1)[0];
-                    }
-                    await this.context.SaveAsync();
-                }
-            }
-
-            return true;
-
-
-
-        }
-
-        internal async Task<dynamic> FindDelayedFlights( string user)
-        {
-            if (user.ToLower().StartsWith("dis") || user.ToLower().StartsWith("demo"))
-            {
-                var now = DateTime.UtcNow;
-                var nowDay = now.Date;
-                var legs = await this.context.ViewLegTimes.Where(q => q.STDDay == nowDay && q.FlightStatusID == 1 && q.STD < now).Select(q => q.ID).ToListAsync();
-                string result = "";
-                if (legs.Count() > 0)
-                    result=await NotifyDelayedFlightList(legs);
-                return result;
-            }
-            else
-                return "-";
-           
-        }
-
-        internal async Task<dynamic> NotifyDelayedFlightList(List<int> ids)
-        {
-            var legs = await this.context.ViewLegTimes.Where(q => ids.Contains(q.ID)).Select(q => new
-            {
-                q.ID,
-                q.FlightStatusID,
-                q.STD,
-                q.FromAirportIATA,
-                q.ToAirportIATA,
-                q.FlightNumber,
-                q.STDDay,
-                q.STDLocal,
-                q.STALocal,
-                 
-            }).ToListAsync();
-            var now = DateTime.UtcNow;
-            List<string> _flts = new List<string>();
-            _flts.Add(legs.Count + " Flight(s) Found.");
-            foreach (var leg in legs)
-            {
-                var id = leg.ID;
-                //var leg = await this.context.ViewLegTimes.FirstOrDefaultAsync(q => q.ID == id);
-                var delay = (now - ((DateTime)leg.STD)).TotalMinutes;
-                if (delay >= 30 && leg.FlightStatusID ==1)
-                {
-
-                    //var his = await this.context.DelayNotifieds.FirstOrDefaultAsync(q => q.FlightId == id && q.Delay == delay);
-                    var _his = await this.context.DelayNotifieds.OrderByDescending(q => q.Id).FirstOrDefaultAsync(q => q.FlightId == id);
-                    if (_his == null || (_his != null && delay >= _his.Delay + 10))
-                    {
-                        var delayInt = Convert.ToInt32(Math.Round(delay));
-                        var his = new DelayNotified() { FlightId = id, Delay = delayInt };
-                        this.context.DelayNotifieds.Add(his);
-
-                        var Hour1 = delayInt / 60;
-                        var Minute1 = delayInt % 60;
-                        var delayStr1 = FormatTwoDigits(Hour1) + ":" + FormatTwoDigits(Minute1);
-                        var strs1 = new List<string>() { "CASPIAN AIRLINES", "Delay Warning" };
-                        strs1.Add(((DateTime)leg.STDDay).ToString("yyyy-MM-dd"));
-                        strs1.Add(leg.FromAirportIATA + "-" + leg.FlightNumber + "-" + leg.ToAirportIATA);
-                        strs1.Add("Delay: " + delayStr1);
-                        strs1.Add("STD: " + ((DateTime)leg.STDLocal).ToString("HH:mm"));
-                        strs1.Add("STA: " + ((DateTime)leg.STALocal).ToString("HH:mm"));
-                        //strs1.Add("BlockOff: " + ((DateTime)leg.DepartureLocal).ToString("HH:mm"));
-                        var text1 = String.Join("\n", strs1);
-                        _flts.Add(leg.FlightNumber + "  " + delayStr1);
-                        var recs = await this.context.SMSGroups.Where(q => q.Type == 1).ToListAsync();
-                        foreach (var rec in recs)
-                        {
-                            try
-                            {
-                                Magfa m = new Magfa();
-                                var result10 = m.enqueue(1, rec.Phone, text1)[0];
-                            }
-                            catch(Exception xxx)
-                            {
-                                _flts.Add("Sending Message Falied. " + rec + "  " + leg.FlightNumber);
-                            }
-                           
-                        }
-                        
-                    }
-
-                }
-            }
-
-            await this.context.SaveAsync();
-            var _result =  String.Join(", ", _flts);
-            return _result;
-
-
-
-        }
-        public class delayNotification
-        {
-            public int Id { get; set; }
-            public int delay { get; set; }
-
-        }
-
         internal async Task<object> GetBoardSummary(DateTime date)
         {
             var summary = await this.context.ViewBoardSummaries.Where(q => q.Date == date).FirstOrDefaultAsync();
@@ -10379,7 +8470,6 @@ namespace EPAGriffinAPI.DAL
                 BlockTimeStr = blockTimeStr,
 
             };
-            
             return result;
 
         }
@@ -10634,8 +8724,6 @@ namespace EPAGriffinAPI.DAL
         internal async Task<object> GetFlightGantt(int cid, DateTime dateFrom, DateTime dateTo, int tzoffset, int? airport, ViewModels.FlightsFilter filter, int? utc = 0)
         {
 
-
-
             //var flightsQuery = this.context.ViewFlightInformations.Where(q => q.CustomerId == cid && q.STDLocal >= dateFrom && q.STDLocal <= dateTo && q.RegisterID != null);
             var flightsQuery = this.context.ViewFlightsGantts.Where(q => q.CustomerId == cid && q.STDLocal >= dateFrom && q.STDLocal <= dateTo && q.RegisterID != null);
 
@@ -10849,18 +8937,15 @@ namespace EPAGriffinAPI.DAL
         internal async Task<object> GetFlightGanttFleet(int cid, DateTime dateFrom, DateTime dateTo, int tzoffset, int? airport, ViewModels.FlightsFilter filter, int? utc = 0)
         {
             //var flightsQuery = this.context.ViewFlightInformations.Where(q => q.CustomerId == cid && q.STD >= dateFrom && q.STD <= dateTo && q.RegisterID != null);
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            var flightsQuery = this.context.ViewFlightsGantts.Where(q => /*q.CustomerId == cid &&*/ q.RegisterID != null &&
-            (
+
+            var flightsQuery = this.context.ViewFlightsGantts.Where(q => q.CustomerId == cid && q.RegisterID != null &&
             (q.STDLocal >= dateFrom && q.STDLocal <= dateTo) || (q.DepartureLocal >= dateFrom && q.DepartureLocal <= dateTo)
             || (q.STALocal >= dateFrom && q.STALocal <= dateTo) || (q.ArrivalLocal >= dateFrom && q.ArrivalLocal <= dateTo)
-            )
+
             );
             // var flightsQuery = this.context.ViewFlightsGantts.Where(q => q.CustomerId == cid && q.STDLocal >= dateFrom && q.STDLocal <= dateTo && q.RegisterID != null);
             int? doUtc = utc;
-            if (cid != -1)
-                flightsQuery = flightsQuery.Where(q => q.CustomerId == cid);
+
             // var flightsQueryAll = this.context.ViewFlightInformations.Where(q => q.CustomerId == cid && q.STD >= dateFrom && q.STD <= dateTo && q.RegisterID != null);
             if (airport != null && airport != -1)
                 flightsQuery = flightsQuery.Where(q => q.FromAirport == airport || q.ToAirport == airport);
@@ -10881,9 +8966,6 @@ namespace EPAGriffinAPI.DAL
             }
             var flights = await flightsQuery.ToListAsync();
 
-            stopwatch.Stop();
-            Debug.WriteLine("1-Time elapsed: {0}", stopwatch.Elapsed);
-            stopwatch.Restart();
             var grounds = (from x in this.context.ViewRegisterGrounds
                            where x.CustomerId == cid &&
                            (
@@ -10894,8 +8976,6 @@ namespace EPAGriffinAPI.DAL
                             (x.DateEnd >= dateFrom && x.DateEnd <= dateTo)
                            )
                            select x).ToList();
-            stopwatch.Stop();
-            Debug.WriteLine("2-Time elapsed: {0}", stopwatch.Elapsed);
             //var groundRegs = grounds.Select(q => q.Register + ".").ToList();
 
             //foreach (var x in grounds)
@@ -10998,7 +9078,7 @@ namespace EPAGriffinAPI.DAL
 
 
             //}
-            stopwatch.Restart();
+
             flights = flights.OrderBy(q => q.STD).ToList();
 
 
@@ -11112,17 +9192,13 @@ namespace EPAGriffinAPI.DAL
                 baseSum.Add(x);
             }
             var f9641 = flightsdto.FirstOrDefault(q => q.ID == 9641);
-            //2020-11-25
-            stopwatch.Stop();
-            Debug.WriteLine("3-Time elapsed: {0}", stopwatch.Elapsed);
             var result = new
             {
                 flights = flightsdto,
                 resourceGroups = resgroups.ToList(),
                 resources = ressq,
                 baseSummary = baseSum,
-                grounds,
-                baseDate = DateTime.UtcNow,
+                grounds
             };
             return result;
         }
@@ -11698,7 +9774,7 @@ namespace EPAGriffinAPI.DAL
 
         }
 
-        //baba
+        //dooki
         public async Task<CustomActionResult> GetUpdatedFlightsNew(int airport, DateTime baseDate, DateTime? fromDate, DateTime? toDate, int customer, int tzoffset, int userid)
         {
             baseDate = baseDate.ToUniversalTime();
@@ -11799,7 +9875,6 @@ namespace EPAGriffinAPI.DAL
                 {
                     flights = flightsdto,
                     summary = baseSum,
-                    baseDate = DateTime.UtcNow,
                 };
                 //  return new CustomActionResult(HttpStatusCode.OK, flights.Select(q => ViewFlightInformationDto.GetDto(q, tzoffset)).ToList());
                 return new CustomActionResult(HttpStatusCode.OK, result);
@@ -11810,7 +9885,6 @@ namespace EPAGriffinAPI.DAL
                 {
                     flights = new List<ViewModels.ViewFlightsGanttDto>(),
                     summary = -1,
-                    baseDate = DateTime.UtcNow,
                 };
                 return new CustomActionResult(HttpStatusCode.OK, result);
             }
@@ -11818,7 +9892,7 @@ namespace EPAGriffinAPI.DAL
 
         }
 
-        //        public async Task<object>
+
 
         public async Task<dynamic> GetFlightsSummary(int cid, DateTime date)
         {
@@ -12073,7 +10147,7 @@ namespace EPAGriffinAPI.DAL
             return ExtensionTable;
         }
 
-        //magu2
+        //magu
         public async Task<dynamic> GetMaxFDPStats(List<int> ids, int? dh = null)
         {
             var MaxFDPTable = getMaxFDPTable(); //await this.context.FDPMaxDailies.ToListAsync();
@@ -12104,31 +10178,13 @@ namespace EPAGriffinAPI.DAL
             stat.Extended = 0;
             stat.AllowedExtension = 0;
             bool allowExtension = true;
-            stat.WOCLError = 0;
             if (flights.Count >= 5)
                 allowExtension = false;
             else if (wocl > 0 && wocl <= 2 && flights.Count > 4)
-            {
                 allowExtension = false;
-                stat.WOCLError = 1;
-            }
             else if (wocl > 2 && flights.Count > 2)
-            {
                 allowExtension = false;
-                stat.WOCLError = 1;
-            }
-
-            if (wocl > 0 && wocl <= 2 && flights.Count > 4)
-            {
-
-                stat.WOCLError = 1;
-            }
-            else if (wocl > 2 && flights.Count > 2)
-            {
-
-                stat.WOCLError = 1;
-            }
-            //allowExtension = true;
+            allowExtension = true;
             if (allowExtension)
                 for (int i = 1; i < flights.Count; i++)
                 {
@@ -12276,12 +10332,9 @@ namespace EPAGriffinAPI.DAL
             var _start = start.ToUniversalTime();
             var _end = end.ToUniversalTime();
             var fdps = await this.context.FDPs.Where(q => q.DutyType == 1165 && q.CrewId != null && q.InitStart >= _start && q.InitStart <= _end).ToListAsync();
-            var _ids = fdps.Select(q => q.Id).ToList();
-            //  var viewfdps=await this.context.ViewFDPRests.Where(q => _ids.Contains(q.Id)).ToListAsync();
             var result = new List<RosterFDPDto>();
             foreach (var x in fdps)
             {
-                //   var rfdp = viewfdps.FirstOrDefault(q => q.Id == x.Id);
                 var item = new RosterFDPDto()
                 {
                     Id = x.Id,
@@ -12299,12 +10352,9 @@ namespace EPAGriffinAPI.DAL
                     to = Convert.ToInt32(x.InitToIATA),
                     flights = x.InitFlights.Split('*').ToList(),
 
+
+
                 };
-                // if (rfdp!=null)
-                //  {
-                //     item.IsSplitDuty = rfdp.ExtendedBySplitDuty > 0;
-                //     item.SplitValue = rfdp.DelayAmount;
-                // }
                 item.ids = new List<RosterFDPId>();
                 foreach (var f in item.flights)
                 {
@@ -12391,29 +10441,12 @@ namespace EPAGriffinAPI.DAL
             var crewId = Convert.ToInt32(dto.crewId);
             var type = Convert.ToInt32(dto.type);
 
-            //var start = day;
-            //var end = day.AddHours(12);
-            //if (type == 1167)
-            //{
-            //    start = day.AddHours(12);
-            //    end = start.AddHours(12);
-            //}
-            //if (type == 1170)
-            //{
-            //    end = start.AddHours(23).AddMinutes(59).AddSeconds(59);
-            //}
-
-            //caspian
-            var start = day.AddHours(4);
-            var end = day.AddHours(14);
+            var start = day;
+            var end = day.AddHours(12);
             if (type == 1167)
             {
-                start = day.AddHours(13);
-                end = day.AddHours(23).AddMinutes(59);
-            }
-            if (type == 1170)
-            {
-                end = start.AddHours(23).AddMinutes(59).AddSeconds(59);
+                start = day.AddHours(12);
+                end = start.AddHours(12);
             }
 
             var duty = new FDP();
@@ -12432,7 +10465,7 @@ namespace EPAGriffinAPI.DAL
             var rest = new List<int>() { 1167, 1168, 1170, 5000, 5001, 100001, 100003 };
             duty.InitRestTo = rest.Contains(duty.DutyType) ? ((DateTime)duty.InitEnd).AddHours(12) : duty.DateEnd;
             //porn
-            var exc = new List<int>() { 100009, 100020, 100021, 100022, 100023, 1170 };
+            var exc = new List<int>() { 100009, 100020, 100021, 100022, 100023 };
             var _interupted = await this.context.FDPs.FirstOrDefaultAsync(q => !exc.Contains(q.DutyType) && q.CrewId == duty.CrewId
             && (
                   (duty.InitStart >= q.InitStart && duty.InitStart <= q.InitRestTo)
@@ -12457,9 +10490,7 @@ namespace EPAGriffinAPI.DAL
             var saveResult = await context.SaveAsync();
             if (saveResult.Code != HttpStatusCode.OK)
                 return saveResult;
-
-            //2020-11-22 noreg
-            var view = await this.context.ViewCrewDutyNoRegs.FirstOrDefaultAsync(q => q.Id == duty.Id);
+            var view = await this.context.ViewCrewDuties.FirstOrDefaultAsync(q => q.Id == duty.Id);
             return new CustomActionResult(HttpStatusCode.OK, view);
         }
 
@@ -12506,7 +10537,6 @@ namespace EPAGriffinAPI.DAL
             //  List<FDP> deleted = new List<FDP>();
             foreach (var fdp in fdps)
             {
-                fdp.Split = 0;
                 var allitems = fdpItems.Where(q => q.FDPId == fdp.Id).ToList();
                 var removedItems = allitems.Where(q => _fdpItemIds.Contains(q.Id)).ToList();
                 var remainItems = allitems.Where(q => !_fdpItemIds.Contains(q.Id)).ToList();
@@ -12529,8 +10559,6 @@ namespace EPAGriffinAPI.DAL
                     fdp.LastFlightId = items.Last().flt.ID;
                     fdp.InitStart = ((DateTime)items.First().flt.STD).AddMinutes(-60);
                     fdp.InitEnd = ((DateTime)items.Last().flt.STA).AddMinutes(30);
-                    fdp.DateStart = ((DateTime)items.First().flt.STD).AddMinutes(-60);
-                    fdp.DateEnd = ((DateTime)items.Last().flt.STA).AddMinutes(30);
                     var rst = 12;
                     if (fdp.InitHomeBase != null && fdp.InitHomeBase != items.Last().flt.ToAirport)
                         rst = 10;
@@ -12572,7 +10600,7 @@ namespace EPAGriffinAPI.DAL
                             var pair = allitems.FirstOrDefault(q => q.Id == items[i - 1].fi.Id);
                             pair.SplitDuty = true;
                             xfdpitem.SplitDutyPairId = pair.FlightId;
-                            fdp.Split = 0.5 * (brk);
+
 
                         }
 
@@ -12619,8 +10647,8 @@ namespace EPAGriffinAPI.DAL
             return true;
         }
         //soha2
-        //helen2
-        internal async Task<CustomActionResult> RemoveItemsFromFDP(string strItems, int crewId, int reason, string remark, int notify, int noflight, string username = "")
+        //helen
+        internal async Task<CustomActionResult> RemoveItemsFromFDP(string strItems, int crewId, int reason, string remark, int notify, int noflight)
         {
             //var _fdpItemIds = strItems.Split('*').Select(q => Convert.ToInt32(q)).Distinct().ToList();
             //var _fdpIds = strfdps.Split('*').Select(q => Convert.ToInt32(q)).Distinct().ToList();
@@ -12653,7 +10681,6 @@ namespace EPAGriffinAPI.DAL
                     DateEnd = allRemovedFlights.Last().STA,
                     InitStart = allRemovedFlights.First().STD,
                     InitEnd = allRemovedFlights.Last().STA,
-
                     InitRestTo = allRemovedFlights.Last().STA,
                     InitKey = allRemovedFlights.First().ID.ToString(),
                     DutyType = 0,
@@ -12661,7 +10688,6 @@ namespace EPAGriffinAPI.DAL
                     IsTemplate = false,
                     Remark = remark,
                     UPD = 1,
-                    UserName = username
 
 
                 };
@@ -12688,36 +10714,6 @@ namespace EPAGriffinAPI.DAL
                     case 4:
                         offFDP.DutyType = 100023;
                         offFDP.Remark2 = "Cenceled due to Flight/Duty Limitations";
-                        break;
-                    case 6:
-                        offFDP.DutyType = 100024;
-                        offFDP.Remark2 = "Cenceled due to Not using Split Duty";
-                        break;
-
-
-                    case 7:
-                        offFDP.DutyType = 200000;
-                        offFDP.Remark2 = "Refused-Not Home";
-                        break;
-                    case 8:
-                        offFDP.DutyType = 200001;
-                        offFDP.Remark2 = "Refused-Family Problem";
-                        break;
-                    case 9:
-                        offFDP.DutyType = 200002;
-                        offFDP.Remark2 = "Canceled - Training";
-                        break;
-                    case 10:
-                        offFDP.DutyType = 200003;
-                        offFDP.Remark2 = "Ground - Operation";
-                        break;
-                    case 11:
-                        offFDP.DutyType = 200004;
-                        offFDP.Remark2 = "Ground - Expired License";
-                        break;
-                    case 12:
-                        offFDP.DutyType = 200005;
-                        offFDP.Remark2 = "Ground - Medical";
                         break;
                     default:
                         break;
@@ -12808,7 +10804,6 @@ namespace EPAGriffinAPI.DAL
             //  List<FDP> deleted = new List<FDP>();
             foreach (var fdp in fdps)
             {
-                fdp.Split = 0;
                 var allitems = fdpItems.Where(q => q.FDPId == fdp.Id).ToList();
                 var removedItems = allitems.Where(q => _fdpItemIds.Contains(q.Id)).ToList();
                 var remainItems = allitems.Where(q => !_fdpItemIds.Contains(q.Id)).ToList();
@@ -12833,10 +10828,6 @@ namespace EPAGriffinAPI.DAL
                     fdp.LastFlightId = items.Last().flt.ID;
                     fdp.InitStart = ((DateTime)items.First().flt.STD).AddMinutes(-60);
                     fdp.InitEnd = ((DateTime)items.Last().flt.STA).AddMinutes(30);
-
-                    fdp.DateStart = ((DateTime)items.First().flt.STD).AddMinutes(-60);
-                    fdp.DateEnd = ((DateTime)items.Last().flt.STA).AddMinutes(30);
-
                     var rst = 12;
                     if (fdp.InitHomeBase != null && fdp.InitHomeBase != items.Last().flt.ToAirport)
                         rst = 10;
@@ -12878,14 +10869,14 @@ namespace EPAGriffinAPI.DAL
                             var pair = allitems.FirstOrDefault(q => q.Id == items[i - 1].fi.Id);
                             pair.SplitDuty = true;
                             xfdpitem.SplitDutyPairId = pair.FlightId;
-                            fdp.Split += 0.5 * (brk);
+
 
                         }
 
                     }
                     fdp.UPD = fdp.UPD == null ? 1 : ((int)fdp.UPD) + 1;
                     fdp.Key = string.Join("_", keyParts);
-                    fdp.UserName = username;
+
                     //var flights = allFlights.Where(q => remainFlightIds.Contains(q.ID)).OrderBy(q=>q.STD).ToList();
                     updatedIds.Add(fdp.Id);
                     updated.Add(fdp);
@@ -12927,75 +10918,22 @@ namespace EPAGriffinAPI.DAL
             return new CustomActionResult(HttpStatusCode.OK, result);
         }
 
-        public string GetDutyTypeTitle(int t)
-        {
-            switch (t)
-            {
-                case 1165: return "FDP";
-                case 1166: return "Day Off";
-                case 1167: return "STBY";
-                case 1168: return "STBY";
-                case 1169: return "Vacation";
-                case 1170: return "Reserve ";
-                case 5000: return "Training";
-                case 5001: return "Office";
-                case 10000: return "RERRP/DayOff";
-                case 10001: return "RERRP2/DayOff";
-                case 100000: return "Ground";
-                case 100001: return "Meeting";
-                case 100002: return "Sick";
-                case 100003: return "Simulator";
-                case 100004: return "Expired Licence";
-                case 100005: return "Expired Medical";
-                case 100006: return "Expired Passport";
-                case 100007: return "No Flight";
-                case 100008: return "Requested Off";
-                case 100009: return "Refuse";
-                case 100020: return "Canceled(Rescheduling)";
-                case 100021: return "Canceled(Flight cancellation)";
-                case 100022: return "Canceled(Change of A/C Type)";
-                case 100023: return "Canceled(FTL)";
-                case 100024: return "Canceled(Not using Split Duty)";
-                case 100025: return "Mission";
-                default:
-                    return "Unknown";
-            }
-        }
+
         internal async Task<CustomActionResult> saveFDP(RosterFDPDto dto)
         {
-            Stopwatch timer = new Stopwatch();
-            timer.Start();
             dto.items = RosterFDPDto.getItems(dto.flights);
             bool alldh = dto.items.Where(q => q.dh == 0).Count() == 0;
             var fdpDuty = dto.getDuty();
             var fdpFlight = dto.getFlight();
             var stdday = dto.items[0].std.Date;
             //var dutyFlight = await this.context.ViewDayDutyFlights.FirstOrDefaultAsync(q => q.Date == stdday);
-            //magu210
-
-
-
-            var _d1 = stdday;
-            var _d2 = stdday.AddDays(-6);
-            var _df1 = stdday;
-            var _df2 = stdday.AddDays(-27);
-            var ncrewid = (Nullable<int>)dto.crewId;
-
-            var _d7 = await this.context.TableDutyFDPs.Where(q => q.CrewId == ncrewid && q.CDate >= _d2 && q.CDate <= _d1).Select(q => q.DurationLocal).SumAsync();
-
-
-
-
-            double duty7 = _d7 ?? 0; //d7 != null && d7.Duty7Local != null ? (double)d7.Duty7Local : 0;
-
-
-
-
-            var _f28 = await this.context.ViewDutyFlightLocals.Where(q => q.CrewId == ncrewid && q.CDate >= _df2 && q.CDate <= _df1).Select(q => q.DurationLocal).SumAsync(); ;
-            double flight28 = _f28 ?? 0; //f28 != null && f28.FLT28Local != null ? (double)f28.FLT28Local : 0;
+            var d7 = await this.context.ViewDayDuty7.FirstOrDefaultAsync(q => q.Date == stdday);
+            var f28 = await this.context.ViewDayFlight28.FirstOrDefaultAsync(q => q.Date == stdday);
+            double duty7 = d7 != null && d7.Duty7Local != null ? (double)d7.Duty7Local : 0;
+            double flight28 = f28 != null && f28.FLT28Local != null ? (double)f28.FLT28Local : 0;
 
             //Check Over FTL/////////////////
-            if (duty7 + fdpDuty > 60 * 60 && (dto.IsAdmin == null || dto.IsAdmin == 0))
+            if (duty7 + fdpDuty > 60 * 60)
             {
                 return new CustomActionResult(HttpStatusCode.NotAcceptable, new
                 {
@@ -13003,7 +10941,7 @@ namespace EPAGriffinAPI.DAL
                     + "7-Day Duties: " + FormatTwoDigits(Convert.ToInt32(Math.Floor(duty7 + fdpDuty)) / 60) + ":" + FormatTwoDigits(Convert.ToInt32(Math.Floor(duty7 + fdpDuty)) % 60)
                 });
             }
-            if (flight28 + fdpFlight > 100 * 60 && (dto.IsAdmin == null || dto.IsAdmin == 0))
+            if (flight28 + fdpFlight > 100 * 60)
             {
                 return new CustomActionResult(HttpStatusCode.NotAcceptable, new
                 {
@@ -13022,11 +10960,9 @@ namespace EPAGriffinAPI.DAL
 
             dto.flts = string.Join(",", dto.items.Select(q => q.no + (q.dh == 1 ? "(dh)" : "")).ToList());
             var rts = dto.items.Select(q => q.from).ToList();
-            //if (dto.items.Count > 1)
-            rts.Add(dto.items.Last().to);
+            if (dto.items.Count > 1)
+                rts.Add(dto.items.Last().to);
             dto.route = string.Join(",", rts);
-            // if (dto.items.Count= 1)
-
 
             var keyParts = dto.items.Select(q => q.flightId + (q.dh == 1 ? "*1" : "*0")).ToList();
             var rst = dto.to == dto.homeBase ? 12 : 10;
@@ -13046,11 +10982,9 @@ namespace EPAGriffinAPI.DAL
                 InitRoute = dto.route,
                 InitFromIATA = dto.from.ToString(),
                 InitToIATA = dto.to.ToString(),
-                InitStart = !alldh ? dto.items.First().std.AddMinutes(-60) : dto.items.First().std,
-                InitEnd = !alldh ? dto.items.Last().sta.AddMinutes(30) : dto.items.Last().sta,
-                DateStart = !alldh ? dto.items.First().std.AddMinutes(-60) : dto.items.First().std,
-                DateEnd = !alldh ? dto.items.Last().sta.AddMinutes(30) : dto.items.Last().sta,
-                InitRestTo = !alldh ? dto.items.Last().sta.AddMinutes(30).AddHours(rst) : dto.items.Last().sta,
+                InitStart = dto.items.First().std.AddMinutes(-60),
+                InitEnd = dto.items.Last().sta.AddMinutes(30),
+                InitRestTo = dto.items.Last().sta.AddMinutes(30).AddHours(rst),
                 InitFlights = string.Join("*", dto.flights),
                 InitGroup = dto.group,
                 InitHomeBase = dto.homeBase,
@@ -13060,8 +10994,7 @@ namespace EPAGriffinAPI.DAL
                 InitRank = dto.rank,
                 InitScheduleName = dto.scheduleName,
                 Extension = dto.extension,
-                Split = 0,
-                UserName = dto.UserName,
+
 
 
             };
@@ -13081,130 +11014,32 @@ namespace EPAGriffinAPI.DAL
                     });
                 }
             }
-            //4-11
+
             //Check interuption/////////////////
-            var exc = new List<int>() { 1166, 1169, /*10000, 10001, 100000, 100002, 100004, 100005, 100006,*/ 100007, 100008, 100024, 100025, 100009, 100020, 100021, 100022, 100023, 200000, 200001, 200002, 200003, 200004, 200005 };
-
-            //if (!alldh)
+            var exc = new List<int>() { 100009, 100020, 100021, 100022, 100023 };
+            if (!alldh)
             {
-                FDP _interupted = null;
-
-                _interupted = await this.context.FDPs.FirstOrDefaultAsync(q =>
-              !exc.Contains(q.DutyType) &&
-              q.Id != fdp.Id && q.CrewId == fdp.CrewId
-         && (
-               (fdp.InitStart >= q.InitStart && fdp.InitStart <= q.InitRestTo)
-            || (fdp.InitEnd >= q.InitStart && fdp.InitEnd <= q.InitRestTo)
-            || (q.InitStart >= fdp.InitStart && q.InitStart <= fdp.InitRestTo)
-            || (q.InitRestTo >= fdp.InitStart && q.InitRestTo <= fdp.InitRestTo)
-           )
-        );
-
-
+                var _interupted = await this.context.FDPs.FirstOrDefaultAsync(q => !exc.Contains(q.DutyType) && q.Id != fdp.Id && q.CrewId == fdp.CrewId
+           && (
+                 (fdp.InitStart >= q.InitStart && fdp.InitStart <= q.InitRestTo)
+              || (fdp.InitEnd >= q.InitStart && fdp.InitEnd <= q.InitRestTo)
+              || (q.InitStart >= fdp.InitStart && q.InitRestTo <= fdp.InitRestTo)
+             )
+          );
                 //doolnaz
-                if (_interupted != null && (dto.IsAdmin == null || dto.IsAdmin == 0))
+                if (_interupted != null)
                 {
                     //Rest/Interruption Error
-                    if ((_interupted.DutyType != 1167 && _interupted.DutyType != 1168 && _interupted.DutyType != 1170) || !(dto.items.First().std >= _interupted.DateStart && dto.items.First().std <= _interupted.DateEnd))
-                    {
-                        //if (false)
-                        bool sendError = false;
-                        switch (_interupted.DutyType)
+                    if ((_interupted.DutyType != 1167 && _interupted.DutyType != 1168) || !(dto.items.First().std >= _interupted.DateStart && dto.items.First().std <= _interupted.DateEnd))
+                        return new CustomActionResult(HttpStatusCode.NotAcceptable, new
                         {
-                            case 10000:
-                            case 100000:
-                            case 100002:
-                            case 100004:
-                            case 100005:
-                            case 100006:
-                                if ((new List<int>() { 10000, 10001, 1169, 100000, 100002, 100004, 100005, 100006, 100007, 100008, 100009, 100020, 100021, 100022, 100023, 100024, 200000, 200001, 200002, 200003, 200004, 200005 }).IndexOf(fdp.DutyType) == -1)
-                                {
-                                    if ((fdp.InitStart >= _interupted.InitStart && fdp.InitStart <= _interupted.InitEnd)
-                                        || (fdp.InitEnd >= _interupted.InitStart && fdp.InitEnd <= _interupted.InitEnd)
-                                        || (_interupted.InitStart >= fdp.InitStart && _interupted.InitStart <= fdp.InitEnd)
-                                        || (_interupted.InitEnd >= fdp.InitStart && _interupted.InitEnd <= fdp.InitEnd)
-                                        )
-                                        sendError = true;
-                                }
-                                break;
-                            case 1165:
-                                if (alldh)
-                                {
-                                    try
-                                    {
-                                        var intStart = ((DateTime)_interupted.InitStart).AddMinutes(60);
-                                        var intEnd = ((DateTime)_interupted.InitEnd).AddMinutes(-30);
-                                        if (fdp.InitStart > intStart && fdp.InitStart < intEnd)
-                                            sendError = true;
-                                        else if (fdp.InitEnd > intStart && fdp.InitEnd < intEnd)
-                                            sendError = true;
-                                        else if (fdp.InitStart == intStart && fdp.InitEnd == intEnd)
-                                            sendError = true;
-                                        else if (intStart >= fdp.InitStart && intStart <= fdp.InitEnd)
-                                            sendError = true;
-                                        else if (intEnd >= fdp.InitStart && intEnd <= fdp.InitEnd)
-                                            sendError = true;
-                                        else
-                                            sendError = false;
 
-                                    }
-                                    catch (Exception exxx)
-                                    {
-                                        sendError = false;
-                                    }
+                            message = "Rest/Interruption Error(" + _interupted.Id + ")." + (_interupted.InitStart == null ? "" : ((DateTime)_interupted.InitStart).ToString("yyyy-MM-dd") + " " + _interupted.InitFlts + " " + _interupted.InitRoute)
 
-                                }
-                                else
-                                {
-                                    if (_interupted.InitNo.Contains("*1"))
-                                    {
-                                        var nodh = await this.context.FDPItems.Where(q => q.FDPId == _interupted.Id && q.IsPositioning != true).CountAsync();
-                                        if (nodh > 0)
-                                            sendError = true;
-                                        else
-                                        {
-                                            var fdpStart = dto.items.First().std;
-                                            var fdpEnd = dto.items.Last().sta;
-                                            if (_interupted.InitStart >= fdpStart && _interupted.InitStart <= fdpEnd)
-                                                sendError = true;
-                                            else if (_interupted.InitEnd >= fdpStart && _interupted.InitEnd <= fdpEnd)
-                                                sendError = true;
-                                            else if (fdpStart >= _interupted.InitStart && fdpStart <= _interupted.InitEnd)
-                                                sendError = true;
-                                            else if (fdpEnd >= _interupted.InitStart && fdpEnd <= _interupted.InitEnd)
-                                                sendError = true;
-                                            else
-                                                sendError = false;
-                                        }
-                                    }
-                                    else
-                                        sendError = true;
-                                }
-
-                                break;
-                            default:
-                                sendError = true;
-                                break;
-                        }
-                        if (sendError)
-                            return new CustomActionResult(HttpStatusCode.NotAcceptable, new
-                            {
-
-                                message = "Rest/Interruption Error(" + _interupted.Id + "). " + (GetDutyTypeTitle(_interupted.DutyType)) + "   " + (_interupted.InitStart == null ? "" : ((DateTime)_interupted.InitStart).ToString("yyyy-MM-dd") + " " + _interupted.InitFlts + " " + _interupted.InitRoute)
-
-                            });
-                    }
+                        });
                     else
                     {
-                        if (_interupted.DutyType == 1167 || _interupted.DutyType == 1168)
-                            return new CustomActionResult(HttpStatusCode.NotImplemented, _interupted);
-                        else
-                        {
-                            var _strt = ((DateTime)fdp.InitStart).AddMinutes(60);
-                            var rdif = Math.Abs((DateTime.UtcNow - _strt).TotalMinutes);
-                            if (rdif < 10 * 60)
-                                return new CustomActionResult(HttpStatusCode.NotModified, _interupted);
-                        }
+                        return new CustomActionResult(HttpStatusCode.NotImplemented, _interupted);
                     }
                     //return new CustomActionResult(HttpStatusCode.NotAcceptable, _interupted);
                 }
@@ -13234,8 +11069,6 @@ namespace EPAGriffinAPI.DAL
                     InitToIATA = dto.to.ToString(),
                     InitStart = dto.items.First().std.AddMinutes(-60),
                     InitEnd = dto.items.Last().std.AddMinutes(30),
-                    Split = 0,
-                    UserName = dto.UserName,
 
                 };
                 this.context.FDPs.Add(temp);
@@ -13271,7 +11104,7 @@ namespace EPAGriffinAPI.DAL
             }
 
             var breakGreaterThan10Hours = string.Empty;
-            if (dto.items.Count > 1 && dto.split)
+            if (dto.items.Count > 1)
             {
                 for (int i = 1; i < dto.items.Count; i++)
                 {
@@ -13294,7 +11127,6 @@ namespace EPAGriffinAPI.DAL
                         var pair = fdp.FDPItems.FirstOrDefault(q => q.FlightId == dto.items[i - 1].flightId);
                         pair.SplitDuty = true;
                         fdpitem.SplitDutyPairId = pair.FlightId;
-                        fdp.Split += 0.5 * (brk);
                         ////////////////////////////////////////////////////
                         if (saveTemp)
                         {
@@ -13303,7 +11135,6 @@ namespace EPAGriffinAPI.DAL
                             var pairTemp = temp.FDPItems.FirstOrDefault(q => q.FlightId == dto.items[i - 1].flightId);
                             pairTemp.SplitDuty = true;
                             fdpitemTemp.SplitDutyPairId = pair.FlightId;
-                            temp.Split += 0.5 * (brk);
                         }
 
 
@@ -13348,114 +11179,8 @@ namespace EPAGriffinAPI.DAL
 
 
 
-            timer.Stop();
-            var _ms = timer.Elapsed;
-            return new CustomActionResult(HttpStatusCode.OK, fdp);
-        }
-
-        internal async Task<CustomActionResult> saveFDPNoCrew(int userId, int flightId, string code)
-        {
-            //momo
-            var fdp = new FDP()
-            {
-                IsTemplate = false,
-                DutyType = 1165,
-                CrewId = userId,
-                GUID = Guid.NewGuid(),
-                JobGroupId = RosterFDPDto.getRank(code),
-                FirstFlightId = flightId,
-                LastFlightId = flightId,
-
-                Split = 0,
-
-
-
-            };
-
-            fdp.FDPItems.Add(new FDPItem()
-            {
-                FlightId = flightId,
-                IsPositioning = false,
-                IsSector = false,
-                PositionId = RosterFDPDto.getRank(code),
-                RosterPositionId = 1,
-
-            });
-
-            this.context.FDPs.Add(fdp);
-            var saveResult = await context.SaveAsync();
-            if (saveResult.Code != HttpStatusCode.OK)
-                return saveResult;
-
-
-
 
             return new CustomActionResult(HttpStatusCode.OK, fdp);
-        }
-
-
-        internal async Task<CustomActionResult> saveFDPNoCrew2(int userId, List<int> flightIds, string code)
-        {
-            //momo
-            List<object> results = new List<object>();
-
-            foreach (var flightId in flightIds)
-            {
-                var _fdp = await this.context.FDPs.Where(q => q.FirstFlightId == flightId && q.CrewId == userId).FirstOrDefaultAsync();
-                if (_fdp == null)
-                {
-
-                    var fdp = new FDP()
-                    {
-                        IsTemplate = false,
-                        DutyType = 1165,
-                        CrewId = userId,
-                        GUID = Guid.NewGuid(),
-                        JobGroupId = RosterFDPDto.getRank(code),
-                        FirstFlightId = flightId,
-                        LastFlightId = flightId,
-
-                        Split = 0,
-
-
-
-                    };
-
-                    fdp.FDPItems.Add(new FDPItem()
-                    {
-                        FlightId = flightId,
-                        IsPositioning = false,
-                        IsSector = false,
-                        PositionId = RosterFDPDto.getRank(code),
-                        RosterPositionId = 1,
-
-                    });
-
-                    this.context.FDPs.Add(fdp);
-                    results.Add(fdp);
-                }
-
-
-
-
-            }
-
-            var saveResult = await context.SaveAsync();
-            if (saveResult.Code != HttpStatusCode.OK)
-                return saveResult;
-            return new CustomActionResult(HttpStatusCode.OK, results);
-        }
-
-
-        internal async Task<CustomActionResult> deleteFDPNoCrew(int userId, int flightId)
-        {
-            var fdp = await this.context.FDPs.FirstOrDefaultAsync(q => q.FirstFlightId == flightId && q.CrewId == userId);
-            if (fdp != null)
-            {
-                this.context.FDPs.Remove(fdp);
-                await context.SaveAsync();
-            }
-            return new CustomActionResult(HttpStatusCode.OK, true);
         }
 
         //sook
@@ -13532,8 +11257,6 @@ namespace EPAGriffinAPI.DAL
             fdp.InitRank = RosterFDPDto.getRankStr(rank);
             fdp.InitStart = ((DateTime)flights.First().STD).AddMinutes(-60);
             fdp.InitEnd = ((DateTime)flights.Last().STA).AddMinutes(30);
-            fdp.DateStart = ((DateTime)flights.First().STD).AddMinutes(-60);
-            fdp.DateEnd = ((DateTime)flights.Last().STA).AddMinutes(30);
             var rst = 12;
 
             fdp.InitRestTo = ((DateTime)flights.Last().STA).AddMinutes(30).AddHours(rst);
@@ -13548,7 +11271,6 @@ namespace EPAGriffinAPI.DAL
               + "_" + ((DateTime)q.STALocal).ToString("yyyyMMddHHmm")
               + "_" + q.FlightNumber + "_" + q.FromAirportIATA + "_" + q.ToAirportIATA).ToList()
             );
-            fdp.Split = 0;
 
             //////////////////////////////////
             var temp = new FDP()
@@ -13561,7 +11283,6 @@ namespace EPAGriffinAPI.DAL
                 FirstFlightId = flights.First().ID,
                 LastFlightId = flights.Last().ID,
                 Key = string.Join("_", keyParts),
-                Split = 0,
 
             };
             this.context.FDPs.Add(temp);
@@ -13619,14 +11340,13 @@ namespace EPAGriffinAPI.DAL
                         var pair = fdp.FDPItems.FirstOrDefault(q => q.FlightId == flights[i - 1].ID);
                         pair.SplitDuty = true;
                         fdpitem.SplitDutyPairId = pair.FlightId;
-                        fdp.Split += 0.5 * (brk);
                         ////////////////////////////////////////////////////
                         var fdpitemTemp = temp.FDPItems.FirstOrDefault(q => q.FlightId == flights[i].ID);
                         fdpitemTemp.SplitDuty = true;
                         var pairTemp = temp.FDPItems.FirstOrDefault(q => q.FlightId == flights[i - 1].ID);
                         pairTemp.SplitDuty = true;
                         fdpitemTemp.SplitDutyPairId = pair.FlightId;
-                        temp.Split += 0.5 * (brk);
+
                         //////////////////////////////////
 
                     }
@@ -16626,27 +14346,10 @@ namespace EPAGriffinAPI.DAL
             };
             return result;
         }
-        public async Task<object> GetDailyRosterReportFP(DateTime df)
-        {
-            var dt = df.AddHours(24);
-            var query = await this.context.ViewRosterReportFPs.Where(q => q.STDDay == df).OrderBy(q => q.Register).ThenBy(q => q.STD).ToListAsync();
-            // var stbyam = await this.context.ViewCrewDuties.Where(q => q.CrewId != null && q.DutyType == 1168 && q.DateLocal == df).OrderBy(q => q.OrderIndex).ThenBy(q => q.ScheduleName).ToListAsync();
-            // var stbypm = await this.context.ViewCrewDuties.Where(q => q.CrewId != null && q.DutyType == 1167 && q.DateLocal == df).OrderBy(q => q.OrderIndex).ThenBy(q => q.ScheduleName).ToListAsync();
-
-            var result = new
-            {
-                items = query,
-                //am = stbyam,
-                //pm = stbypm,
-
-            };
-            return result;
-        }
         // return unitOfWork.FlightRepository.GetViewFDPRest().Where(q => q.CrewId == crewid && q.DateStartYear == year && q.DateStartMonth == month);
         public async Task<object> GetCrewDuties(DateTime dateStart, DateTime dateEnd, int? cabin, int? cockpit)
         {
-            //2020-11-22 noreg
-            var query = from x in this.context.ViewCrewDutyNoRegs
+            var query = from x in this.context.ViewCrewDuties
                         where x.Start >= dateStart && x.Start <= dateEnd
                         select x;
             if (cabin == 1)
@@ -16674,7 +14377,7 @@ namespace EPAGriffinAPI.DAL
         {
 
             var query = from x in this.context.ViewCrewDuties
-                        where x.DateStartYear == year && x.DateStartMonth == month && x.DateStartDay == day && (x.DutyType == 1167 || x.DutyType == 1168 || x.DutyType == 1170)
+                        where x.DateStartYear == year && x.DateStartMonth == month && x.DateStartDay == day && (x.DutyType == 1167 || x.DutyType == 1168)
                         select x;
 
             var result = await query.OrderBy(q => q.DateStartLocal).ToListAsync();
@@ -16761,698 +14464,698 @@ namespace EPAGriffinAPI.DAL
             Color randomColor = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
             return ColorToHexString(randomColor);
         }
-        Dictionary<string, double?> calculateTrendSlope(List<ViewDelayDailyCategory> ds)
-        {
-
-            double c = 1;
-            Dictionary<string, double?> result = new Dictionary<string, double?>();
-            var grouped = (from x in ds
-                           group x by x.Category into grp
-                           select grp).ToList();
-
-            foreach (var grp in grouped)
-            {
-                c = 1;
-                TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
-                var items = grp.OrderBy(q => q.Date).ToList();
-                foreach (var r in items)
-                {
-                    linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
-                    {
-                        X = c,
-                        Y = Convert.ToDouble(r.Delay)
-                    });
-                    c++;
-                }
-                linearTrend.Calculate();
-                result.Add(grp.Key, linearTrend.Slope);
-
-            }
-            return result;
-
-        }
-
-
-        Dictionary<string, double?> calculateTrendSlope(List<ViewDelayDailyAirport> ds)
-        {
-
-            double c = 1;
-            Dictionary<string, double?> result = new Dictionary<string, double?>();
-            var grouped = (from x in ds
-                           group x by x.Airport into grp
-                           select grp).ToList();
-
-            foreach (var grp in grouped)
-            {
-                c = 1;
-                TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
-                var items = grp.OrderBy(q => q.Date).ToList();
-                foreach (var r in items)
-                {
-                    linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
-                    {
-                        X = c,
-                        Y = Convert.ToDouble(r.Delay)
-                    });
-                    c++;
-                }
-                linearTrend.Calculate();
-                result.Add(grp.Key, linearTrend.Slope);
-
-            }
-            return result;
-
-        }
-        internal async Task<object> GetReportDelayDaily(int cid, DateTime df, DateTime dt)
-        {
-            //masha
-            var colorSet1 = new List<string>() { "#ffffb3", "#ffbf80", "#ff9999", "#ffb3ff", "#ffd633", "#e6ac00", "#d65cad", "#ff1a1a", "#ff661a" };
-
-            var colorSet2 = new List<string>() { "#66ff99", "#4ddbff", "#ffb3ff", "#33cccc", "#ffff4d", "#70db70", "#6699ff", "#94b8b8", "#a3a375", "#7575a3" };
-            var flightsCount = await this.context.FlightInformations.Where(q => q.CustomerId == cid && q.FlightStatusID != 1 && q.FlightStatusID != 4).CountAsync();
-            var delaysSum = await this.context.ViewFlightDelays.Where(q => q.CustomerId == cid && q.Code != "93").SumAsync(q => q.Delay);
-            var avgDelayLeg = flightsCount != 0 ? Math.Round(Convert.ToDouble(delaysSum * 1.0) / flightsCount, 2) : 0;
-
-
-
-
-            var flightsCountDate = await this.context.ViewFlightInformations.Where(q => q.CustomerId == cid && q.STDDay >= df && q.STDDay <= dt && q.FlightStatusID != 1 && q.FlightStatusID != 4).CountAsync();
-            // var times = await this.context.ViewFlightInformations.Where(q => q.CustomerId == cid && q.STDDay >= df && q.STDDay <= dt && q.FlightStatusID != 1 && q.FlightStatusID != 4).Select(q => new { });
-            var times = await this.context.ViewFlightInformations.Where(q => q.CustomerId == cid && q.STDDay >= df && q.STDDay <= dt && q.FlightStatusID != 1 && q.FlightStatusID != 4)
-                .GroupBy(x => true)
-                .Select(x => new
-                {
-                    BL = x.Sum(y => y.BlockTime),
-                    FL = x.Sum(y => y.FlightTime)
-                }).ToListAsync();
-
-
-            var delays = await this.context.ViewFlightDelays.Where(q => q.CustomerId == cid && q.STDDay >= df && q.STDDay <= dt && q.Code != "93").ToListAsync();
-            var delaysTotal = await this.context.ViewDelayDailies.Where(q => q.Date >= df && q.Date <= dt).OrderBy(q => q.Date).ToListAsync();
-            foreach (var x in delaysTotal)
-            {
-                x.DelayLeg = x.TotalFlights == 0 || x.TotalFlights == null ? 0 : Math.Round(Convert.ToDouble(x.Delay * 1.0) / (int)x.TotalFlights, 2);
-                x.DelayRatio = x.BlockTime == 0 ? 0 : Math.Round(Convert.ToDouble(x.Delay * 1.0) / x.BlockTime, 2);
-            }
-
-            TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
-            TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend2 = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
-            foreach (var d in delaysTotal)
-            {
-                linearTrend.DataItems.Add(new TrendCalculus.DateItem()
-                {
-                    X = d.Date,
-                    Y = Convert.ToDouble(d.Delay)
-                });
-                linearTrend2.DataItems.Add(new TrendCalculus.DateItem()
-                {
-                    X = d.Date,
-                    Y = Convert.ToDouble(d.DelayLeg)
-                });
-            }
-
-            if (linearTrend.Calculate() && linearTrend2.Calculate())
-            {
-                var totalDelaysTrend = linearTrend.TrendItems.OrderBy(q => q.ConvertedX).ToList();
-                var totalDelaysTrendDl = linearTrend2.TrendItems.OrderBy(q => q.ConvertedX).ToList();
-                for (var j = 0; j < totalDelaysTrend.Count; j++)
-                {
-                    delaysTotal[j].TRND = totalDelaysTrend[j].Y;
-                    delaysTotal[j].TRNDLeg = totalDelaysTrendDl[j].Y;
-                }
-
-            }
-
-            var dailyCats = await this.context.ViewDelayDailyCategories.Where(q => q.Date >= df && q.Date <= dt).OrderBy(q => q.Date).ToListAsync();
-            var _dailyCatsSlope = calculateTrendSlope(dailyCats);
-            #region dailyCats table
-            var dailyCatsTbl = new DataTable();
-            dailyCatsTbl.Columns.Add(new DataColumn("Date", typeof(DateTime)));
-            var _dcs = dailyCats.Select(q => q.Category).Distinct().OrderBy(q => q).ToList();
-            foreach (var dc in _dcs)
-            {
-                dailyCatsTbl.Columns.Add(new DataColumn(dc, typeof(double)));
-            }
-            var _dailyCatsGrouped = dailyCats.GroupBy(q => q.Date).OrderBy(q => q.Key).ToList();
-            foreach (var x in _dailyCatsGrouped)
-            {
-                var row = dailyCatsTbl.NewRow();
-                row["Date"] = x.Key;
-
-                for (int i = 1; i <= dailyCatsTbl.Columns.Count - 1; i++)
-                {
-                    var _ct = dailyCatsTbl.Columns[i].ColumnName;
-                    var _vl = x.FirstOrDefault(q => q.Category == _ct);
-
-                    row[_ct] = _vl == null ? 0 : _vl.Delay;
-                }
-
-                dailyCatsTbl.Rows.Add(row);
-            }
-
-            #endregion
-
-            var dailyAirports = await this.context.ViewDelayDailyAirports.Where(q => q.Date >= df && q.Date <= dt).OrderBy(q => q.Date).ThenBy(q => q.Airport).ToListAsync();
-            var _dailyAirportsSlope = calculateTrendSlope(dailyAirports);
-            #region dailyAirports table
-            var dailyAirportsTbl = new DataTable();
-            dailyAirportsTbl.Columns.Add(new DataColumn("Date", typeof(DateTime)));
-            var _das = dailyAirports.Select(q => q.Airport).Distinct().OrderBy(q => q).ToList();
-            foreach (var dc in _das)
-            {
-                dailyAirportsTbl.Columns.Add(new DataColumn(dc, typeof(double)));
-            }
-            var _dailyAirportsGrouped = dailyAirports.GroupBy(q => q.Date).OrderBy(q => q.Key).ToList();
-            foreach (var x in _dailyAirportsGrouped)
-            {
-                var row = dailyAirportsTbl.NewRow();
-                row["Date"] = x.Key;
-
-                for (int i = 1; i <= dailyAirportsTbl.Columns.Count - 1; i++)
-                {
-                    var _ct = dailyAirportsTbl.Columns[i].ColumnName;
-                    var _vl = x.FirstOrDefault(q => q.Airport == _ct);
-
-                    row[_ct] = _vl == null ? 0 : _vl.Delay;
-                }
-
-                dailyAirportsTbl.Rows.Add(row);
-            }
-
-            #endregion
-
-
-            var delaysSumDate = delays.Sum(q => q.Delay);
-            var delayLeg = delays == null || flightsCountDate == 0 ? 0 : Math.Round(Convert.ToDouble(delaysSumDate * 1.0) / flightsCountDate, 2);
-
-            var avgCategory = await this.context.DelayAvgByCategories.ToListAsync();
-            var avgAirport = await this.context.DelayAvgByAirports.ToListAsync();
-            var avgAirportCategory = await this.context.DelayAvgByAirportCategories.ToListAsync();
-            //pussy
-            var category = (from vfd in delays
-                            group vfd by vfd.ICategory into grp
-                            let sumDelay = grp.Sum(q => q.DelayHH * 60) + grp.Sum(q => q.DelayMM)
-                            select new DelayReportObject()
-                            {
-                                Category = grp.Key,
-                                Count = grp.Count(),
-                                Delay = sumDelay,
-                                DelayFormatted = FormatTwoDigits(Convert.ToInt32(sumDelay) / 60) + ":" + FormatTwoDigits(Convert.ToInt32(sumDelay) % 60),
-                                Avg = avgCategory.First(q => q.Category == grp.Key).Avg,
-                                Slope = _dailyCatsSlope[grp.Key],
-
-                            }).OrderByDescending(q => q.Delay).ThenBy(q => q.Category).ToList();
-
-            Dictionary<string, string> categoryColors = new Dictionary<string, string>();
-            for (int i = 0; i < category.Count; i++)
-            {
-                if (i < colorSet1.Count)
-                    categoryColors.Add(category[i].Category, colorSet1[i]);
-                else
-                    categoryColors.Add(category[i].Category, getRandomColor());
-            }
-
-            var categoryDetails = delays.OrderBy(q => q.Category).ThenBy(q => q.STDDay).ThenBy(q => q.FlightNumber).ToList();
-
-
-            var airport = (from vfd in delays
-                           group vfd by vfd.FromAirportIATA into grp
-                           let sumDelay = grp.Sum(q => q.DelayHH * 60) + grp.Sum(q => q.DelayMM)
-                           select new DelayReportObject()
-                           {
-                               Airport = grp.Key,
-                               Count = grp.Count(),
-                               Delay = sumDelay,
-                               DelayFormatted = FormatTwoDigits(Convert.ToInt32(sumDelay) / 60) + ":" + FormatTwoDigits(Convert.ToInt32(sumDelay) % 60),
-                               Avg = avgAirport.First(q => q.FromAirportIATA == grp.Key).Avg,
-                               Slope = _dailyAirportsSlope[grp.Key],
-
-                           }).OrderByDescending(q => q.Delay).ThenBy(q => q.Airport).ToList();
-            Dictionary<string, string> airportColors = new Dictionary<string, string>();
-            for (int i = 0; i < airport.Count; i++)
-            {
-                if (i < colorSet2.Count)
-                    airportColors.Add(airport[i].Airport, colorSet2[i]);
-                else
-                    airportColors.Add(airport[i].Airport, getRandomColor());
-            }
-            var airportCategory = (from vfd in delays
-                                   group vfd by new { vfd.FromAirportIATA, vfd.ICategory } into grp
-                                   let sumDelay = grp.Sum(q => q.DelayHH * 60) + grp.Sum(q => q.DelayMM)
-                                   let avgCat = avgAirportCategory.FirstOrDefault(q => q.FromAirportIATA == grp.Key.FromAirportIATA && q.Category == grp.Key.ICategory)
-                                   select new DelayReportObject()
-                                   {
-                                       Airport = grp.Key.FromAirportIATA,
-                                       Category = grp.Key.ICategory,
-                                       Count = grp.Count(),
-                                       Delay = sumDelay,
-                                       DelayFormatted = FormatTwoDigits(Convert.ToInt32(sumDelay) / 60) + ":" + FormatTwoDigits(Convert.ToInt32(sumDelay) % 60),
-                                       Avg = avgCat == null ? 0 : avgCat.Avg,
-
-                                   }).OrderBy(q => q.Airport).ThenByDescending(q => q.Delay).ThenBy(q => q.Category).ToList();
-
-            var airportCategoryGrouped = await (from x in this.context.ViewDelayAirportCategoryGroupeds
-                                                where x.STDDay >= df && x.STDDay <= dt
-                                                group x by new { x.Airport, x.Category } into grp
-                                                select new
-                                                {
-                                                    grp.Key.Airport,
-                                                    grp.Key.Category,
-                                                    Delay = grp.Sum(q => q.Delay),
-                                                    Count = grp.Sum(q => q.Count),
-                                                }
-                                                ).OrderBy(q => q.Airport).ThenBy(q => q.Category).ToListAsync();
-            var airportCategoryDaily = await this.context.ViewDelayDailyAirportCategories.Where(q => q.Date >= df && q.Date <= dt).OrderBy(q => q.Date).ThenBy(q => q.Airport).ThenBy(q => q.Category).ToListAsync();
-            #region process airportCategoryDaily
-            var acdGrouped = from x in airportCategoryDaily
-                             group x by new { x.Date, x.PDate } into grp
-                             select new { grp.Key.Date, grp.Key.PDate, Items = grp.Select(w => new { Title = w.Airport + "-" + w.Category, w.Delay, w.Count, w.TotalFlights }).ToList() };
-            var airportCategoryDailyTbl = new DataTable();
-            airportCategoryDailyTbl.Columns.Add(new DataColumn("Date", typeof(DateTime)));
-            airportCategoryDailyTbl.Columns.Add(new DataColumn("PDate", typeof(string)));
-            foreach (var item in acdGrouped.First().Items)
-            {
-                airportCategoryDailyTbl.Columns.Add(new DataColumn(item.Title, typeof(double)));
-                airportCategoryDailyTbl.Columns.Add(new DataColumn(item.Title + "Count", typeof(double)));
-
-            }
-            foreach (var grp in acdGrouped)
-            {
-                var row = airportCategoryDailyTbl.NewRow();
-                row["Date"] = grp.Date;
-                row["PDate"] = grp.PDate;
-                foreach (var item in grp.Items)
-                {
-
-                    row[item.Title] = item.Delay;
-                    row[item.Title + "Count"] = item.Count;
-                }
-                airportCategoryDailyTbl.Rows.Add(row);
-            }
-            #endregion
-
-            var airportDetails = delays.OrderBy(q => q.FromAirportIATA).ThenBy(q => q.STDDay).ThenBy(q => q.FlightNumber).ToList();
-
-
-            delays = delays.OrderBy(q => q.Register).OrderBy(q => q.STD).ToList();
-
-            //                SELECT
-            // vfd.ICategory as Category,
-            // count(*) as Count,
-            //SUM(vfd.DelayHH * 60 + vfd.DelayMM) AS Delay,
-            //      format(dateadd(minute, SUM(vfd.DelayHH * 60 + vfd.DelayMM), '00:00:00'), N'HH\:mm', 'FR-fr') 
-
-
-            //  FROM ViewFlightDelay vfd
-
-            //  GROUP BY vfd.ICategory
-            //    ORDER BY ICategory
-
-
-
-
-            //var fdp = await this.context.FDPs.FirstOrDefaultAsync(q => q.Id == fdpId);
-            //fdp.JobGroupId = position;
-            return new
-            {
-                categoryColors,
-                airportColors,
-                delays,
-                delaysTotal,
-                dailyCats,
-                dailyCatsTbl,
-                dailyAirports,
-                dailyAirportsTbl,
-                airport,
-                airportCategory,
-                airportCategoryGrouped,
-                airportDetails,
-                airportCategoryDaily,
-                airportCategoryDailyTbl,
-                category,
-                categoryDetails,
-                avgCategory,
-                avgAirport,
-                avgAirportCategory,
-                delaysSum,
-                delaysSumDate,
-                flightsCount,
-                flightsCountDate,
-                avgDelayLeg,
-                delayLeg,
-                block = times.First().BL,
-                flight = times.First().FL,
-                delayRatio = Math.Round(Convert.ToDouble(delaysSumDate) * 100.0 / (double)times.First().BL, 1)
-            };
-        }
-
-
-        Dictionary<string, double?> calculateDelayTrendByCategories(List<ViewDelayWeeklyCategory> ds)
-        {
-            double c = 1;
-            Dictionary<string, double?> result = new Dictionary<string, double?>();
-            var grouped = (from x in ds
-                           group x by x.Category into grp
-                           select grp).ToList();
-
-            foreach (var grp in grouped)
-            {
-                c = 1;
-                TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
-                var items = grp.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.WeekOfMonth).ToList();
-                foreach (var r in items)
-                {
-                    linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
-                    {
-                        X = c,
-                        Y = Convert.ToDouble(r.Delay)
-                    });
-                    c++;
-                }
-                linearTrend.Calculate();
-                result.Add(grp.Key, linearTrend.Slope);
-
-            }
-            return result;
-
-        }
-
-        Dictionary<string, double?> calculateDelayTrendByAirport(List<ViewDelayWeeklyAirport> ds)
-        {
-            double c = 1;
-            Dictionary<string, double?> result = new Dictionary<string, double?>();
-            var grouped = (from x in ds
-                           group x by x.Airport into grp
-                           select grp).ToList();
-
-            foreach (var grp in grouped)
-            {
-                c = 1;
-                TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
-                var items = grp.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.WeekOfMonth).ToList();
-                foreach (var r in items)
-                {
-                    linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
-                    {
-                        X = c,
-                        Y = Convert.ToDouble(r.Delay)
-                    });
-                    c++;
-                }
-                linearTrend.Calculate();
-                result.Add(grp.Key, linearTrend.Slope);
-
-            }
-            return result;
-
-        }
-        internal async Task<object> GetReportDelayYearlyTotal(int cid)
-        {
-            var flightsCount = await this.context.FlightInformations.Where(q => q.CustomerId == cid && q.FlightStatusID != 1 && q.FlightStatusID != 4).CountAsync();
-            var delaysSum = await this.context.ViewFlightDelays.Where(q => q.CustomerId == cid && q.Code != "93").SumAsync(q => q.Delay);
-            var avgDelayLeg = flightsCount != 0 ? Math.Round(Convert.ToDouble(delaysSum * 1.0) / flightsCount, 2) : 0;
-            var times = await this.context.ViewFlightInformations.Where(q => q.CustomerId == cid && q.FlightStatusID != 1 && q.FlightStatusID != 4)
-                .GroupBy(x => true)
-                .Select(x => new
-                {
-                    BL = x.Sum(y => y.BlockTime),
-                    FL = x.Sum(y => y.FlightTime)
-                }).ToListAsync();
-
-            var delays = await this.context.ViewDelayMonthlies.ToListAsync();
-            dynamic delaysTrend = null;
-            dynamic delaysWeekTrend = null;
-            dynamic delayLegTrend = null;
-            dynamic delayLegWeekTrend = null;
-            TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
-            TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend2 = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
-            linearTrend.DataItems.Clear();
-            foreach (var d in delays)
-            {
-                linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
-                {
-                    X = d.MonthOfYear,
-                    Y = Convert.ToDouble(d.Delay)
-                });
-            }
-
-
-            if (linearTrend.Calculate())
-            {
-                delaysTrend = linearTrend.TrendItems.ToList();
-                var Slope = linearTrend.Slope;
-                var Intercept = linearTrend.Intercept;
-                var Correl = linearTrend.Correl;
-                var R2 = linearTrend.R2;
-                var StartX = linearTrend.StartPoint.ConvertedX;
-                var StartY = linearTrend.StartPoint.Y;
-                var EndX = linearTrend.EndPoint.ConvertedX;
-                var EndY = linearTrend.EndPoint.Y;
-            }
-
-            var categories = await this.context.ViewDelayMonthlyCategories.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.Category).ToListAsync();
-            var qry1 = (from x in categories
-                        group x by x.Category into grp
-                        orderby grp.Key
-                        select grp).ToList();
-            var categoriesTbl = new DataTable();
-            categoriesTbl.Columns.Add(new DataColumn("Category", typeof(string)));
-            for (int i = 1; i <= 12; i++)
-            {
-                categoriesTbl.Columns.Add(new DataColumn("M" + i, typeof(double)));
-            }
-
-            foreach (var x in qry1)
-            {
-                var row = categoriesTbl.NewRow();
-                row["Category"] = x.Key;
-                for (int i = 1; i <= 12; i++)
-                {
-                    var md = x.FirstOrDefault(q => q.MonthOfYear == i);
-                    row["M" + i] = md == null ? 0 : md.Delay;
-                }
-
-                categoriesTbl.Rows.Add(row);
-            }
-
-
-            var airports = await this.context.ViewDelayMonthlyAirports.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.Airport).ToListAsync();
-
-            var airportsCategories = await this.context.ViewDelayMonthlyAirportCategories.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.Airport).ThenBy(q => q.Category).ToListAsync();
-            var airportsCategoriesSum = (from x in airportsCategories group x by new { x.Airport, x.Category } into grp select new { airport = grp.Key.Airport, category = grp.Key.Category, count = grp.Count(), sum = grp.Sum(q => q.Delay) }).ToList();
-
-            var delaysWeek = await this.context.ViewDelayWeeklies.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.WeekOfMonth).ToListAsync();
-            var categoriesWeek = await this.context.ViewDelayWeeklyCategories.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.WeekOfMonth).ThenBy(q => q.Category).ToListAsync();
-            //var qry2 = (from x in categoriesWeek
-            //            group x by x.Category into grp
-            //            orderby grp.Key
-            //            select grp).ToList();
-            //var categoriesWeekTbl = new DataTable();
-            //categoriesWeekTbl.Columns.Add(new DataColumn("Category", typeof(string)));
-            //for (int i = 1; i <= 12; i++)
-            //{
-            //    for (int j = 1; j <= 4; j++)
-            //    {
-            //        categoriesTbl.Columns.Add(new DataColumn("M" + i+"W"+j, typeof(double)));
-            //    }
-            //}
-
-            //foreach (var x in qry2)
-            //{
-            //    var row = categoriesWeekTbl.NewRow();
-            //    row["Category"] = x.Key;
-            //    for (int i = 1; i <= 12; i++)
-            //    {
-            //        for (int j = 1; j <= 4; j++)
-            //        {
-            //            var md = x.FirstOrDefault(q => q.MonthOfYear == i && q.WeekOfMonth==j);
-            //            row["M" + i+"W"+j] = md == null ? 0 : md.Delay;
-            //        }
-
-            //    }
-
-            //    categoriesWeekTbl.Rows.Add(row);
-            //}
-
-
-
-            var airportsWeek = await this.context.ViewDelayWeeklyAirports.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.WeekOfMonth).ThenBy(q => q.Airport).ToListAsync();
-            var airportsCategoriesWeek = await this.context.ViewDelayWeeklyAirportCategories.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.WeekOfMonth).ThenBy(q => q.Airport).ThenBy(q => q.Category).ToListAsync();
-
-            var categoriesTrend = calculateDelayTrendByCategories(categoriesWeek);
-            var airportsTrend = calculateDelayTrendByAirport(airportsWeek);
-            var categoriesSum = (from x in categories
-                                 group x by x.Category into grp
-                                 select new
-                                 {
-                                     category = grp.Key,
-                                     sum = grp.Sum(q => q.Delay),
-                                     count = grp.Sum(q => q.Count),
-                                     trend = categoriesTrend[grp.Key],
-                                 }
-                                 ).OrderByDescending(q => q.sum).ToList();
-
-            var airportsSum = (from x in airports group x by x.Airport into grp select new { airport = grp.Key, count = grp.Sum(q => q.Count), sum = grp.Sum(q => q.Delay), trend = airportsTrend[grp.Key], }).OrderByDescending(q => q.sum).ToList();
-
-            var cats = categories.Select(q => q.Category).Distinct().ToList();
-            var apts = airports.Select(q => q.Airport).Distinct().ToList();
-            var colorSet1 = new List<string>() { "#ff4d4d", "#9999ff", "#00cccc", "#e6e600", "#cc9966", "#a6a6a6", "#ff33ff", "#cc6666", "#4ddbff" };
-            var colorSet2 = new List<string>() { "#66ff33", "#ffcc00", "#ff00ff", "#ff3300", "#0000cc", "#00ccff", "#b3b3b3", "#00cccc" };
-            Dictionary<string, string> categoryColors = new Dictionary<string, string>();
-            for (int i = 0; i < cats.Count; i++)
-            {
-                if (i < colorSet1.Count)
-                    categoryColors.Add(cats[i], colorSet1[i]);
-                else
-                    categoryColors.Add(cats[i], getRandomColor());
-            }
-            Dictionary<string, string> airportColors = new Dictionary<string, string>();
-            for (int i = 0; i < apts.Count; i++)
-            {
-                if (i < colorSet2.Count)
-                    airportColors.Add(apts[i], colorSet2[i]);
-                else
-                    airportColors.Add(apts[i], getRandomColor());
-            }
-            linearTrend.DataItems.Clear();
-            foreach (var x in delays)
-            {
-                x.DelayRatio = Math.Round(((double)x.Delay) / x.BlockTime, 2, MidpointRounding.AwayFromZero) * 100;
-                x.DelayLeg = Math.Round(((double)x.Delay) / (int)x.TotalFlights, 2, MidpointRounding.AwayFromZero);
-                linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
-                {
-                    X = x.MonthOfYear,
-                    Y = Convert.ToDouble(x.DelayLeg)
-                });
-
-            }
-
-            if (linearTrend.Calculate())
-            {
-                delayLegTrend = linearTrend.TrendItems.ToList(); ;
-
-            }
-
-            linearTrend.DataItems.Clear();
-            linearTrend2.DataItems.Clear();
-            foreach (var x in delaysWeek)
-            {
-                x.DelayRatio = Math.Round(((double)x.Delay) / x.BlockTime, 2, MidpointRounding.AwayFromZero) * 100;
-                x.DelayLeg = Math.Round(((double)x.Delay) / (int)x.TotalFlights, 2, MidpointRounding.AwayFromZero);
-
-
-
-            }
-            var min_month = delaysWeek.Min(q => q.MonthOfYear);
-            var max_month = delaysWeek.Max(q => q.MonthOfYear);
-            var _c = 0;
-            for (int i = min_month; i <= max_month; i++)
-            {
-                for (int j = 1; j <= 4; j++)
-                {
-                    var item = delaysWeek.Where(q => q.MonthOfYear == i && q.WeekOfMonth == j).FirstOrDefault();
-                    var x = _c; //i.ToString() + j.ToString();
-                    var y1 = item == null ? 0 : item.Delay;
-                    var y2 = item == null ? 0 : item.DelayLeg;
-                    linearTrend2.DataItems.Add(new TrendCalculus.NumberItem()
-                    {
-                        X = Convert.ToDouble(x),
-                        Y = Convert.ToDouble(y2)
-                    });
-
-                    linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
-                    {
-                        X = Convert.ToDouble(x),
-                        Y = Convert.ToDouble(y1)
-                    });
-                    _c++;
-                }
-            }
-            if (linearTrend.Calculate())
-            {
-                delaysWeekTrend = linearTrend.TrendItems.ToList(); ;
-
-            }
-            if (linearTrend2.Calculate())
-            {
-                delayLegWeekTrend = linearTrend2.TrendItems.ToList(); ;
-
-            }
-            var grouped = (from x in delays
-                           group x by x.YearStr into grp
-                           select grp).ToList();
-
-            var groupedWeek = (from x in delaysWeek
-                               group x by x.YearStr into grp
-                               select grp).ToList();
-
-            foreach (var x in airports)
-            {
-                //x.DelayRatio = Math.Round(((double)x.Delay) / x.BlockTime, 2, MidpointRounding.AwayFromZero) * 100;
-                x.DelayLeg = Math.Round(((double)x.Delay) / (int)x.TotalFlights, 2, MidpointRounding.AwayFromZero);
-
-
-
-            }
-            foreach (var x in airportsCategories)
-            {
-                //x.DelayRatio = Math.Round(((double)x.Delay) / x.BlockTime, 2, MidpointRounding.AwayFromZero) * 100;
-                x.DelayLeg = Math.Round(((double)x.Delay) / (int)x.TotalFlights, 2, MidpointRounding.AwayFromZero);
-
-
-
-            }
-            foreach (var x in airportsWeek)
-            {
-                //x.DelayRatio = Math.Round(((double)x.Delay) / x.BlockTime, 2, MidpointRounding.AwayFromZero) * 100;
-                x.DelayLeg = Math.Round(((double)x.Delay) / (int)x.TotalFlights, 2, MidpointRounding.AwayFromZero);
-
-
-
-            }
-            foreach (var x in airportsCategoriesWeek)
-            {
-                //x.DelayRatio = Math.Round(((double)x.Delay) / x.BlockTime, 2, MidpointRounding.AwayFromZero) * 100;
-                x.DelayLeg = Math.Round(((double)x.Delay) / (int)x.TotalFlights, 2, MidpointRounding.AwayFromZero);
-
-
-
-            }
-
-            var result = new
-            {
-                delays,
-                delaysTrend,
-                delayLegTrend,
-                delaysWeekTrend,
-                delayLegWeekTrend,
-                grouped,
-                categories,
-                categoriesTbl,
-                categoriesSum,
-                delaysWeek,
-                groupedWeek,
-                categoriesWeek,
-                // categoriesWeekTbl,
-                airports,
-                airportsSum,
-                airportsCategories,
-                airportsCategoriesSum,
-                airportsWeek,
-                airportsCategoriesWeek,
-                categoryColors,
-                airportColors,
-                flightsCount,
-                delaysSum,
-                avgDelayLeg,
-                block = times.First().BL,
-                flight = times.First().FL,
-                delayRatio = Math.Round(Convert.ToDouble(delaysSum) * 100.0 / (double)times.First().BL, 1)
-
-            };
-
-            return result;
-        }
+        //Dictionary<string, double?> calculateTrendSlope(List<ViewDelayDailyCategory> ds)
+        //{
+
+        //    double c = 1;
+        //    Dictionary<string, double?> result = new Dictionary<string, double?>();
+        //    var grouped = (from x in ds
+        //                   group x by x.Category into grp
+        //                   select grp).ToList();
+
+        //    foreach (var grp in grouped)
+        //    {
+        //        c = 1;
+        //        TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
+        //        var items = grp.OrderBy(q => q.Date).ToList();
+        //        foreach (var r in items)
+        //        {
+        //            linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
+        //            {
+        //                X = c,
+        //                Y = Convert.ToDouble(r.Delay)
+        //            });
+        //            c++;
+        //        }
+        //        linearTrend.Calculate();
+        //        result.Add(grp.Key, linearTrend.Slope);
+
+        //    }
+        //    return result;
+
+        //}
+
+
+        //Dictionary<string, double?> calculateTrendSlope(List<ViewDelayDailyAirport> ds)
+        //{
+
+        //    double c = 1;
+        //    Dictionary<string, double?> result = new Dictionary<string, double?>();
+        //    var grouped = (from x in ds
+        //                   group x by x.Airport into grp
+        //                   select grp).ToList();
+
+        //    foreach (var grp in grouped)
+        //    {
+        //        c = 1;
+        //        TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
+        //        var items = grp.OrderBy(q => q.Date).ToList();
+        //        foreach (var r in items)
+        //        {
+        //            linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
+        //            {
+        //                X = c,
+        //                Y = Convert.ToDouble(r.Delay)
+        //            });
+        //            c++;
+        //        }
+        //        linearTrend.Calculate();
+        //        result.Add(grp.Key, linearTrend.Slope);
+
+        //    }
+        //    return result;
+
+        //}
+        //internal async Task<object> GetReportDelayDaily(int cid, DateTime df, DateTime dt)
+        //{
+        //    //masha
+        //    var colorSet1 = new List<string>() { "#ffffb3", "#ffbf80", "#ff9999", "#ffb3ff", "#ffd633", "#e6ac00", "#d65cad", "#ff1a1a", "#ff661a" };
+
+        //    var colorSet2 = new List<string>() { "#66ff99", "#4ddbff", "#ffb3ff", "#33cccc", "#ffff4d", "#70db70", "#6699ff", "#94b8b8", "#a3a375", "#7575a3" };
+        //    var flightsCount = await this.context.FlightInformations.Where(q => q.CustomerId == cid && q.FlightStatusID != 1 && q.FlightStatusID != 4).CountAsync();
+        //    var delaysSum = await this.context.ViewFlightDelays.Where(q => q.CustomerId == cid && q.Code != "93").SumAsync(q => q.Delay);
+        //    var avgDelayLeg = flightsCount != 0 ? Math.Round(Convert.ToDouble(delaysSum * 1.0) / flightsCount, 2) : 0;
+
+
+
+
+        //    var flightsCountDate = await this.context.ViewFlightInformations.Where(q => q.CustomerId == cid && q.STDDay >= df && q.STDDay <= dt && q.FlightStatusID != 1 && q.FlightStatusID != 4).CountAsync();
+        //    // var times = await this.context.ViewFlightInformations.Where(q => q.CustomerId == cid && q.STDDay >= df && q.STDDay <= dt && q.FlightStatusID != 1 && q.FlightStatusID != 4).Select(q => new { });
+        //    var times = await this.context.ViewFlightInformations.Where(q => q.CustomerId == cid && q.STDDay >= df && q.STDDay <= dt && q.FlightStatusID != 1 && q.FlightStatusID != 4)
+        //        .GroupBy(x => true)
+        //        .Select(x => new
+        //        {
+        //            BL = x.Sum(y => y.BlockTime),
+        //            FL = x.Sum(y => y.FlightTime)
+        //        }).ToListAsync();
+
+
+        //    var delays = await this.context.ViewFlightDelays.Where(q => q.CustomerId == cid && q.STDDay >= df && q.STDDay <= dt && q.Code != "93").ToListAsync();
+        //    var delaysTotal = await this.context.ViewDelayDailies.Where(q => q.Date >= df && q.Date <= dt).OrderBy(q => q.Date).ToListAsync();
+        //    foreach (var x in delaysTotal)
+        //    {
+        //        x.DelayLeg = x.TotalFlights == 0 || x.TotalFlights == null ? 0 : Math.Round(Convert.ToDouble(x.Delay * 1.0) / (int)x.TotalFlights, 2);
+        //        x.DelayRatio = x.BlockTime == 0 ? 0 : Math.Round(Convert.ToDouble(x.Delay * 1.0) / x.BlockTime, 2);
+        //    }
+
+        //    TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
+        //    TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend2 = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
+        //    foreach (var d in delaysTotal)
+        //    {
+        //        linearTrend.DataItems.Add(new TrendCalculus.DateItem()
+        //        {
+        //            X = d.Date,
+        //            Y = Convert.ToDouble(d.Delay)
+        //        });
+        //        linearTrend2.DataItems.Add(new TrendCalculus.DateItem()
+        //        {
+        //            X = d.Date,
+        //            Y = Convert.ToDouble(d.DelayLeg)
+        //        });
+        //    }
+
+        //    if (linearTrend.Calculate() && linearTrend2.Calculate())
+        //    {
+        //        var totalDelaysTrend = linearTrend.TrendItems.OrderBy(q => q.ConvertedX).ToList();
+        //        var totalDelaysTrendDl = linearTrend2.TrendItems.OrderBy(q => q.ConvertedX).ToList();
+        //        for (var j = 0; j < totalDelaysTrend.Count; j++)
+        //        {
+        //            delaysTotal[j].TRND = totalDelaysTrend[j].Y;
+        //            delaysTotal[j].TRNDLeg = totalDelaysTrendDl[j].Y;
+        //        }
+
+        //    }
+
+        //    var dailyCats = await this.context.ViewDelayDailyCategories.Where(q => q.Date >= df && q.Date <= dt).OrderBy(q => q.Date).ToListAsync();
+        //    var _dailyCatsSlope = calculateTrendSlope(dailyCats);
+        //    #region dailyCats table
+        //    var dailyCatsTbl = new DataTable();
+        //    dailyCatsTbl.Columns.Add(new DataColumn("Date", typeof(DateTime)));
+        //    var _dcs = dailyCats.Select(q => q.Category).Distinct().OrderBy(q => q).ToList();
+        //    foreach (var dc in _dcs)
+        //    {
+        //        dailyCatsTbl.Columns.Add(new DataColumn(dc, typeof(double)));
+        //    }
+        //    var _dailyCatsGrouped = dailyCats.GroupBy(q => q.Date).OrderBy(q => q.Key).ToList();
+        //    foreach (var x in _dailyCatsGrouped)
+        //    {
+        //        var row = dailyCatsTbl.NewRow();
+        //        row["Date"] = x.Key;
+
+        //        for (int i = 1; i <= dailyCatsTbl.Columns.Count - 1; i++)
+        //        {
+        //            var _ct = dailyCatsTbl.Columns[i].ColumnName;
+        //            var _vl = x.FirstOrDefault(q => q.Category == _ct);
+
+        //            row[_ct] = _vl == null ? 0 : _vl.Delay;
+        //        }
+
+        //        dailyCatsTbl.Rows.Add(row);
+        //    }
+
+        //    #endregion
+
+        //    var dailyAirports = await this.context.ViewDelayDailyAirports.Where(q => q.Date >= df && q.Date <= dt).OrderBy(q => q.Date).ThenBy(q => q.Airport).ToListAsync();
+        //    var _dailyAirportsSlope = calculateTrendSlope(dailyAirports);
+        //    #region dailyAirports table
+        //    var dailyAirportsTbl = new DataTable();
+        //    dailyAirportsTbl.Columns.Add(new DataColumn("Date", typeof(DateTime)));
+        //    var _das = dailyAirports.Select(q => q.Airport).Distinct().OrderBy(q => q).ToList();
+        //    foreach (var dc in _das)
+        //    {
+        //        dailyAirportsTbl.Columns.Add(new DataColumn(dc, typeof(double)));
+        //    }
+        //    var _dailyAirportsGrouped = dailyAirports.GroupBy(q => q.Date).OrderBy(q => q.Key).ToList();
+        //    foreach (var x in _dailyAirportsGrouped)
+        //    {
+        //        var row = dailyAirportsTbl.NewRow();
+        //        row["Date"] = x.Key;
+
+        //        for (int i = 1; i <= dailyAirportsTbl.Columns.Count - 1; i++)
+        //        {
+        //            var _ct = dailyAirportsTbl.Columns[i].ColumnName;
+        //            var _vl = x.FirstOrDefault(q => q.Airport == _ct);
+
+        //            row[_ct] = _vl == null ? 0 : _vl.Delay;
+        //        }
+
+        //        dailyAirportsTbl.Rows.Add(row);
+        //    }
+
+        //    #endregion
+
+
+        //    var delaysSumDate = delays.Sum(q => q.Delay);
+        //    var delayLeg = delays == null || flightsCountDate == 0 ? 0 : Math.Round(Convert.ToDouble(delaysSumDate * 1.0) / flightsCountDate, 2);
+
+        //    var avgCategory = await this.context.DelayAvgByCategories.ToListAsync();
+        //    var avgAirport = await this.context.DelayAvgByAirports.ToListAsync();
+        //    var avgAirportCategory = await this.context.DelayAvgByAirportCategories.ToListAsync();
+        //    //pussy
+        //    var category = (from vfd in delays
+        //                    group vfd by vfd.ICategory into grp
+        //                    let sumDelay = grp.Sum(q => q.DelayHH * 60) + grp.Sum(q => q.DelayMM)
+        //                    select new DelayReportObject()
+        //                    {
+        //                        Category = grp.Key,
+        //                        Count = grp.Count(),
+        //                        Delay = sumDelay,
+        //                        DelayFormatted = FormatTwoDigits(Convert.ToInt32(sumDelay) / 60) + ":" + FormatTwoDigits(Convert.ToInt32(sumDelay) % 60),
+        //                        Avg = avgCategory.First(q => q.Category == grp.Key).Avg,
+        //                        Slope = _dailyCatsSlope[grp.Key],
+
+        //                    }).OrderByDescending(q => q.Delay).ThenBy(q => q.Category).ToList();
+
+        //    Dictionary<string, string> categoryColors = new Dictionary<string, string>();
+        //    for (int i = 0; i < category.Count; i++)
+        //    {
+        //        if (i < colorSet1.Count)
+        //            categoryColors.Add(category[i].Category, colorSet1[i]);
+        //        else
+        //            categoryColors.Add(category[i].Category, getRandomColor());
+        //    }
+
+        //    var categoryDetails = delays.OrderBy(q => q.Category).ThenBy(q => q.STDDay).ThenBy(q => q.FlightNumber).ToList();
+
+
+        //    var airport = (from vfd in delays
+        //                   group vfd by vfd.FromAirportIATA into grp
+        //                   let sumDelay = grp.Sum(q => q.DelayHH * 60) + grp.Sum(q => q.DelayMM)
+        //                   select new DelayReportObject()
+        //                   {
+        //                       Airport = grp.Key,
+        //                       Count = grp.Count(),
+        //                       Delay = sumDelay,
+        //                       DelayFormatted = FormatTwoDigits(Convert.ToInt32(sumDelay) / 60) + ":" + FormatTwoDigits(Convert.ToInt32(sumDelay) % 60),
+        //                       Avg = avgAirport.First(q => q.FromAirportIATA == grp.Key).Avg,
+        //                       Slope = _dailyAirportsSlope[grp.Key],
+
+        //                   }).OrderByDescending(q => q.Delay).ThenBy(q => q.Airport).ToList();
+        //    Dictionary<string, string> airportColors = new Dictionary<string, string>();
+        //    for (int i = 0; i < airport.Count; i++)
+        //    {
+        //        if (i < colorSet2.Count)
+        //            airportColors.Add(airport[i].Airport, colorSet2[i]);
+        //        else
+        //            airportColors.Add(airport[i].Airport, getRandomColor());
+        //    }
+        //    var airportCategory = (from vfd in delays
+        //                           group vfd by new { vfd.FromAirportIATA, vfd.ICategory } into grp
+        //                           let sumDelay = grp.Sum(q => q.DelayHH * 60) + grp.Sum(q => q.DelayMM)
+        //                           let avgCat = avgAirportCategory.FirstOrDefault(q => q.FromAirportIATA == grp.Key.FromAirportIATA && q.Category == grp.Key.ICategory)
+        //                           select new DelayReportObject()
+        //                           {
+        //                               Airport = grp.Key.FromAirportIATA,
+        //                               Category = grp.Key.ICategory,
+        //                               Count = grp.Count(),
+        //                               Delay = sumDelay,
+        //                               DelayFormatted = FormatTwoDigits(Convert.ToInt32(sumDelay) / 60) + ":" + FormatTwoDigits(Convert.ToInt32(sumDelay) % 60),
+        //                               Avg = avgCat == null ? 0 : avgCat.Avg,
+
+        //                           }).OrderBy(q => q.Airport).ThenByDescending(q => q.Delay).ThenBy(q => q.Category).ToList();
+
+        //    var airportCategoryGrouped = await (from x in this.context.ViewDelayAirportCategoryGroupeds
+        //                                        where x.STDDay >= df && x.STDDay <= dt
+        //                                        group x by new { x.Airport, x.Category } into grp
+        //                                        select new
+        //                                        {
+        //                                            grp.Key.Airport,
+        //                                            grp.Key.Category,
+        //                                            Delay = grp.Sum(q => q.Delay),
+        //                                            Count = grp.Sum(q => q.Count),
+        //                                        }
+        //                                        ).OrderBy(q => q.Airport).ThenBy(q => q.Category).ToListAsync();
+        //    var airportCategoryDaily = await this.context.ViewDelayDailyAirportCategories.Where(q => q.Date >= df && q.Date <= dt).OrderBy(q => q.Date).ThenBy(q => q.Airport).ThenBy(q => q.Category).ToListAsync();
+        //    #region process airportCategoryDaily
+        //    var acdGrouped = from x in airportCategoryDaily
+        //                     group x by new { x.Date, x.PDate } into grp
+        //                     select new { grp.Key.Date, grp.Key.PDate, Items = grp.Select(w => new { Title = w.Airport + "-" + w.Category, w.Delay, w.Count, w.TotalFlights }).ToList() };
+        //    var airportCategoryDailyTbl = new DataTable();
+        //    airportCategoryDailyTbl.Columns.Add(new DataColumn("Date", typeof(DateTime)));
+        //    airportCategoryDailyTbl.Columns.Add(new DataColumn("PDate", typeof(string)));
+        //    foreach (var item in acdGrouped.First().Items)
+        //    {
+        //        airportCategoryDailyTbl.Columns.Add(new DataColumn(item.Title, typeof(double)));
+        //        airportCategoryDailyTbl.Columns.Add(new DataColumn(item.Title + "Count", typeof(double)));
+
+        //    }
+        //    foreach (var grp in acdGrouped)
+        //    {
+        //        var row = airportCategoryDailyTbl.NewRow();
+        //        row["Date"] = grp.Date;
+        //        row["PDate"] = grp.PDate;
+        //        foreach (var item in grp.Items)
+        //        {
+
+        //            row[item.Title] = item.Delay;
+        //            row[item.Title + "Count"] = item.Count;
+        //        }
+        //        airportCategoryDailyTbl.Rows.Add(row);
+        //    }
+        //    #endregion
+
+        //    var airportDetails = delays.OrderBy(q => q.FromAirportIATA).ThenBy(q => q.STDDay).ThenBy(q => q.FlightNumber).ToList();
+
+
+        //    delays = delays.OrderBy(q => q.Register).OrderBy(q => q.STD).ToList();
+
+        //    //                SELECT
+        //    // vfd.ICategory as Category,
+        //    // count(*) as Count,
+        //    //SUM(vfd.DelayHH * 60 + vfd.DelayMM) AS Delay,
+        //    //      format(dateadd(minute, SUM(vfd.DelayHH * 60 + vfd.DelayMM), '00:00:00'), N'HH\:mm', 'FR-fr') 
+
+
+        //    //  FROM ViewFlightDelay vfd
+
+        //    //  GROUP BY vfd.ICategory
+        //    //    ORDER BY ICategory
+
+
+
+
+        //    //var fdp = await this.context.FDPs.FirstOrDefaultAsync(q => q.Id == fdpId);
+        //    //fdp.JobGroupId = position;
+        //    return new
+        //    {
+        //        categoryColors,
+        //        airportColors,
+        //        delays,
+        //        delaysTotal,
+        //        dailyCats,
+        //        dailyCatsTbl,
+        //        dailyAirports,
+        //        dailyAirportsTbl,
+        //        airport,
+        //        airportCategory,
+        //        airportCategoryGrouped,
+        //        airportDetails,
+        //        airportCategoryDaily,
+        //        airportCategoryDailyTbl,
+        //        category,
+        //        categoryDetails,
+        //        avgCategory,
+        //        avgAirport,
+        //        avgAirportCategory,
+        //        delaysSum,
+        //        delaysSumDate,
+        //        flightsCount,
+        //        flightsCountDate,
+        //        avgDelayLeg,
+        //        delayLeg,
+        //        block = times.First().BL,
+        //        flight = times.First().FL,
+        //        delayRatio = Math.Round(Convert.ToDouble(delaysSumDate) * 100.0 / (double)times.First().BL, 1)
+        //    };
+        //}
+
+
+        //Dictionary<string, double?> calculateDelayTrendByCategories(List<ViewDelayWeeklyCategory> ds)
+        //{
+        //    double c = 1;
+        //    Dictionary<string, double?> result = new Dictionary<string, double?>();
+        //    var grouped = (from x in ds
+        //                   group x by x.Category into grp
+        //                   select grp).ToList();
+
+        //    foreach (var grp in grouped)
+        //    {
+        //        c = 1;
+        //        TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
+        //        var items = grp.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.WeekOfMonth).ToList();
+        //        foreach (var r in items)
+        //        {
+        //            linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
+        //            {
+        //                X = c,
+        //                Y = Convert.ToDouble(r.Delay)
+        //            });
+        //            c++;
+        //        }
+        //        linearTrend.Calculate();
+        //        result.Add(grp.Key, linearTrend.Slope);
+
+        //    }
+        //    return result;
+
+        //}
+
+        //Dictionary<string, double?> calculateDelayTrendByAirport(List<ViewDelayWeeklyAirport> ds)
+        //{
+        //    double c = 1;
+        //    Dictionary<string, double?> result = new Dictionary<string, double?>();
+        //    var grouped = (from x in ds
+        //                   group x by x.Airport into grp
+        //                   select grp).ToList();
+
+        //    foreach (var grp in grouped)
+        //    {
+        //        c = 1;
+        //        TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
+        //        var items = grp.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.WeekOfMonth).ToList();
+        //        foreach (var r in items)
+        //        {
+        //            linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
+        //            {
+        //                X = c,
+        //                Y = Convert.ToDouble(r.Delay)
+        //            });
+        //            c++;
+        //        }
+        //        linearTrend.Calculate();
+        //        result.Add(grp.Key, linearTrend.Slope);
+
+        //    }
+        //    return result;
+
+        //}
+        //internal async Task<object> GetReportDelayYearlyTotal(int cid)
+        //{
+        //    var flightsCount = await this.context.FlightInformations.Where(q => q.CustomerId == cid && q.FlightStatusID != 1 && q.FlightStatusID != 4).CountAsync();
+        //    var delaysSum = await this.context.ViewFlightDelays.Where(q => q.CustomerId == cid && q.Code != "93").SumAsync(q => q.Delay);
+        //    var avgDelayLeg = flightsCount != 0 ? Math.Round(Convert.ToDouble(delaysSum * 1.0) / flightsCount, 2) : 0;
+        //    var times = await this.context.ViewFlightInformations.Where(q => q.CustomerId == cid && q.FlightStatusID != 1 && q.FlightStatusID != 4)
+        //        .GroupBy(x => true)
+        //        .Select(x => new
+        //        {
+        //            BL = x.Sum(y => y.BlockTime),
+        //            FL = x.Sum(y => y.FlightTime)
+        //        }).ToListAsync();
+
+        //    var delays = await this.context.ViewDelayMonthlies.ToListAsync();
+        //    dynamic delaysTrend = null;
+        //    dynamic delaysWeekTrend = null;
+        //    dynamic delayLegTrend = null;
+        //    dynamic delayLegWeekTrend = null;
+        //    TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
+        //    TrendCalculus.LinearTrend<TrendCalculus.IValueItem> linearTrend2 = new TrendCalculus.LinearTrend<TrendCalculus.IValueItem>();
+        //    linearTrend.DataItems.Clear();
+        //    foreach (var d in delays)
+        //    {
+        //        linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
+        //        {
+        //            X = d.MonthOfYear,
+        //            Y = Convert.ToDouble(d.Delay)
+        //        });
+        //    }
+
+
+        //    if (linearTrend.Calculate())
+        //    {
+        //        delaysTrend = linearTrend.TrendItems.ToList();
+        //        var Slope = linearTrend.Slope;
+        //        var Intercept = linearTrend.Intercept;
+        //        var Correl = linearTrend.Correl;
+        //        var R2 = linearTrend.R2;
+        //        var StartX = linearTrend.StartPoint.ConvertedX;
+        //        var StartY = linearTrend.StartPoint.Y;
+        //        var EndX = linearTrend.EndPoint.ConvertedX;
+        //        var EndY = linearTrend.EndPoint.Y;
+        //    }
+
+        //    var categories = await this.context.ViewDelayMonthlyCategories.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.Category).ToListAsync();
+        //    var qry1 = (from x in categories
+        //                group x by x.Category into grp
+        //                orderby grp.Key
+        //                select grp).ToList();
+        //    var categoriesTbl = new DataTable();
+        //    categoriesTbl.Columns.Add(new DataColumn("Category", typeof(string)));
+        //    for (int i = 1; i <= 12; i++)
+        //    {
+        //        categoriesTbl.Columns.Add(new DataColumn("M" + i, typeof(double)));
+        //    }
+
+        //    foreach (var x in qry1)
+        //    {
+        //        var row = categoriesTbl.NewRow();
+        //        row["Category"] = x.Key;
+        //        for (int i = 1; i <= 12; i++)
+        //        {
+        //            var md = x.FirstOrDefault(q => q.MonthOfYear == i);
+        //            row["M" + i] = md == null ? 0 : md.Delay;
+        //        }
+
+        //        categoriesTbl.Rows.Add(row);
+        //    }
+
+
+        //    var airports = await this.context.ViewDelayMonthlyAirports.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.Airport).ToListAsync();
+
+        //    var airportsCategories = await this.context.ViewDelayMonthlyAirportCategories.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.Airport).ThenBy(q => q.Category).ToListAsync();
+        //    var airportsCategoriesSum = (from x in airportsCategories group x by new { x.Airport, x.Category } into grp select new { airport = grp.Key.Airport, category = grp.Key.Category, count = grp.Count(), sum = grp.Sum(q => q.Delay) }).ToList();
+
+        //    var delaysWeek = await this.context.ViewDelayWeeklies.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.WeekOfMonth).ToListAsync();
+        //    var categoriesWeek = await this.context.ViewDelayWeeklyCategories.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.WeekOfMonth).ThenBy(q => q.Category).ToListAsync();
+        //    //var qry2 = (from x in categoriesWeek
+        //    //            group x by x.Category into grp
+        //    //            orderby grp.Key
+        //    //            select grp).ToList();
+        //    //var categoriesWeekTbl = new DataTable();
+        //    //categoriesWeekTbl.Columns.Add(new DataColumn("Category", typeof(string)));
+        //    //for (int i = 1; i <= 12; i++)
+        //    //{
+        //    //    for (int j = 1; j <= 4; j++)
+        //    //    {
+        //    //        categoriesTbl.Columns.Add(new DataColumn("M" + i+"W"+j, typeof(double)));
+        //    //    }
+        //    //}
+
+        //    //foreach (var x in qry2)
+        //    //{
+        //    //    var row = categoriesWeekTbl.NewRow();
+        //    //    row["Category"] = x.Key;
+        //    //    for (int i = 1; i <= 12; i++)
+        //    //    {
+        //    //        for (int j = 1; j <= 4; j++)
+        //    //        {
+        //    //            var md = x.FirstOrDefault(q => q.MonthOfYear == i && q.WeekOfMonth==j);
+        //    //            row["M" + i+"W"+j] = md == null ? 0 : md.Delay;
+        //    //        }
+
+        //    //    }
+
+        //    //    categoriesWeekTbl.Rows.Add(row);
+        //    //}
+
+
+
+        //    var airportsWeek = await this.context.ViewDelayWeeklyAirports.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.WeekOfMonth).ThenBy(q => q.Airport).ToListAsync();
+        //    var airportsCategoriesWeek = await this.context.ViewDelayWeeklyAirportCategories.OrderBy(q => q.PassedYear).ThenBy(q => q.MonthOfYear).ThenBy(q => q.WeekOfMonth).ThenBy(q => q.Airport).ThenBy(q => q.Category).ToListAsync();
+
+        //    var categoriesTrend = calculateDelayTrendByCategories(categoriesWeek);
+        //    var airportsTrend = calculateDelayTrendByAirport(airportsWeek);
+        //    var categoriesSum = (from x in categories
+        //                         group x by x.Category into grp
+        //                         select new
+        //                         {
+        //                             category = grp.Key,
+        //                             sum = grp.Sum(q => q.Delay),
+        //                             count = grp.Sum(q => q.Count),
+        //                             trend = categoriesTrend[grp.Key],
+        //                         }
+        //                         ).OrderByDescending(q => q.sum).ToList();
+
+        //    var airportsSum = (from x in airports group x by x.Airport into grp select new { airport = grp.Key, count = grp.Sum(q => q.Count), sum = grp.Sum(q => q.Delay), trend = airportsTrend[grp.Key], }).OrderByDescending(q => q.sum).ToList();
+
+        //    var cats = categories.Select(q => q.Category).Distinct().ToList();
+        //    var apts = airports.Select(q => q.Airport).Distinct().ToList();
+        //    var colorSet1 = new List<string>() { "#ff4d4d", "#9999ff", "#00cccc", "#e6e600", "#cc9966", "#a6a6a6", "#ff33ff", "#cc6666", "#4ddbff" };
+        //    var colorSet2 = new List<string>() { "#66ff33", "#ffcc00", "#ff00ff", "#ff3300", "#0000cc", "#00ccff", "#b3b3b3", "#00cccc" };
+        //    Dictionary<string, string> categoryColors = new Dictionary<string, string>();
+        //    for (int i = 0; i < cats.Count; i++)
+        //    {
+        //        if (i < colorSet1.Count)
+        //            categoryColors.Add(cats[i], colorSet1[i]);
+        //        else
+        //            categoryColors.Add(cats[i], getRandomColor());
+        //    }
+        //    Dictionary<string, string> airportColors = new Dictionary<string, string>();
+        //    for (int i = 0; i < apts.Count; i++)
+        //    {
+        //        if (i < colorSet2.Count)
+        //            airportColors.Add(apts[i], colorSet2[i]);
+        //        else
+        //            airportColors.Add(apts[i], getRandomColor());
+        //    }
+        //    linearTrend.DataItems.Clear();
+        //    foreach (var x in delays)
+        //    {
+        //        x.DelayRatio = Math.Round(((double)x.Delay) / x.BlockTime, 2, MidpointRounding.AwayFromZero) * 100;
+        //        x.DelayLeg = Math.Round(((double)x.Delay) / (int)x.TotalFlights, 2, MidpointRounding.AwayFromZero);
+        //        linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
+        //        {
+        //            X = x.MonthOfYear,
+        //            Y = Convert.ToDouble(x.DelayLeg)
+        //        });
+
+        //    }
+
+        //    if (linearTrend.Calculate())
+        //    {
+        //        delayLegTrend = linearTrend.TrendItems.ToList(); ;
+
+        //    }
+
+        //    linearTrend.DataItems.Clear();
+        //    linearTrend2.DataItems.Clear();
+        //    foreach (var x in delaysWeek)
+        //    {
+        //        x.DelayRatio = Math.Round(((double)x.Delay) / x.BlockTime, 2, MidpointRounding.AwayFromZero) * 100;
+        //        x.DelayLeg = Math.Round(((double)x.Delay) / (int)x.TotalFlights, 2, MidpointRounding.AwayFromZero);
+
+
+
+        //    }
+        //    var min_month = delaysWeek.Min(q => q.MonthOfYear);
+        //    var max_month = delaysWeek.Max(q => q.MonthOfYear);
+        //    var _c = 0;
+        //    for (int i = min_month; i <= max_month; i++)
+        //    {
+        //        for (int j = 1; j <= 4; j++)
+        //        {
+        //            var item = delaysWeek.Where(q => q.MonthOfYear == i && q.WeekOfMonth == j).FirstOrDefault();
+        //            var x = _c; //i.ToString() + j.ToString();
+        //            var y1 = item == null ? 0 : item.Delay;
+        //            var y2 = item == null ? 0 : item.DelayLeg;
+        //            linearTrend2.DataItems.Add(new TrendCalculus.NumberItem()
+        //            {
+        //                X = Convert.ToDouble(x),
+        //                Y = Convert.ToDouble(y2)
+        //            });
+
+        //            linearTrend.DataItems.Add(new TrendCalculus.NumberItem()
+        //            {
+        //                X = Convert.ToDouble(x),
+        //                Y = Convert.ToDouble(y1)
+        //            });
+        //            _c++;
+        //        }
+        //    }
+        //    if (linearTrend.Calculate())
+        //    {
+        //        delaysWeekTrend = linearTrend.TrendItems.ToList(); ;
+
+        //    }
+        //    if (linearTrend2.Calculate())
+        //    {
+        //        delayLegWeekTrend = linearTrend2.TrendItems.ToList(); ;
+
+        //    }
+        //    var grouped = (from x in delays
+        //                   group x by x.YearStr into grp
+        //                   select grp).ToList();
+
+        //    var groupedWeek = (from x in delaysWeek
+        //                       group x by x.YearStr into grp
+        //                       select grp).ToList();
+
+        //    foreach (var x in airports)
+        //    {
+        //        //x.DelayRatio = Math.Round(((double)x.Delay) / x.BlockTime, 2, MidpointRounding.AwayFromZero) * 100;
+        //        x.DelayLeg = Math.Round(((double)x.Delay) / (int)x.TotalFlights, 2, MidpointRounding.AwayFromZero);
+
+
+
+        //    }
+        //    foreach (var x in airportsCategories)
+        //    {
+        //        //x.DelayRatio = Math.Round(((double)x.Delay) / x.BlockTime, 2, MidpointRounding.AwayFromZero) * 100;
+        //        x.DelayLeg = Math.Round(((double)x.Delay) / (int)x.TotalFlights, 2, MidpointRounding.AwayFromZero);
+
+
+
+        //    }
+        //    foreach (var x in airportsWeek)
+        //    {
+        //        //x.DelayRatio = Math.Round(((double)x.Delay) / x.BlockTime, 2, MidpointRounding.AwayFromZero) * 100;
+        //        x.DelayLeg = Math.Round(((double)x.Delay) / (int)x.TotalFlights, 2, MidpointRounding.AwayFromZero);
+
+
+
+        //    }
+        //    foreach (var x in airportsCategoriesWeek)
+        //    {
+        //        //x.DelayRatio = Math.Round(((double)x.Delay) / x.BlockTime, 2, MidpointRounding.AwayFromZero) * 100;
+        //        x.DelayLeg = Math.Round(((double)x.Delay) / (int)x.TotalFlights, 2, MidpointRounding.AwayFromZero);
+
+
+
+        //    }
+
+        //    var result = new
+        //    {
+        //        delays,
+        //        delaysTrend,
+        //        delayLegTrend,
+        //        delaysWeekTrend,
+        //        delayLegWeekTrend,
+        //        grouped,
+        //        categories,
+        //        categoriesTbl,
+        //        categoriesSum,
+        //        delaysWeek,
+        //        groupedWeek,
+        //        categoriesWeek,
+        //        // categoriesWeekTbl,
+        //        airports,
+        //        airportsSum,
+        //        airportsCategories,
+        //        airportsCategoriesSum,
+        //        airportsWeek,
+        //        airportsCategoriesWeek,
+        //        categoryColors,
+        //        airportColors,
+        //        flightsCount,
+        //        delaysSum,
+        //        avgDelayLeg,
+        //        block = times.First().BL,
+        //        flight = times.First().FL,
+        //        delayRatio = Math.Round(Convert.ToDouble(delaysSum) * 100.0 / (double)times.First().BL, 1)
+
+        //    };
+
+        //    return result;
+        //}
         public class FlightTimeReport2
         {
             public DateTime Date { get; set; }
@@ -17749,19 +15452,17 @@ namespace EPAGriffinAPI.DAL
 
         }
 
-        internal async Task<object> AllNira(DateTime d1, DateTime d2)
+        internal async Task<object> AllNira()
         {
-            //if (ConfigurationManager.AppSettings["nira"] == "0")
-            //    return true;
-            var legs = await this.context.ViewLegTimes.Where(q => q.STDDay >= d1 && q.STDDay <= d2 && q.FlightStatusID == 1).OrderBy(q => q.STDLocal).ToListAsync();
+            if (ConfigurationManager.AppSettings["nira"] == "0")
+                return true;
+            var legs = await this.context.ViewLegTimes.Where(q => q.STDLocal >= new DateTime(2020, 7, 27, 0, 0, 0) && q.FlightStatusID == 1).OrderBy(q => q.STDLocal).ToListAsync();
             foreach (var leg in legs)
             {
                 var _std = (DateTime)leg.STDLocal;
                 string airline = "IV";
                 var date = (_std).Year + "-" + (_std).Month.ToString().PadLeft(2, '0') + "-" + (_std).Day.ToString().PadLeft(2, '0');
-
                 var dep = ((DateTime)leg.DepartureLocal).ToString("HH:mm");
-                var depDate = ((DateTime)leg.DepartureLocal).ToString("yyyy-MM-dd");
                 var arr = ((DateTime)leg.ArrivalLocal).ToString("HH:mm");
                 var status = "Scheduled";
                 if (leg.FlightStatusID == 4)
@@ -17772,111 +15473,11 @@ namespace EPAGriffinAPI.DAL
                     status = "Landed";
                 //var duration = arr.Subtract(dep).TotalMinutes;
                 //var _dep = dep.Year + "-" + dep.Month.ToString().PadLeft(2, '0') + "-" + dep.Day.ToString().PadLeft(2, '0') + "T" + dep.Hour + "%3A" + dep.Minute;
-                var url2 = "http://iv.nirasoftware.com:882/NRSFlightInfo.jsp?Airline=" + airline + "&FlightNo=" + leg.FlightNumber
-                    + "&Origin=" + leg.FromAirportIATA + "&Destination=" + leg.ToAirportIATA + "&FlightDate="
-                    + date
-                    + "&NewDepartureTime=" + dep + "&NewArrivalTime=" + arr + "&NewFlightStatus=" + status + "&NewACT=EP-" + leg.Register
-                    + "&Comment=lorem_ipsum&FleetWatchKey" + leg.ID + "&SendSMS=NO&OfficeUser=" + "Thr003.airpocket" + "&OfficePass=" + "nira123";
-
-
                 var url = "http://iv.nirasoftware.com:882/NRSFlightInfo.jsp?Airline=" + airline + "&FlightNo=" + leg.FlightNumber
                     + "&Origin=" + leg.FromAirportIATA + "&Destination=" + leg.ToAirportIATA + "&FlightDate="
                     + date
-                    + "&NewDepartureTime=" + dep + "&NewDepartureDate=" + depDate + "&NewArrivalTime=" + arr + "&NewFlightStatus=" + status + "&NewACT=EP-" + leg.Register
-                    + "&Comment=lorem_ipsum&FleetWatchKey=" + leg.ID + "&SendSMS=NO&OfficeUser=" + "Thr003.airpocket" + "&OfficePass=" + "nira123";
-
-
-                try
-                {
-                    var result = new NiraHistory()
-                    {
-                        FlightId = leg.ID,
-                        Arrival = leg.Arrival,
-                        Departure = leg.Departure,
-                        FlightStatusId = leg.FlightStatusID,
-                        Register = leg.Register,
-                        DateSend = DateTime.Now,
-                        Remark = url
-                    };
-                    WebRequest request = WebRequest.Create(url);
-
-                    request.Credentials = CredentialCache.DefaultCredentials;
-
-                    WebResponse response = await request.GetResponseAsync();
-
-                    Stream dataStream = response.GetResponseStream();
-
-                    StreamReader reader = new StreamReader(dataStream);
-
-                    string responseFromServer = reader.ReadToEnd();
-
-                    reader.Close();
-                    response.Close();
-
-                    result.DateReplied = DateTime.Now;
-
-
-                    dynamic myObject = JsonConvert.DeserializeObject<dynamic>(responseFromServer);
-                    result.CHTIME = Convert.ToString(myObject.CHTIME);
-                    result.FLIGHT = Convert.ToString(myObject.FLIGHT);
-                    result.NEWAIRCRAFT = Convert.ToString(myObject.NEWAIRCRAFT);
-                    result.NEWSTATUS = Convert.ToString(myObject.NEWSTATUS);
-
-                    this.context.NiraHistories.Add(result);
-                    var saveResult = await this.context.SaveAsync();
-
-
-                }
-                catch (Exception ex)
-                {
-                    var msg = ex.Message;
-                    if (ex.InnerException != null)
-                        msg += "_______" + ex.InnerException.Message;
-                    return msg;
-
-                }
-            }
-
-            return legs.Count;
-        }
-
-        internal async Task<object> NIRAFLYPERSIA()
-        {
-            // if (ConfigurationManager.AppSettings["nira"] == "0")
-            //     return true;
-            var legs = await this.context.ViewLegTimes.Where(q => q.STDDay >= new DateTime(2020, 4, 1, 0, 0, 0) && q.STDDay < new DateTime(2020, 12, 20, 0, 0, 0) && (q.FlightStatusID == 15 || q.FlightStatusID == 3)).OrderBy(q => q.STDLocal).ToListAsync();
-            foreach (var leg in legs)
-            {
-                var _std = (DateTime)leg.STDLocal;
-                string airline = "FP";
-                var date = (_std).Year + "-" + (_std).Month.ToString().PadLeft(2, '0') + "-" + (_std).Day.ToString().PadLeft(2, '0');
-
-                var dep = ((DateTime)leg.DepartureLocal).ToString("HH:mm");
-                var depDate = ((DateTime)leg.DepartureLocal).ToString("yyyy-MM-dd");
-                var arr = ((DateTime)leg.ArrivalLocal).ToString("HH:mm");
-                var status = "Scheduled";
-                if (leg.FlightStatusID == 4)
-                    status = "Canceled";
-                else if (leg.FlightStatusID == 2)
-                    status = "TookOff";
-                else if (leg.FlightStatusID == 3 || leg.FlightStatusID == 15)
-                    status = "Landed";
-                //var duration = arr.Subtract(dep).TotalMinutes;
-                //var _dep = dep.Year + "-" + dep.Month.ToString().PadLeft(2, '0') + "-" + dep.Day.ToString().PadLeft(2, '0') + "T" + dep.Hour + "%3A" + dep.Minute;
-                var url2 = "http://api.flypersia.aero/ws1/NRSFlightInfo.jsp?Airline=" + airline + "&FlightNo=" + leg.FlightNumber
-                    + "&Origin=" + leg.FromAirportIATA + "&Destination=" + leg.ToAirportIATA + "&FlightDate="
-                    + date
                     + "&NewDepartureTime=" + dep + "&NewArrivalTime=" + arr + "&NewFlightStatus=" + status + "&NewACT=EP-" + leg.Register
-                    + "&Comment=lorem_ipsum&FleetWatchKey" + leg.ID + "&SendSMS=NO&OfficeUser=" + "Thr003.airpocket" + "&OfficePass=" + "nira123";
-
-
-                var url = "http://api.flypersia.aero/ws1/NRSFlightInfo.jsp?Airline=" + airline + "&FlightNo=" + leg.FlightNumber
-                    + "&Origin=" + leg.FromAirportIATA + "&Destination=" + leg.ToAirportIATA + "&FlightDate="
-                    + date
-                    + "&NewDepartureTime=" + dep + "&NewDepartureDate=" + depDate + "&NewArrivalTime=" + arr + "&NewFlightStatus=" + status + "&NewACT=EP-" + leg.Register
-                    + "&Comment=lorem_ipsum&FleetWatchKey=" + leg.ID + "&SendSMS=NO&OfficeUser=" + "Thr003.airpocket" + "&OfficePass=" + "nira123";
-
-
+                    + "&Comment=lorem_ipsum&FleetWatchKey" + leg.ID + "&SendSMS=false&OfficeUser=" + "Thr003.airpocket" + "&OfficePass=" + "nira123";
                 try
                 {
                     var result = new NiraHistory()
@@ -17923,12 +15524,11 @@ namespace EPAGriffinAPI.DAL
                     var msg = ex.Message;
                     if (ex.InnerException != null)
                         msg += "_______" + ex.InnerException.Message;
-                    return msg;
 
                 }
             }
 
-            return legs.Count;
+            return true;
         }
 
         internal async Task<dynamic> NotifyNira(int id, string remark, string newregister = "")
@@ -18134,751 +15734,8 @@ namespace EPAGriffinAPI.DAL
             }
 
         }
-        public class DelayReportPeriodic
-        {
-            public string Title { get; set; }
-            public string Title2 { get; set; }
-            public int? Current { get; set; }
-            public int? Past { get; set; }
-            public int? Diff { get; set; }
-            public double? Percent { get; set; }
-            public double? DiffPercent { get; set; }
-        }
-        public class DelayReportFlightSum
-        {
-            public double? Total { get; set; }
-            public double? Seats { get; set; }
-            public double? Pax { get; set; }
-            public double? Freight { get; set; }
-            public double? LF { get; set; }
 
-            public double? TotalDiff { get; set; }
-            public double? SeatsDiff { get; set; }
-            public double? PaxDiff { get; set; }
-            public double? FreightDiff { get; set; }
-            public double? LFDiff { get; set; }
 
-
-        }
-        public async Task<object> GetDelayMapTitles()
-        {
-            var query = await this.context.RptDelayLegMaps.Select(q => q.MapTitle2).Distinct().ToListAsync();
-            return query;
-        }
-        //monk
-        public class AirportDelayReport
-        {
-            public string Airport { get; set; }
-            public int? Delay { get; set; }
-            public int? Delay30 { get; set; }
-            public int? Cycle { get; set; }
-            public double? DC30 { get; set; }
-            public double? DC { get; set; }
-            public double? Ratio { get; set; }
-            public double? Ratio30 { get; set; }
-
-        }
-
-        public async Task<object> GetDelaysAirportReport(DateTime df, DateTime dt)
-        {
-            df = df.Date;
-            dt = dt.Date;
-            var query = from x in this.context.DlyGrpFlights
-                        where x.STDDay >= df && x.STDDay <= dt
-                        group x by x.FromAirportIATA into grp
-                        select new AirportDelayReport()
-                        {
-                            Airport = grp.Key,
-                            Delay = grp.Sum(q => q.Delay),
-
-                        };
-            var airports = await query.ToListAsync();
-
-            var query30 = from x in this.context.DlyGrpFlights
-                          where x.Delay > 30 && x.STDDay >= df && x.STDDay <= dt
-                          group x by x.FromAirportIATA into grp
-                          select new AirportDelayReport()
-                          {
-                              Airport = grp.Key,
-                              Delay = grp.Sum(q => q.Delay),
-
-                          };
-            var airports30 = await query30.ToListAsync();
-
-            var apts = airports.Select(q => q.Airport).ToList();
-            var cycles = await (from x in this.context.ViewLegTimes
-                                where (x.FlightStatusID == 3 || x.FlightStatusID == 15 || x.FlightStatusID == 7) && apts.Contains(x.FromAirportIATA)
-                                && x.STDDay >= df && x.STDDay <= dt
-                                group x by x.FromAirportIATA into grp
-                                select new AirportDelayReport()
-                                {
-                                    Airport = grp.Key,
-                                    Cycle = grp.Count()
-                                }).ToListAsync();
-
-            var total = airports.Sum(q => q.Delay);
-            var total30 = airports30.Sum(q => q.Delay);
-
-            foreach (var airport in airports)
-            {
-                var d30 = airports30.FirstOrDefault(q => q.Airport == airport.Airport);
-                airport.Delay30 = d30 != null ? d30.Delay : 0;
-                var cycle = cycles.FirstOrDefault(q => q.Airport == airport.Airport);
-                airport.Cycle = cycle != null ? cycle.Cycle : 0;
-
-                //5-7
-                airport.DC = airport.Cycle == 0 ? 0 : Math.Round((double)((airport.Delay * 1.0) / airport.Cycle), 2, MidpointRounding.AwayFromZero);
-                airport.DC30 = airport.Cycle == 0 ? 0 : Math.Round((double)((airport.Delay30 * 1.0) / airport.Cycle), 2, MidpointRounding.AwayFromZero);
-
-                airport.Ratio = (airport.Delay * 1.0) / total;
-                airport.Ratio30 = (airport.Delay30 * 1.0) / total30;
-            }
-
-
-            var result = airports.OrderByDescending(q => q.Delay30).ToList();
-            return result;
-
-
-
-
-        }
-        public async Task<object> GetRptDelayReportPeriodic2(DateTime dto, DateTime dfrom, int period, List<string> cats)
-        {
-            dto = dto.Date;
-            dfrom = dfrom.Date;
-            period = Convert.ToInt32((dto - dfrom).TotalDays) + 1;
-            var dto2 = dfrom.AddDays(-1).Date;
-            var dfrom2 = dto2.AddDays(-period + 1).Date;
-            var delayedFlightsCurrent = await this.context.DlyGrpFlights.Where(x => x.STDDay >= dfrom && x.STDDay <= dto).ToListAsync();
-            var currentDelayedFlightsIds = delayedFlightsCurrent.Where(q => q.Delay >= 31).Select(q => q.FlightId).ToList();
-            var delayedFlightsPast = await this.context.DlyGrpFlights.Where(x => x.STDDay >= dfrom2 && x.STDDay <= dto2).ToListAsync();
-            var pastDelayedFlightsIds = delayedFlightsPast.Where(q => q.Delay >= 31).Select(q => q.FlightId).ToList();
-            /////////////////////////////////////////////
-            ///cat delays
-            var query = from x in this.context.RptDelayLegMaps
-                        where x.STDDay >= dfrom && x.STDDay <= dto && cats.Contains(x.MapTitle2) && currentDelayedFlightsIds.Contains(x.FlightId)
-                        group x by new { x.MapTitle, x.MapTitle2 } into grp
-                        select new DelayReportPeriodic()
-                        {
-                            Title = grp.Key.MapTitle,
-                            Title2 = grp.Key.MapTitle2,
-                            Current = grp.Sum(q => q.Delay),
-                            Past = 0,
-                            Diff = 0,
-                            Percent = 0,
-
-                        };
-            var missCurrent = await (from x in this.context.RptDelayLegMaps
-                                     where x.STDDay >= dfrom && x.STDDay <= dto && !cats.Contains(x.MapTitle2) && currentDelayedFlightsIds.Contains(x.FlightId)
-                                     group x by true into grp
-                                     select new DelayReportPeriodic()
-                                     {
-                                         Title = "متفرقه",
-                                         Title2 = "MISCELLANEOUS",
-                                         Current = grp.Sum(q => q.Delay),
-                                         Past = 0,
-                                         Diff = 0,
-                                         Percent = 0,
-
-                                     }).FirstOrDefaultAsync();
-            var query2 = from x in this.context.RptDelayLegMaps
-                         where x.STDDay >= dfrom2 && x.STDDay <= dto2 && cats.Contains(x.MapTitle2) && pastDelayedFlightsIds.Contains(x.FlightId)
-                         group x by new { x.MapTitle, x.MapTitle2 } into grp
-                         select new DelayReportPeriodic()
-                         {
-                             Title = grp.Key.MapTitle,
-                             Title2 = grp.Key.MapTitle2,
-                             Current = grp.Sum(q => q.Delay),
-                             Past = 0,
-                             Diff = 0,
-                             Percent = 0,
-
-                         };
-            var missPast = await (from x in this.context.RptDelayLegMaps
-                                  where x.STDDay >= dfrom2 && x.STDDay <= dto2 && !cats.Contains(x.MapTitle2) && pastDelayedFlightsIds.Contains(x.FlightId)
-                                  group x by true into grp
-                                  select new DelayReportPeriodic()
-                                  {
-                                      Title = "متفرقه",
-                                      Title2 = "MISCELLANEOUS",
-                                      Current = grp.Sum(q => q.Delay),
-                                      Past = 0,
-                                      Diff = 0,
-                                      Percent = 0,
-
-                                  }).FirstOrDefaultAsync();
-
-            var current = await query.ToListAsync();
-            var past = await query2.ToListAsync();
-            var currentOther = missCurrent; //current.FirstOrDefault(q => q.Title2 == "MISCELLANEOUS");
-            var pastOther = missPast; //past.FirstOrDefault(q => q.Title2 == "MISCELLANEOUS");
-            if (currentOther == null)
-            {
-                currentOther = new DelayReportPeriodic()
-                {
-                    Current = 0,
-                    Diff = 0,
-                    Past = 0,
-                    Percent = 0,
-                    Title = "متفرقه",
-                    Title2 = "MISCELLANEOUS"
-                };
-
-            }
-            current.Add(currentOther);
-
-            if (pastOther == null)
-            {
-                pastOther = new DelayReportPeriodic()
-                {
-                    Current = 0,
-                    Diff = 0,
-                    Past = 0,
-                    Percent = 0,
-                    Title = "متفرقه",
-                    Title2 = "MISCELLANEOUS"
-                };
-
-            }
-            past.Add(pastOther);
-
-            foreach (var c in current)
-            {
-                var cat = cats.FirstOrDefault(w => w == c.Title2);
-                if (cat == null && c.Title2 != "MISCELLANEOUS")
-                {
-                    currentOther.Current += c.Current;
-                    c.Current = -1;
-
-                }
-
-            }
-            foreach (var c in past)
-            {
-                var cat = cats.FirstOrDefault(w => w == c.Title2);
-                if (cat == null && c.Title2 != "MISCELLANEOUS")
-                {
-                    pastOther.Current += c.Current;
-                    c.Current = -1;
-
-                }
-
-            }
-
-            foreach (var cat in cats)
-            {
-                var xc = current.FirstOrDefault(q => q.Title2 == cat);
-                var xp = past.FirstOrDefault(q => q.Title2 == cat);
-                if (xc == null)
-                {
-                    current.Add(new DelayReportPeriodic()
-                    {
-                        Current = 0,
-                        Diff = 0,
-                        Past = 0,
-                        Percent = 0,
-                        Title2 = cat,
-
-                    });
-                }
-                if (xp == null)
-                {
-                    past.Add(new DelayReportPeriodic()
-                    {
-                        Current = 0,
-                        Diff = 0,
-                        Past = 0,
-                        Percent = 0,
-                        Title2 = cat,
-
-                    });
-                }
-
-            }
-
-            current = current.Where(q => q.Current != -1).ToList();
-            past = past.Where(q => q.Current != -1).ToList();
-            var totalCurrent = current.Sum(q => q.Current);
-            foreach (var x in current)
-            {
-                x.Percent = Math.Round((double)(x.Current * 100.0 / totalCurrent), 2, MidpointRounding.AwayFromZero);
-                var pst = past.FirstOrDefault(q => q.Title2 == x.Title2);
-                if (pst == null || pst.Current == 0)
-                {
-                    x.Diff = x.Current;
-                    x.DiffPercent = 100;
-                    x.Past = 0;
-                }
-                else
-                {
-                    x.Past = pst.Current;
-                    x.Diff = x.Current - pst.Current;
-                    x.DiffPercent = Math.Round((double)(x.Diff * 100.0 / pst.Current), 2, MidpointRounding.AwayFromZero);
-                }
-
-            }
-            ////////////////////////////////////
-
-
-            var flight = await (from x in this.context.C_ViewLegTime
-                                where (x.FlightStatusID == 3 || x.FlightStatusID == 15) && x.STDDay >= dfrom && x.STDDay <= dto
-                                group x by true into grp
-                                select new DelayReportFlightSum()
-                                {
-                                    Total = grp.Count(),
-                                    Pax = grp.Sum(q => q.PaxInfant + q.PaxAdult + q.PaxChild),
-                                    Seats = grp.Sum(q => q.TotalSeat),
-                                    Freight = grp.Sum(q => q.Freight)
-                                }).FirstOrDefaultAsync();
-            flight.LF = Math.Round((double)(flight.Pax * 100.0 / flight.Seats), 2, MidpointRounding.AwayFromZero);
-
-            var flightPast = await (from x in this.context.C_ViewLegTime
-                                    where (x.FlightStatusID == 3 || x.FlightStatusID == 15) && x.STDDay >= dfrom2 && x.STDDay <= dto2
-                                    group x by true into grp
-                                    select new DelayReportFlightSum()
-                                    {
-                                        Total = grp.Count(),
-                                        Pax = grp.Sum(q => q.PaxInfant + q.PaxAdult + q.PaxChild),
-                                        Seats = grp.Sum(q => q.TotalSeat),
-                                        Freight = grp.Sum(q => q.Freight),
-
-                                    }).FirstOrDefaultAsync();
-            flightPast.LF = Math.Round((double)(flight.Pax * 100.0 / flight.Seats), 2, MidpointRounding.AwayFromZero);
-
-            flight.TotalDiff = flightPast.Total == 0 ? 100 : Math.Round((double)((flight.Total - flightPast.Total) * 100.0 / flightPast.Total), 2, MidpointRounding.AwayFromZero);
-            flight.PaxDiff = flightPast.Pax == 0 ? 100 : Math.Round((double)((flight.Pax - flightPast.Pax) * 100.0 / flightPast.Pax), 2, MidpointRounding.AwayFromZero);
-            flight.SeatsDiff = flightPast.Seats == 0 ? 100 : Math.Round((double)((flight.Seats - flightPast.Seats) * 100.0 / flightPast.Seats), 2, MidpointRounding.AwayFromZero);
-            flight.FreightDiff = flightPast.Freight == 0 ? 100 : Math.Round((double)((flight.Freight - flightPast.Freight) * 100.0 / flightPast.Freight), 2, MidpointRounding.AwayFromZero);
-            flight.LFDiff = flightPast.LF == 0 ? 100 : Math.Round((double)((flight.LF - flightPast.LF) * 100.0 / flightPast.LF), 2, MidpointRounding.AwayFromZero);
-            //////////////////////////////////////////
-            var currentTotalFlights = flight.Total;
-
-            var pastTotalFlights = flightPast.Total;
-            //////////////////////////////////////////
-            //var OnTime = 0;// await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && q.Delay <= 30).CountAsync();
-            var D3160 = delayedFlightsCurrent.Where(q => q.Delay >= 31 && q.Delay <= 60).Count();
-            var D61120 = delayedFlightsCurrent.Where(q => q.Delay >= 61 && q.Delay <= 120).Count();
-            var D121180 = delayedFlightsCurrent.Where(q => q.Delay >= 121 && q.Delay <= 180).Count();
-            var D181 = delayedFlightsCurrent.Where(q => q.Delay >= 181).Count();
-            var DelayedTotalCurrent = D3160 + D61120 + D121180 + D181;
-            var OnTime = currentTotalFlights - DelayedTotalCurrent;
-
-            // var pastOnTime = 0;// await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && q.Delay <= 30).CountAsync();
-            var pastD3160 = delayedFlightsPast.Where(q => q.Delay >= 31 && q.Delay <= 60).Count();
-            var pastD61120 = delayedFlightsPast.Where(q => q.Delay >= 61 && q.Delay <= 120).Count();
-            var pastD121180 = delayedFlightsPast.Where(q => q.Delay >= 121 && q.Delay <= 180).Count();
-            var pastD181 = delayedFlightsPast.Where(q => q.Delay >= 181).Count();
-            var DelayedTotalPast = pastD3160 + pastD61120 + pastD121180 + pastD181;
-            var pastOnTime = pastTotalFlights - DelayedTotalPast;
-
-            //await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && (q.Delay >= 181)).CountAsync();
-            ///////////////////////////////////////////
-
-            var totalDelay = delayedFlightsCurrent.Sum(q => q.Delay);
-
-
-
-            var result = new
-            {
-                delayedFlights = new
-                {
-                    OnTime,
-                    D3160,
-                    D61120,
-                    D121180,
-                    D181,
-                    pastOnTime,
-                    pastD3160,
-                    pastD61120,
-                    pastD121180,
-                    pastD181,
-                    OnTimePercent = Math.Round((double)(OnTime * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    D3160Percent = Math.Round((double)(D3160 * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    D61120Percent = Math.Round((double)(D61120 * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    D121180Percent = Math.Round((double)(D121180 * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    D181Percent = Math.Round((double)(D181 * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    OnTimeDiff = Math.Round((double)((OnTime - pastOnTime) * 100.0 / pastOnTime), 2, MidpointRounding.AwayFromZero),
-                    D3160Diff = Math.Round((double)((D3160 - pastD3160) * 100.0 / pastD3160), 2, MidpointRounding.AwayFromZero),
-                    D61120Diff = Math.Round((double)((D61120 - pastD61120) * 100.0 / pastD61120), 2, MidpointRounding.AwayFromZero),
-                    D121180Diff = Math.Round((double)((D121180 - pastD121180) * 100.0 / pastD121180), 2, MidpointRounding.AwayFromZero),
-                    D181Diff = Math.Round((double)((D181 - pastD181) * 100.0 / pastD181), 2, MidpointRounding.AwayFromZero),
-                    DelayedCount = D3160 + D61120 + D121180 + D181,
-                    DelayedCountPercent = 100 - Math.Round((double)(OnTime * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-
-
-                },
-                currentFrom = dfrom,
-                currentTo = dto,
-                pastFrom = dfrom2,
-                pastTo = dto2,
-
-                totalDelay,
-                delays = current.OrderByDescending(q => q.Current).ToList(),
-                delay = current.Sum(q => q.Current),
-                dl = Math.Round((double)(current.Sum(q => q.Current) / flight.Total), 0, MidpointRounding.AwayFromZero),
-                delayTotal = totalDelay,
-                dlTotal = Math.Round((double)(totalDelay / flight.Total), 0, MidpointRounding.AwayFromZero),
-                flight,
-                flightPast,
-
-            };
-
-            return result;
-        }
-        public async Task<object> GetRptDelayReportPeriodic(DateTime dto, DateTime dfrom, int period, List<string> cats)
-        {
-            dto = dto.Date;
-            dfrom = dfrom.Date;
-            period = Convert.ToInt32((dto - dfrom).TotalDays) + 1;
-            var dto2 = dfrom.AddDays(-1).Date;
-            var dfrom2 = dto2.AddDays(-period + 1).Date;
-            var query = from x in this.context.RptDelayLegMaps
-                        where x.STDDay >= dfrom && x.STDDay <= dto && cats.Contains(x.MapTitle2)
-                        group x by new { x.MapTitle, x.MapTitle2 } into grp
-                        select new DelayReportPeriodic()
-                        {
-                            Title = grp.Key.MapTitle,
-                            Title2 = grp.Key.MapTitle2,
-                            Current = grp.Sum(q => q.Delay),
-                            Past = 0,
-                            Diff = 0,
-                            Percent = 0,
-
-                        };
-
-            var query2 = from x in this.context.RptDelayLegMaps
-                         where x.STDDay >= dfrom2 && x.STDDay <= dto2 && cats.Contains(x.MapTitle2)
-                         group x by new { x.MapTitle, x.MapTitle2 } into grp
-                         select new DelayReportPeriodic()
-                         {
-                             Title = grp.Key.MapTitle,
-                             Title2 = grp.Key.MapTitle2,
-                             Current = grp.Sum(q => q.Delay),
-                             Past = 0,
-                             Diff = 0,
-                             Percent = 0,
-
-                         };
-            var missCurrent = await (from x in this.context.RptDelayLegMaps
-                                     where x.STDDay >= dfrom && x.STDDay <= dto && !cats.Contains(x.MapTitle2) && x.Delay > 30
-                                     group x by true into grp
-                                     select new DelayReportPeriodic()
-                                     {
-                                         Title = "متفرقه",
-                                         Title2 = "MISCELLANEOUS",
-                                         Current = grp.Sum(q => q.Delay),
-                                         Past = 0,
-                                         Diff = 0,
-                                         Percent = 0,
-
-                                     }).FirstOrDefaultAsync();
-
-            var missPast = await (from x in this.context.RptDelayLegMaps
-                                  where x.STDDay >= dfrom2 && x.STDDay <= dto2 && !cats.Contains(x.MapTitle2) && x.Delay > 30
-                                  group x by true into grp
-                                  select new DelayReportPeriodic()
-                                  {
-                                      Title = "متفرقه",
-                                      Title2 = "MISCELLANEOUS",
-                                      Current = grp.Sum(q => q.Delay),
-                                      Past = 0,
-                                      Diff = 0,
-                                      Percent = 0,
-
-                                  }).FirstOrDefaultAsync();
-
-            var current = await query.ToListAsync();
-            var past = await query2.ToListAsync();
-            var currentOther = missCurrent; //current.FirstOrDefault(q => q.Title2 == "MISCELLANEOUS");
-            var pastOther = missPast; //past.FirstOrDefault(q => q.Title2 == "MISCELLANEOUS");
-            if (currentOther == null)
-            {
-                currentOther = new DelayReportPeriodic()
-                {
-                    Current = 0,
-                    Diff = 0,
-                    Past = 0,
-                    Percent = 0,
-                    Title = "متفرقه",
-                    Title2 = "MISCELLANEOUS"
-                };
-
-            }
-            current.Add(currentOther);
-
-            if (pastOther == null)
-            {
-                pastOther = new DelayReportPeriodic()
-                {
-                    Current = 0,
-                    Diff = 0,
-                    Past = 0,
-                    Percent = 0,
-                    Title = "متفرقه",
-                    Title2 = "MISCELLANEOUS"
-                };
-
-            }
-            past.Add(pastOther);
-
-            foreach (var c in current)
-            {
-                var cat = cats.FirstOrDefault(w => w == c.Title2);
-                if (cat == null && c.Title2 != "MISCELLANEOUS")
-                {
-                    currentOther.Current += c.Current;
-                    c.Current = -1;
-
-                }
-
-            }
-            foreach (var c in past)
-            {
-                var cat = cats.FirstOrDefault(w => w == c.Title2);
-                if (cat == null && c.Title2 != "MISCELLANEOUS")
-                {
-                    pastOther.Current += c.Current;
-                    c.Current = -1;
-
-                }
-
-            }
-
-            foreach (var cat in cats)
-            {
-                var xc = current.FirstOrDefault(q => q.Title2 == cat);
-                var xp = past.FirstOrDefault(q => q.Title2 == cat);
-                if (xc == null)
-                {
-                    current.Add(new DelayReportPeriodic()
-                    {
-                        Current = 0,
-                        Diff = 0,
-                        Past = 0,
-                        Percent = 0,
-                        Title2 = cat,
-
-                    });
-                }
-                if (xp == null)
-                {
-                    past.Add(new DelayReportPeriodic()
-                    {
-                        Current = 0,
-                        Diff = 0,
-                        Past = 0,
-                        Percent = 0,
-                        Title2 = cat,
-
-                    });
-                }
-
-            }
-
-            current = current.Where(q => q.Current != -1).ToList();
-            past = past.Where(q => q.Current != -1).ToList();
-            var totalCurrent = current.Sum(q => q.Current);
-            foreach (var x in current)
-            {
-                x.Percent = Math.Round((double)(x.Current * 100.0 / totalCurrent), 2, MidpointRounding.AwayFromZero);
-                var pst = past.FirstOrDefault(q => q.Title2 == x.Title2);
-                if (pst == null || pst.Current == 0)
-                {
-                    x.Diff = x.Current;
-                    x.DiffPercent = 100;
-                    x.Past = 0;
-                }
-                else
-                {
-                    x.Past = pst.Current;
-                    x.Diff = x.Current - pst.Current;
-                    x.DiffPercent = Math.Round((double)(x.Diff * 100.0 / pst.Current), 2, MidpointRounding.AwayFromZero);
-                }
-
-            }
-
-            var OnTime = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && q.Delay <= 30).CountAsync();
-            var D3160 = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && (q.Delay >= 31 && q.Delay <= 60)).CountAsync();
-            var D61120 = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && (q.Delay >= 61 && q.Delay <= 120)).CountAsync();
-            var D121180 = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && (q.Delay >= 121 && q.Delay <= 180)).CountAsync();
-            var D181 = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && (q.Delay >= 181)).CountAsync();
-
-            var totalDelay = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto).SumAsync(q => q.Delay);
-
-            var pastOnTime = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom2 && q.STDDay <= dto2 && q.Delay <= 30).CountAsync();
-            var pastD3160 = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom2 && q.STDDay <= dto2 && (q.Delay >= 31 && q.Delay <= 60)).CountAsync();
-            var pastD61120 = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom2 && q.STDDay <= dto2 && (q.Delay >= 61 && q.Delay <= 120)).CountAsync();
-            var pastD121180 = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom2 && q.STDDay <= dto2 && (q.Delay >= 121 && q.Delay <= 180)).CountAsync();
-            var pastD181 = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom2 && q.STDDay <= dto2 && (q.Delay >= 181)).CountAsync();
-
-            var currentTotalFlights = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto).CountAsync();
-
-            var flight = await (from x in this.context.ViewLegTimes
-                                where (x.FlightStatusID == 3 || x.FlightStatusID == 15) && x.STDDay >= dfrom && x.STDDay <= dto
-                                group x by true into grp
-                                select new DelayReportFlightSum()
-                                {
-                                    Total = grp.Count(),
-                                    Pax = grp.Sum(q => q.PaxInfant + q.PaxAdult + q.PaxChild),
-                                    Seats = grp.Sum(q => q.TotalSeat),
-                                    Freight = grp.Sum(q => q.Freight)
-                                }).FirstOrDefaultAsync();
-            flight.LF = Math.Round((double)(flight.Pax * 100.0 / flight.Seats), 2, MidpointRounding.AwayFromZero);
-
-            var flightPast = await (from x in this.context.ViewLegTimes
-                                    where (x.FlightStatusID == 3 || x.FlightStatusID == 15) && x.STDDay >= dfrom2 && x.STDDay <= dto2
-                                    group x by true into grp
-                                    select new DelayReportFlightSum()
-                                    {
-                                        Total = grp.Count(),
-                                        Pax = grp.Sum(q => q.PaxInfant + q.PaxAdult + q.PaxChild),
-                                        Seats = grp.Sum(q => q.TotalSeat),
-                                        Freight = grp.Sum(q => q.Freight),
-
-                                    }).FirstOrDefaultAsync();
-            flightPast.LF = Math.Round((double)(flight.Pax * 100.0 / flight.Seats), 2, MidpointRounding.AwayFromZero);
-
-            flight.TotalDiff = flightPast.Total == 0 ? 100 : Math.Round((double)((flight.Total - flightPast.Total) * 100.0 / flightPast.Total), 2, MidpointRounding.AwayFromZero);
-            flight.PaxDiff = flightPast.Pax == 0 ? 100 : Math.Round((double)((flight.Pax - flightPast.Pax) * 100.0 / flightPast.Pax), 2, MidpointRounding.AwayFromZero);
-            flight.SeatsDiff = flightPast.Seats == 0 ? 100 : Math.Round((double)((flight.Seats - flightPast.Seats) * 100.0 / flightPast.Seats), 2, MidpointRounding.AwayFromZero);
-            flight.FreightDiff = flightPast.Freight == 0 ? 100 : Math.Round((double)((flight.Freight - flightPast.Freight) * 100.0 / flightPast.Freight), 2, MidpointRounding.AwayFromZero);
-            flight.LFDiff = flightPast.LF == 0 ? 100 : Math.Round((double)((flight.LF - flightPast.LF) * 100.0 / flightPast.LF), 2, MidpointRounding.AwayFromZero);
-
-
-            var result = new
-            {
-                delayedFlights = new
-                {
-                    OnTime,
-                    D3160,
-                    D61120,
-                    D121180,
-                    D181,
-                    pastOnTime,
-                    pastD3160,
-                    pastD61120,
-                    pastD121180,
-                    pastD181,
-                    OnTimePercent = Math.Round((double)(OnTime * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    D3160Percent = Math.Round((double)(D3160 * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    D61120Percent = Math.Round((double)(D61120 * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    D121180Percent = Math.Round((double)(D121180 * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    D181Percent = Math.Round((double)(D121180 * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    OnTimeDiff = Math.Round((double)((OnTime - pastOnTime) * 100.0 / pastOnTime), 2, MidpointRounding.AwayFromZero),
-                    D3160Diff = Math.Round((double)((D3160 - pastD3160) * 100.0 / pastD3160), 2, MidpointRounding.AwayFromZero),
-                    D61120Diff = Math.Round((double)((D61120 - pastD61120) * 100.0 / pastD61120), 2, MidpointRounding.AwayFromZero),
-                    D121180Diff = Math.Round((double)((D121180 - pastD121180) * 100.0 / pastD121180), 2, MidpointRounding.AwayFromZero),
-                    D181Diff = Math.Round((double)((D181 - pastD181) * 100.0 / pastD181), 2, MidpointRounding.AwayFromZero),
-                    DelayedCount = D3160 + D61120 + D121180 + D181,
-                    DelayedCountPercent = 100 - Math.Round((double)(OnTime * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-
-
-                },
-                currentFrom = dfrom,
-                currentTo = dto,
-                pastFrom = dfrom2,
-                pastTo = dto2,
-                // totalDelay=totalCurrent,
-                totalDelay,
-                delays = current.OrderByDescending(q => q.Current).ToList(),
-                delay = current.Sum(q => q.Current),
-                dl = Math.Round((double)(current.Sum(q => q.Current) / flight.Total), 0, MidpointRounding.AwayFromZero),
-                delayTotal = totalDelay,
-                dlTotal = Math.Round((double)(totalDelay / flight.Total), 0, MidpointRounding.AwayFromZero),
-                flight,
-                flightPast,
-
-            };
-            return result;
-        }
-
-
-        public async Task<object> GetRptDelayReportFlightSummary(DateTime dto, DateTime dfrom)
-        {
-            dto = dto.Date;
-            dfrom = dfrom.Date;
-
-            //magu6
-            var delayedFlightsCurrent = await this.context.DlyGrpFlights.Where(x => x.STDDay >= dfrom && x.STDDay <= dto).ToListAsync();
-
-            //var OnTime = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && q.Delay <= 30).CountAsync();
-            var D3160 = delayedFlightsCurrent.Where(q => q.Delay >= 31 && q.Delay <= 60).Count(); //await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && (q.Delay >= 31 && q.Delay <= 60)).CountAsync();
-            var D61120 = delayedFlightsCurrent.Where(q => q.Delay >= 61 && q.Delay <= 120).Count(); //await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && (q.Delay >= 61 && q.Delay <= 120)).CountAsync();
-            var D121180 = delayedFlightsCurrent.Where(q => q.Delay >= 121 && q.Delay <= 180).Count();//await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && (q.Delay >= 121 && q.Delay <= 180)).CountAsync();
-            var D181 = delayedFlightsCurrent.Where(q => q.Delay >= 181).Count(); // await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto && (q.Delay >= 181)).CountAsync();
-
-            var totalDelay = delayedFlightsCurrent.Sum(q => q.Delay);
-
-
-            var currentTotalFlights = await this.context.SumFlightDelays.Where(q => q.STDDay >= dfrom && q.STDDay <= dto).CountAsync();
-            var OnTime = currentTotalFlights - D181 - D121180 - D61120 - D3160;
-
-            var flight = await (from x in this.context.ViewLegTimes
-                                where (x.FlightStatusID == 3 || x.FlightStatusID == 15) && x.STDDay >= dfrom && x.STDDay <= dto
-                                group x by true into grp
-                                select new DelayReportFlightSum()
-                                {
-                                    Total = grp.Count(),
-                                    Pax = grp.Sum(q => q.PaxInfant + q.PaxAdult + q.PaxChild),
-                                    Seats = grp.Sum(q => q.TotalSeat),
-                                    Freight = grp.Sum(q => q.Freight)
-                                }).FirstOrDefaultAsync();
-            if (flight != null)
-            {
-                flight.Freight = Math.Round((double)flight.Freight * 1.0 / 1000, 2, MidpointRounding.AwayFromZero);
-                flight.LF = Math.Round((double)(flight.Pax * 100.0 / flight.Seats), 2, MidpointRounding.AwayFromZero);
-            }
-            else
-            {
-                flight = new DelayReportFlightSum()
-                {
-                    Total = 0,
-                    Pax = 0,
-                    Seats = 0,
-                    Freight = 0,
-                };
-            }
-
-
-
-
-
-
-            var result = new
-            {
-                delayedFlights = new
-                {
-                    OnTime,
-                    D3160,
-                    D61120,
-                    D121180,
-                    D181,
-
-                    OnTimePercent = Math.Round((double)(OnTime * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    D3160Percent = Math.Round((double)(D3160 * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    D61120Percent = Math.Round((double)(D61120 * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    D121180Percent = Math.Round((double)(D121180 * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-                    D181Percent = Math.Round((double)(D121180 * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-
-                    DelayedCount = D3160 + D61120 + D121180 + D181,
-                    DelayedCountPercent = 100 - Math.Round((double)(OnTime * 100.0 / currentTotalFlights), 2, MidpointRounding.AwayFromZero),
-
-
-                },
-                currentFrom = dfrom,
-                currentTo = dto,
-
-                // totalDelay=totalCurrent,
-                totalDelay,
-
-                delayTotal = totalDelay,
-                dlTotal = flight.Total == 0 ? 0 : Math.Round((double)(totalDelay / flight.Total), 0, MidpointRounding.AwayFromZero),
-                flight,
-
-
-            };
-            return result;
-        }
 
         internal async Task<object> UpdateAti(int id, int offset, string std = "", string sta = "", string offblock = "", string onblock = "", string takeoff = "", string landing = "")
         {
@@ -19097,107 +15954,7 @@ namespace EPAGriffinAPI.DAL
         //        noDs
         //    };
         //}
-        //mimi
-        internal async Task<object> GetFixTimeRoutes()
-        {
-            var query = await this.context.ViewFixTimeRoutes.OrderBy(q => q.Route).ToListAsync();
-            return query;
-        }
-        internal async Task<object> GetNoCrews()
-        {
-            var query = await this.context.ViewEmployeeLights.Where(q => q.JobGroupCode.StartsWith("00103") || q.JobGroupCode.StartsWith("004") || q.JobGroupCode.StartsWith("005")).OrderBy(q => q.JobGroup).ThenBy(q => q.LastName).ThenBy(q => q.FirstName).ToListAsync();
-            return query;
-        }
-        internal async Task<CustomActionResult> deleteFixTime(string route, string userName)
-        {
-            route = route.ToUpper();
-            var exist = await this.context.FixTimeRoutes.Where(q => q.Route == route).FirstOrDefaultAsync();
-            if (exist != null)
-            {
-                this.context.FixTimeRouteHistories.Add(new FixTimeRouteHistory()
-                {
-                    Date = DateTime.Now,
-                    NewTime = null,
-                    OldTime = exist.FixTime2,
-                    Route = route,
-                    UserName = userName,
-                });
-                this.context.FixTimeRoutes.Remove(exist);
-                var saveResult = await context.SaveAsync();
-                if (saveResult.Code != HttpStatusCode.OK)
-                    return saveResult;
 
-
-            }
-            return new CustomActionResult(HttpStatusCode.OK, exist);
-        }
-        internal async Task<CustomActionResult> saveFixTime(string route, int hh, int mm, string userName, bool edit)
-        {
-            route = route.ToUpper();
-            var exist = await this.context.FixTimeRoutes.Where(q => q.Route == route).FirstOrDefaultAsync();
-            if (edit)
-            {
-                if (exist == null)
-                {
-                    return new CustomActionResult(HttpStatusCode.NotAcceptable, new
-                    {
-
-                        message = "The item not found."
-
-                    });
-                }
-                var fxHistory = new FixTimeRouteHistory()
-                {
-                    UserName = userName,
-                    Route = exist.Route,
-                    OldTime = exist.FixTime2,
-                    Date = DateTime.Now,
-                };
-                exist.FixTime2 = new TimeSpan(hh, mm, 0);
-                exist.FixtTime = hh * 60 + mm;
-                fxHistory.NewTime = exist.FixTime2;
-                this.context.FixTimeRouteHistories.Add(fxHistory);
-                var saveResult = await context.SaveAsync();
-                if (saveResult.Code != HttpStatusCode.OK)
-                    return saveResult;
-
-                return new CustomActionResult(HttpStatusCode.OK, exist);
-            }
-            else
-            {
-                if (exist != null)
-                {
-                    return new CustomActionResult(HttpStatusCode.NotAcceptable, new
-                    {
-
-                        message = "The item already exists."
-
-                    });
-                }
-                var fx = new FixTimeRoute()
-                {
-                    FixTime2 = new TimeSpan(hh, mm, 0),
-                    FixtTime = hh * 60 + mm,
-                    Route = route,
-                };
-                var fxHistory = new FixTimeRouteHistory()
-                {
-                    UserName = userName,
-                    Route = fx.Route,
-                    OldTime = null,
-                    NewTime = fx.FixTime2,
-                    Date = DateTime.Now,
-                };
-                this.context.FixTimeRoutes.Add(fx);
-                this.context.FixTimeRouteHistories.Add(fxHistory);
-                var saveResult = await context.SaveAsync();
-                if (saveResult.Code != HttpStatusCode.OK)
-                    return saveResult;
-
-                return new CustomActionResult(HttpStatusCode.OK, fx);
-
-            }
-        }
         internal async Task<object> GetCrewFixTimePeriodReport(int year, string period, string rank)
         {
             string _period = "";
@@ -19243,105 +16000,42 @@ namespace EPAGriffinAPI.DAL
                     break;
             }
 
-
             var query = from x in this.context.RptFDPMonthlyPersians
                         where x.PYear == year && x.PeriodFixTime == _period
                         select x;
-            var query2 = from x in this.context.RptNoFDPMonthlyPersians
-                         where x.PYear == year && x.PeriodFixTime == _period
-                         select x;
             switch (rank)
             {
                 case "All":
                     break;
                 case "Cockpit":
                     query = query.Where(q => q.JobGroup == "TRE" || q.JobGroup == "TRI" || q.JobGroup == "LTC" || q.JobGroup == "P1" || q.JobGroup == "P2");
-                    query2 = query2.Where(q => q.JobGroup == "TRE" || q.JobGroup == "TRI" || q.JobGroup == "LTC" || q.JobGroup == "P1" || q.JobGroup == "P2");
                     break;
                 case "Cabin":
                     query = query.Where(q => q.JobGroup == "ISCCM" || q.JobGroup == "SCCM" || q.JobGroup == "CCM");
-                    query2 = query2.Where(q => q.JobGroup == "ISCCM" || q.JobGroup == "SCCM" || q.JobGroup == "CCM");
                     break;
                 case "IP":
                     query = query.Where(q => q.JobGroup == "TRE" || q.JobGroup == "TRI" || q.JobGroup == "LTC");
-                    query2 = query2.Where(q => q.JobGroup == "TRE" || q.JobGroup == "TRI" || q.JobGroup == "LTC");
                     break;
                 case "P1":
                     query = query.Where(q => q.JobGroup == "P1");
-                    query2 = query2.Where(q => q.JobGroup == "P1");
                     break;
                 case "P2":
                     query = query.Where(q => q.JobGroup == "P2");
-                    query2 = query2.Where(q => q.JobGroup == "P2");
                     break;
                 case "ISCCM":
                     query = query.Where(q => q.JobGroup == "ISCCM");
-                    query2 = query2.Where(q => q.JobGroup == "ISCCM");
                     break;
                 case "SCCM":
                     query = query.Where(q => q.JobGroup == "SCCM");
-                    query2 = query2.Where(q => q.JobGroup == "SCCM");
                     break;
                 case "CCM":
                     query = query.Where(q => q.JobGroup == "CCM");
-                    query2 = query2.Where(q => q.JobGroup == "CCM");
                     break;
                 default:
                     break;
             }
             var fixDs = await query.OrderBy(q => q.RankOrder).ThenByDescending(q => q.FixTime).ThenBy(q => q.LastName).ToListAsync();
-            foreach (var x in fixDs)
-            {
-                x.FixTimeTotal = x.FixTime;
-            }
-            var noFDPs = await query2.ToListAsync();
-            foreach (var x in noFDPs)
-            {
-                var exist = fixDs.FirstOrDefault(q => q.CrewId == x.CrewId);
-                if (exist != null)
-                {
-                    if (x.DutyTypeTitle == "StandBy")
-                        exist.StandBy = x.Count;
-                    if (x.DutyTypeTitle == "Mission")
-                    {
-                        exist.Misson = x.Duration;
-                        exist.FixTimeTotal = (int)exist.FixTimeTotal + exist.Misson;
-                    }
 
-
-                }
-                else
-                {
-                    var rec = new RptFDPMonthlyPersian()
-                    {
-                        CrewId = x.CrewId,
-                        Name = x.Name,
-                        PeriodFixTime = x.PeriodFixTime,
-                        PYear = x.PYear,
-                        RankOrder = x.RankOrder,
-                        ScheduleName = x.ScheduleName,
-                        JobGroup = x.JobGroup,
-                        JobGroupCode = x.JobGroupCode,
-                        JobGroupRoot = x.JobGroupRoot,
-                        LastName = x.LastName,
-                        FirstName = x.FirstName,
-                        Misson = 0,
-                        StandBy = 0,
-
-                    };
-                    if (x.DutyTypeTitle == "StandBy")
-                        rec.StandBy = x.Count;
-                    if (x.DutyTypeTitle == "Mission")
-                    {
-                        rec.Misson = x.Duration;
-                        rec.FixTimeTotal = x.Duration;
-                    }
-
-                    fixDs.Add(rec);
-
-                }
-            }
-            fixDs = fixDs.OrderBy(q => q.RankOrder).ThenByDescending(q => q.FixTime).ThenBy(q => q.LastName).ToList();
             var ids = fixDs.Select(q => q.CrewId).ToList();
             var noDs = await this.context.ViewEmployeeLights.Where(q => !ids.Contains(q.Id)).OrderBy(q => q.JobGroup).OrderBy(q => q.LastName).ToListAsync();
 
@@ -19352,119 +16046,6 @@ namespace EPAGriffinAPI.DAL
                 noDs
             };
         }
-
-        internal async Task<object> GetCrewFixTimePeriodReportCrew(int year, string period, int crew)
-        {
-            string _period = "";
-            switch (period)
-            {
-                case "1":
-                    _period = "12/16 - 01/15";
-                    break;
-                case "2":
-                    _period = "01/16 - 02/15";
-                    break;
-                case "3":
-                    _period = "02/16 - 03/15";
-                    break;
-                case "4":
-                    _period = "03/16 - 04/15";
-                    break;
-                case "5":
-                    _period = "04/16 - 05/15";
-                    break;
-                case "6":
-                    _period = "05/16 - 06/15";
-                    break;
-                case "7":
-                    _period = "06/16 - 07/15";
-                    break;
-                case "8":
-                    _period = "07/16 - 08/15";
-                    break;
-                case "9":
-                    _period = "08/16 - 09/15";
-                    break;
-                case "10":
-                    _period = "09/16 - 10/15";
-                    break;
-                case "11":
-                    _period = "10/16 - 11/15";
-                    break;
-                case "12":
-                    _period = "11/16 - 12/15";
-                    break;
-                default:
-                    break;
-            }
-
-
-            var query = await (from x in this.context.RptFDPs
-                               where x.PYear == year && x.PeriodFixTime == _period && x.CrewId == crew
-                               orderby x.STDDay
-                               select x).ToListAsync();
-
-            return query;
-
-
-        }
-
-        internal async Task<object> GetCrewFixTimePeriodReportCrewNoFDP(int year, string period, int crew)
-        {
-            string _period = "";
-            switch (period)
-            {
-                case "1":
-                    _period = "12/16 - 01/15";
-                    break;
-                case "2":
-                    _period = "01/16 - 02/15";
-                    break;
-                case "3":
-                    _period = "02/16 - 03/15";
-                    break;
-                case "4":
-                    _period = "03/16 - 04/15";
-                    break;
-                case "5":
-                    _period = "04/16 - 05/15";
-                    break;
-                case "6":
-                    _period = "05/16 - 06/15";
-                    break;
-                case "7":
-                    _period = "06/16 - 07/15";
-                    break;
-                case "8":
-                    _period = "07/16 - 08/15";
-                    break;
-                case "9":
-                    _period = "08/16 - 09/15";
-                    break;
-                case "10":
-                    _period = "09/16 - 10/15";
-                    break;
-                case "11":
-                    _period = "10/16 - 11/15";
-                    break;
-                case "12":
-                    _period = "11/16 - 12/15";
-                    break;
-                default:
-                    break;
-            }
-
-
-            var query = await (from x in this.context.RptNoFDPs
-                               where x.PYear == year && x.PeriodFixTime == _period && x.CrewId == crew
-                               orderby x.Date
-                               select x).ToListAsync();
-
-            return query;
-
-
-        }
-        //dali
         internal async Task<object> GetFormAReport(int yf, int yt)
         {
             var query = await (from x in this.context.ViewFormAMonthlies.Where(q => q.Year >= yf && q.Year <= yt)
@@ -19472,69 +16053,6 @@ namespace EPAGriffinAPI.DAL
                                select x).ToListAsync();
             return query;
         }
-        internal async Task<object> GetFormAYearlyReport(int yf, int yt)
-        {
-            var query = await (from x in this.context.ViewFormAYearlies.Where(q => q.Year >= yf && q.Year <= yt)
-                               orderby x.Year descending
-                               select x).ToListAsync();
-            return query;
-        }
-        internal async Task<object> GetFormAReportMonth(int year, int month)
-        {
-            var query = await (from x in this.context.ViewFormAMonthlies.Where(q => q.Year == year && q.Month == month)
-                               orderby x.Year descending, x.Month descending
-                               select x).ToListAsync();
-            return query;
-        }
-        internal async Task<object> GetFormAReportYear(int year)
-        {
-            var query = await (from x in this.context.ViewFormAYearlies.Where(q => q.Year == year)
-                               orderby x.Year descending
-                               select x).ToListAsync();
-            return query;
-        }
-
-        internal async Task<bool> CreateFixTimeRoute()
-        {
-            var fxs = await this.context.FixTimeRoutes.ToListAsync();
-            var leg2s = fxs.Where(q => q.Route.Length == 11).ToList();
-            foreach (var r1 in leg2s)
-            {
-                foreach (var r2 in leg2s)
-                {
-
-                    var m1 = r1.FixTime2.TotalMinutes;
-                    var m2 = r2.FixTime2.TotalMinutes;
-                    var mn = m1 + m2;
-                    var hh = ((int)mn) / 60;
-                    var mm = ((int)mn) % 60;
-                    var newtime = new TimeSpan(hh, mm, 0);
-                    var rt1 = r1.Route;
-                    var rt2 = r2.Route.Substring(3);
-                    var newroute = rt1 + rt2;
-                    var exist = fxs.FirstOrDefault(q => q.Route == newroute);
-
-                    if (exist == null)
-                    {
-                        var nfx = new FixTimeRoute()
-                        {
-                            FixTime2 = newtime,
-                            FixtTime = (int)mn,
-                            Route = newroute,
-
-                        };
-                        this.context.FixTimeRoutes.Add(nfx);
-                    }
-
-                }
-            }
-
-            var saveResult = await context.SaveAsync();
-            return true;
-
-        }
-
-
         internal async Task<bool> SaveCoord(decimal lat, decimal lng, int uid)
         {
             this.context.Coords.Add(new Coord()
@@ -19548,19 +16066,6 @@ namespace EPAGriffinAPI.DAL
             return true;
 
         }
-
-
-
-        public async Task<List<RptFuelLeg>> GetRptFuelLegs()
-        {
-            var records = await this.context.RptFuelLegs.ToListAsync();
-            return records;
-        }
-
-
-
-
-
 
 
     }

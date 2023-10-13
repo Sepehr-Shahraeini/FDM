@@ -90,6 +90,7 @@
     <Content Include="app\controllers\ceoFlightBoardController.js" />
     <Content Include="app\controllers\certificateAddController.js" />
     <Content Include="app\controllers\changeFlightRegisterController.js" />
+    <Content Include="app\controllers\qaCatering.js" />
     <Content Include="app\controllers\citypair.js" />
     <Content Include="app\controllers\citypairyearly.js" />
     <Content Include="app\controllers\courseAddController.js" />
@@ -105,20 +106,24 @@
     <Content Include="app\controllers\crewReportController.js" />
     <Content Include="app\controllers\crewtest.js" />
     <Content Include="app\controllers\crewtimereport.js" />
+    <Content Include="app\controllers\qaCabin.js" />
     <Content Include="app\controllers\dailyRoster2Controller.js" />
     <Content Include="app\controllers\delayAirportReport.js" />
     <Content Include="app\controllers\delaybidaily.js" />
     <Content Include="app\controllers\delaybiKPI.js" />
     <Content Include="app\controllers\delayCodesController.js" />
     <Content Include="app\controllers\delayReport.js" />
+    <Content Include="app\controllers\qaDispatch.js" />
     <Content Include="app\controllers\documentAddController.js" />
     <Content Include="app\controllers\drAdd.js" />
     <Content Include="app\controllers\employeeSelectController.js" />
     <Content Include="app\controllers\employeeSelectCourse.js" />
     <Content Include="app\controllers\fdm.js" />
     <Content Include="app\controllers\fdmCrewReportController.js" />
+    <Content Include="app\controllers\FdmDashboardBoeing.js" />
     <Content Include="app\controllers\fdmDashboardController.js" />
     <Content Include="app\controllers\fdmDashboardCptNew.js" />
+    <Content Include="app\controllers\FdmDashboardMD.js" />
     <Content Include="app\controllers\fdmDashboardPilot.js" />
     <Content Include="app\controllers\fdmDashboardPilotMonthly.js" />
     <Content Include="app\controllers\FDMFoDashboard.js" />
@@ -126,6 +131,7 @@
     <Content Include="app\controllers\fdmOpsController.js" />
     <Content Include="app\controllers\fdmQAController.js" />
     <Content Include="app\controllers\flightBoardController - Copy.js" />
+    <Content Include="app\controllers\qaGround.js" />
     <Content Include="app\controllers\mapController.js" />
     <Content Include="app\controllers\matchList.js" />
     <Content Include="app\controllers\fdmRegDaily.js" />
@@ -195,6 +201,7 @@
     <Content Include="app\controllers\logAdd.js" />
     <Content Include="app\controllers\mlistAddController.js" />
     <Content Include="app\controllers\mlistController.js" />
+    <Content Include="app\controllers\qaMaintenance.js" />
     <Content Include="app\controllers\nira.js" />
     <Content Include="app\controllers\notificationController.js" />
     <Content Include="app\controllers\ofpAdd.js" />
@@ -213,6 +220,12 @@
     <Content Include="app\controllers\planController.js" />
     <Content Include="app\controllers\planningBoard.js" />
     <Content Include="app\controllers\planRegistersController.js" />
+    <Content Include="app\controllers\qaDashboard.js" />
+    <Content Include="app\controllers\qaEmployee.js" />
+    <Content Include="app\controllers\qaForm.js" />
+    <Content Include="app\controllers\qaOperationPopup.js" />
+    <Content Include="app\controllers\qaReports.js" />
+    <Content Include="app\controllers\qaReportStatus.js" />
     <Content Include="app\controllers\regAvailabilityController.js" />
     <Content Include="app\controllers\regflightmonthly.js" />
     <Content Include="app\controllers\reportFDR.js" />
@@ -223,6 +236,7 @@
     <Content Include="app\controllers\rosterReport.js" />
     <Content Include="app\controllers\routeAddController.js" />
     <Content Include="app\controllers\routeController.js" />
+    <Content Include="app\controllers\qaSecurity.js" />
     <Content Include="app\controllers\sqlQueryController.js" />
     <Content Include="app\controllers\statDelayController.js" />
     <Content Include="app\controllers\studyFieldSelectController.js" />
@@ -232,9 +246,11 @@
     <Content Include="app\controllers\tblDelayedFlights.js" />
     <Content Include="app\controllers\tblDelayItems.js" />
     <Content Include="app\controllers\tblDelayTech.js" />
+    <Content Include="app\controllers\qaRefer.js" />
     <Content Include="app\controllers\training.js" />
     <Content Include="app\controllers\usersController.js" />
     <Content Include="app\controllers\verify.js" />
+    <Content Include="app\controllers\qaVoluntary.js" />
     <Content Include="app\controllers\vrAdd.js" />
     <Content Include="app\services\activityService.js" />
     <Content Include="app\services\aircraftService.js" />
@@ -252,6 +268,7 @@
     <Content Include="app\services\notificationService.js" />
     <Content Include="app\services\organizationService.js" />
     <Content Include="app\services\personService.js" />
+    <Content Include="app\services\qaService.js" />
     <Content Include="app\services\statService.js" />
     <Content Include="app\services\trainingService.js" />
     <Content Include="app\services\weatherService.js" />
@@ -268,6 +285,7 @@
     <Content Include="app\views\ceoFlightBoard.html" />
     <Content Include="app\views\certificateAdd.html" />
     <Content Include="app\views\changeflightregister.html" />
+    <Content Include="app\views\qaCatering.html" />
     <Content Include="app\views\citypair.html" />
     <Content Include="app\views\citypairyearly.html" />
     <Content Include="app\views\course.html" />
@@ -283,24 +301,29 @@
     <Content Include="app\views\crewReport.html" />
     <Content Include="app\views\crewtest.html" />
     <Content Include="app\views\crewtimereport.html" />
+    <Content Include="app\views\qaCabin.html" />
     <Content Include="app\views\dailyRoster2.html" />
     <Content Include="app\views\dashboard.html" />
     <Content Include="app\views\DatePicker.html" />
     <Content Include="app\views\delayAirportReport.html" />
     <Content Include="app\views\delaybidaily.html" />
     <Content Include="app\views\delaybiKPI.html" />
+    <Content Include="app\views\qaDispatch.html" />
     <Content Include="app\views\drAdd.html" />
     <Content Include="app\views\employeeSelectCourse.html" />
     <Content Include="app\views\fdm.html" />
     <Content Include="app\views\fdmCrewReport.html" />
     <Content Include="app\views\fdmDashboard.html" />
+    <Content Include="app\views\FdmDashboardBoeing.html" />
     <Content Include="app\views\fdmDashboardCptNew.html" />
+    <Content Include="app\views\FdmDashboardMD.html" />
     <Content Include="app\views\fdmFoDashboard.html" />
     <Content Include="app\views\fdmDashboardPilot.html" />
     <Content Include="app\views\fdmDashboardPilotMonthly.html" />
     <Content Include="app\views\fdmFoDashboardMonthly.html" />
     <Content Include="app\views\fdmOps.html" />
     <Content Include="app\views\fdmQA.html" />
+    <Content Include="app\views\qaGround.html" />
     <Content Include="app\views\map.html" />
     <Content Include="app\views\matchList.html" />
     <Content Include="app\views\fdmRegDaily.html" />
@@ -379,6 +402,7 @@
     <Content Include="app\views\menu.html" />
     <Content Include="app\views\mlist.html" />
     <Content Include="app\views\mlistAdd.html" />
+    <Content Include="app\views\qaMaintenance.html" />
     <Content Include="app\views\nira.html" />
     <Content Include="app\views\notification.html" />
     <Content Include="app\views\ofpAdd.html" />
@@ -397,6 +421,12 @@
     <Content Include="app\views\plan.html" />
     <Content Include="app\views\planningBoard.html" />
     <Content Include="app\views\planRegisters.html" />
+    <Content Include="app\views\qaDashboard.html" />
+    <Content Include="app\views\qaEmployee.html" />
+    <Content Include="app\views\qaForm.html" />
+    <Content Include="app\views\qaOperationPopup.html" />
+    <Content Include="app\views\qaReport.html" />
+    <Content Include="app\views\qaReportStatus.html" />
     <Content Include="app\views\regavailability.html" />
     <Content Include="app\views\regflightmonthly.html" />
     <Content Include="app\views\reportFDR.html" />
@@ -406,6 +436,7 @@
     <Content Include="app\views\rosterReport.html" />
     <Content Include="app\views\route.html" />
     <Content Include="app\views\routeAdd.html" />
+    <Content Include="app\views\qaSecurity.html" />
     <Content Include="app\views\sqlQuery.html" />
     <Content Include="app\views\statDelay.html" />
     <Content Include="app\views\studyFieldSelect.html" />
@@ -416,9 +447,11 @@
     <Content Include="app\views\tblDelayItems.html" />
     <Content Include="app\views\tblDelayTech.html" />
     <Content Include="app\views\templates.html" />
+    <Content Include="app\views\qaRefer.html" />
     <Content Include="app\views\training.html" />
     <Content Include="app\views\users.html" />
     <Content Include="app\views\verify.html" />
+    <Content Include="app\views\qaVoluntary.html" />
     <Content Include="app\views\vrAdd.html" />
     <Content Include="app\views\_fdmDashboard.html" />
     <Content Include="content\css\bootstrap-4.min.css" />
@@ -537,7 +570,6 @@
     <Content Include="gantt2.css" />
     <Content Include="gantt2.html" />
     <Content Include="gantt2.js" />
-    <Content Include="Global.asax" />
     <Content Include="Progress.html" />
     <Content Include="scripts\combinedJqueryAngular.js" />
     <Content Include="scripts\ej.widget.angular.min.js" />
@@ -689,9 +721,6 @@
       <DependentUpon>filehandler.ashx</DependentUpon>
     </Compile>
     <Compile Include="FileManager.cs" />
-    <Compile Include="Global.asax.cs">
-      <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
