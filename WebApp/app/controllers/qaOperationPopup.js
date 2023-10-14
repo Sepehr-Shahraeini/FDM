@@ -2,6 +2,8 @@
 app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$rootScope', function ($scope, qaService, $routeParams, $rootScope) {
 
     $scope.isNotLocked = true;
+    $scope.Type = null;
+    $scope.isResponsible = false;
 
     $scope.popup_operation_visible = false;
     $scope.popup_height = $(window).height() - 100;
@@ -22,6 +24,9 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
                     type: 'default', text: 'Referre', onClick: function (e) {
 
                         $rootScope.$broadcast('InitQAEmployee', { Type: $scope.tempData.Type, Id: $scope.tempData.Id, Category: $scope.tempData.Category });
+                        if ($scope.tempData.Category == 'new')
+                            $scope.tempData.Category = 'open'
+
                     }
                 }, toolbar: 'bottom'
             },
@@ -43,10 +48,12 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
                         $scope.entity.Type = $scope.tempData.Type;
                         $scope.entity.EmployeeId = $scope.tempData.EmployeeId;
                         $scope.entity.isResponsible = $scope.isResponsible;
-                        
+
                         qaService.acceptQA($scope.entity).then(function (response) {
                             $scope.loadingVisible = false;
                             General.ShowNotify(Config.Text_QAAccept, 'success');
+
+                            console.log("is Responsilbe", $scope.isResponsible);
 
                             if ($scope.isResponsible == true) {
 
@@ -66,6 +73,7 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
                                     row.Status = "Closed";
                                     row.EmployeeStatus = "Closed";
                                     row.Status = 1;
+                                    $scope.tempData.Category = "open";
                                     $rootScope.dg_determined_ds.push(row);
                                     $rootScope.dg_new_ds = Enumerable.From($rootScope.dg_new_ds).Where(function (x) {
                                         return x.Id != $scope.entity.Id;
@@ -156,6 +164,8 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
         qaService.getIsResponsible($scope.tempData.EmployeeId, $scope.tempData.Type, $scope.tempData.Id).then(function (response) {
             if (response.IsSuccess == true)
                 $scope.isResponsible = true
+
+
 
         });
     }
