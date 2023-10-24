@@ -208,9 +208,9 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
             });
         });
 
-        qaService.getIsResponsible($rootScope.followUpEntity.EmployeeId, $rootScope.followUpEntity.Type, $rootScope.followUpEntity.Id).then(function (response) {
+        qaService.getIsResponsible($scope.followUpEntity.EmployeeId, $scope.followUpEntity.Type, $scope.followUpEntity.Id).then(function (response) {
             if (response.IsSuccess == true)
-                $rootScope.followUpEntity.isResponsible = true
+                $scope.followUpEntity.isResponsible = true
 
         });
     };

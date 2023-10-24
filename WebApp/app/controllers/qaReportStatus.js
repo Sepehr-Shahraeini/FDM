@@ -21,7 +21,7 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
 
     };
 
-    $rootScope.employeeId = 4539;
+     $rootScope.employeeId = 4539,
     $scope.entity = {
         employeeId: $rootScope.employeeId,
     }
@@ -353,7 +353,10 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
-
+                case '7':
+                    $rootScope.$broadcast('InitOperationPopup', data);
+                    //$rootScope.$broadcast('InitQADispatch', data);
+                    break;
             }
         },
 
@@ -508,6 +511,10 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                     //$rootScope.$broadcast('InitQASecurity', data);
                     break;
                 case '6':
+                    $rootScope.$broadcast('InitOperationPopup', data);
+                    //$rootScope.$broadcast('InitQADispatch', data);
+                    break;
+                case '7':
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
@@ -667,6 +674,10 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                     //$rootScope.$broadcast('InitQASecurity', data);
                     break;
                 case '6':
+                    $rootScope.$broadcast('InitOperationPopup', data);
+                    //$rootScope.$broadcast('InitQADispatch', data);
+                    break;
+                case '7':
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;

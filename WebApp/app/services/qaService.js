@@ -561,6 +561,8 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
         return deferred.promise;
     }
 
+   
+
     var _sendComment = function (entity) {
         console.log(entity);
         var deferred = $q.defer();
@@ -573,6 +575,77 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
         return deferred.promise;
     }
 
+    var _getCyberIncident = function () {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + '/api/get/cyber/incident').then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _getCyberAccess = function () {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + '/api/get/cyber/accessibility').then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _getCyberMethod = function () {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + '/api/get/cyber/method').then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _saveCyber = function (entity) {
+
+        var deferred = $q.defer();
+        $http.post(apiQA + '/api/save/cyber', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _getCyberByFlightId = function (employeeId, flightId) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + '/api/get/cyber/' + employeeId + '/' + flightId).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _getCyberById = function (id) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/get/cyber/byid/' + id).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
 
 
     serviceFactory.getQAByEmployee = _getQAByEmployee;
@@ -637,6 +710,14 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
 
     serviceFactory.getComments = _getComments
     serviceFactory.sendComment = _sendComment
+
+    serviceFactory.getCyberByFlightId = _getCyberByFlightId;
+    serviceFactory.getCyberById = _getCyberById;
+    serviceFactory.saveCyber = _saveCyber;
+    serviceFactory.getCyberIncident = _getCyberIncident;
+    serviceFactory.getCyberAccess = _getCyberAccess;
+    serviceFactory.getCyberMethod = _getCyberMethod;
+
 
 
     return serviceFactory;

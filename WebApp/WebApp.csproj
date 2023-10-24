@@ -113,6 +113,7 @@
     <Content Include="app\controllers\delaybiKPI.js" />
     <Content Include="app\controllers\delayCodesController.js" />
     <Content Include="app\controllers\delayReport.js" />
+    <Content Include="app\controllers\qaCyberSecurity.js" />
     <Content Include="app\controllers\qaDispatch.js" />
     <Content Include="app\controllers\documentAddController.js" />
     <Content Include="app\controllers\drAdd.js" />
@@ -308,6 +309,7 @@
     <Content Include="app\views\delayAirportReport.html" />
     <Content Include="app\views\delaybidaily.html" />
     <Content Include="app\views\delaybiKPI.html" />
+    <Content Include="app\views\qaCyberSecurity.html" />
     <Content Include="app\views\qaDispatch.html" />
     <Content Include="app\views\drAdd.html" />
     <Content Include="app\views\employeeSelectCourse.html" />

@@ -208,6 +208,9 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
         $rootScope.$broadcast('InitVHR', $scope.tempData);
     }
 
+    $scope.cyberLoaded = function () {
+        $rootScope.$broadcast('InitQACyberSecurity', $scope.tempData);
+    }
 
 }]);
 
