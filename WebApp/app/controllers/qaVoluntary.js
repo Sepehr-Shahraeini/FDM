@@ -42,7 +42,7 @@ app.controller('qaVoluntaryController', ['$scope', '$location', 'qaService', 'au
         });
     };
     ////////////////////////////////
-    $scope.scroll_vhradd_height = $scope.popup_height - 12;
+    $scope.scroll_vhradd_height = $(window).height() - 170;
     $scope.scroll_vhradd = {
         //width: 900,
         bounceEnabled: false,
@@ -279,9 +279,16 @@ app.controller('qaVoluntaryController', ['$scope', '$location', 'qaService', 'au
         });
     }
 
-    $scope.tempData = null;
+    var appWindow = angular.element($window);
+    appWindow.bind('resize', function () {
+        $scope.scroll_vhradd_height = $(window).height() - 170;
+    });
 
+
+    
     ///////////////////////////////////
+
+    $scope.tempData = null;
 
     $scope.$on('InitVHR', function (event, prms) {
 

@@ -131,7 +131,7 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
 
     };
     ////////////////////////////////
-    $scope.scroll_qaCyber_height = $(window).height() - 130;
+    $scope.scroll_qaCyber_height = $(window).height() - 170;
     $scope.scroll_qaCyber = {
        /* width: '100%',*/
         bounceEnabled: false,
@@ -375,6 +375,13 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
     }
 
     ////////////////////////////////
+
+
+    var appWindow = angular.element($window);
+    appWindow.bind('resize', function () {
+        $scope.scroll_qaCyber_height = $(window).height() - 170;
+    });
+
 
     $scope.tempData = null;
 

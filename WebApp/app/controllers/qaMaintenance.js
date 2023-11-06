@@ -54,7 +54,7 @@ app.controller('qaMaintenanceController', ['$scope', '$location', 'qaService', '
 
     };
     ////////////////////////////////
-    $scope.scroll_qaMaintenance_height = $scope.popup_height - 12;
+    $scope.scroll_qaMaintenance_height = $(window).height() - 170;
     $scope.scroll_qaMaintenance = {
         bounceEnabled: false,
         showScrollbar: 'never',
@@ -382,6 +382,13 @@ app.controller('qaMaintenanceController', ['$scope', '$location', 'qaService', '
         });
     }
     /////////////////////////////////
+
+    var appWindow = angular.element($window);
+    appWindow.bind('resize', function () {
+        $scope.scroll_qaMaintenance_height = $(window).height() - 170;
+    });
+
+
     $scope.$on('InitQAMaintenance', function (event, prms) {
 
 

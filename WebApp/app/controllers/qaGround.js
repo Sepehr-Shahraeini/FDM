@@ -80,7 +80,7 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
 
     ////////////////////////////////
 
-    $scope.scroll_qaGround_height = $scope.popup_height - 12;
+    $scope.scroll_qaGround_height = $(window).height() - 170;
     $scope.scroll_qaGround = {
         //width: 900,
         bounceEnabled: false,
@@ -838,6 +838,12 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     ////////////////////////////////
+
+    var appWindow = angular.element($window);
+    appWindow.bind('resize', function () {
+        $scope.scroll_qaGround_height = $(window).height() - 170;
+    });
+
 
     $scope.tempData = null;
 

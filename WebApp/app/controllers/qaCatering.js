@@ -60,9 +60,8 @@ app.controller('qaCateringController', ['$scope', '$location', 'qaService', 'aut
         });
     };
     ////////////////////////////////
-    $scope.scroll_qaCatering_height = $scope.popup_height - 12;
+    $scope.scroll_qaCatering_height = $(window).height() - 170;
     $scope.scroll_qaCatering = {
-        //width: 900,
         bounceEnabled: false,
         showScrollbar: 'never',
         pulledDownText: '',
@@ -412,6 +411,13 @@ app.controller('qaCateringController', ['$scope', '$location', 'qaService', 'aut
     }
 
     ///////////////////////////////
+
+    var appWindow = angular.element($window);
+    appWindow.bind('resize', function () {
+        $scope.scroll_qaCatering_height = $(window).height() - 170;
+    });
+
+
 
     $scope.$on('InitQACatering', function (event, prms) {
 

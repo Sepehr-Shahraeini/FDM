@@ -69,7 +69,7 @@ app.controller('qaDispatchController', ['$scope', '$location', 'qaService', 'aut
         });
     };
     ////////////////////////////////
-    $scope.scroll_qaDispatch_height = $scope.popup_height - 12;
+    $scope.scroll_qaDispatch_height = $(window).height() - 170;
     $scope.scroll_qaDispatch = {
         //width: 900,
         bounceEnabled: false,
@@ -165,6 +165,7 @@ app.controller('qaDispatchController', ['$scope', '$location', 'qaService', 'aut
         focusStateEnabled: false,
         displayFormat: 'HH:mm',
         type: 'time',
+        width: '100%',
         bindingOptions: {
             value: 'entity.OPTimeReceived',
         }
@@ -439,6 +440,12 @@ app.controller('qaDispatchController', ['$scope', '$location', 'qaService', 'aut
 
 
     ////////////////////////////////
+
+    var appWindow = angular.element($window);
+    appWindow.bind('resize', function () {
+        $scope.scroll_qaDispatch_height = $(window).height() - 170;
+    });
+
 
     $scope.tempData = null;
 

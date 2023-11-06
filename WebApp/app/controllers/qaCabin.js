@@ -71,7 +71,7 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
 
     };
     ////////////////////////////////
-    $scope.scroll_qaCabin_height = $(window).height() - 130;
+    $scope.scroll_qaCabin_height = $(window).height() - 170;
     $scope.scroll_qaCabin = {
         //width: 900,
         bounceEnabled: true,
@@ -82,8 +82,13 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
         refreshingText: 'Updating...',
         onPullDown: function (options) {
 
-            options.component.release();
+            options.component.release(true);
 
+        },
+        onReachBottom: function (e) {
+            // ..  
+            e.component.release(true);
+            // ..  
         },
         onInitialized: function (e) {
 
@@ -306,7 +311,7 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
             fixed: true, fixedPosition: 'right',
         },
 
-        { dataField: 'Description', caption: 'Description', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, minwidth: 100, },
+        { dataField: 'Description', caption: 'Description', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minwidth: 100, },
         { dataField: 'Lable', caption: 'Name', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
 
 
@@ -389,7 +394,10 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
         });
     }
     ////////////////////////////////
-
+    var appWindow = angular.element($window);
+    appWindow.bind('resize', function () {
+        $scope.scroll_qaCabin_height = $(window).height() - 170;
+    });
 
     $scope.$on('InitQACabin', function (event, prms) {
 

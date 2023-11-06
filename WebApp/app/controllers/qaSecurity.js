@@ -53,7 +53,7 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
         });
     };
     ////////////////////////////////
-    $scope.scroll_qaSecurity_height = $scope.popup_height - 12;
+    $scope.scroll_qaSecurity_height = $(window).height() - 170;
     $scope.scroll_qaSecurity = {
         //width: 900,
         bounceEnabled: false,
@@ -410,6 +410,12 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
     }
 
     //////////////////////////////////
+
+    var appWindow = angular.element($window);
+    appWindow.bind('resize', function () {
+        $scope.scroll_qaSecurity_height = $(window).height() - 170;
+    });
+
 
     $scope.$on('InitQASecurity', function (event, prms) {
 
