@@ -308,13 +308,15 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
 
         onRowClick: function (e) {
 
+            console.log(e);
 
             var data = {
                 Id: e.data.Id,
                 Type: $scope.entity.type,
                 EmployeeId: $rootScope.employeeId,
                 isNotDetermined: true,
-                Category: 'new'
+                Category: 'new',
+                ProducerId: e.data.EmployeeId
             };
 
 
@@ -475,7 +477,8 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                 Type: $scope.entity.type,
                 EmployeeId: $rootScope.employeeId,
                 Status: e.data.Status,
-                Category: 'open'
+                Category: 'open',
+                ProducerId: e.data.EmployeeId
 
             }
 
@@ -640,6 +643,7 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                 Type: $scope.entity.type,
                 EmployeeId: $rootScope.employeeId,
                 Status: e.data.Status,
+                ProducerId: e.data.EmployeeId
             };
 
             if (e.data.Status == 1)

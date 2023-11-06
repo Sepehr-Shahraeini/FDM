@@ -21,7 +21,7 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
 
             {
                 widget: 'dxButton', location: 'before', options: {
-                    type: 'default', text: 'Referre', onClick: function (e) {
+                    type: 'default', text: 'Refere', onClick: function (e) {
 
                         $rootScope.$broadcast('InitQAEmployee', { Type: $scope.tempData.Type, Id: $scope.tempData.Id, Category: $scope.tempData.Category });
                         if ($scope.tempData.Category == 'new')
@@ -42,19 +42,17 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
                     type: 'default', text: 'Close The Report', validationGroup: 'result', onClick: function (e) {
 
                         $scope.loadingVisible = true;
-
                         $scope.entity.Category = $scope.tempData.Category;
                         $scope.entity.Id = $scope.tempData.Id;
                         $scope.entity.Type = $scope.tempData.Type;
                         $scope.entity.EmployeeId = $scope.tempData.EmployeeId;
                         $scope.entity.isResponsible = $scope.isResponsible;
+                        $scope.entity.Result = $rootScope.result.Result;
 
                         qaService.acceptQA($scope.entity).then(function (response) {
                             $scope.loadingVisible = false;
+                            $rootScope.result.Result = null;
                             General.ShowNotify(Config.Text_QAAccept, 'success');
-
-                            console.log("is Responsilbe", $scope.isResponsible);
-
                             if ($scope.isResponsible == true) {
 
                                 if (response.IsSuccess == true && $scope.tempData.Category == 'open') {
@@ -154,7 +152,7 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
             height: 'popup_height',
             width: 'popup_width',
             'toolbarItems[0].visible': 'isNotLocked',
-            'toolbarItems[1].visible': 'isNotLocked',
+            //'toolbarItems[1].visible': 'isNotLocked',
             'toolbarItems[2].visible': 'isNotLocked',
 
         }
@@ -176,6 +174,7 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
         $scope.tempData = prms;
 
         $scope.Type = $scope.tempData.Type;
+        $scope.isNotLocked = $scope.tempData.isNotLocked
 
         $scope.popup_operation_visible = true;
     });

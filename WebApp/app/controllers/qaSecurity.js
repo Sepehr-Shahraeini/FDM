@@ -1,14 +1,10 @@
 ﻿'use strict';
 app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'authService', '$routeParams', '$rootScope', '$window', function ($scope, $location, qaService, authService, $routeParams, $rootScope, $window) {
-    $scope.isNew = true;
-    $scope.isEditable = true;
-    $scope.isContentVisible = false;
     $scope.isFullScreen = false;
-    $scope.isSettled = false;
-
+    
     var detector = new MobileDetect(window.navigator.userAgent);
-
     //if (detector.mobile() && !detector.tablet())
+
     $scope.isFullScreen = true;
 
     $scope.entity = {
@@ -17,175 +13,21 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
 
     $scope.followUpEntity = {
         Type: 5,
-    }
+    };
 
-    $scope.optReason = [],
+    $rootScope.result = {
+        Result: null,
+    };
 
-
-        ////////////////////////
-        //    $scope.popup_add_visible = false;
-        //$scope.popup_height = $(window).height() - 100;
-        //$scope.popup_width = 1500;
-        //$scope.popup_add_title = 'Security Hazard Report Form';
-        //$scope.popup_instance = null;
-
-        //$scope.popup_add = {
-
-
-        //    showTitle: true,
-
-        //    toolbarItems: [
-
-        //        {
-        //            widget: 'dxButton', location: 'before', options: {
-        //                type: 'default', text: 'Referre', onClick: function (e) {
-
-        //                    $rootScope.$broadcast('InitQAEmployee', { Type: $scope.followUpEntity.Type, Id: $scope.entity.Id, Category: $scope.followUpEntity.Category });
-        //                }
-        //            }, toolbar: 'bottom'
-        //        },
-        //        {
-        //            widget: 'dxButton', location: 'before', options: {
-        //                type: 'default', text: 'Action', onClick: function (e) {
-
-        //                }
-        //            }, toolbar: 'bottom'
-        //        },
-        //        {
-        //            widget: 'dxButton', location: 'before', options: {
-        //                type: 'danger', text: 'closed', validationGroup: 'result', onClick: function (e) {
-        //                    $scope.loadingVisible = true;
-
-        //                    $scope.entity.Category = $scope.tempData.Category;
-        //                    $scope.entity.Id = $scope.tempData.Id;
-        //                    $scope.entity.Type = $scope.tempData.Type;
-        //                    $scope.entity.EmployeeId = $scope.tempData.EmployeeId;
-        //                    $scope.entity.isResponsible = $scope.followUpEntity.isResponsible;
-        //                    console.log($scope.entity.result);
-
-        //                    qaService.acceptQA($scope.entity).then(function (response) {
-        //                        $scope.loadingVisible = false;
-        //                        General.ShowNotify(Config.Text_QAAccept, 'success');
-
-        //                        if ($scope.followUpEntity.isResponsible == true) {
-
-        //                            if (response.IsSuccess == true && $scope.followUpEntity.Category == 'open') {
-        //                                var row = Enumerable.From($rootScope.dg_open_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
-        //                                row.Status = "Closed";
-        //                                row.EmployeeStatus = "Closed";
-        //                                row.Status = 1;
-        //                                $rootScope.dg_determined_ds.push(row);
-        //                                $rootScope.dg_open_ds = Enumerable.From($rootScope.dg_open_ds).Where(function (x) {
-        //                                    return x.Id != $scope.entity.Id;
-        //                                }).ToArray();
-        //                            }
-
-        //                            if (response.IsSuccess == true && $scope.followUpEntity.Category == 'new') {
-        //                                var row = Enumerable.From($rootScope.dg_new_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
-        //                                row.Status = "Closed";
-        //                                row.EmployeeStatus = "Closed";
-        //                                row.Status = 1;
-        //                                $rootScope.dg_determined_ds.push(row);
-        //                                $rootScope.dg_new_ds = Enumerable.From($rootScope.dg_new_ds).Where(function (x) {
-        //                                    return x.Id != $scope.entity.Id;
-        //                                }).ToArray();
-        //                            }
-        //                        } else {
-        //                            if (response.IsSuccess == true && $scope.followUpEntity.Category == 'open') {
-        //                                var row = Enumerable.From($rootScope.dg_open_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
-        //                                row.Status = "Closed";
-        //                                row.EmployeeStatus = "Closed";
-        //                                $rootScope.dg_determined_ds.push(row);
-        //                                $rootScope.dg_open_ds = Enumerable.From($rootScope.dg_open_ds).Where(function (x) {
-        //                                    return x.Id != $scope.entity.Id;
-        //                                }).ToArray();
-        //                            }
-
-        //                            if (response.IsSuccess == true && $scope.followUpEntity.Category == 'new') {
-        //                                var row = Enumerable.From($rootScope.dg_new_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
-        //                                row.Status = "Closed";
-        //                                row.EmployeeStatus = "Closed";
-        //                                $rootScope.dg_determined_ds.push(row);
-        //                                $rootScope.dg_new_ds = Enumerable.From($rootScope.dg_new_ds).Where(function (x) {
-        //                                    return x.Id != $scope.entity.Id;
-        //                                }).ToArray();
-        //                            }
-        //                        }
-
-
-        //                    });
-        //                }
-        //            }, toolbar: 'bottom'
-        //        },
-
-        //    ],
-
-        //    visible: false,
-        //    dragEnabled: true,
-        //    closeOnOutsideClick: false,
-        //    onShowing: function (e) {
-        //        $rootScope.IsRootSyncEnabled = false;
-        //        $scope.popup_instance.repaint();
-
-
-        //    },
-        //    onShown: function (e) {
-
-        //        if ($scope.isNew) {
-        //            $scope.isContentVisible = true;
-        //        }
-        //        if ($scope.tempData != null)
-        //            $scope.bind();
-        //        $rootScope.$broadcast('InitTest', $scope.tempData);
-
-
-
-
-
-        //    },
-        //    onHiding: function () {
-        //        $rootScope.IsRootSyncEnabled = true;
-        //        //$scope.clearEntity();
-        //        $scope.entity = {
-        //            Id: -1,
-
-        //        };
-
-        //        $rootScope.followUpEntity.Result = null;
-        //        $scope.popup_add_visible = false;
-        //        $rootScope.$broadcast('onQASecurityHide', null);
-
-
-        //    },
-        //    onContentReady: function (e) {
-        //        if (!$scope.popup_instance)
-        //            $scope.popup_instance = e.component;
-
-
-        //    },
-        //    bindingOptions: {
-        //        visible: 'popup_add_visible',
-        //        fullScreen: 'isFullScreen',
-        //        title: 'popup_add_title',
-        //        height: 'popup_height',
-        //        width: 'popup_width',
-        //        'toolbarItems[0].visible': 'isNotLocked',
-        //        'toolbarItems[1].visible': 'isNotLocked',
-        //        'toolbarItems[2].visible': 'isNotLocked',
-
-        //    }
-        //};
-
-
-
-        /////////////////////////////////
-        $scope.fill = function (data) {
-            $scope.entity = data;
-            $.each($scope.shrReason, function (_i, _d) {
-                if (_d.Id == data.ReasonId)
-                    _d.checked = true;
-            });
-        };
+    /////////////////////////////////
+    $scope.fill = function (data) {
+        $scope.entity = data;
+        $rootScope.result.Result = data.Result;
+        $.each($scope.shrReason, function (_i, _d) {
+            if (_d.Id == data.ReasonId)
+                _d.checked = true;
+        });
+    };
 
 
     $scope.bind = function () {
@@ -194,8 +36,6 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
             $scope.shrReason = res.Data
             qaService.getSHRById($scope.followUpEntity.Id).then(function (res) {
                 $scope.fill(res.Data);
-                if ($scope.tempData.isNotDetermined == true)
-                    $scope.isSettled = true;
             });
         });
 
@@ -207,6 +47,10 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
 
         });
 
+        qaService.getImportedFile($scope.followUpEntity.Id, $scope.followUpEntity.ProducerId, $scope.followUpEntity.Type).then(function (response) {
+            console.log(response);
+            $rootScope.dg_attachments_ds = response.Data;
+        });
     };
     ////////////////////////////////
     $scope.scroll_qaSecurity_height = $scope.popup_height - 12;
@@ -281,6 +125,7 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
     $scope.txt_reportDate = {
         readOnly: true,
         focusStateEnabled: false,
+        width: '100%',
         bindingOptions: {
             value: 'entity.DateReport',
         }
@@ -289,6 +134,7 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
     $scope.txt_hazardDate = {
         readOnly: true,
         focusStateEnabled: false,
+        width: '100%',
         displayFormat: 'yyyy-MM-dd HH:mm',
         type: 'datetime',
         bindingOptions: {
@@ -434,12 +280,134 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
 
     $scope.txt_result = {
         bindingOptions: {
-            value: 'followUpEntity.Result'
+            value: 'result.Result'
+        }
+    }
+
+    $scope.txt_email = {
+        hoverStateEnabled: false,
+        useMaskBehavior: false,
+        readOnly: true,
+        bindingOptions: {
+            value: 'entity.Email',
+        }
+    }
+
+    $scope.txt_telNumber = {
+        hoverStateEnabled: false,
+        useMaskBehavior: false,
+        readOnly: true,
+        bindingOptions: {
+            value: 'entity.Mobile ',
+        }
+    }
+
+    $scope.txt_name = {
+        hoverStateEnabled: false,
+        useMaskBehavior: false,
+        readOnly: true,
+        bindingOptions: {
+            value: 'entity.EmployeeName ',
         }
     }
 
 
 
+    $scope.dg_attachments_columns = [
+
+
+
+        {
+            dataField: "Id", caption: '',
+            width: 115,
+            cellTemplate: "download",
+            allowFiltering: false,
+            allowSorting: false,
+
+            fixed: true, fixedPosition: 'right',
+        },
+
+        { dataField: 'Description', caption: 'Description', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, minwidth: 100, },
+        { dataField: 'Lable', caption: 'Name', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
+
+
+
+    ];
+    $scope.dg_attachments_selected = null;
+    $rootScope.dg_attachments_instance = null;
+    $rootScope.dg_attachments_ds = null;
+    $scope.dg_attachments = {
+
+
+
+        wordWrapEnabled: true,
+        rowAlternationEnabled: false,
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: 200,
+        columns: $scope.dg_attachments_columns,
+        onContentReady: function (e) {
+            if (!$rootScope.dg_attachments_instance)
+                $rootScope.dg_attachments_instance = e.component;
+
+        },
+
+        onRowClick: function (e) {
+
+        },
+
+        onRowPrepared: function (e) {
+        },
+
+        onSelectionChanged: function (e) {
+            var data = e.selectedRowsData[0];
+
+
+            if (!data) {
+                $scope.dg_attachments_selected = null;
+            }
+            else
+                $scope.dg_attachments_selected = data;
+
+
+        },
+
+        bindingOptions: {
+            dataSource: 'dg_attachments_ds'
+        },
+        columnChooser: {
+            enabled: false
+        },
+
+    };
+
+    $scope.download = function (e) {
+
+        var filename = e.data.Lable.split(".");
+        console.log("file name", filename);
+        qaService.downloadQa(filename[0], filename[1]).then(function (response) {
+
+        });
+    }
 
     //////////////////////////////////
 
@@ -456,12 +424,10 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
         $scope.isNotLocked = $scope.tempData.isNotLocked;
         $scope.isNotDetermined = $scope.tempData.isNotDetermined;
 
-        /*  $scope.popup_add_visible = true;*/
         $scope.bind();
     });
 
     $scope.$on('onEmployeeSelectHide', function (event, prms) {
-        console.log(prms);
         $scope.followUpEntity.Category = prms;
     });
 

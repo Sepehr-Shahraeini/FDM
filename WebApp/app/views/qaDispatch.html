@@ -52,13 +52,38 @@
 
 
                     <div style="clear:both"></div>
-
-
+                    <div style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold; margin-top: 10px">
+                        ATTACHED DOCUMENTS
+                    </div>
+                    <div dx-data-grid="dg_attachments" id="dg_attachments" class="content" style="overflow-y:hidden" dx-item-alias="row">
+                        <div data-options="dxTemplate:{ name:'download' }">
+                            <a ng-click="download(row)" href="" class='w3-button w3-block w3-blue' style=' margin:0 auto 0px auto;text-decoration:none;padding:5px 5px !important; text-align:center'>Download</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div>
                 <div class="visible-sm visible-md visible-lg">
+                    <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
+                        <tr>
+                            <td style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold" colspan="2">
+                                Contact Information (Optionally) (اطلاعات تماس (اختیاری
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Email (آدرس ایمیل): </td>
+                            <td style="padding:7px;text-align:left;"><div dx-text-box="txt_email" class="center" dx-validator="{validationGroup:'asradd',  validationRules: [{ type: 'required',   }]}"></div></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Tel No. (شماره تلفن): </td>
+                            <td style="padding:7px;text-align:left;"><div dx-text-box="txt_telNumber" class="center" dx-validator="{validationGroup:'asradd',  validationRules: [{ type: 'required',   }]}"></div></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Full Name (نام و نام‌خانوادگی): </td>
+                            <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_name" class="center"></div></td>
+                        </tr>
+                    </table>
                     <table style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
 
                         <tr>
@@ -140,7 +165,7 @@
                             Event Catagory:
                         </div>
                         <div style="padding: 1%;text-align:left" ng-repeat="x in opCatagory">
-                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="optOPCatagory[$index]" ng-change="chkOPCatagory($index)" /> <p style="margin-right:5px;display:inline-block">{{x.Title}}</p>
+                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="optOPCatagory[$index]" ng-change="chkOPCatagory($index)" ng-disabled="true" /> <p style="margin-right:5px;display:inline-block">{{x.Title}}</p>
                         </div>
                         <div style="clear:both"></div>
                     </div>
@@ -172,7 +197,7 @@
                         </div>
 
                         <div style="padding: 1%;text-align:left" ng-repeat="x in disCatagory">
-                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="optDISCatagory[$index]" ng-change="chkDISCatagory($index)" /> <p style="margin-right:5px;display:inline-block">{{x.Title}}</p>
+                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="optDISCatagory[$index]" ng-change="chkDISCatagory($index)" ng-disabled="true"/> <p style="margin-right:5px;display:inline-block">{{x.Title}}</p>
                         </div>
                         <div style="clear:both"></div>
                     </div>
@@ -191,6 +216,14 @@
                     </table>
 
                     <div style="clear:both"></div>
+                    <div style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold; margin-top: 10px">
+                        ATTACHED DOCUMENTS
+                    </div>
+                    <div dx-data-grid="dg_attachments" id="dg_attachments" class="content" style="overflow-y:hidden" dx-item-alias="row">
+                        <div data-options="dxTemplate:{ name:'download' }">
+                            <a ng-click="download(row)" href="" class='w3-button w3-block w3-blue' style=' margin:0 auto 0px auto;text-decoration:none;padding:5px 5px !important; text-align:center'>Download</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -27,31 +27,34 @@
         background: #00ffaa !important;
         color: black !important;
     }
+
+    .dx-fileuploader-input-wrapper {
+        padding-left: 320px !important
+    }
+
+    .dx-fileuploader-input {
+        display: none !important
+    }
 </style>
 <div ng-controller="qaReferController">
     <div style='padding:0 5px 0 5px'>
         <div style='border:1px solid #eee;'>
             <table style='width:100%;margin-bottom:5px'>
                 <tr>
-                    <td style='width:25%;border-right:1px solid white'>
+                    <td style='width:33.333%;border-right:1px solid white'>
                         <div style='padding:7px;background:#009999;color:white;text-align:center;font-weight:bold' class='ht selected' ng-click="ht_click($event,'followup')">FOLLOWUP</div>
                     </td>
-                    <td style='width:25%;border-right:1px solid white'>
+                    <td style='width:33.333%; border-right: 1px solid white'>
                         <div style='padding:7px;background:#009999;color:white;text-align:center;font-weight:bold' class='ht' ng-click="ht_click($event,'comments')">COMMENTS</div>
                     </td>
-                    <td style='width:25%;border-right:1px solid white'>
-                        <div style='padding:7px;background:#009999;color:white;text-align:center;font-weight:bold' class='ht' ng-click="ht_click($event,'attachments')">ATTACHMENTS</div>
-                    </td>
-                    <td style='width:25%;border-right:0px solid white'>
+                    <td style='width:33.333%; border-right: 0px solid white'>
                         <div style='padding:7px;background:#009999;color:white;text-align:center;font-weight:bold' class='ht' ng-click="ht_click($event,'actions')">ACTIONS</div>
                     </td>
                 </tr>
             </table>
 
 
-            <!--<div id="scroll_referre" dx-scroll-view="scroll_referre">
 
-            </div>-->
 
             <div id='followup' class='ht_content'>
                 <div dx-tree-list="referred_list"></div>
@@ -59,22 +62,58 @@
                 <div dx-text-area="txt_referComment" class='dx-border'></div>
             </div>
             <div id='comments' style='display:none' class='ht_content'>
-                <div dx-data-grid="dg_comment" id="dg_comment" class="content" style="overflow-y:hidden" dx-item-alias="row"></div>
-                <div>
-                    <div style='margin-top:5px;padding:5px;'>
-                        <div style='padding:5px 0 5px 0'>New Comment</div>
-                        <div dx-text-box="txt_comment" class="col-lg-11 dx-border"></div>
-                        <div class="col-lg-1" style="display: inline-block;padding: 0px;float:right;text-align:center">
-                            <div dx-button="btn_send"></div>
+                <div id="scroll_comment" dx-scroll-view="scroll_comment">
+                    <div style="border: 1px lightgray solid;margin:10px; padding:5px" ng-repeat="c in comments">
+                        <div style="border-bottom: 1px lightgray solid; text-align: center; height:25px">{{c.EmployeeName}} {{"   "}} {{c.DateComment.substring(0,10)}}</div>
+                        <div style="border-bottom: 1px lightgray solid;height:150px">{{c.Comment}}</div>
+                        <div>
+                            <table>
+                                <tr>
+                                    <td class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="text-align:center;height:30px" ng-repeat="a in c.Attachments" ng-click="download(a.Lable)"><div style="height:30px; margin-top:5px; padding-top:5px" class="w3-blue">{{a.Lable}}</div></td>
+                                </tr>
+                            </table>
                         </div>
-                        <div style='clear:both'></div>
                     </div>
                 </div>
+                <div dx-button="btn_comment"></div>
             </div>
+
 
         </div>
 
     </div>
+
+
+    <div id="popup_comment" dx-popup="popup_comment" class="no-padding">
+        <div class="filter-container box  ">
+            <div class="filter-container box  ">
+
+                <div dx-tabs="tabs_options"></div>
+
+                <div id="comment" class="tabs">
+                    <div dx-text-box="txt_comment" class="dx-border content" style=" overflow-y:hidden;height:150px; padding:10px"></div>
+                </div>
+
+                <div id="attachment" class="tabs">
+                    <div dx-data-grid="dg_attachment" id="dg_attachment" class="content" style="overflow-y:hidden" dx-item-alias="row">
+
+                        <div data-options="dxTemplate:{ name:'downloadTemplate' }">
+                            <a ng-click="download(row.data.FileName)" href="" class='w3-button w3-block w3-blue' style=' margin:0 auto 0px auto;text-decoration:none;padding:5px 5px !important; text-align:center'>Download</a>
+
+                        </div> <div data-options="dxTemplate:{ name:'deleteTemplate' }">
+                            <a ng-click="deleteFile(row.data)" href="" class='w3-button w3-block w3-red' style=' margin:0 auto 0px auto;text-decoration:none;padding:5px 5px !important; text-align:center'>Delete</a>
+                        </div>
+                    </div>
+                    <div id="uploader_document" dx-file-uploader="uploader_document" style="margin-right:4%; margin-top:7px"></div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
 
     <div dx-load-panel="loadPanel"></div>
 </div>

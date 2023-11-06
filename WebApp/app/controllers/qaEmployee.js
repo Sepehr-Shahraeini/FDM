@@ -91,7 +91,7 @@ app.controller('qaEmployee', ['$scope', '$location', 'authService', '$routeParam
         toolbarItems: [
             {
                 widget: 'dxButton', location: 'after', options: {
-                    type: 'default', text: 'Referr', icon: 'check'
+                    type: 'default', text: 'Refer', icon: 'check'
                 }, toolbar: 'bottom'
             },
             { widget: 'dxButton', location: 'after', options: { type: 'danger', text: 'Close', icon: 'remove', }, toolbar: 'bottom' }

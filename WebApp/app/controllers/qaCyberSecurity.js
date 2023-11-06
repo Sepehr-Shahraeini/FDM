@@ -21,18 +21,11 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
         Type: 7,
     }
 
-  
-
-
-
-
-    ////////////////////////
-
-   
-
+    $rootScope.result = {
+        Result: null,
+    };
 
     /////////////////////////////////
-    $scope.flight = null;
 
     $scope.chkIncidentBy = function (obj) {
         var _id = obj.Id;
@@ -84,7 +77,10 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
 
    
     $scope.fill = function (data) {
+
         $scope.entity = data;
+        $rootScope.result.Result = data.Result;
+
 
         $.each($scope.incident, function (_i, _d) {
             if (_d.Id == data.IncidentId)
@@ -126,7 +122,11 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
             });
         });
 
-      
+        
+        qaService.getImportedFile($scope.followUpEntity.Id, $scope.followUpEntity.ProducerId, $scope.followUpEntity.Type).then(function (response) {
+            console.log(response);
+            $rootScope.dg_attachments_ds = response.Data;
+        });
 
 
     };
@@ -160,13 +160,17 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
 
     $scope.txt_name = {
         hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
-            value: 'entity.Name',
+            value: 'entity.EmployeeName',
         }
     }
 
     $scope.txt_jobTitle = {
         hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.JobTitle',
         }
@@ -174,6 +178,8 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
 
     $scope.txt_contactInfo = {
         hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.ContactInfo',
         }
@@ -181,8 +187,9 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
 
     $scope.txt_dateEvent = {
         hoverStateEnabled: false,
-        useMaskBehavior: true,
-
+        readOnly: true,
+        focusStateEnabled: false,
+        width: '100%',
         type: 'datetime',
         pickerType: "rollers",
         displayFormat: "yyyy-MMM-dd  HH:mm",
@@ -193,8 +200,10 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
 
     $scope.txt_dateIncident = {
         hoverStateEnabled: false,
-        useMaskBehavior: true,
+        readOnly: true,
+        focusStateEnabled: false,
         type: 'datetime',
+        width: '100%',
         pickerType: "rollers",
         displayFormat: "yyyy-MMM-dd  HH:mm",
         bindingOptions: {
@@ -204,6 +213,8 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
 
     $scope.txt_attack = {
         hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.AttackDescriptipn',
         }
@@ -211,29 +222,157 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
 
     $scope.txt_impacted = {
         hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.ImpactDescription',
         }
     }
     $scope.txt_breached = {
         hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.BreachedDescription',
         }
     }
     $scope.txt_containment = {
         hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.AccessDescription',
         }
     }
     $scope.txt_other = {
         hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.Other',
         }
     }
 
+    $scope.txt_mobile = {
+        hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
+       
+        bindingOptions: {
+            value: 'entity.Mobile',
+        }
+    }
+
+    $scope.txt_email = {
+        hoverStateEnabled: false,
+        useMaskBehavior: false,
+        readOnly: true,
+        focusStateEnabled: false,
+        readOnly: true,
+        bindingOptions: {
+            value: 'entity.Email',
+        }
+    }
+
+    $scope.txt_result = {
+        bindingOptions: {
+            value: 'result.Result',
+        }
+    }
+
+
+    $scope.dg_attachments_columns = [
+        {
+            dataField: "Id", caption: '',
+            width: 115,
+            cellTemplate: "download",
+            allowFiltering: false,
+            allowSorting: false,
+
+            fixed: true, fixedPosition: 'right',
+        },
+
+        { dataField: 'Description', caption: 'Description', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, minwidth: 100, },
+        { dataField: 'Lable', caption: 'Name', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, },
+
+
+
+    ];
+    $scope.dg_attachments_selected = null;
+    $rootScope.dg_attachments_instance = null;
+    $rootScope.dg_attachments_ds = null;
+    $scope.dg_attachments = {
+
+
+
+        wordWrapEnabled: true,
+        rowAlternationEnabled: false,
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: 200,
+        columns: $scope.dg_attachments_columns,
+        onContentReady: function (e) {
+            if (!$rootScope.dg_attachments_instance)
+                $rootScope.dg_attachments_instance = e.component;
+
+        },
+
+        onRowClick: function (e) {
+
+        },
+
+        onRowPrepared: function (e) {
+        },
+
+        onSelectionChanged: function (e) {
+            var data = e.selectedRowsData[0];
+
+
+            if (!data) {
+                $scope.dg_attachments_selected = null;
+            }
+            else
+                $scope.dg_attachments_selected = data;
+
+
+        },
+
+        bindingOptions: {
+            dataSource: 'dg_attachments_ds'
+        },
+        columnChooser: {
+            enabled: false
+        },
+
+    };
+
+    $scope.download = function (e) {
+
+        var filename = e.data.Lable.split(".");
+        console.log("file name", filename);
+        qaService.downloadQa(filename[0], filename[1]).then(function (response) {
+
+        });
+    }
 
     ////////////////////////////////
 
@@ -248,6 +387,7 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
         $scope.followUpEntity.Id = $scope.tempData.Id;
         $scope.followUpEntity.Type = $scope.tempData.Type;
         $scope.followUpEntity.EmployeeId = $scope.tempData.EmployeeId;
+        $scope.followUpEntity.ProducerId = parseInt($scope.tempData.ProducerId);
         $scope.isNotLocked = $scope.tempData.isNotLocked;
 
         console.log($scope.followUpEntity);

@@ -561,7 +561,7 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
         return deferred.promise;
     }
 
-   
+
 
     var _sendComment = function (entity) {
         console.log(entity);
@@ -574,6 +574,19 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
 
         return deferred.promise;
     }
+
+    var _saveComment = function (entityId, type, employeeId) {
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/comment/' + entityId + "/" + type + "/" + employeeId).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+
 
     var _getCyberIncident = function () {
 
@@ -647,6 +660,66 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
         return deferred.promise;
     }
 
+    var _getImportedFile = function (entityId, employeeId, type) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/get/imported/file/' + entityId + '/' + employeeId + '/' + type).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _downloadQa = function (filename, filetype) {
+        var deferred = $q.defer();
+        var name = filename + "." + filetype;
+        $http.get(apiQA + 'api/download/qa/' + filename + "/" + filetype, { responseType: 'arraybuffer' }).then(function (response) {
+            deferred.resolve(response.data);
+            console.log(response);
+            //var headers = response.config.headers;
+            //var filename = headers['content-disposition'].split('=')[1];
+
+            var blob = new Blob([response.data], { type: "application/octet-stream" });
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = name;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }, function (err, status) {
+            // deferred.reject(Exeptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    }
+
+    var _deleteAttachment = function (entity) {
+
+        var deferred = $q.defer();
+        $http.post(apiQA + 'api/delete/attachment', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _getStation = function (cid) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + '/api/get/station').then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+
 
     serviceFactory.getQAByEmployee = _getQAByEmployee;
     serviceFactory.getQAStatus = _getQAStatus;
@@ -717,6 +790,13 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
     serviceFactory.getCyberIncident = _getCyberIncident;
     serviceFactory.getCyberAccess = _getCyberAccess;
     serviceFactory.getCyberMethod = _getCyberMethod;
+
+    serviceFactory.getImportedFile = _getImportedFile;
+    serviceFactory.downloadQa = _downloadQa;
+    serviceFactory.deleteAttachment = _deleteAttachment;
+
+    serviceFactory.saveComment = _saveComment;
+    serviceFactory.getStation = _getStation;
 
 
 

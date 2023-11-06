@@ -10,10 +10,6 @@
         text-align: center;
     }
 
-    .ctr {
-        /*height:30px;*/
-    }
-
     .ctd-center {
         background-color: lightseagreen;
     }
@@ -29,15 +25,11 @@
 
             <div class="container">
                 <div class="visible-xs">
-                    <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
+                    <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold"> Date: </td>
-                            <td style="padding:7px;text-align:left;"><div dx-date-box="txt_date" class="center"></div></td>
+                            <td style="padding:7px;text-align:left;"><div dx-date-box="txt_date" class="center" dx-validator="{validationGroup:'ground',  validationRules: [{ type: 'required',   }]}"></div></td>
                         </tr>
-                        <!--<tr>
-                            <td style="padding: 7px;text-align:left; font-weight: bold"> Time of occurrence: </td>
-                            <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_occurrecneTime"></div></td>
-                        </tr>-->
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold"> Phase Of Operation: </td>
                             <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_optPhase"></div></td>
@@ -73,22 +65,22 @@
 
                     </table>
 
-                    <div style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
-                        <div style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold">
+                    <div style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
+                        <div style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold">
                             Damage By:
                         </div>
 
                         <div class="col-xs-3 col-sm-3 col-md-3" style="padding: 1%" ng-repeat="x in damageBy">
-                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="dmgOptions[x.Id]" ng-change="chkDamageBy($index)" /> {{x.Title}}
+                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="x.checked" ng-change="chkDamageBy(x)" ng-disabled="!isEditable" /> {{x.Title}}
                         </div>
                         <div style="clear:both"></div>
-                        <div ng-show="showOther" style="margin:1%;border:1px solid #ccc;width:98%;color:black" dx-text-area="txt_eventOther"></div>
+                        <div ng-show="showOther" style="margin: 1%; border: 1px solid #eee; width: 98%; color: black" dx-text-area="txt_eventOther"></div>
 
                     </div>
 
-                    <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
+                    <table style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
                         <tr>
-                            <td style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold">
+                            <td style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold">
                                 DETAILS OF DAMAGE
                             </td>
                         </tr>
@@ -98,9 +90,9 @@
 
                     </table>
 
-                    <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
+                    <table style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
                         <tr>
-                            <td style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold" colspan="9">
+                            <td style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold" colspan="9">
                                 NUMBER OF CASUALTIES
                             </td>
                         </tr>
@@ -127,9 +119,9 @@
 
                     </table>
 
-                    <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
+                    <table style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
                         <tr>
-                            <td style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold" colspan="6">
+                            <td style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold" colspan="6">
                                 VEHICLE/RAMP EQUIMPMENT DETAILS AND CONDITIONS REPORT(گزارش شرایط و جزئیات وسائل نقلیه و تجهیزات رمپ)
                             </td>
                         </tr>
@@ -170,52 +162,80 @@
 
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold" colspan="1"> Tyres (تایرها): </td>
-                            <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veTyer"></div></td>
-
+                        </tr>
+                        <tr>
+                            <td style="padding: 7px; text-align: center" colspan="2"> <div dx-select-box="sb_veTyer"></div></td>
                         </tr>
 
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold" colspan="1"> Brakes (ترمزها): </td>
-                            <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veBrake"></div></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 7px; text-align: center;" colspan="2"> <div dx-select-box="sb_veBrake"></div></td>
                         </tr>
 
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold" colspan="1"> Steering (فرمان): </td>
-                            <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veSteering"></div></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 7px; text-align: center;" colspan="2"> <div dx-select-box="sb_veSteering"></div></td>
                         </tr>
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold" colspan="1"> Lights (چراغ‌ها): </td>
-                            <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veLight"></div></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 7px; text-align: center;" colspan="2"> <div dx-select-box="sb_veLight"></div></td>
                         </tr>
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold" colspan="1"> Wipers (برف پاک‌کن): </td>
-                            <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veWiper"></div></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 7px; text-align: center;" colspan="2"> <div dx-select-box="sb_veWiper"></div></td>
                         </tr>
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold" colspan="1"> Protection (حفاظ): </td>
-                            <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veProtection"></div></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 7px; text-align: center;" colspan="2"> <div dx-select-box="sb_veProtection"></div></td>
                         </tr>
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold" colspan="1"> Warning Devices (وسایل هشداردهنده): </td>
-                            <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veWarningDevices"></div></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 7px; text-align: center;" colspan="2"> <div dx-select-box="sb_veWarningDevices"></div></td>
                         </tr>
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold" colspan="1"> Stabilizer (استابیلایزر‌ها): </td>
-                            <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veStab"></div></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 7px; text-align: center;" colspan="2"> <div dx-select-box="sb_veStab"></div></td>
                         </tr>
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold" colspan="1"> Tow Hitch (اتصال کشنده): </td>
-                            <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veTow"></div></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 7px; text-align: center;" colspan="2"> <div dx-select-box="sb_veTow"></div></td>
                         </tr>
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold" colspan="1"> Field of vision from driving position (میدان دید هنگام رانندگی): </td>
-                            <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veVision"></div></td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 7px; text-align: center;" colspan="2"> <div dx-select-box="sb_veVision"></div></td>
                         </tr>
                     </table>
 
-                    <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
+                    <table style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
                         <tr>
-                            <td style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold" colspan="6">
+                            <td style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold" colspan="6">
                                 DETAILS OF PERSONNEL INVOLVED (مشخصات کارکنان درگیر)
                             </td>
                         </tr>
@@ -240,7 +260,7 @@
                             <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_p1License"></div></td>
                         </tr>
 
-                        <tr style="border-bottom: 1px dashed #ccc; padding: 5px"></tr>
+                        <tr style="border-bottom: 1px dashed #eee; padding: 5px"></tr>
 
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold"> Name (نام): </td>
@@ -263,7 +283,7 @@
                             <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_p2License"></div></td>
                         </tr>
 
-                        <tr style="border-bottom: 1px dashed #ccc;padding: 5px"></tr>
+                        <tr style="border-bottom: 1px dashed #eee;padding: 5px"></tr>
 
                         <tr>
                             <td style="padding: 7px;text-align:left; font-weight: bold"> Name (نام): </td>
@@ -287,9 +307,9 @@
                         </tr>
                     </table>
 
-                    <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
+                    <table style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
                         <tr>
-                            <td style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold" colspan="6">
+                            <td style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold" colspan="6">
                                 CONDITIONS
                             </td>
                         </tr>
@@ -308,44 +328,44 @@
                         </tr>
 
                     </table>
-                    <div style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
-                        <div style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold">
+                    <div style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
+                        <div style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold">
                             Weather (هوا):
                         </div>
 
-                        <div class="col-xs-3 col-sm-3 col-md-3" style="padding: 1%" ng-repeat="x in weather">
-                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="wxOptions[x.Id]" ng-change="chkWeather($index)" /> {{x.Title}}
+                        <div class="col-xs-4 col-sm-4 col-md-4" style="padding: 1%" ng-repeat="x in weather">
+                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="x.checked" ng-change="chkWeather(x)" ng-disabled="!isEditable" /> {{x.Title}}
                         </div>
                         <div style="clear:both"></div>
                     </div>
                     <div style="clear:both"></div>
 
-                    <div style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
-                        <div style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold">
+                    <div style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
+                        <div style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold">
                             Surface (سطح) :
                         </div>
 
-                        <div class="col-xs-3 col-sm-3 col-md-3" style="padding: 1%" ng-repeat="x in surface">
-                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="surfaceOptions[x.Id]" ng-change="chkSurface($index)" /> {{x.Title}}
+                        <div class="col-xs-4 col-sm-4 col-md-4" style="padding: 1%" ng-repeat="x in surface">
+                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="x.checked" ng-change="chkSurface(x)" ng-disabled="!isEditable" /> {{x.Title}}
                         </div>
                         <div style="clear:both"></div>
                     </div>
                     <div style="clear:both"></div>
 
-                    <div style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
-                        <div style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold">
-                            :
+                    <div style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
+                        <div style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold">
+                            Lighting:
                         </div>
 
-                        <div class="col-xs-3 col-sm-3 col-md-3" style="padding: 1%" ng-repeat="x in lighting">
-                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="lightingOptions[x.Id]" ng-change="chkLighting($index)" /> {{x.Title}}
+                        <div class="col-xs-4 col-sm-4 col-md-4" style="padding: 1%" ng-repeat="x in lighting">
+                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="x.checked" ng-change="chkLighting(x)" ng-disabled="!isEditable" /> {{x.Title}}
                         </div>
                         <div style="clear:both"></div>
                     </div>
 
-                    <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
+                    <table style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
                         <tr>
-                            <td style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold">
+                            <td style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold">
                                 CONTRIBUTORY FACTORS (عوامل کمکی)
                             </td>
                         </tr>
@@ -361,21 +381,9 @@
 
                     </table>
 
-                    <!--<table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
+                    <table style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
                         <tr>
-                            <td style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold">
-                                SKETCH (کروکی)
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 7px;text-align:left;"> <div dx-text-area="txt_sketch"></div></td>
-                        </tr>
-
-                    </table>-->
-
-                    <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
-                        <tr>
-                            <td style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold">
+                            <td style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold">
                                 EVENT
                             </td>
                         </tr>
@@ -391,9 +399,9 @@
 
                     </table>
 
-                    <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
+                    <table style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
                         <tr>
-                            <td style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold">
+                            <td style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold">
                                 CORRECTIVE ACTION TAKEN (اقدامات اصلاحی صورت گرفته)
                             </td>
                         </tr>
@@ -403,9 +411,9 @@
 
                     </table>
 
-                    <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
+                    <table style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
                         <tr>
-                            <td style="background-color:black;padding:7px;text-align:left;color:black;font-weight:bold">
+                            <td style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold">
                                 OTHER INFORMATION & SUGGESTIONS FOR PREVENTIVE ACTIONS (سایر اطلاعات و پیشنهادهایی جهت اقدامات پیشگیرانه)
                             </td>
                         </tr>
@@ -464,7 +472,7 @@
                         </div>
 
                         <div class="col-xs-3 col-sm-3 col-md-3" style="padding: 1%" ng-repeat="x in damageBy">
-                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="dmgOptions[x.Id]" ng-change="chkDamageBy($index)" /> {{x.Title}}
+                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="dmgOptions[x.Id]" ng-change="chkDamageBy($index)" ng-disabled="true" /> {{x.Title}}
                         </div>
                         <div style="clear:both"></div>
                         <div ng-show="showOther" style="margin:1%;border:1px solid #ccc;width:98%;color:black" dx-text-area="txt_eventOther"></div>
@@ -542,48 +550,36 @@
                             <td style="padding: 7px;text-align:left; font-weight: bold"> Remarks: </td>
                             <td style="padding: 7px;text-align:left;" colspan="3"> <div dx-text-area="txt_veRemarks"></div></td>
                         </tr>
-
                         <tr>
-                            <td style="padding: 7px;text-align:left; font-weight: bold" colspan="3"> Tyres (تایرها): </td>
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Tyres (تایرها): </td>
                             <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veTyer"></div></td>
-
-                        </tr>
-
-                        <tr>
-                            <td style="padding: 7px;text-align:left; font-weight: bold" colspan="3"> Brakes (ترمزها): </td>
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Brakes (ترمزها): </td>
                             <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veBrake"></div></td>
                         </tr>
+                        <tr>
 
-                        <tr>
-                            <td style="padding: 7px;text-align:left; font-weight: bold" colspan="3"> Steering (فرمان): </td>
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Steering (فرمان): </td>
                             <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veSteering"></div></td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 7px;text-align:left; font-weight: bold" colspan="3"> Lights (چراغ‌ها): </td>
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Lights (چراغ‌ها): </td>
                             <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veLight"></div></td>
                         </tr>
                         <tr>
-                            <td style="padding: 7px;text-align:left; font-weight: bold" colspan="3"> Wipers (برف پاک‌کن): </td>
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Wipers (برف پاک‌کن): </td>
                             <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veWiper"></div></td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 7px;text-align:left; font-weight: bold" colspan="3"> Protection (حفاظ): </td>
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Protection (حفاظ): </td>
                             <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veProtection"></div></td>
                         </tr>
                         <tr>
-                            <td style="padding: 7px;text-align:left; font-weight: bold" colspan="3"> Warning Devices (وسایل هشداردهنده): </td>
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Warning Devices (وسایل هشداردهنده): </td>
                             <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veWarningDevices"></div></td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 7px;text-align:left; font-weight: bold" colspan="3"> Stabilizer (استابیلایزر‌ها): </td>
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Stabilizer (استابیلایزر‌ها): </td>
                             <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veStab"></div></td>
                         </tr>
                         <tr>
-                            <td style="padding: 7px;text-align:left; font-weight: bold" colspan="3"> Tow Hitch (اتصال کشنده): </td>
+
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Tow Hitch (اتصال کشنده): </td>
                             <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veTow"></div></td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 7px;text-align:left; font-weight: bold" colspan="3"> Field of vision from driving position (میدان دید هنگام رانندگی): </td>
+                            <td style="padding: 7px;text-align:left; font-weight: bold"> Field of vision from driving position (میدان دید هنگام رانندگی): </td>
                             <td style="padding: 7px; text-align: center;"> <div dx-select-box="sb_veVision"></div></td>
                         </tr>
                     </table>
@@ -677,7 +673,7 @@
                         </div>
 
                         <div class="col-xs-3 col-sm-3 col-md-3" style="padding: 1%" ng-repeat="x in weather">
-                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="wxOptions[x.Id]" ng-change="chkWeather($index)" /> {{x.Title}}
+                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="wxOptions[x.Id]" ng-change="chkWeather($index)" ng-disabled="true" /> {{x.Title}}
                         </div>
                         <div style="clear:both"></div>
                     </div>
@@ -689,7 +685,7 @@
                         </div>
 
                         <div class="col-xs-3 col-sm-3 col-md-3" style="padding: 1%" ng-repeat="x in surface">
-                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="surfaceOptions[x.Id]" ng-change="chkSurface($index)" /> {{x.Title}}
+                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="surfaceOptions[x.Id]" ng-change="chkSurface($index)" ng-disabled="true" /> {{x.Title}}
                         </div>
                         <div style="clear:both"></div>
                     </div>
@@ -701,7 +697,7 @@
                         </div>
 
                         <div class="col-xs-3 col-sm-3 col-md-3" style="padding: 1%" ng-repeat="x in lighting">
-                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="lightingOptions[x.Id]" ng-change="chkLighting($index)" /> {{x.Title}}
+                            <input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="lightingOptions[x.Id]" ng-change="chkLighting($index)" ng-disabled="true" /> {{x.Title}}
                         </div>
                         <div style="clear:both"></div>
                     </div>
@@ -791,7 +787,14 @@
                     </table>
 
                     <div style="clear:both"></div>
-
+                    <div style="background-color:lightgray;padding:7px;text-align:left;color:black;font-weight:bold">
+                        ATTACHED DOCUMENTS
+                    </div>
+                    <div dx-data-grid="dg_attachments" id="dg_attachments" class="content" style="overflow-y:hidden;margin-top:10px" dx-item-alias="row">
+                        <div data-options="dxTemplate:{ name:'download' }">
+                            <a ng-click="download(row)" href="" class='w3-button w3-block w3-blue' style=' margin:0 auto 0px auto;text-decoration:none;padding:5px 5px !important; text-align:center'>Download</a>
+                        </div>
+                    </div>
 
                 </div>
             </div>
