@@ -1,4 +1,4 @@
-﻿﻿﻿
+
 <style>
 
     .ctd {
@@ -29,7 +29,7 @@
     }
 
     .dx-fileuploader-input-wrapper {
-        padding-left: 320px !important
+        padding-left: 10px !important
     }
 
     .dx-fileuploader-input {
@@ -37,8 +37,8 @@
     }
 </style>
 <div ng-controller="qaReferController">
-    <div style='padding:0 5px 0 5px'>
-        <div style='border:1px solid #eee;'>
+    <div style='padding:10px 5px 0 5px'>
+        <div style='border:0px solid #eee;'>
             <table style='width:100%;margin-bottom:5px'>
                 <tr>
                     <td style='width:33.333%;border-right:1px solid white'>
@@ -57,25 +57,34 @@
 
 
             <div id='followup' class='ht_content'>
+				<div style='border:1px solid #ccc'>
                 <div dx-tree-list="referred_list"></div>
-                <div style='margin-top:5px;padding:7px;border-top:1px solid #ccc;background:#eee'>Note</div>
-                <div dx-text-area="txt_referComment" class='dx-border'></div>
+				</div>
+                <div style='margin-top:10px;padding:7px;border-top:0px solid #ccc;background:#eee'>Note</div>
+                <div  dx-text-area="txt_referComment" class='dx-border'></div>
             </div>
             <div id='comments' style='display:none' class='ht_content'>
-                <div id="scroll_comment" dx-scroll-view="scroll_comment">
+                <div id="scroll_comment" dx-scroll-view="scroll_comment" style='border:1px solid #ccc' >
                     <div style="border: 1px lightgray solid;margin:10px; padding:5px" ng-repeat="c in comments">
-                        <div style="border-bottom: 1px lightgray solid; text-align: center; height:25px">{{c.EmployeeName}} {{"   "}} {{c.DateComment.substring(0,10)}}</div>
-                        <div style="border-bottom: 1px lightgray solid;height:150px">{{c.Comment}}</div>
-                        <div>
-                            <table>
-                                <tr>
-                                    <td class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="text-align:center;height:30px" ng-repeat="a in c.Attachments" ng-click="download(a.Lable)"><div style="height:30px; margin-top:5px; padding-top:5px" class="w3-blue">{{a.Lable}}</div></td>
-                                </tr>
-                            </table>
+                        <div style="border-bottom: 1px lightgray solid;background:#ddd  "> 
+						   <table style='width:100%;'>
+						     <tr>
+							  <td style='padding:5px;text-align:left;width:70%;'>{{c.EmployeeName}}</td>
+							  <td style='text-align:right;padding:5px;'>{{c.DateComment.substring(0,10)}}</td>
+							 </tr>
+						   </table>
+						</div>
+                        <div class='thin-scroll' style="border-bottom: 1px lightgray solid;padding:5px;overflow-y:auto;height:100px;">{{c.Comment}}</div>
+                        <div style='margin-top:5px;padding-top:5px;'>
+						    <div style='padding:4px;font-size:11px;display:inline-block;margin-left:5px;margin-bottom:5px;text-align:center;color:white;background:#00b3b3' ng-repeat="a in c.Attachments" ng-click="download(a.Lable)">
+							  {{a.Lable}}
+							</div>
+                           
+							<div style='clear:both'></div>
                         </div>
                     </div>
                 </div>
-                <div dx-button="btn_comment"></div>
+                <div dx-button="btn_comment" style='margin-top:5px;'></div>
             </div>
 
 
@@ -85,13 +94,13 @@
 
 
     <div id="popup_comment" dx-popup="popup_comment" class="no-padding">
-        <div class="filter-container box  ">
-            <div class="filter-container box  ">
+        
+            
 
                 <div dx-tabs="tabs_options"></div>
 
                 <div id="comment" class="tabs">
-                    <div dx-text-box="txt_comment" class="dx-border content" style=" overflow-y:hidden;height:150px; padding:10px"></div>
+                    <div dx-text-area="txt_comment" class="dx-border" style=" overflow-y:hidden;  padding:10px"></div>
                 </div>
 
                 <div id="attachment" class="tabs">
@@ -104,13 +113,13 @@
                             <a ng-click="deleteFile(row.data)" href="" class='w3-button w3-block w3-red' style=' margin:0 auto 0px auto;text-decoration:none;padding:5px 5px !important; text-align:center'>Delete</a>
                         </div>
                     </div>
-                    <div id="uploader_document" dx-file-uploader="uploader_document" style="margin-right:4%; margin-top:7px"></div>
+                    <div id="uploader_document" dx-file-uploader="uploader_document" style=" margin-top:7px"></div>
 
                 </div>
 
 
-            </div>
-        </div>
+             
+        
     </div>
 
 

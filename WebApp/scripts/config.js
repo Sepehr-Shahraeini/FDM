@@ -18,6 +18,7 @@ Config.Text_NoRowSelected = 'No Row(s) Selected';
 Config.Text_NoFlightSelected = 'No Flight(s) Selected';
 Config.Text_NoSarfaslSelected = 'هیچ سرفصلی انتخاب نشده است';
 Config.Text_DeleteConfirm = 'The selected row will be deleted. Are you sure?';
+Config.Text_CloseConfirm = 'The selected file will be closed. Are you sure?';
 Config.Text_SimpleConfirm = 'Are you sure?';
 Config.Text_CanNotDelete = 'The selected cannot be deleted';
 Config.Text_CanNotEdit = 'این ردیف قابل ویرایش نمی باشد';

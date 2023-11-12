@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authService', '$routeParams', '$rootScope', '$window', '$sce', function ($scope, $location, qaService, authService, $routeParams, $rootScope, $window, $sce) {
 
 
@@ -11,7 +11,7 @@ app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authSe
     $scope.popupselectedTabIndex = -1;
     $scope.popupselectedTabId = null;
     $scope.tabs = [
-        { text: "Comment", id: 'comment' },
+        { text: "Description", id: 'comment' },
         { text: "Attachment", id: 'attachment' },
     ];
 
@@ -76,8 +76,8 @@ app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authSe
 
     $scope.isFullScreen = false
     $scope.popup_comment_visible = false;
-    $scope.popup_height = 750;
-    $scope.popup_width = 750;
+    $scope.popup_height = 500;
+    $scope.popup_width = 680;
     $scope.popup_comment_title = 'Comment';
     $scope.popup_instance = null;
 
@@ -152,8 +152,8 @@ app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authSe
     };
 
     $scope.btn_comment = {
-        text: 'Comment',
-        type: 'success',
+        text: 'Add Comment',
+        type: 'default',
         width: '100%',
         onClick: function (e) {
             $scope.popup_comment_visible = true;
@@ -212,11 +212,11 @@ app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authSe
         },
 
 
-        { dataField: 'FileName', caption: 'Name', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, minWidth: 150 },
+        { dataField: 'FileName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'number', allowEditing: false, minWidth: 150 },
         {
             dataField: "Id",
             caption: '',
-            width: 140,
+            width: 100,
             allowFiltering: false,
             allowSorting: false,
             cellTemplate: 'downloadTemplate',
@@ -228,7 +228,7 @@ app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authSe
         {
             dataField: "Id",
             caption: '',
-            width: 140,
+            width: 100,
             allowFiltering: false,
             allowSorting: false,
             cellTemplate: 'deleteTemplate',
@@ -250,7 +250,7 @@ app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authSe
             visible: false
         },
         filterRow: {
-            visible: true,
+            visible: false,
             showOperationChooser: true,
         },
         showRowLines: true,
@@ -267,7 +267,7 @@ app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authSe
         selection: { mode: 'single' },
 
         columnAutoWidth: true,
-        height: 550,
+        height: $scope.popup_height-200,
         width: "100%",
         columns: $scope.dg_attachment_columns,
         onContentReady: function (e) {
@@ -349,6 +349,7 @@ app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authSe
     $scope.bind = function () {
         qaService.getReferredList($scope.commentEntity.EmployeeId, $scope.commentEntity.Type, $scope.commentEntity.Id).then(function (response) {
             $rootScope.referred_list_ds = response.Data;
+			$scope.expandedRow=Enumerable.From(response.Data).Select('$.Id').ToArray();
         });
 
         qaService.getComments($scope.commentEntity.Id, $scope.commentEntity.Type).then(function (response) {
@@ -415,7 +416,7 @@ app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authSe
     }
 
     $scope.txt_comment = {
-
+        height:$scope.popup_height-140,
         bindingOptions: {
             value: 'commentEntity.Comment'
         }
@@ -526,13 +527,15 @@ app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authSe
         //{ dataField: 'Comment', caption: 'Note', allowResizing: true, alignment: 'left', dataType: 'date', allowEditing: false, width: 300 },
     ];
 
-    $scope.tree_height = $(window).height() - 300;
+    $scope.tree_height = $(window).height() - 288;
     $scope.referred_list = {
         keyExpr: 'Id',
         parentIdExpr: 'ParentId',
         columns: $scope.referred_list_columns,
         noDataText: '',
+		selection:{mode:'single'},
         columnAutoWidth: true,
+		autoExpandAll:'true',
 
         onContentReady: function (e) {
             if (!$scope.referred_list_instance)
@@ -545,7 +548,8 @@ app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authSe
 
         bindingOptions: {
             dataSource: 'referred_list_ds',
-            height: 'tree_height'
+            height: 'tree_height',
+			 expandedRowKeys: 'expandedRow',
 
         }
     }
@@ -576,7 +580,11 @@ app.controller('qaReferController', ['$scope', '$location', 'qaService', 'authSe
 
         $scope.bind();
     });
-
+ 
+	 var appWindow = angular.element($window);
+    appWindow.bind('resize', function () {
+		 $scope.tree_height = $(window).height() - 288;
+	});
 
 
 }]);

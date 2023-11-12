@@ -41,64 +41,67 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
                 widget: 'dxButton', location: 'before', options: {
                     type: 'default', text: 'Close The Report', validationGroup: 'result', onClick: function (e) {
 
-                        $scope.loadingVisible = true;
+
                         $scope.entity.Category = $scope.tempData.Category;
                         $scope.entity.Id = $scope.tempData.Id;
                         $scope.entity.Type = $scope.tempData.Type;
                         $scope.entity.EmployeeId = $scope.tempData.EmployeeId;
                         $scope.entity.isResponsible = $scope.isResponsible;
                         $scope.entity.Result = $rootScope.result.Result;
+                        General.Confirm(Config.Text_CloseConfirm, function (res) {
+                            if (res) {
+                                $scope.loadingVisible = true;
+                                qaService.acceptQA($scope.entity).then(function (response) {
+                                    $scope.loadingVisible = false;
+                                    $rootScope.result.Result = null;
+                                    General.ShowNotify(Config.Text_QAAccept, 'success');
+                                    if ($scope.isResponsible == true) {
 
-                        qaService.acceptQA($scope.entity).then(function (response) {
-                            $scope.loadingVisible = false;
-                            $rootScope.result.Result = null;
-                            General.ShowNotify(Config.Text_QAAccept, 'success');
-                            if ($scope.isResponsible == true) {
+                                        if (response.IsSuccess == true && $scope.tempData.Category == 'open') {
+                                            var row = Enumerable.From($rootScope.dg_open_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
+                                            row.Status = "Closed";
+                                            row.EmployeeStatus = "Closed";
+                                            row.Status = 1;
+                                            $rootScope.dg_determined_ds.push(row);
+                                            $rootScope.dg_open_ds = Enumerable.From($rootScope.dg_open_ds).Where(function (x) {
+                                                return x.Id != $scope.entity.Id;
+                                            }).ToArray();
+                                        }
 
-                                if (response.IsSuccess == true && $scope.tempData.Category == 'open') {
-                                    var row = Enumerable.From($rootScope.dg_open_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
-                                    row.Status = "Closed";
-                                    row.EmployeeStatus = "Closed";
-                                    row.Status = 1;
-                                    $rootScope.dg_determined_ds.push(row);
-                                    $rootScope.dg_open_ds = Enumerable.From($rootScope.dg_open_ds).Where(function (x) {
-                                        return x.Id != $scope.entity.Id;
-                                    }).ToArray();
-                                }
+                                        if (response.IsSuccess == true && $scope.tempData.Category == 'new') {
+                                            var row = Enumerable.From($rootScope.dg_new_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
+                                            row.Status = "Closed";
+                                            row.EmployeeStatus = "Closed";
+                                            row.Status = 1;
+                                            $scope.tempData.Category = "open";
+                                            $rootScope.dg_determined_ds.push(row);
+                                            $rootScope.dg_new_ds = Enumerable.From($rootScope.dg_new_ds).Where(function (x) {
+                                                return x.Id != $scope.entity.Id;
+                                            }).ToArray();
+                                        }
+                                    } else {
+                                        if (response.IsSuccess == true && $scope.tempData.Category == 'open') {
+                                            var row = Enumerable.From($rootScope.dg_open_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
+                                            row.Status = "Closed";
+                                            row.EmployeeStatus = "Closed";
+                                            $rootScope.dg_determined_ds.push(row);
+                                            $rootScope.dg_open_ds = Enumerable.From($rootScope.dg_open_ds).Where(function (x) {
+                                                return x.Id != $scope.entity.Id;
+                                            }).ToArray();
+                                        }
 
-                                if (response.IsSuccess == true && $scope.tempData.Category == 'new') {
-                                    var row = Enumerable.From($rootScope.dg_new_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
-                                    row.Status = "Closed";
-                                    row.EmployeeStatus = "Closed";
-                                    row.Status = 1;
-                                    $scope.tempData.Category = "open";
-                                    $rootScope.dg_determined_ds.push(row);
-                                    $rootScope.dg_new_ds = Enumerable.From($rootScope.dg_new_ds).Where(function (x) {
-                                        return x.Id != $scope.entity.Id;
-                                    }).ToArray();
-                                }
-                            } else {
-                                if (response.IsSuccess == true && $scope.tempData.Category == 'open') {
-                                    var row = Enumerable.From($rootScope.dg_open_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
-                                    row.Status = "Closed";
-                                    row.EmployeeStatus = "Closed";
-                                    $rootScope.dg_determined_ds.push(row);
-                                    $rootScope.dg_open_ds = Enumerable.From($rootScope.dg_open_ds).Where(function (x) {
-                                        return x.Id != $scope.entity.Id;
-                                    }).ToArray();
-                                }
-
-                                if (response.IsSuccess == true && $scope.tempData.Category == 'new') {
-                                    var row = Enumerable.From($rootScope.dg_new_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
-                                    row.Status = "Closed";
-                                    row.EmployeeStatus = "Closed";
-                                    $rootScope.dg_determined_ds.push(row);
-                                    $rootScope.dg_new_ds = Enumerable.From($rootScope.dg_new_ds).Where(function (x) {
-                                        return x.Id != $scope.entity.Id;
-                                    }).ToArray();
-                                }
+                                        if (response.IsSuccess == true && $scope.tempData.Category == 'new') {
+                                            var row = Enumerable.From($rootScope.dg_new_ds).Where("$.Id==" + $scope.entity.Id).FirstOrDefault();
+                                            row.Status = "Closed";
+                                            row.EmployeeStatus = "Closed";
+                                            $rootScope.dg_determined_ds.push(row);
+                                            $rootScope.dg_new_ds = Enumerable.From($rootScope.dg_new_ds).Where(function (x) {
+                                                return x.Id != $scope.entity.Id;
+                                            }).ToArray();
+                                        }
+                                    }
+                                });
                             }
-
 
                         });
                     }

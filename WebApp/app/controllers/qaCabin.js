@@ -85,11 +85,11 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
             options.component.release(true);
 
         },
-        onReachBottom: function (e) {
-            // ..  
-            e.component.release(true);
-            // ..  
-        },
+		onReachBottom: function(e) {  
+    // ..  
+    e.component.release(true);  
+    // ..  
+} ,
         onInitialized: function (e) {
 
 
@@ -396,8 +396,8 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
     ////////////////////////////////
     var appWindow = angular.element($window);
     appWindow.bind('resize', function () {
-        $scope.scroll_qaCabin_height = $(window).height() - 170;
-    });
+		$scope.scroll_qaCabin_height = $(window).height() - 170;
+	});
 
     $scope.$on('InitQACabin', function (event, prms) {
 

@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', function ($http, $q, ngAuthSettings, $rootScope) {
 
     var serviceFactory = {};
@@ -387,6 +387,31 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
         return deferred.promise;
     }
 
+    var _getCyberReport = function (ymf, ymt) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/get/qa/cyber/report/' + ymf + "/" + ymt).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _getVoluntaryReport = function (ymf, ymt) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/get/qa/voluntary/report/' + ymf + "/" + ymt).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+
     var _getCateringReport = function (ymf, ymt) {
 
         var deferred = $q.defer();
@@ -719,6 +744,44 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
         return deferred.promise;
     }
 
+    var _getQAFormByDate = function (yearmonth, type) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/qa/form/date/' + yearmonth + "/" + type).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _getQAFormByRegister = function (yf, yt, mf, mt, register, type) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/qa/form/register/' + yf + "/" + yt + "/" + (mf + 1) + "/" + (mt + 1) + "/" + register + "/" + type).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _getQAFormByRoute = function (yf, yt, mf, mt, route, type) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/qa/form/route/' + yf + "/" + yt + "/" + (mf + 1) + "/" + (mt + 1) + "/" + route + "/" + type).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+
+
 
 
     serviceFactory.getQAByEmployee = _getQAByEmployee;
@@ -771,6 +834,10 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
     serviceFactory.getMaintenanceRegReport = _getMaintenanceRegReport
     serviceFactory.getCabinReport = _getCabinReport
     serviceFactory.getDispatchReport = _getDispatchReport
+    serviceFactory.getVoluntaryReport = _getVoluntaryReport
+    serviceFactory.getCyberReport = _getCyberReport
+
+
     serviceFactory.getQAEmployee = _getQAEmployee
 
     serviceFactory.referre = _referre
@@ -797,6 +864,11 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
 
     serviceFactory.saveComment = _saveComment;
     serviceFactory.getStation = _getStation;
+
+
+    serviceFactory.getQAFormByDate = _getQAFormByDate;
+    serviceFactory.getQAFormByRegister = _getQAFormByRegister;
+    serviceFactory.getQAFormByRoute = _getQAFormByRoute;
 
 
 

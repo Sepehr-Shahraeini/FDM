@@ -179,6 +179,10 @@
     #dg_events .dx-icon.dx-icon-export-excel-button {
         color: white;
     }
+	
+	.tile-form-selected{
+	   background:#66ffc2 !important;
+	}
 </style>
 
 
@@ -192,240 +196,397 @@
 
 
     <div class="rowx content" style="clear:both">
+        <div dx-popup="popup_form_list" id="popup_form_list">
+            <div id="dg_form_list" dx-data-grid="dg_form_list" class="content" style="overflow-y:hidden" dx-item-alias="row"></div>
+        </div>
+
+        <div id="popup_form" dx-popup="popup_form" class="no-padding">
+            <div ng-include="'app/views/qaCatering.html?vx=2'" ng-if="Type == 4 && popup_form_visible == true" onload="cateringLoaded()"></div>
+            <div ng-include="'app/views/qaCabin.html?vx=2'" ng-if="Type == 0 && popup_form_visible == true" onload="cabinLoaded()"></div>
+            <div ng-include="'app/views/qaMaintenance.html?vx=2'" ng-if="Type == 3 && popup_form_visible == true" onload="maintenanceLoaded()"></div>
+            <div ng-include="'app/views/qaGround.html?vx=2'" ng-if="Type == 1 && popup_form_visible == true" onload="groundLoaded()"></div>
+            <div ng-include="'app/views/qaVoluntary.html?vx=2'" ng-if="Type == 2 && popup_form_visible == true" onload="voluntaryLoaded()"></div>
+            <div ng-include="'app/views/qaSecurity.html?vx=2'" ng-if="Type == 5 && popup_form_visible == true" onload="securityLoaded()"></div>
+            <div ng-include="'app/views/qaDispatch.html?vx=2'" ng-if="Type == 6 && popup_form_visible == true" onload="dispatchLoaded()"></div>
+            <div ng-include="'app/views/qaCyberSecurity.html?vx=2'" ng-if="Type == 7 && popup_form_visible == true" onload="cyberLoaded()"></div>
+        </div>
+
         <div dx-scroll-view="scroll_1">
 
 
             <div class='visible-lg'>
-                <div class='col-lg-12' style='padding:10px 11px 10px 14px'>
+
+                <div>
+                    <div class="col-lg-3 col-md-3  " style="padding: 2px; height: 150px" ng-click="Type = 0">
+                        <div class="chartBox" style="width: 100%; height: 100%" ng-class='get_form_tile_class(0)'>
+                            <p style="text-align: center; font-size: 16px; padding-top: 5px">Cabin Safty Report</p>
+                            <p style="text-align: center; font-size: 60px; margin-top: 0">{{ds_cabinTotal}}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3 " style="padding: 2px; height: 150px" ng-click="Type = 1">
+                        <div class="chartBox" style="width: 100%;height:100%" ng-class='get_form_tile_class(1)'>
+                            <p style="text-align: center; font-size: 16px; padding-top: 5px">Ground Damage Report</p>
+                            <p style="text-align: center; font-size: 60px;margin-top: 0">{{ds_groundTotal}}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3  " style="padding: 2px; height: 150px" ng-click="Type = 3">
+                        <div class="chartBox" style="width:100%;height:100%" ng-class='get_form_tile_class(3)'>
+                            <p style="text-align: center; font-size: 16px; padding-top: 5px">MAINTENANCE OCCURENCE REPORT</p>
+                            <p style="text-align: center; font-size: 60px; margin-top: 0 ">{{ds_maintenanceTotal}}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3  " style="padding: 2px; height: 150px" ng-click="Type = 6">
+                        <div class="chartBox" style="width:100%;height:100%" ng-class='get_form_tile_class(6)'>
+                            <p style="text-align: center; font-size: 16px; padding-top: 5px">DISPATCH HAZARD REPORT</p>
+                            <p style="text-align: center; font-size: 60px; margin-top: 0 ">{{ds_dispatchTotal}}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3  " style="padding: 2px; height: 150px" ng-click="Type = 5">
+                        <div class="chartBox" style="width:100%;height:100%" ng-class='get_form_tile_class(5)'>
+                            <p style="text-align: center; font-size: 16px; padding-top: 5px">SECURITY HAZARD REPORT</p>
+                            <p style="text-align: center; font-size: 60px; margin-top: 0 ">{{ds_securityTotal}}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3  " style="padding: 2px; height: 150px" ng-click="Type = 4">
+                        <div class="chartBox" style="width:100%;height:100%" ng-class='get_form_tile_class(4)'>
+                            <p style="text-align: center; font-size: 16px; padding-top: 5px">CATERING HAZARD REPORT</p>
+                            <p style="text-align: center; font-size: 60px; margin-top: 0 ">{{ds_cateringTotal}}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3  " style="padding: 2px; height: 150px" ng-click="Type = 2">
+                        <div class="chartBox" style="width:100%;height:100%" ng-class='get_form_tile_class(2)'>
+                            <p style="text-align: center; font-size: 16px; padding-top: 5px">VOLUNTARY HAZARD REPORTING</p>
+                            <p style="text-align: center; font-size: 60px; margin-top: 0 ">{{ds_voluntaryTotal}}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3  " style="padding: 2px; height: 150px" ng-click="Type = 7">
+                        <div class="chartBox" style="width:100%;height:100%" ng-class='get_form_tile_class(7)'>
+                            <p style="text-align: center; font-size: 16px; padding-top: 5px">CYBER SECURITY HAZARD REPORT</p>
+                            <p style="text-align: center; font-size: 60px; margin-top: 0 ">{{ds_cyberTotal}}</p>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 0">
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
                         <div id="qaCSRChart" dx-chart="qaCSRChart"></div>
                     </div>
                 </div>
 
-                <div class='col-lg-12' style='padding:10px 11px 10px 14px'>
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 0">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaCSRByRegisterChart" dx-chart="qaCSRByRegisterChart"></div>
+                    </div>
+                </div>
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 0">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaCSRByRouteChart" dx-chart="qaCSRByRouteChart"></div>
+                    </div>
+                </div>
+
+                <div class='col-lg-6' style='padding:10px 11px 10px 14px' ng-if="Type == 3">
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
                         <div id="qaMaintenanceChart" dx-chart="qaMaintenanceChart"></div>
                     </div>
                 </div>
 
-                <div class='col-lg-12' style='padding:10px 11px 10px 14px'>
+                <div class='col-lg-6' style='padding:10px 11px 10px 14px' ng-if="Type == 3">
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
                         <div id="qaMaintenanceRegChart" dx-chart="qaMaintenanceRegChart"></div>
                     </div>
                 </div>
 
-                <div class='col-lg-12' style='padding:10px 11px 10px 14px'>
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 3">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaMaintenanceRoute" dx-chart="qaMaintenanceRoute"></div>
+                    </div>
+                </div>
+				
+				 <div class='col-lg-6' style='padding:10px 11px 10px 14px' ng-if="Type == 3">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                         <div dx-pie-chart="pie_maint_component"  ></div>
+                    </div>
+                </div>
+				 <div class='col-lg-6' style='padding:10px 11px 10px 14px' ng-if="Type == 3">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="bar_maint_component" dx-chart="bar_maint_component"></div>
+                    </div>
+                </div>
+				
+				<div style='clear:both'></div>
+				<div class='col-lg-12'  ng-if="Type == 3">
+				  <div  style='margin-top:5px;padding:7px;text-align:center;background:gray;color:white'>{{maint_component}}</div>
+				</div>
+				<div style='clear:both'></div>
+				<div class='col-lg-6' style='padding:10px 11px 10px 14px' ng-if="Type == 3">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                           <div id="bar_maint_component_reg" dx-chart="bar_maint_component_reg"></div>
+                    </div>
+                </div>
+				<div class='col-lg-6' style='padding:10px 11px 10px 14px' ng-if="Type == 3">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                         <div dx-pie-chart="pie_maint_component_regs"  ></div>
+                    </div>
+                </div>
+				
+				
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 6">
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
                         <div id="qaDispatchChart" dx-chart="qaDispatchChart"></div>
                     </div>
                 </div>
 
-                <div class='col-lg-12' style='padding:10px 11px 10px 14px'>
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 6">
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="qaCateringTreeMap" dx-tree-map="qaCateringTreeMap"></div>
+                        <div id="qaDispatchRegister" dx-chart="qaDispatchRegister"></div>
                     </div>
                 </div>
 
-                <div class='col-lg-12' style='padding:10px 11px 10px 14px'>
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 6">
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="qaGroundTreeMap" dx-tree-map="qaGroundTreeMap"></div>
+                        <div id="qaDispatchRoute" dx-chart="qaDispatchRoute"></div>
                     </div>
                 </div>
 
-                <div class='col-lg-12' style='padding:10px 11px 10px 14px'>
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 1">
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="qaSecurityTreeMap" dx-tree-map="qaSecurityTreeMap"></div>
+                        <div id="qaGroundChart" dx-chart="qaGroundChart"></div>
                     </div>
                 </div>
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 1">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaGroundRegister" dx-chart="qaGroundRegister"></div>
+                    </div>
+                </div>
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 1">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaGroundRoute" dx-chart="qaGroundRoute"></div>
+                    </div>
+                </div>
+
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 4">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaCateringChart" dx-chart="qaCateringChart"></div>
+                    </div>
+                </div>
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 4">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaCateringRegister" dx-chart="qaCateringRegister"></div>
+                    </div>
+                </div>
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 4">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaCateringRoute" dx-chart="qaCateringRoute"></div>
+                    </div>
+                </div>
+
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 5">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaSecurityChart" dx-chart="qaSecurityChart"></div>
+                    </div>
+                </div>
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 5">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaSecurityRegister" dx-chart="qaSecurityRegister"></div>
+                    </div>
+                </div>
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 5">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaSecurityRoute" dx-chart="qaSecurityRoute"></div>
+                    </div>
+                </div>
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 2">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaVoluntaryChart" dx-chart="qaVoluntaryChart"></div>
+                    </div>
+                </div>
+
+
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 7">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaCyberChart" dx-chart="qaCyberChart"></div>
+                    </div>
+                </div>
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 7">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaCyberRegister" dx-chart="qaCyberRegister"></div>
+                    </div>
+                </div>
+
+                <div class='col-lg-12' style='padding:10px 11px 10px 14px' ng-if="Type == 7">
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaCyberRoute" dx-chart="qaCyberRoute"></div>
+                    </div>
+                </div>
+
                 <div style="clear:both"></div>
             </div>
             <div style="clear:both"></div>
 
             <div class='visible-md visible-sm'>
 
-                <div class='col-md-12 col-sm-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="cptScoresChart" dx-chart="cptScoresChart"></div>
-                    </div>
-                </div>
-                <div class='col-md-12 col-sm-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="eventPerFlightChart" dx-chart="eventPerFlightChart"></div>
-                    </div>
-                </div>
-
-                <div class='col-md-12 col-sm-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="compareCptXS" dx-chart="compareCptXS"></div>
-                    </div>
-                </div>
-
-                <div class='col-md-12 col-sm-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="compareRegXS" dx-chart="compareRegXS"></div>
-                    </div>
-                </div>
-
-                <div class='col-md-12 col-sm-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="eventsTreeMap" dx-tree-map="eventsTreeMap"></div>
-                    </div>
-                </div>
-
-                <div class='col-md-12 col-sm-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="eventsMonthlyChart" dx-chart="eventsMonthlyChart"></div>
-                    </div>
-                </div>
-
-                <div class='col-md-12 col-sm-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="scoresMonthlyChart" dx-chart="scoresMonthlyChart"></div>
-                    </div>
-                </div>
-
-                <div class='col-md-12 col-sm-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="registerEventsChart" dx-chart="registerEventsChart"></div>
-                    </div>
-                </div>
-
-
-                <div class='col-md-12 col-sm-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="registerScoresChart" dx-chart="registerScoresChart"></div>
-                    </div>
-                </div>
-
-                <div class='col-md-12 col-sm-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="cptRouteChart" dx-chart="cptRouteChart"></div>
-                    </div>
-                </div>
-
-                <div class='col-md-12 col-sm-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="eventPerFlightRoute" dx-chart="eventPerFlightRoute"></div>
-                    </div>
-                </div>
 
             </div>
 
             <div class='visible-xs'>
 
-                <div class="col-xs-6 generalInfo chartBox" style='width:50%;height:150px'>
-                    <p style="font-size: 16px; padding-top: 5px">Flights</p>
-                    <p style="text-align: center; font-size: 40px;padding-top: 0px">{{ds_cptEventsGeneral.TotalFlightCount}}</p>
-                </div>
-                <div class="col-xs-6 generalInfo chartBox" style='width:49%;height:150px' ng-click="showEvents()">
-                    <p style="font-size: 16px; padding-top: 5px">Events</p>
-                    <p style="text-align: center; font-size: 40px;padding-top: 0px">{{ds_cptEventsGeneral.TotalEventsCount}}</p>
-                </div>
-                <div class="col-xs-6 generalInfo chartBox" style='width:50%;height:150px'>
-                    <p style="font-size: 16px; padding-top: 5px">Scores</p>
-                    <p style="text-align: center; font-size: 40px;padding-top: 0px">{{ds_cptEventsGeneral.TotalScores}}</p>
-                </div>
-                <div class="col-xs-6 generalInfo chartBox" style='width:49%;height:150px;padding:0 !important'>
-                    <div class="chartBox" style="height: 75px">
-                        <p style="font-size: 16px; padding-top: 5px; padding-left: 14px;margin-bottom: 0!important">Events per flight</p>
-                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.EventPerFlight.toFixed(2)}}</p>
-                    </div>
-                    <div class="chartBox" style="height: 75px">
-                        <p style="font-size: 16px; padding-top: 5px; padding-left: 14px;margin-bottom: 0!important">Score per flight</p>
-                        <p style="text-align: center; font-size: 23px">{{ds_cptEventsGeneral.ScorePerFlight.toFixed(2)}}</p>
-                    </div>
-                </div>
-                <div style="clear:both"></div>
-                <div class='col-md-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="totalEventsPieXS" dx-pie-chart="totalEventsPieXS"></div>
-                    </div>
-                </div>
-
-                <div style="clear:both"></div>
-
-                <div class="col-md-4 generalInfo chartBox" style=" height:100px;background:#ffb3b3">
-                    <p style="font-size: 16px; padding-top: 2px;margin:0">High Score</p>
-                    <p style="text-align: center; font-size: 40px;padding-top:0px;margin:0">{{ds_cptEventsGeneral.TotalHighScore}}</p>
-                </div>
-                <div class="col-md-4 generalInfo chartBox" style=" height:100px;background:#ffd9b3">
-                    <p style="font-size: 16px; padding-top: 2px;margin:0">Medium Score</p>
-                    <p style="text-align: center; font-size: 40px;padding-top:0px;margin:0">{{ds_cptEventsGeneral.TotalMediumScore}}</p>
-                </div>
-                <div class="col-md-4 generalInfo chartBox" style=" height:100px;background:#b3ffec">
-                    <p style="font-size: 16px; padding-top: 2px;margin:0">Low Score</p>
-                    <p style="text-align: center; font-size: 40px;padding-top:0px;margin:0">{{ds_cptEventsGeneral.TotalLowScore}}</p>
-                </div>
-
-                <div style="clear:both"></div>
 
                 <div class='col-xs-12' style='padding:10px 0 10px 0'>
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="cptScoresChartXS" dx-chart="cptScoresChartXS"></div>
+                        <div id="qaCSRChartXS" dx-chart="qaCSRChartXS"></div>
                     </div>
                 </div>
 
                 <div class='col-xs-12' style='padding:10px 0 10px 0'>
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="eventPerFlightChartXS" dx-chart="eventPerFlightChartXS"></div>
+                        <div id="qaCSRByRegisterXS" dx-chart="qaCSRByRegisterXS"></div>
                     </div>
                 </div>
 
                 <div class='col-xs-12' style='padding:10px 0 10px 0'>
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="compareCptXS" dx-chart="compareCptXS"></div>
+                        <div id="qaCSRByRouteXS" dx-chart="qaCSRByRouteXS"></div>
                     </div>
                 </div>
 
                 <div class='col-xs-12' style='padding:10px 0 10px 0'>
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="compareRegXS" dx-chart="compareRegXS"></div>
+                        <div id="qaMaintenanceChartXS" dx-chart="qaMaintenanceChartXS"></div>
                     </div>
                 </div>
 
                 <div class='col-xs-12' style='padding:10px 0 10px 0'>
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="eventsTreeMapXS" dx-tree-map="eventsTreeMapXS"></div>
+                        <div id="qaMaintenanceRegChartXS" dx-chart="qaMaintenanceRegChartXS"></div>
                     </div>
                 </div>
 
                 <div class='col-xs-12' style='padding:10px 0 10px 0'>
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="eventsMonthlyChartXS" dx-chart="eventsMonthlyChartXS"></div>
+                        <div id="qaMaintenanceRouteXS" dx-chart="qaMaintenanceRouteXS"></div>
                     </div>
                 </div>
 
                 <div class='col-xs-12' style='padding:10px 0 10px 0'>
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="scoresMonthlyChartXS" dx-chart="scoresMonthlyChartXS"></div>
+                        <div id="qaDispatchChartXS" dx-chart="qaDispatchChartXS"></div>
+                    </div>
+                </div>
+
+                <div class='col-xs-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaDispatchRegisterXS" dx-chart="qaDispatchRegisterXS"></div>
+                    </div>
+                </div>
+
+                <div class='col-xs-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaDispatchRouteXS" dx-chart="qaDispatchRouteXS"></div>
+                    </div>
+                </div>
+
+                <div class='col-xs-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaGroundChartXS" dx-chart="qaDispatchChartXS"></div>
+                    </div>
+                </div>
+
+                <div class='col-xs-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaGroundRegisterXS" dx-chart="qaDispatchRegisterXS"></div>
+                    </div>
+                </div>
+
+                <div class='col-xs-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaGroundRouteXS" dx-chart="qaDispatchRouteXS"></div>
+                    </div>
+                </div>
+
+                <div class='col-xs-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaCateringChartXS" dx-chart="qaCateringChartXS"></div>
+                    </div>
+                </div>
+
+                <div class='col-xs-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaCateringRegisterXS" dx-chart="qaCateringRegisterXS"></div>
+                    </div>
+                </div>
+
+                <div class='col-xs-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaCateringRouteXS" dx-chart="qaCateringRouteXS"></div>
+                    </div>
+                </div>
+
+                <div class='col-xs-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaSecurityChartXS" dx-chart="qaSecurityChartXS"></div>
+                    </div>
+                </div>
+
+                <div class='col-xs-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaSecurityRegisterXS" dx-chart="qaSecurityRegisterXS"></div>
+                    </div>
+                </div>
+
+                <div class='col-xs-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaSecurityRouteXS" dx-chart="qaSecurityRouteXS"></div>
+                    </div>
+                </div>
+
+                <div class='col-xs-12' style='padding:10px 0 10px 0'>
+                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                        <div id="qaVoluntaryChartXS" dx-chart="qaVoluntaryChartXS"></div>
                     </div>
                 </div>
 
 
                 <div class='col-xs-12' style='padding:10px 0 10px 0'>
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="registerEventsChartXS" dx-chart="registerEventsChartXS"></div>
-                    </div>
-                </div>
-
-
-                <div class='col-xs-12' style='padding:10px 0 10px 0'>
-                    <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="registerScoresChartXS" dx-chart="registerScoresChartXS"></div>
+                        <div id="qaCyberChartXS" dx-chart="qaCyberChartXS"></div>
                     </div>
                 </div>
 
                 <div class='col-xs-12' style='padding:10px 0 10px 0'>
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="cptRouteChartXS" dx-chart="cptRouteChartXS"></div>
+                        <div id="qaCyberRegisterXS" dx-chart="qaCyberRegisterXS"></div>
                     </div>
                 </div>
 
                 <div class='col-xs-12' style='padding:10px 0 10px 0'>
                     <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                        <div id="eventPerFlightRouteXS" dx-chart="eventPerFlightRouteXS"></div>
+                        <div id="qaCyberRouteXS" dx-chart="qaCyberRouteXS"></div>
                     </div>
                 </div>
+
 
 
             </div>
@@ -444,56 +605,12 @@
                     <td style="width:100px; padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_yt"></div></td>
                     <td style="width:100px; padding-right:5px" class="dx-border"><div class="center" dx-select-box="sb_mt"></div></td>
                     <td style="width:120px;margin-left:10px" dx-button="btn_search"></td>
-
-                    <!--<td style="width:100px;margin-left:10px" dx-button="btn_FDMEvents"></td>-->
                 </tr>
             </table>
         </div>
     </div>
 
 
-    <!--<div id="popup_date" dx-popup="popup_date">
-        <div class="margin-bottom-5 padding-7 dx-border" style="padding:25px 0 10px 0">
-            <div>
-                <label style="width:45px;text-align:right;margin-right:5px;">From</label>
-
-                <input type="text" class="date1 locale-en" style="border: 1px solid gray !important;padding:10px;text-align:center" />
-            </div>
-            <div style="margin-top:15px;">
-                <label style="width:45px;text-align:right; margin-right:5px;">To</label>
-
-                <input type="text" class="date2 locale-en" style="border: 1px solid gray !important;padding:10px;text-align:center" />
-            </div>
-
-
-
-        </div>
-
-
-    </div>-->
-    <!--<div id="popup" dx-popup="popup">
-        <div class="wrapper " style="padding:5px;background-color:whitesmoke">
-            <div class="padding-0" style="padding:0px; border:1px solid #ccc;background:white;margin-top:0px">
-
-
-                <div dx-data-grid="dg_events" id="dg_events" class="content" style="overflow-y:hidden;margin-top:10px" dx-item-alias="xrow">
-
-                    <div data-options="dxTemplate:{ name:'titleTemplate' }">
-                        <div>
-                            <span style='color:white;'>Records</span>
-                        </div>
-                    </div>
-                    <div data-options="dxTemplate:{ name:'titleTemplate' }">
-                        <div>
-                            <span style='color:white;'>Flights</span>
-                        </div>
-                    </div>
-                </div>
-
-
-            </div>
-        </div>
-    </div>-->
     <div dx-load-panel="loadPanel"></div>
 
 </div>

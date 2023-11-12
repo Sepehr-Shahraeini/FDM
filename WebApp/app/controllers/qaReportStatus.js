@@ -21,12 +21,13 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
 
     };
 
-     $rootScope.employeeId = 4539,
+    $rootScope.employeeId = 4539;
     $scope.entity = {
         employeeId: $rootScope.employeeId,
     }
 
     $scope.entity.type = $routeParams.type;
+	
 
 
     $scope.$watch("selectedTabIndex", function (newValue) {
@@ -55,10 +56,10 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
             }
             if ($scope.dg_new_instance)
                 $scope.dg_new_instance.refresh();
-            if ($scope.dg_confirmed_instance)
-                $scope.dg_confirmed_instance.refresh();
-            if ($scope.dg_notDetermined_instance)
-                $scope.dg_notDetermined_instance.refresh();
+            if ( $scope.dg_open_instance)
+                $scope.dg_open_instance.refresh();
+            if ( $scope.dg_determined_instance)
+                 $scope.dg_determined_instance.refresh();
 
         }
         catch (e) {
@@ -255,12 +256,14 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
 
 
 
-        { dataField: 'Id', caption: 'Id', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 150 },
+        { dataField: 'Id', caption: 'Id', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100 },
         { dataField: 'FlightNumber', caption: 'FlightNumber', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 150 },
+        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Register', caption: 'Register', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
+        { dataField: 'FlightDate', caption: 'Flight Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 250 },
         { dataField: 'EmployeeName', caption: 'Producer', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, minwidth: 250 },
         { dataField: 'DateOccurrence', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 250 },
         { dataField: 'ReviewResultTitle', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
-
 
 
 
@@ -308,9 +311,8 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
 
         onRowClick: function (e) {
 
-            console.log(e);
 
-            var data = {
+               var data = {
                 Id: e.data.Id,
                 Type: $scope.entity.type,
                 EmployeeId: $rootScope.employeeId,
@@ -355,10 +357,11 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
-                case '7':
+					  case '7':
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
+
             }
         },
 
@@ -394,7 +397,6 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
 
     $scope.dg_open_columns = [
 
-
         {
             cellTemplate: function (container, options) {
                 $("<div style='text-align:center'/>")
@@ -404,10 +406,13 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
         },
 
 
-        { dataField: 'Id', caption: 'Id', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 150 },
-        { dataField: 'FlightNumber', caption: 'FlightNumber', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 150 },
+        { dataField: 'Id', caption: 'Id', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80 },
+        { dataField: 'FlightNumber', caption: 'FlightNumber', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100 },
+        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Register', caption: 'Register', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
+        { dataField: 'FlightDate', caption: 'Flight Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 180 },
         { dataField: 'EmployeeName', caption: 'Producer', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, minwidth: 250 },
-        { dataField: 'DateOccurrence', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 250 },
+        { dataField: 'DateOccurrence', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 180 },
         { dataField: 'ReviewResultTitle', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
         {
             dataField: 'Status', caption: ' Main Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, cellTemplate: function (container, options) {
@@ -426,8 +431,9 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                 }
             }
         },
-        { dataField: 'ReferCount', caption: 'Referred', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'ClosedCount', caption: 'Closed', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'ReferCount', caption: 'Referred', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+        { dataField: 'ClosedCount', caption: 'Closed', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+
 
 
 
@@ -472,16 +478,14 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
 
         onRowClick: function (e) {
 
-            var data = {
+                var data = {
                 Id: e.data.Id,
                 Type: $scope.entity.type,
                 EmployeeId: $rootScope.employeeId,
-                Status: e.data.Status,
+                isNotDetermined: true,
                 Category: 'open',
                 ProducerId: e.data.EmployeeId
-
-            }
-
+            };
             if (e.data.Status == 1)
                 data.isNotLocked = false;
             else
@@ -517,7 +521,7 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
-                case '7':
+					  case '7':
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
@@ -559,7 +563,6 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
 
     $scope.dg_determined_columns = [
 
-
         {
             cellTemplate: function (container, options) {
                 $("<div style='text-align:center'/>")
@@ -569,10 +572,13 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
         },
 
 
-        { dataField: 'Id', caption: 'Id', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 150 },
-        { dataField: 'FlightNumber', caption: 'FlightNumber', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 150 },
+        { dataField: 'Id', caption: 'Id', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80 },
+        { dataField: 'FlightNumber', caption: 'FlightNumber', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100 },
+        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
+        { dataField: 'Register', caption: 'Register', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
+        { dataField: 'Flight Date', caption: 'FlightDate', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 180 },
         { dataField: 'EmployeeName', caption: 'Producer', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, minwidth: 250 },
-        { dataField: 'DateOccurrence', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 250 },
+        { dataField: 'DateOccurrence', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 180 },
         { dataField: 'EmployeeStatus', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
         {
             dataField: 'Status', caption: 'Main Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, cellTemplate: function (container, options) {
@@ -591,9 +597,8 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                 }
             }
         },
-        { dataField: 'ReferCount', caption: 'Referred', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'ClosedCount', caption: 'Closed', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-
+        { dataField: 'ReferCount', caption: 'Referred', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
+        { dataField: 'ClosedCount', caption: 'Closed', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
 
 
 
@@ -626,7 +631,7 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
         selection: { mode: 'single' },
 
         columnAutoWidth: false,
-        height: $(window).height() - 155,
+       height: $(window).height() - 155,
 
         columns: $scope.dg_determined_columns,
         onContentReady: function (e) {
@@ -638,11 +643,11 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
         onRowClick: function (e) {
 
 
-            var data = {
+              var data = {
                 Id: e.data.Id,
                 Type: $scope.entity.type,
                 EmployeeId: $rootScope.employeeId,
-                Status: e.data.Status,
+                isNotDetermined: true,
                 ProducerId: e.data.EmployeeId
             };
 
@@ -681,7 +686,7 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
-                case '7':
+					  case '7':
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
@@ -750,6 +755,7 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
         authService.redirectToLogin();
     }
     else {
+		 //$rootScope.Title = $routeParams.title.replaceAll('_','/');
         $rootScope.page_title = '> ' + $rootScope.Title;
 
 

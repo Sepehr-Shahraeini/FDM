@@ -26,9 +26,11 @@ app.controller('qaEmployee', ['$scope', '$location', 'authService', '$routeParam
         }
     };
     $scope.dg_columns = [
-        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 250 },
-        { dataField: 'TypeTitle', caption: 'Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 250 },
-        { dataField: 'ReceiverEmployeeId', caption: 'ReceiverEmployeeId', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 260 },
+        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 200 },
+		{ dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
+		{ dataField: 'Mobile', caption: 'Mobile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
+        //{ dataField: 'TypeTitle', caption: 'Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 250 },
+       // { dataField: 'ReceiverEmployeeId', caption: 'ReceiverEmployeeId', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 260 },
 
     ];
     $scope.dg_selected = null;
@@ -79,8 +81,8 @@ app.controller('qaEmployee', ['$scope', '$location', 'authService', '$routeParam
 
     /////////////////////////////
 
-    $scope.pop_width = 800;
-    $scope.pop_height = 500;
+    $scope.pop_width = 700;
+    $scope.pop_height = $(window).height()-100;
     $scope.popup_add_visible = false;
     $scope.popup_add_title = 'Employees';
     $scope.popup_add = {
@@ -101,11 +103,11 @@ app.controller('qaEmployee', ['$scope', '$location', 'authService', '$routeParam
         dragEnabled: false,
         closeOnOutsideClick: false,
         onShowing: function (e) {
-            var size = $rootScope.getWindowSize();
+            /*var size = $rootScope.getWindowSize();
             if (size.width <= 800) {
                 $scope.pop_width = size.width;
                 $scope.pop_height = size.height;
-            }
+            }*/
             $scope.dg_height = $scope.pop_height - 200;
         },
         onShown: function (e) {
@@ -195,6 +197,7 @@ app.controller('qaEmployee', ['$scope', '$location', 'authService', '$routeParam
     };
 
     $scope.referComment = {
+		hegiht:50,
         bindingOptions: {
             value: 'Comment'
         }
