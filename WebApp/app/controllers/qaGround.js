@@ -147,12 +147,21 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
 
     $scope.txt_date = {
         hoverStateEnabled: false,
-        useMaskBehavior: true,
-        width: '100%',
-        displayFormat: 'yyyy-MM-dd HH:mm',
-        type: 'datetime',
         readOnly: true,
-        focusStateEnabled: false,
+        type: 'datetime',
+        pickerType: "rollers",
+        displayFormat: "yyyy-MMM-dd",
+        bindingOptions: {
+            value: 'entity.DateOccurrence',
+        }
+    }
+
+    $scope.txt_OccurrenceTime = {
+        hoverStateEnabled: false,
+        readOnly: true,
+        type: 'time',
+        pickerType: "rollers",
+        displayFormat: "HH:mm",
         bindingOptions: {
             value: 'entity.DateOccurrence',
         }
@@ -216,6 +225,9 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
         hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
+        type: 'time',
+        pickerType: "rollers",
+        displayFormat: "HH:mm",
         bindingOptions: {
             value: 'entity.ScheduledGroundTime',
         }
@@ -225,6 +237,9 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
         hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
+        type: 'time',
+        pickerType: "rollers",
+        displayFormat: "HH:mm",
         bindingOptions: {
             value: 'entity.FlightDelay',
         }

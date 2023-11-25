@@ -145,16 +145,92 @@ app.controller('qaCateringController', ['$scope', '$location', 'qaService', 'aut
     }
 
     $scope.txt_hazardDate = {
+        hoverStateEnabled: false,
+        readOnly: true,
+        type: 'date',
+        pickerType: "rollers",
+        displayFormat: "yyyy-MMM-dd",
+        bindingOptions: {
+            value: 'entity.DateOccurrence',
+        }
+    }
+    $scope.txt_hazardTime = {
+        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
-        width: '100%',
-        displayFormat: 'yyyy-MM-dd HH:mm',
-        type: 'datetime',
+        type: 'time',
+        pickerType: "rollers",
+        displayFormat: "HH:mm",
         bindingOptions: {
             value: 'entity.DateOccurrence',
         }
     }
 
+    $scope.txt_description = {
+        hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
+        bindingOptions: {
+            value: 'entity.Description',
+        }
+    }
+
+
+    $scope.dsInjury = [
+        { value: false, title: 'NO' },
+        { value: true, title: 'YES' },
+    ];
+
+    $scope.sb_injuryOccurring = {
+        showClearButton: false,
+        searchEnabled: false,
+        dataSource: $scope.dsInjury,
+        placeholder: '',
+        displayExpr: 'title',
+        valueExpr: 'value',
+        bindingOptions: {
+            value: 'entity.InjeryOccurring',
+        }
+    }
+
+
+    $scope.txt_injuryDescription = {
+        hoverStateEnabled: false,
+        bindingOptions: {
+            value: 'entity.InjuryDescription',
+        }
+    }
+
+
+    $scope.dsSafty = [
+        { value: false, title: 'NO' },
+        { value: true, title: 'YES' },
+    ];
+
+    $scope.sb_safty = {
+        showClearButton: false,
+        searchEnabled: false,
+        dataSource: $scope.dsSafty,
+        placeholder: '',
+        displayExpr: 'title',
+        valueExpr: 'value',
+        bindingOptions: {
+            value: 'entity.SaftyEquipmentUseage',
+            useMaskBehavior: 'isEditable',
+            readOnly: '!isEditable'
+        }
+    }
+
+
+
+    $scope.txt_saftyEquipmentType = {
+        hoverStateEnabled: false,
+        bindingOptions: {
+            value: 'entity.SaftyEquipmentType',
+            useMaskBehavior: 'isEditable',
+            readOnly: '!isEditable'
+        }
+    }
 
     $scope.txt_area = {
         readOnly: true,

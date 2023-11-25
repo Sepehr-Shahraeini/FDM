@@ -183,6 +183,12 @@ app.controller('qaVoluntaryController', ['$scope', '$location', 'qaService', 'au
         }
     }
 
+    $scope.txt_relatedDepartment = {
+        bindingOptions: {
+            value: 'entity.RelatedDepartment',
+        }
+    }
+
     $scope.dg_attachments_columns = [
 
 

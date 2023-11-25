@@ -1,4 +1,18 @@
-﻿<div ng-controller="qaVoluntaryController">
+﻿<style>
+    .tdStyle {
+        padding: 7px;
+        text-align: left
+    }
+
+    .titleStyle {
+        background-color: whitesmoke;
+        padding: 7px;
+        text-align: left;
+        color: black;
+        font-weight: bold
+    }
+</style>
+<div ng-controller="qaVoluntaryController">
     <div style="padding:0px 10px 0 10px;">
         <div style="margin-top: 0px; float: left; overflow: hidden; width: 60%;padding:10px 15px 0 0px">
             <div style='background:#898e8c;color:white;font-weight:bold;padding:7px;text-align:center'>VOLUNTARY HAZARD REPORT</div>
@@ -9,26 +23,28 @@
                     <div class="visible-sm visible-md visible-lg">
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold" colspan="4">
+                                <td class="titleStyle" colspan="4">
                                     Contact Information (Optionally) (اطلاعات تماس (اختیاری
                                 </td>
                             </tr>
                             <tr>
                                 <td style="padding: 7px;text-align:left; font-weight: bold"> Email (آدرس ایمیل): </td>
-                                <td style="padding:7px;text-align:left;"><div dx-text-box="txt_email" class="center" dx-validator="{validationGroup:'asradd',  validationRules: [{ type: 'required',   }]}"></div></td>
+                                <td style="padding:7px;text-align:left;"><div dx-text-box="txt_email" class="center"></div></td>
                                 <td style="padding: 7px;text-align:left; font-weight: bold"> Tel No. (شماره تلفن): </td>
-                                <td style="padding:7px;text-align:left;"><div dx-text-box="txt_telNumber" class="center" dx-validator="{validationGroup:'asradd',  validationRules: [{ type: 'required',   }]}"></div></td>
+                                <td style="padding:7px;text-align:left;"><div dx-text-box="txt_telNumber" class="center"></div></td>
                             </tr>
                             <tr>
                                 <td style="padding: 7px;text-align:left; font-weight: bold"> Full Name (نام و نام‌خانوادگی): </td>
                                 <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_name" class="center"></div></td>
+                                <td style="padding: 7px;text-align:left; font-weight: bold"> Related Department (واحد مربوطه):</td>
+                                <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_relatedDepartment" class="center"></div></td>
                             </tr>
                         </table>
 
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold" colspan="4">
-                                    Hazard Details جزئیات پتانسیل خطر:
+                                <td class="titleStyle" colspan="4">
+                                    Hazard Details (جزئیات پتانسیل خطر):
                                 </td>
                             </tr>
                             <tr>
@@ -39,7 +55,7 @@
                             </tr>
                             <tr>
                                 <td style="padding: 7px;text-align:left; font-weight: bold"> Report Date: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-date-box="txt_repDate"></div></td>
+                                <td style="padding: 7px;text-align:left;"> <div dx-date-box="txt_repDate" class="center"></div></td>
                             </tr>
                         </table>
 
@@ -47,8 +63,8 @@
 
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold">
-                                    Description of Incident/Hazard
+                                <td class="titleStyle">
+                                    Description of Incident/Hazard (شرح پتانسیل خطر یا حادثه):
                                 </td>
                             </tr>
                             <tr>
@@ -59,8 +75,8 @@
 
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold">
-                                    Recommended action to mitigate hazard
+                                <td class="titleStyle">
+                                    Recommended action to mitigate hazard (اقدام توصیه شده جهت رفع پتانسیل خطر):
                                 </td>
                             </tr>
                             <tr>
@@ -71,7 +87,7 @@
 
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold">
+                                <td class="titleStyle" style="background-color: #66ffcc !important">
                                     Result
                                 </td>
                             </tr>
@@ -83,7 +99,7 @@
 
 
                         <div style="clear:both"></div>
-                        <div style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold; margin-top: 10px">
+                        <div class="titleStyle" style="margin-top:10px">
                             ATTACHED DOCUMENTS
                         </div>
                         <div dx-data-grid="dg_attachments" id="dg_attachments" class="content" style="overflow-y:hidden" dx-item-alias="row">

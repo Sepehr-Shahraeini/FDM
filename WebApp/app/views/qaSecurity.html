@@ -1,4 +1,18 @@
-﻿<div ng-controller="qaSecurityController">
+﻿<style>
+    .td-field {
+        padding: 7px;
+        text-align: right
+    }
+
+    .td-title {
+        background-color: whitesmoke;
+        padding: 7px;
+        text-align: right;
+        color: black;
+        font-weight: bold
+    }
+</style>
+<div ng-controller="qaSecurityController">
     <div style="padding:0px 10px 0 10px;">
         <div style="margin-top: 0px; float: left; overflow: hidden; width: 60%;padding:10px 15px 0 0px">
             <div style='background:#898e8c;color:white;font-weight:bold;padding:7px;text-align:center'>SECURITY HAZARD REPORT</div>
@@ -7,51 +21,51 @@
                     <div class="visible-sm visible-md visible-lg">
                         <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold" colspan="2">
+                                <td class="td-title" colspan="2">
                                     Contact Information (Optionally) (اطلاعات تماس (اختیاری
                                 </td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Email (آدرس ایمیل): </td>
-                                <td style="padding:7px;text-align:left;"><div dx-text-box="txt_email" class="center" dx-validator="{validationGroup:'asradd',  validationRules: [{ type: 'required',   }]}"></div></td>
+                                <td class="td-field"><div dx-text-box="txt_email" class="center"></div></td>
+                                <td class="td-field" style="font-weight:bold"> :(Email) آدرس ایمیل </td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Tel No. (شماره تلفن): </td>
-                                <td style="padding:7px;text-align:left;"><div dx-text-box="txt_telNumber" class="center" dx-validator="{validationGroup:'asradd',  validationRules: [{ type: 'required',   }]}"></div></td>
+                                <td class="td-field"><div dx-text-box="txt_telNumber" class="center"></div></td>
+                                <td class="td-field" style="font-weight: bold"> :(Tel No.) شماره تلفن </td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Full Name (نام و نام‌خانوادگی): </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_name" class="center"></div></td>
+                                <td class="td-field"> <div dx-text-box="txt_name" class="center"></div></td>
+                                <td class="td-field" style="font-weight: bold"> :(Full Name) نام و نام‌خانوادگی </td>
                             </tr>
                         </table>
                         <table style="margin-top: 10px; border: 1px solid #eee; width: 100%; color: black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: right; color: black; font-weight: bold" colspan="4">
+                                <td class="td-title" colspan="4">
                                     اطلاعات اولیه
                                 </td>
                             </tr>
                             <tr>
-                                <td style="padding:7px;text-align:right;"><div dx-date-box="txt_reportDate" class="center"></div></td>
-                                <td style="padding: 7px;text-align:right; font-weight: bold"> :تاریخ گزارش </td>
-                                <td style="padding:7px;text-align:right;"><div dx-date-box="txt_hazardDate" class="center"></div></td>
-                                <td style="padding: 7px;text-align:right; font-weight: bold"> :تاریخ و ساعت بروز رویداد/مخاطره </td>
+                                <td class="td-field"><div dx-date-box="txt_reportDate" class="center"></div></td>
+                                <td class="td-field" style=" font-weight: bold"> :تاریخ گزارش </td>
+                                <td class="td-field"><div dx-date-box="txt_hazardDate" class="center"></div></td>
+                                <td class="td-field" style="font-weight: bold"> :تاریخ و ساعت بروز رویداد/مخاطره </td>
                             </tr>
                             <tr>
-                                <td style="padding:7px;text-align:right;"><div dx-text-box="txt_area" class="center"></div></td>
-                                <td style="padding: 7px;text-align:right; font-weight: bold"> :محل و بخض رویداد/مخاطره </td>
-                                <td style="padding:7px;text-align:right;"><div dx-text-box="txt_register" class="center"></div></td>
-                                <td style="padding: 7px;text-align:right; font-weight: bold"> :علامت ثبت هواپیما </td>
+                                <td class="td-field"><div dx-text-box="txt_area" class="center"></div></td>
+                                <td class="td-field" style="font-weight: bold"> :محل و بخض رویداد/مخاطره </td>
+                                <td class="td-field"><div dx-text-box="txt_register" class="center"></div></td>
+                                <td class="td-field" style="font-weight: bold"> :علامت ثبت هواپیما </td>
                             </tr>
                             <tr>
-                                <td style="padding:7px;text-align:right;"><div dx-text-box="txt_route" class="center"></div></td>
-                                <td style="padding: 7px;text-align:right; font-weight: bold"> :مسیر پرواز </td>
-                                <td style="padding:7px;text-align:right;"><div dx-text-box="txt_flightNumber" class="center"></div></td>
-                                <td style="padding: 7px;text-align:right; font-weight: bold"> :شماره پرواز </td>
+                                <td class="td-field"><div dx-text-box="txt_route" class="center"></div></td>
+                                <td class="td-field" style=" font-weight: bold"> :مسیر پرواز </td>
+                                <td class="td-field"><div dx-text-box="txt_flightNumber" class="center"></div></td>
+                                <td class="td-field" style="font-weight: bold"> :شماره پرواز </td>
                             </tr>
                         </table>
 
                         <div style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
-                            <div style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold">
+                            <div class="td-title">
                                 :عامل بروز مخاطره/رویداد
                             </div>
 
@@ -59,91 +73,93 @@
                                 <p style="margin-right:5px;display:inline-block">{{x.Title}}</p><input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="optReason[$index]" ng-change="chkReason($index)" ng-disabled="true" />
                             </div>
                             <div style="clear:both"></div>
-                            <div ng-show="showOther" style="margin:1%;border:1px solid #eee;width:98%;color:black" dx-text-area="txt_eventOther"></div>
+                            <div ng-show="showOther" class="td-field" dx-text-area="txt_eventOther"></div>
                         </div>
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: right; color: black; font-weight: bold" colspan="6">
+                                <td class="td-title" colspan="6">
                                     جزئیات پتانسیل خطر
                                 </td>
                             </tr>
 
 
                             <tr>
-                                <td style="padding:7px;text-align:right;"><div dx-text-box="txt_camera" class="center"></div></td>
-                                <td style="padding: 7px;text-align:right; font-weight: bold"> :دوربین </td>
-                                <td style="padding:7px;text-align:right;"><div dx-text-box="txt_carryingBox" class="center"></div></td>
-                                <td style="padding: 7px;text-align:right; font-weight: bold"> :جعبه حمل اشیاء ممنوعه </td>
-                                <td style="padding:7px;text-align:right;"><div dx-text-box="txt_handRocket" class="center"></div></td>
-                                <td style="padding: 7px;text-align:right; font-weight: bold"> :راکت‌دستی بازرسی کترینگ </td>
+                                <td class="td-field"><div dx-text-box="txt_camera" class="center"></div></td>
+                                <td class="td-field" style="font-weight: bold"> :دوربین </td>
+                                <td class="td-field"><div dx-text-box="txt_carryingBox" class="center"></div></td>
+                                <td class="td-field" style="font-weight: bold"> :جعبه حمل اشیاء ممنوعه </td>
+                                <td class="td-field"><div dx-text-box="txt_handRocket" class="center"></div></td>
+                                <td class="td-field" style="font-weight: bold"> :راکت‌دستی بازرسی کترینگ </td>
                             </tr>
                             <tr>
-                                <td style="padding:7px;text-align:right;"><div dx-text-box="txt_comail" class="center"></div></td>
-                                <td style="padding: 7px;text-align:right; font-weight: bold"> Co mail: </td>
-                                <td style="padding:7px;text-align:right;"><div dx-text-box="txt_other" class="center"></div></td>
-                                <td style="padding: 7px;text-align:right; font-weight: bold"> :سایر </td>
+                                <td class="td-field"><div dx-text-box="txt_comail" class="center"></div></td>
+                                <td class="td-field" style="font-weight: bold"> Co mail: </td>
+                                <td class="td-field"><div dx-text-box="txt_other" class="center"></div></td>
+                                <td class="td-field" style="font-weight: bold"> :سایر </td>
                             </tr>
                         </table>
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: right; color: black; font-weight: bold" colspan="4">
-                                    گزارش شرایط و جزئیات تجهیزات مرتبط با مخاطره/رویداد
+                                <td class="td-title">
+                                    :گزارش شرایط و جزئیات تجهیزات مرتبط با مخاطره/رویداد
                                 </td>
                             </tr>
                             <tr>
-                                <td style="padding:7px"><div dx-text-area="txt_equipmentDescription" class="center"></div></td>
+                                <td class="td-field"><div dx-text-area="txt_equipmentDescription" class="center"></div></td>
                             </tr>
                         </table>
 
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: right; color: black; font-weight: bold" colspan="4">
-                                    (آیا رویداد منجر به جرح/مصدومیت یا آسیب‌دیدگی پرسنل گردیدهاست؟ (توضیح داده شود
+                                <td class="td-title">
+                                    آیا رویداد منجر به جرح/مصدومیت یا آسیب‌دیدگی پرسنل گردیدهاست؟ (توضیح داده شود)
                                 </td>
                             </tr>
                             <tr>
-                                <td style="padding:7px;text-align:right;"><div dx-text-area="txt_injuryDescription" class="center"></div></td>
+                                <td class="td-field"><div dx-select-box="sb_injuryOccuring" class="center"></div></td>
+                            </tr>
+                            <tr ng-show="entity.InjuryOccuring == true">
+                                <td class="td-field"><div dx-text-area="txt_injuryDescription" class="center"></div></td>
                             </tr>
                         </table>
 
 
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: right; color: black; font-weight: bold" colspan="4">
-                                    آیا رویداد منجر به وقفه کاری شده است؟
+                                <td class="td-title">
+                                    آیا رویداد منجر به وقفه کاری شده است؟ (چه مدت؟ بر حسب دقیقه)
                                 </td>
                             </tr>
-                            <tr style="float:right; padding: 0px !important">
-                                <td class="col-sm-6 col-md-6" style="padding:7px;text-align:right;"><div dx-number-box="txt_workBreakPeriod" class="center"></div></td>
-                                <!-- <td class="col-sm-3 col-md-3" style="padding: 7px;text-align:left; font-weight: bold"> :چه مدت؟ </td>-->
+                            <tr style="padding: 0px !important;text-align:center;width:100%">
+                                <td class="col-sm-12 col-xs-12 col-md-12 td-field"><div dx-number-box="txt_workBreakPeriod" class="center"></div></td>
                             </tr>
                         </table>
 
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: right; color: black; font-weight: bold" colspan="4">
-                                    اقدامات پیشگیرانه/پیشنهادی یا اصلاحی لازم
+                                <td class="td-title">
+                                    :اقدامات پیشگیرانه/پیشنهادی یا اصلاحی لازم
                                 </td>
                             </tr>
                             <tr>
-                                <td style="padding:7px;text-align:right;"><div dx-text-area="txt_preventiveActions" class="center"></div></td>
+                                <td class="td-field"><div dx-text-area="txt_preventiveActions" class="center"></div></td>
                             </tr>
 
                         </table>
 
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold">
+                                <td class="td-title" style="text-align: left !important; background-color: #66ffcc !important ">
                                     Result
                                 </td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-area="txt_result"></div></td>
+                                <td class="td-field"> <div dx-text-area="txt_result"></div></td>
                             </tr>
 
                         </table>
                         <div style="clear:both"></div>
-                        <div style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold; margin-top: 10px">
+                        <div class="td-title" style="text-align: left; margin-top: 10px">
                             ATTACHED DOCUMENTS
                         </div>
                         <div dx-data-grid="dg_attachments" id="dg_attachments" class="content" style="overflow-y:hidden" dx-item-alias="row">

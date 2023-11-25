@@ -127,16 +127,26 @@ app.controller('qaMaintenanceController', ['$scope', '$location', 'qaService', '
 
 
     $scope.txt_OccurrenceDate = {
+        hoverStateEnabled: false,
         readOnly: true,
-        focusStateEnabled: false,
-        width: '100%',
-        displayFormat: 'yyyy-MM-dd HH:mm',
+
+        displayFormat: 'yyyy-MM-dd',
         type: 'datetime',
+        pickerType: "rollers",
         bindingOptions: {
             value: 'entity.DateOccurrence',
         }
     }
 
+    $scope.txt_OccurrenceTime = {
+        hoverStateEnabled: false,
+        type: 'time',
+        pickerType: "rollers",
+        displayFormat: "HH:mm",
+        bindingOptions: {
+            value: 'entity.DateOccurrence',
+        }
+    }
     $scope.txt_acType = {
         readOnly: true,
         focusStateEnabled: false,
@@ -189,7 +199,7 @@ app.controller('qaMaintenanceController', ['$scope', '$location', 'qaService', '
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
-            value: 'entity.FlightRoute',
+            value: 'entity.Route',
         }
     }
 

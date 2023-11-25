@@ -187,16 +187,24 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
 
     $scope.txt_dateEvent = {
         hoverStateEnabled: false,
+        useMaskBehavior: false,
         readOnly: true,
-        focusStateEnabled: false,
-        width: '100%',
-        type: 'datetime',
-        pickerType: "rollers",
-        displayFormat: "yyyy-MMM-dd  HH:mm",
+        displayFormat: "yyyy-MMM-dd",
         bindingOptions: {
             value: 'entity.DateOccurrence',
         }
     }
+
+    $scope.txt_OccurrenceTime = {
+        hoverStateEnabled: false,
+        type: 'time',
+        pickerType: "rollers",
+        displayFormat: "HH:mm",
+        bindingOptions: {
+            value: 'entity.DateOccurrence',
+        }
+    }
+
 
     $scope.txt_dateIncident = {
         hoverStateEnabled: false,

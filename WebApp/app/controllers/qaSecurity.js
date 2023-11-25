@@ -214,13 +214,52 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
         }
     }
 
-    $scope.txt_injuryOccuring = {
-        readOnly: true,
-        focusStateEnabled: false,
+
+    $scope.dsBeark = [
+        { value: false, title: 'NO' },
+        { value: true, title: 'YES' },
+    ];
+
+    $scope.sb_workBreak = {
+        showClearButton: false,
+        searchEnabled: false,
+        dataSource: $scope.dsBeark,
+        placeholder: '',
+        displayExpr: 'title',
+        valueExpr: 'value',
+        bindingOptions: {
+            value: 'WorkBreak',
+        }
+    }
+
+    $scope.dsInjury = [
+        { value: false, title: 'NO' },
+        { value: true, title: 'YES' },
+    ];
+
+    $scope.sb_injuryOccuring = {
+        showClearButton: false,
+        searchEnabled: false,
+        dataSource: $scope.dsInjury,
+        placeholder: '',
+        displayExpr: 'title',
+        valueExpr: 'value',
         bindingOptions: {
             value: 'entity.InjuryOccuring',
         }
     }
+
+
+
+    $scope.txt_injuryDescription = {
+        hoverStateEnabled: false,
+        bindingOptions: {
+            value: 'entity.InjuryDescription',
+        }
+    }
+
+
+  
 
     $scope.txt_other = {
         readOnly: true,
@@ -235,22 +274,6 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
         focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.EquipmentDescription',
-        }
-    }
-
-    $scope.txt_injuryDescription = {
-        readOnly: true,
-        focusStateEnabled: false,
-        bindingOptions: {
-            value: 'entity.InjuryDescription',
-        }
-    }
-
-    $scope.txt_workBreak = {
-        readOnly: true,
-        focusStateEnabled: false,
-        bindingOptions: {
-            value: 'entity.WorkBreak',
         }
     }
 

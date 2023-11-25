@@ -166,11 +166,21 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
 
     $scope.txt_OccurrenceDate = {
         hoverStateEnabled: false,
+        useMaskBehavior: true,
         readOnly: true,
-        width: '100%',
-        focusStateEnabled: false,
-        displayFormat: 'yyyy-MM-dd HH:mm',
         type: 'datetime',
+        pickerType: "rollers",
+        displayFormat: "yyyy-MMM-dd",
+        bindingOptions: {
+            value: 'entity.DateOccurrence',
+        }
+    }
+
+    $scope.txt_OccurrenceTime = {
+        hoverStateEnabled: false,
+        type: 'time',
+        pickerType: "rollers",
+        displayFormat: "HH:mm",
         bindingOptions: {
             value: 'entity.DateOccurrence',
         }
@@ -189,7 +199,7 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
-            value: 'entity.FlightSegment',
+            value: 'entity.Route',
         }
     }
 

@@ -1,9 +1,22 @@
-﻿<div ng-controller="qaMaintenanceController">
+﻿<style>
+    .tdStyle {
+        padding: 7px;
+        text-align: left
+    }
+
+    .titleStyle {
+        background-color: whitesmoke;
+        padding: 7px;
+        text-align: left;
+        color: black;
+        font-weight: bold
+    }
+</style>
+<div ng-controller="qaMaintenanceController">
     <div style="padding:0px 10px 0 10px;">
         <div style="margin-top: 0px; float: left; overflow: hidden; width: 60%;padding:10px 15px 0 0px">
             <div style='background:#898e8c;color:white;font-weight:bold;padding:7px;text-align:center'>MAINTENANCE OCCURENCE REPOERT</div>
             <div style="border:1px solid #ccc;padding:10px;">
-                <!--<div id="scroll_qaCabin" dx-scroll-view="scroll_qaCabin" class='thin-scroll'>-->
                 <div class='thin-scroll' style='overflow-y:auto;' ng-style="{height: scroll_qaMaintenance_height + 'px'}">
 
 
@@ -11,104 +24,105 @@
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
 
                             <tr>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Date of Occurrence: </td>
-                                <td style="padding:7px;text-align:left;"><div dx-date-box="txt_OccurrenceDate" class="center" dx-validator="{validationGroup:'asradd',  validationRules: [{ type: 'required',   }]}"></div></td>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Station: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-select-box="sb_station"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> Date of Occurrence: </td>
+                                <td class="tdStyle"><div dx-date-box="txt_OccurrenceDate" class="center"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> Time Of Occurrence: </td>
+                                <td class="tdStyle"><div dx-date-box="txt_OccurrenceTime" class="center"></div></td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> A/C Register: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_acReg"></div></td>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Aircraft Type: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_acType"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> Station: </td>
+                                <td class="tdStyle"> <div dx-select-box="sb_station" class="center"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> A/C Register: </td>
+                                <td class="tdStyle"> <div dx-text-box="txt_acReg" class="center"></div></td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Flight number: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_fltNum"></div></td>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Route: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_route"></div></td>
-
-
+                                <td class="tdStyle" style="font-weight: bold"> Aircraft Type: </td>
+                                <td class="tdStyle"> <div dx-text-box="txt_acType" class="center"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> Flight number: </td>
+                                <td class="tdStyle"> <div dx-text-box="txt_fltNum" class="center"></div></td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> ATL No. : </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_atlNum"></div></td>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Task No. : </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_taskNum"></div></td>
-
+                                <td class="tdStyle" style="font-weight: bold"> Route: </td>
+                                <td class="tdStyle"> <div dx-text-box="txt_route" class="center"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> ATL No. : </td>
+                                <td class="tdStyle"> <div dx-text-box="txt_atlNum" class="center"></div></td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Reference: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_reference"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> Task No. : </td>
+                                <td class="tdStyle"> <div dx-text-box="txt_taskNum" class="center"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> Reference: </td>
+                                <td class="tdStyle"> <div dx-text-box="txt_reference" class="center"></div></td>
                             </tr>
 
                         </table>
 
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold" colspan="6">
+                                <td class="titleStyle" colspan="6">
                                     Component Specification:
                                 </td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Component: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-select-box="sb_compn"></div></td>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Serial Number: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-number-box="nb_serialNumber"></div></td>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Part Number: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-number-box="nb_partNumber"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> Component: </td>
+                                <td class="tdStyle"> <div dx-select-box="sb_compn" class="center"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> Serial Number: </td>
+                                <td class="tdStyle"> <div dx-number-box="nb_serialNumber" class="center"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> Part Number: </td>
+                                <td class="tdStyle"> <div dx-number-box="nb_partNumber" class="center"></div></td>
                             </tr>
                         </table>
 
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold">
+                                <td class="titleStyle">
                                     Event
                                 </td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-area="txt_event"></div></td>
+                                <td class="tdStyle"> <div dx-text-area="txt_event"></div></td>
                             </tr>
 
                         </table>
 
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold">
+                                <td class="titleStyle">
                                     Corrective Action Taken Until Now:
                                 </td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-area="txt_actionTaken"></div></td>
+                                <td class="tdStyle"> <div dx-text-area="txt_actionTaken"></div></td>
                             </tr>
 
                         </table>
 
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
-                                <td style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold">
+                                <td class="tdStyle" style="font-weight: bold"> Name: </td>
+                                <td class="tdStyle"> <div dx-text-box="txt_name" class="center"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> CAA License No.: </td>
+                                <td class="tdStyle"> <div dx-text-box="txt_CAALicense" class="center"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> Authorization No.: </td>
+                                <td class="tdStyle"> <div dx-text-box="txt_authNum" class="center"></div></td>
+                            </tr>
+                        </table>
+
+                        <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
+                            <tr>
+                                <td class="titleStyle" style="background-color: #66ffcc !important">
                                     Result
                                 </td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-area="txt_result"></div></td>
+                                <td class="tdStyle"> <div dx-text-area="txt_result"></div></td>
                             </tr>
 
                         </table>
 
 
-                        <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
-                            <tr>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Name: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_name"></div></td>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> CAA License No.: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_CAALicense"></div></td>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Authorization No.: </td>
-                                <td style="padding: 7px;text-align:left;"> <div dx-text-box="txt_authNum"></div></td>
-                            </tr>
-                        </table>
+
                         <div style="clear:both"></div>
-                        <div style="background-color: lightgray; padding: 7px; text-align: left; color: black; font-weight: bold; margin-top: 10px">
+                        <div class="titleStyle" style="margin-top:10px">
                             ATTACHED DOCUMENTS
                         </div>
                         <div dx-data-grid="dg_attachments" id="dg_attachments" class="content" style="overflow-y:hidden" dx-item-alias="row">
