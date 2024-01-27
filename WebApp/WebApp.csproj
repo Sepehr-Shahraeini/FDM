@@ -90,6 +90,7 @@
     <Content Include="app\controllers\ceoFlightBoardController.js" />
     <Content Include="app\controllers\certificateAddController.js" />
     <Content Include="app\controllers\changeFlightRegisterController.js" />
+    <Content Include="app\controllers\efbAsrController.js" />
     <Content Include="app\controllers\qaCatering.js" />
     <Content Include="app\controllers\citypair.js" />
     <Content Include="app\controllers\citypairyearly.js" />
@@ -202,6 +203,7 @@
     <Content Include="app\controllers\logAdd.js" />
     <Content Include="app\controllers\mlistAddController.js" />
     <Content Include="app\controllers\mlistController.js" />
+    <Content Include="app\controllers\qaHazardLog.js" />
     <Content Include="app\controllers\qaMaintenance.js" />
     <Content Include="app\controllers\nira.js" />
     <Content Include="app\controllers\notificationController.js" />
@@ -269,6 +271,7 @@
     <Content Include="app\services\notificationService.js" />
     <Content Include="app\services\organizationService.js" />
     <Content Include="app\services\personService.js" />
+    <Content Include="app\services\qahService.js" />
     <Content Include="app\services\qaService.js" />
     <Content Include="app\services\statService.js" />
     <Content Include="app\services\trainingService.js" />
@@ -286,6 +289,7 @@
     <Content Include="app\views\ceoFlightBoard.html" />
     <Content Include="app\views\certificateAdd.html" />
     <Content Include="app\views\changeflightregister.html" />
+    <Content Include="app\views\efbAsr.html" />
     <Content Include="app\views\qaCatering.html" />
     <Content Include="app\views\citypair.html" />
     <Content Include="app\views\citypairyearly.html" />
@@ -404,6 +408,7 @@
     <Content Include="app\views\menu.html" />
     <Content Include="app\views\mlist.html" />
     <Content Include="app\views\mlistAdd.html" />
+    <Content Include="app\views\qahazardlog.html" />
     <Content Include="app\views\qaMaintenance.html" />
     <Content Include="app\views\nira.html" />
     <Content Include="app\views\notification.html" />

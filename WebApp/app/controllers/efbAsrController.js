@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 app.controller('asrAddController', ['$scope', '$location', 'flightBagService', 'authService', '$routeParams', '$rootScope', '$window', function ($scope, $location, flightBagService, authService, $routeParams, $rootScope, $window) {
     $scope.isNew = true;
     $scope.isEditable = false;
@@ -6,6 +6,23 @@ app.controller('asrAddController', ['$scope', '$location', 'flightBagService', '
     $scope.isContentVisible = false;
     $scope.isFullScreen = false;
     var detector = new MobileDetect(window.navigator.userAgent);
+
+    $scope.entity = {
+        Id: -1,
+        Status: null,
+        StatusEmployeeId: null,
+        DateStatus: null,
+        DateSign: null
+    };
+
+    $scope.followUpEntity = {
+        Type: 8,
+    }
+
+    $rootScope.result = {
+        Result: null,
+    };
+
 
 
     $scope.isOPSManager = true;
@@ -106,91 +123,7 @@ app.controller('asrAddController', ['$scope', '$location', 'flightBagService', '
 
         }
     };
-
-    //////////////////////////
-    $scope.popup_add_visible = false;
-    $scope.popup_height = $(window).height() - 100;
-    $scope.popup_width = 900;
-    $scope.popup_add_title = 'AIR SAFETY REPORT';
-    $scope.popup_instance = null;
-
-    $scope.popup_add = {
-
-
-        showTitle: true,
-
-        toolbarItems: [
-              {
-                widget: 'dxButton', location: 'after', options: {
-                    type: 'default', text: 'Print', icon: 'remove', onClick: function (e) {
-                        $window.open('https://report.apvaresh.com/frmreportview.aspx' + '?type=17&fid=' +$scope.entity.FlightId, '_blank');
-                    }
-                }, toolbar: 'bottom'
-            },
-            {
-                widget: 'dxButton', location: 'after', options: {
-                    type: 'danger', text: 'Close', icon: 'remove', onClick: function (e) {
-                        $scope.popup_add_visible = false;
-                    }
-                }, toolbar: 'bottom'
-            }
-        ],
-
-        visible: false,
-        dragEnabled: true,
-        closeOnOutsideClick: false,
-        onShowing: function (e) {
-            $scope.popup_instance.repaint();
-
-
-        },
-        onShown: function (e) {
-
-            if ($scope.isNew) {
-                $scope.isContentVisible = true;
-            }
-            if ($scope.tempData != null)
-                $scope.bind();
-
-
-
-
-
-        },
-        onHiding: function () {
-
-            //$scope.clearEntity();
-            $scope.entity = {
-                Id: -1,
-                IsSecurityEvent: false,
-                IsAirproxATC: false,
-                IsTCASRA: false,
-                IsWakeTur: false,
-                IsBirdStrike: false,
-                IsOthers: false,
-
-            };
-            $scope.popup_add_visible = false;
-            $rootScope.$broadcast('onAsrAddHide', null);
-        },
-        onContentReady: function (e) {
-            if (!$scope.popup_instance)
-                $scope.popup_instance = e.component;
-
-        },
-        fullScreen:false,
-        bindingOptions: {
-            visible: 'popup_add_visible',
-            //fullScreen: 'isFullScreen',
-            title: 'popup_add_title',
-            height: 'popup_height',
-            width: 'popup_width',
-          //  'toolbarItems[0].visible': 'isSave',
-          //  'toolbarItems[1].visible': 'isEditable',
-
-        }
-    };
-
+    
     /////////////////////////////////
 
 
@@ -215,10 +148,12 @@ app.controller('asrAddController', ['$scope', '$location', 'flightBagService', '
 
         $scope.loadingVisible = true;
 
-        flightBagService.epGetASRByFlight($scope.entity.FlightId).then(function (response2) {
+        flightBagService.epGetASRByFlight($scope.followUpEntity.Priority).then(function (response2) {
 
             $scope.loadingVisible = false;
             //$scope.isEditable = (diff <= 24);
+            $scope.fromNo = response2.FormNo;
+
 
             $scope.flight = response2;
             if (!$scope.flight.OPSStaffStatusId)
@@ -227,77 +162,77 @@ app.controller('asrAddController', ['$scope', '$location', 'flightBagService', '
                 $scope.flight.OPSStatusId = 0;
 
             $scope.isSave = $scope.isSave && ($scope.flight.OPSStatusId > 0 || $scope.isOPSManager);
-            
-            if (!response2 ) {
+
+            if (!response2) {
                 $scope.entity.Id = -1;
                 $scope.isNew = true;
-                $scope.form_id="-";
+                $scope.form_id = "-";
 
             }
             else {
-				$scope.form_id="VRH-ASR-"+response2.Id;
+                $scope.form_id = response2.Id;
                 $scope.url_sign2 = '';
-                $scope.PIC2 ='';
+                $scope.PIC2 = '';
                 $scope.signDate2 = '';
-				response2.JLSignedBy=response2.PICId;
+                response2.JLSignedBy = response2.PICId;
                 if (response2.JLSignedBy) {
-                   
+
                     $scope.isEditable = false;
                     $scope.url_sign2 = signFiles + response2.PICId + ".jpg";
                     $scope.PIC2 = response2.PIC;
                     $scope.signDate2 = moment(new Date(response2.JLDatePICApproved)).format('YYYY-MM-DD HH:mm');
                 }
-                 
-                
 
-                    $scope.isNew = false;
-                    $scope.fill(response2);
-                
+
+
+                $scope.isNew = false;
+                $scope.fill(response2);
+
             }
 
             //console.log('ASR',response2.Data);
 
 
 
-        $scope.entity.FlightNo = response2.FlightNumber;
-        $scope.entity.Date = new Date(response2.STDDay);
-        $scope.entity.ACReg = response2.Register;
-        $scope.entity.Route = response2.FromAirportIATA + ' - ' + response2.ToAirportIATA
-        $scope.entity.FlightNo = response2.FlightNumber
-        $scope.FlightNo = {
-            min: 0,
-            bindingOptions: {
-                value: 'entity.FlightNo',
-            }
-        };
+            $scope.entity.FlightNo = response2.FlightNumber;
+            $scope.entity.Date = new Date(response2.STDDay);
+            $scope.entity.ACReg = response2.Register;
+            $scope.entity.Route = response2.FromAirportIATA + ' - ' + response2.ToAirportIATA
+            $scope.entity.FlightNo = response2.FlightNumber
+            $scope.FlightNo = {
+                min: 0,
+                bindingOptions: {
+                    value: 'entity.FlightNo',
+                }
+            };
 
-        $scope.Date = {
-            min: 0, 
-            bindingOptions: {
-                value: 'entity.Date',
-            }
-        };
+            $scope.Date = {
+                min: 0,
+                bindingOptions: {
+                    value: 'entity.Date',
+                }
+            };
 
-        $scope.Route = {
-            min: 0,
-            bindingOptions: {
-                value: 'entity.Route',
-            }
-        };
+            $scope.Route = {
+                min: 0,
+                bindingOptions: {
+                    value: 'entity.Route',
+                }
+            };
 
-        $scope.ACType = {
-            min: 0,
-            bindingOptions: {
-                value: 'entity.ACType',
-            }
-        };
+            $scope.ACType = {
+                min: 0,
+                bindingOptions: {
+                    value: 'entity.ACType',
+                }
+            };
 
-        $scope.ACReg = {
-            min: 0,
-            bindingOptions: {
-                value: 'entity.ACReg',
-            }
-        };
+            $scope.ACReg = {
+                min: 0,
+                bindingOptions: {
+                    value: 'entity.ACReg',
+                }
+            };
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
 
@@ -1280,20 +1215,32 @@ app.controller('asrAddController', ['$scope', '$location', 'flightBagService', '
             }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
     });
-    $scope.$on('InitAsrAdd', function (event, prms) {
 
-
-        $scope.tempData = null;
-
-
+    $scope.tempData = null;
+    $scope.$on('InitEfbAsr', function (event, prms) {
 
 
         $scope.tempData = prms;
 
+        $scope.followUpEntity.Category = $scope.tempData.Category;
+        $scope.followUpEntity.Id = $scope.tempData.Id;
+        $scope.followUpEntity.Type = $scope.tempData.Type;
+        $scope.followUpEntity.Priority = $scope.tempData.Priority;
+        $scope.followUpEntity.EmployeeId = $scope.tempData.EmployeeId;
+        $scope.followUpEntity.ProducerId = parseInt($scope.tempData.ProducerId);
+        $scope.entity.FlightId = $scope.tempData.FlightId;
+        $scope.isNotLocked = $scope.tempData.isNotLocked;
 
-        $scope.popup_add_visible = true;
+        console.log($scope.followUpEntity);
+        $scope.bind();
+      
 
     });
+
+    $scope.testLoaded = function () {
+        $rootScope.$broadcast('InitTest', $scope.tempData);
+    }
+
 
 }]);
 

@@ -48,13 +48,13 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
                         $scope.entity.EmployeeId = $scope.tempData.EmployeeId;
                         $scope.entity.isResponsible = $scope.isResponsible;
                         $scope.entity.Result = $rootScope.result.Result;
-                        General.Confirm(Config.Text_CloseConfirm, function (res) {
+                        General.Confirm("Are You Sure?", function (res) {
                             if (res) {
                                 $scope.loadingVisible = true;
                                 qaService.acceptQA($scope.entity).then(function (response) {
                                     $scope.loadingVisible = false;
                                     $rootScope.result.Result = null;
-                                    General.ShowNotify(Config.Text_QAAccept, 'success');
+                                    General.ShowNotify(Config.Text_SavedOk, 'success');
                                     if ($scope.isResponsible == true) {
 
                                         if (response.IsSuccess == true && $scope.tempData.Category == 'open') {
@@ -165,16 +165,15 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
         qaService.getIsResponsible($scope.tempData.EmployeeId, $scope.tempData.Type, $scope.tempData.Id).then(function (response) {
             if (response.IsSuccess == true)
                 $scope.isResponsible = true
-
-
-
         });
     }
 
 
 
     $scope.$on('InitOperationPopup', function (event, prms) {
+
         $scope.tempData = prms;
+        console.log($scope.tempData);
 
         $scope.Type = $scope.tempData.Type;
         $scope.isNotLocked = $scope.tempData.isNotLocked
@@ -212,6 +211,10 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
 
     $scope.cyberLoaded = function () {
         $rootScope.$broadcast('InitQACyberSecurity', $scope.tempData);
+    }
+
+    $scope.asrLoaded = function () {
+        $rootScope.$broadcast('InitEfbAsr', $scope.tempData);
     }
 
 }]);

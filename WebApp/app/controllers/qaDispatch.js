@@ -465,7 +465,6 @@ app.controller('qaDispatchController', ['$scope', '$location', 'qaService', 'aut
     });
 
     $scope.$on('onEmployeeSelectHide', function (event, prms) {
-        console.log(prms);
         $scope.followUpEntity.Category = prms;
     });
 

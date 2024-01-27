@@ -2,7 +2,7 @@
 app.controller('qaEmployee', ['$scope', '$location', 'authService', '$routeParams', '$rootScope', 'qaService', function ($scope, $location, authService, $routeParams, $rootScope, qaService) {
 
     $scope.employeeList = [];
-
+    $scope.DeadLine = null;
 
     //////////////////////////
     $scope.loadingVisible = false;
@@ -27,10 +27,10 @@ app.controller('qaEmployee', ['$scope', '$location', 'authService', '$routeParam
     };
     $scope.dg_columns = [
         { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 200 },
-		{ dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
-		{ dataField: 'Mobile', caption: 'Mobile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
+        { dataField: 'JobGroup', caption: 'Group', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
+        { dataField: 'Mobile', caption: 'Mobile', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
         //{ dataField: 'TypeTitle', caption: 'Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 250 },
-       // { dataField: 'ReceiverEmployeeId', caption: 'ReceiverEmployeeId', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 260 },
+        // { dataField: 'ReceiverEmployeeId', caption: 'ReceiverEmployeeId', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 260 },
 
     ];
     $scope.dg_selected = null;
@@ -82,7 +82,7 @@ app.controller('qaEmployee', ['$scope', '$location', 'authService', '$routeParam
     /////////////////////////////
 
     $scope.pop_width = 700;
-    $scope.pop_height = $(window).height()-100;
+    $scope.pop_height = $(window).height() - 20;
     $scope.popup_add_visible = false;
     $scope.popup_add_title = 'Employees';
     $scope.popup_add = {
@@ -108,7 +108,7 @@ app.controller('qaEmployee', ['$scope', '$location', 'authService', '$routeParam
                 $scope.pop_width = size.width;
                 $scope.pop_height = size.height;
             }*/
-            $scope.dg_height = $scope.pop_height - 200;
+            $scope.dg_height = $scope.pop_height - 280;
         },
         onShown: function (e) {
 
@@ -151,7 +151,9 @@ app.controller('qaEmployee', ['$scope', '$location', 'authService', '$routeParam
                 ReferredId: _d.ReceiverEmployeeId,
                 ReferrerId: $rootScope.employeeId,
                 Type: $scope.Type,
-                Comment: $scope.Comment
+                Comment: $scope.Comment,
+                Priority: $scope.Priority,
+                DeadLine: moment(new Date($scope.DeadLine)).format('YYYY-MM-DD')
             });
 
         });
@@ -197,9 +199,33 @@ app.controller('qaEmployee', ['$scope', '$location', 'authService', '$routeParam
     };
 
     $scope.referComment = {
-		hegiht:50,
         bindingOptions: {
             value: 'Comment'
+        }
+    }
+
+    $scope.deadline = {
+        hegiht: 25,
+        bindingOptions: {
+            value: 'DeadLine'
+        }
+    }
+
+    $scope.ds_priority = [
+        { Id: 0, Title: 'Critical' },
+        { Id: 1, Title: 'Major' },
+        { Id: 2, Title: 'Minor' },
+    ]
+
+    $scope.sb_priority = {
+        showClearButton: false,
+        searchEnabled: false,
+        placeholder: 'Priority',
+        displayExpr: 'Title',
+        valueExpr: 'Id',
+        dataSource: $scope.ds_priority,
+        bindingOptions: {
+            value: 'Priority',
         }
     }
 

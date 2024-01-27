@@ -29,8 +29,8 @@ app.controller('qaCateringController', ['$scope', '$location', 'qaService', 'aut
 
         /////////////////////////////////
         $scope.fill = function (data) {
-        $scope.entity = data;
-        $rootScope.result.Result = data.Result;
+            $scope.entity = data;
+            $rootScope.result.Result = data.Result;
             $scope.optReason[data.ReasonId] = true;
             console.log($scope.optReason);
             $.each($scope.chrReason, function (_i, _d) {
@@ -145,8 +145,8 @@ app.controller('qaCateringController', ['$scope', '$location', 'qaService', 'aut
     }
 
     $scope.txt_hazardDate = {
-        hoverStateEnabled: false,
         readOnly: true,
+        focusStateEnabled: false,
         type: 'date',
         pickerType: "rollers",
         displayFormat: "yyyy-MMM-dd",
@@ -155,7 +155,6 @@ app.controller('qaCateringController', ['$scope', '$location', 'qaService', 'aut
         }
     }
     $scope.txt_hazardTime = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         type: 'time',
@@ -167,7 +166,6 @@ app.controller('qaCateringController', ['$scope', '$location', 'qaService', 'aut
     }
 
     $scope.txt_description = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -182,8 +180,8 @@ app.controller('qaCateringController', ['$scope', '$location', 'qaService', 'aut
     ];
 
     $scope.sb_injuryOccurring = {
-        showClearButton: false,
-        searchEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         dataSource: $scope.dsInjury,
         placeholder: '',
         displayExpr: 'title',
@@ -195,7 +193,8 @@ app.controller('qaCateringController', ['$scope', '$location', 'qaService', 'aut
 
 
     $scope.txt_injuryDescription = {
-        hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.InjuryDescription',
         }
@@ -210,21 +209,23 @@ app.controller('qaCateringController', ['$scope', '$location', 'qaService', 'aut
     $scope.sb_safty = {
         showClearButton: false,
         searchEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         dataSource: $scope.dsSafty,
         placeholder: '',
         displayExpr: 'title',
         valueExpr: 'value',
         bindingOptions: {
             value: 'entity.SaftyEquipmentUseage',
-            useMaskBehavior: 'isEditable',
-            readOnly: '!isEditable'
+
         }
     }
 
 
 
     $scope.txt_saftyEquipmentType = {
-        hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.SaftyEquipmentType',
             useMaskBehavior: 'isEditable',
@@ -363,27 +364,24 @@ app.controller('qaCateringController', ['$scope', '$location', 'qaService', 'aut
     }
 
     $scope.txt_email = {
-        hoverStateEnabled: false,
-        useMaskBehavior: false,
         readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.Email',
         }
     }
 
     $scope.txt_telNumber = {
-        hoverStateEnabled: false,
-        useMaskBehavior: false,
         readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.Mobile ',
         }
     }
 
     $scope.txt_name = {
-        hoverStateEnabled: false,
-        useMaskBehavior: false,
         readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.EmployeeName ',
         }

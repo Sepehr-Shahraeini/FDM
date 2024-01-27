@@ -23,6 +23,13 @@
                     <div class="visible-sm visible-md visible-lg">
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
+                                <td colspan="6" style=" padding:7px;text-align:left;color:black;font-weight:bold">
+                                    Id:<span style='display:inline-block;margin-left:5px;'>{{entity.FormNo}}</span>
+                                </td>
+                            </tr>
+                        </table>
+                        <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
+                            <tr>
                                 <td class="titleStyle" colspan="4">
                                     Contact Information (Optionally) (اطلاعات تماس (اختیاری
                                 </td>
@@ -47,14 +54,15 @@
                                     Hazard Details (جزئیات پتانسیل خطر):
                                 </td>
                             </tr>
+
                             <tr>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Date of Hazard identified: </td>
+                                <td style="padding: 7px;text-align:left; font-weight: bold">تاریخ شناسایی پتانسیل خطر <br />(Date of Hazard identified): </td>
                                 <td style="padding:7px;text-align:left;"><div dx-date-box="txt_hazardDate" class="center"></div></td>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Affected area of Incident/Hazard: </td>
+                                <td style="padding: 7px;text-align:left; font-weight: bold">   مناطق تحت تاثیر پتانسیل خطر<br />(Affected area of Incident/Hazard): </td>
                                 <td style="padding:7px;text-align:left;"><div dx-text-box="txt_affectedArea" class="center"></div></td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px;text-align:left; font-weight: bold"> Report Date: </td>
+                                <td style="padding: 7px;text-align:left; font-weight: bold"> تاریخ گزارش<br />(Report Date): </td>
                                 <td style="padding: 7px;text-align:left;"> <div dx-date-box="txt_repDate" class="center"></div></td>
                             </tr>
                         </table>

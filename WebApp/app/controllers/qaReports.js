@@ -130,7 +130,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         { dataField: 'FlightNumber', caption: 'FlightNumber', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 150 },
         { dataField: 'EmployeeName', caption: 'Producer', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, minwidth: 250 },
         { dataField: 'DateOccurrence', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 250 },
-        
+
 
     ];
     $scope.dg_form_list_selected = null;
@@ -242,6 +242,14 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
                     }
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
+                case 8:
+                    $scope.popup_form_visible = true;
+                    $scope.asrLoaded = function () {
+                        $rootScope.$broadcast('InitEfbAsr', data);
+                    }
+                    //$rootScope.$broadcast('InitQADispatch', data);
+                    break;
+
             }
         },
 
@@ -421,6 +429,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
             $scope.ds_cateringDate = response.Data.DateCount;
             $scope.ds_cateringRegister = response.Data.RegisterCount;
             $scope.ds_cateringRoute = response.Data.RouteCount;
+            $scope.ds_cateringReasonTitle = response.Data.ReasonTitle;
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
         qaService.getGroundReport($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
@@ -428,6 +437,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
             $scope.ds_groundDate = response.Data.DateCount;
             $scope.ds_groundRegister = response.Data.RegisterCount;
             $scope.ds_groundRoute = response.Data.RouteCount;
+            $scope.ds_groundDamage = response.Data.DamageByCount;
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
         qaService.getSecurityReport($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
@@ -435,6 +445,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
             $scope.ds_securityDate = response.Data.DateCount;
             $scope.ds_securityRegister = response.Data.RegisterCount;
             $scope.ds_securityRoute = response.Data.RouteCount;
+            $scope.ds_securityReasonTitle = response.Data.ReasonTitle;
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
 
@@ -443,6 +454,22 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
             $scope.ds_cabinDate = response.Data.DateCount;
             $scope.ds_cabinRegister = response.Data.RegisterCount;
             $scope.ds_cabinRoute = response.Data.RouteCount;
+            $scope.ds_cabinFltPhase = response.Data.FlightPhase;
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        qaService.getCabinEventReport($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+            $scope.arr = [];
+            $.each(response.Data, function (_i, _d) {
+
+
+                $scope.arr.push({ name: _d.EventTitle, value: _d.Count });
+            });
+
+
+            $scope.ds_cabinEvent = [{ name: 'Events', items: $scope.arr }];
+
+
+            console.log($scope.ds_cabinEvent);
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
         qaService.getMaintenanceReport($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
@@ -450,9 +477,9 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
             $scope.ds_maintenanceDate = response.Data.DateCount;
             $scope.ds_maintenanceRegister = response.Data.RegisterCount;
             $scope.ds_maintenanceRoute = response.Data.RouteCount;
-			$scope.ds_maint_component=response.Data.components;
-			$scope.ds_maint_component_registers=response.Data.components_regs;
-			console.log($scope.ds_maint_component);
+            $scope.ds_maint_component = response.Data.components;
+            $scope.ds_maint_component_registers = response.Data.components_regs;
+            console.log($scope.ds_maint_component);
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
         qaService.getDispatchReport($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
@@ -513,7 +540,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
 
     ///SIZES/////////////////
     $scope.chrt_size = { height: 450, width: $(window).width() - 100 };
-	$scope.chrt_size100 = { height: 450, width: '100%' };
+    $scope.chrt_size100 = { height: 450, width: '100%' };
     $scope.chrt_sizeXS = { height: 600, width: $(window).width() - 15 };
     $scope.treeChrt_size = { height: 600, width: $(window).width() - 60 };
     $scope.treeChrt_sizeXS = { height: 600, width: $(window).width() };
@@ -534,6 +561,135 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
 
         return $scope._title + " (" + year + ")";
     }
+
+
+
+    $scope.qaCSREventChart = {
+        title: 'Event Count Report',
+
+
+        tooltip: {
+            enabled: true,
+            format: 'thousands',
+            customizeTooltip(arg) {
+                const { data } = arg.node;
+                let result = null;
+
+                if (arg.node.isLeaf()) {
+                    result = `<span>${data.name}</span> <br/>Event count: ${arg.value}`;
+                }
+
+                return {
+                    text: result,
+                };
+            },
+        },
+        label: {
+            visible: true, // Make sure labels are visible
+            font: {
+                color: '#333', // Change label text color
+                size: 12, // Adjust font size as needed
+                weight: 600, // Adjust font weight (boldness) as needed
+            },
+            border: {
+                visible: true, // Show label border
+                color: '#ccc', // Change border color
+                width: 1, // Adjust border width as needed
+                cornerRadius: 5, // Adjust border corner radius as needed
+            },
+        },
+        bindingOptions:
+        {
+            dataSource: 'ds_cabinEvent',
+            size: 'treeChrt_size'
+        },
+    };
+
+    $scope.qaCSREventChartXS = {
+        title: 'Event Count Report',
+        tooltip: {
+            enabled: true,
+            format: 'thousands',
+            customizeTooltip(arg) {
+                console.log(arg);
+                const { data } = arg.node;
+                let result = null;
+
+                if (arg.node.isLeaf()) {
+                    result = `<span>${data.name}</span> <br/>Event count: ${arg.value}`;
+                }
+
+                return {
+                    text: result,
+                };
+            },
+        },
+
+        bindingOptions:
+        {
+            dataSource: 'ds_cabinEvent',
+            size: 'treeChrt_sizeXS'
+        },
+    };
+
+    $scope.cabinFltPhase = {
+        palette: "Green Mist",
+        rtlEnabled: false,
+        onInitialized: function (e) {
+        },
+        sizeGroup: 'sg1',
+        type: "doughnut",
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+            itemTextPosition: 'right',
+            rowCount: 1
+        },
+        tooltip: {
+            enabled: true,
+
+            customizeTooltip: function () {
+                return { text: this.value.toFixed(2) };
+            }
+        },
+        "export": {
+            enabled: false
+        },
+        series: [
+
+            {
+                name: 'Flight Phase',
+                ignoreEmptyPoints: true,
+                argumentField: "Route",
+                valueField: "Count",
+                label: {
+                    position: 'inside',
+                    backgroundColor: 'transparent',
+                    visible: true,
+                    font: {
+                        size: 12,
+                        color: 'white',
+                    },
+
+                    connector: {
+                        visible: true
+                    },
+                    customizeText: function (arg) {
+
+                        return arg.percentText;
+                    }
+                }
+            },
+
+        ],
+        size: {
+            height: 450,
+        },
+        bindingOptions: {
+            dataSource: 'ds_cabinFltPhase',
+
+        }
+    };
 
 
 
@@ -566,7 +722,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
             horizontalAlignment: 'center',
         },
         export: {
-            enabled: true,
+            enabled: false,
         },
         onPointClick(e) {
             e.target.select();
@@ -579,9 +735,9 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
             grid: {
                 visible: true,
             },
-            title: {
-                text: 'Report Counts',
-            },
+            //title: {
+            //    text: 'Report Counts',
+            //},
             tickInterval: 1,
         }],
 
@@ -594,11 +750,10 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
                 },
             }
         },
-
         bindingOptions:
         {
             dataSource: 'ds_cabinDate',
-            size: 'chrt_size'
+            size: 'chrt_size100'
         },
     };
 
@@ -721,7 +876,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         bindingOptions:
         {
             dataSource: 'ds_cabinRegister',
-            size: 'chrt_size'
+            size: 'chrt_size100'
         },
     };
 
@@ -1094,13 +1249,13 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
             size: 'chrt_size100'
         },
     };
-	
-	$scope.pie_maint_component = {
+
+    $scope.pie_maint_component = {
         rtlEnabled: false,
-		  palette: "Violet",
+        palette: "Violet",
         onInitialized: function (e) {
-          //  if (!$scope.pie_ontime_delayed_instance)
-          //      $scope.pie_ontime_delayed_instance = e.component;
+            //  if (!$scope.pie_ontime_delayed_instance)
+            //      $scope.pie_ontime_delayed_instance = e.component;
         },
         sizeGroup: 'sg1',
         type: "doughnut",
@@ -1116,7 +1271,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
             enabled: true,
 
             customizeTooltip: function () {
-                return { text:   this.value.toFixed(2) };
+                return { text: this.value.toFixed(2) };
             }
         },
         "export": {
@@ -1147,17 +1302,17 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
                     }
                 }
             },
-             
+
         ],
-		 onPointClick(e) {
+        onPointClick(e) {
             e.target.select();
-           // qaService.getQAFormByRegister($scope.yf, $scope.yt, $scope.mf, $scope.mt, e.target.data.Register, $scope.Type).then(function (response) {
+            // qaService.getQAFormByRegister($scope.yf, $scope.yt, $scope.mf, $scope.mt, e.target.data.Register, $scope.Type).then(function (response) {
             //    $scope.dg_form_list_ds = response.Data;
             //    $scope.popup_form_list_visible = true;
             //});
-			$scope.ds_maint_regs=Enumerable.From($scope.ds_maint_component_registers).Where('$.ComponentId=='+e.target.data.ComponentId).ToArray();
-			$scope.maint_component=e.target.data.Component;
-			 
+            $scope.ds_maint_regs = Enumerable.From($scope.ds_maint_component_registers).Where('$.ComponentId==' + e.target.data.ComponentId).ToArray();
+            $scope.maint_component = e.target.data.Component;
+
         },
         size: {
             height: 350,
@@ -1167,10 +1322,10 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
 
         }
     };
-	
-	$scope.maint_component='Component';
-	  $scope.bar_maint_component = {
-		    palette: "Violet",
+
+    $scope.maint_component = 'Component';
+    $scope.bar_maint_component = {
+        palette: "Violet",
         tooltip: {
             enabled: true,
             location: 'edge',
@@ -1206,13 +1361,13 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         },
         onPointClick(e) {
             e.target.select();
-           // qaService.getQAFormByRegister($scope.yf, $scope.yt, $scope.mf, $scope.mt, e.target.data.Register, $scope.Type).then(function (response) {
+            // qaService.getQAFormByRegister($scope.yf, $scope.yt, $scope.mf, $scope.mt, e.target.data.Register, $scope.Type).then(function (response) {
             //    $scope.dg_form_list_ds = response.Data;
             //    $scope.popup_form_list_visible = true;
             //});
-			$scope.ds_maint_regs=Enumerable.From($scope.ds_maint_component_registers).Where('$.ComponentId=='+e.target.data.ComponentId).ToArray();
-			$scope.maint_component=e.target.data.Component;
-			 
+            $scope.ds_maint_regs = Enumerable.From($scope.ds_maint_component_registers).Where('$.ComponentId==' + e.target.data.ComponentId).ToArray();
+            $scope.maint_component = e.target.data.Component;
+
         },
         valueAxis: [
             {
@@ -1232,23 +1387,23 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         },
         size: {
             height: 350,
-			width:'100%'
+            width: '100%'
         },
         bindingOptions:
         {
             dataSource: 'ds_maint_component',
-            
+
         },
     };
-	
-	
-	
-	$scope.pie_maint_component_regs = {
-		   palette: "Green Mist",
+
+
+
+    $scope.pie_maint_component_regs = {
+        palette: "Green Mist",
         rtlEnabled: false,
         onInitialized: function (e) {
-          //  if (!$scope.pie_ontime_delayed_instance)
-          //      $scope.pie_ontime_delayed_instance = e.component;
+            //  if (!$scope.pie_ontime_delayed_instance)
+            //      $scope.pie_ontime_delayed_instance = e.component;
         },
         sizeGroup: 'sg1',
         type: "doughnut",
@@ -1264,7 +1419,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
             enabled: true,
 
             customizeTooltip: function () {
-                return { text:   this.value.toFixed(2) };
+                return { text: this.value.toFixed(2) };
             }
         },
         "export": {
@@ -1295,7 +1450,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
                     }
                 }
             },
-             
+
         ],
         size: {
             height: 350,
@@ -1305,11 +1460,11 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
 
         }
     };
-	
-	
-	
-	$scope.bar_maint_component_reg = {
-		    palette: "Postel",
+
+
+
+    $scope.bar_maint_component_reg = {
+        palette: "Postel",
         tooltip: {
             enabled: true,
             location: 'edge',
@@ -1332,7 +1487,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         }],
         series: [
 
-            { valueField: 'Count', name: 'Count',   pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Count', name: 'Count', pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
 
         ],
         title: 'Registers',
@@ -1345,13 +1500,13 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         },
         onPointClick(e) {
             e.target.select();
-           // qaService.getQAFormByRegister($scope.yf, $scope.yt, $scope.mf, $scope.mt, e.target.data.Register, $scope.Type).then(function (response) {
+            // qaService.getQAFormByRegister($scope.yf, $scope.yt, $scope.mf, $scope.mt, e.target.data.Register, $scope.Type).then(function (response) {
             //    $scope.dg_form_list_ds = response.Data;
             //    $scope.popup_form_list_visible = true;
             //});
-			$scope.ds_maint_regs=Enumerable.From($scope.ds_maint_component_registers).Where('$.ComponentId=='+e.target.data.ComponentId).ToArray();
-			$scope.maint_component=e.target.data.Component;
-			 
+            $scope.ds_maint_regs = Enumerable.From($scope.ds_maint_component_registers).Where('$.ComponentId==' + e.target.data.ComponentId).ToArray();
+            $scope.maint_component = e.target.data.Component;
+
         },
         valueAxis: [
             {
@@ -1371,12 +1526,12 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         },
         size: {
             height: 350,
-			width:'100%'
+            width: '100%'
         },
         bindingOptions:
         {
             dataSource: 'ds_maint_regs',
-            
+
         },
     };
 
@@ -2000,7 +2155,9 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         }],
         series: [
 
-            { valueField: 'Count', name: 'Count', color: highColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Count', name: 'Count', color: highColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'InjuredCount', name: 'Injured Count', color: lowColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'FatalityCount', name: 'Fatality Count', color: medColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
 
         ],
         title: 'Ground Report',
@@ -2080,7 +2237,9 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         //],
         series: [
 
-            { valueField: 'Count', name: 'Count', color: highColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Count', name: 'Count', color: highColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'InjuredCount', name: 'Injured Count', color: lowColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'FatalityCount', name: 'Fatality Count', color: medColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
 
         ],
         title: 'Ground Report',
@@ -2150,8 +2309,9 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
 
         }],
         series: [
-
-            { valueField: 'Count', name: 'Count', color: lowColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Count', name: 'Count', color: highColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'InjuredCount', name: 'Injured Count', color: lowColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'FatalityCount', name: 'Fatality Count', color: medColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
 
         ],
         title: 'Ground Report By Register',
@@ -2214,7 +2374,9 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
 
         series: [
 
-            { valueField: 'Count', name: 'Count', color: lowColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Count', name: 'Count', color: highColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'InjuredCount', name: 'Injured Count', color: lowColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'FatalityCount', name: 'Fatality Count', color: medColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
 
         ],
         title: 'Ground Report By Register',
@@ -2279,7 +2441,9 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         }],
         series: [
 
-            { valueField: 'Count', name: 'Count', color: medColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Count', name: 'Count', color: highColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'InjuredCount', name: 'Injured Count', color: lowColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'FatalityCount', name: 'Fatality Count', color: medColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
 
         ],
         title: 'Ground Report By Route',
@@ -2340,7 +2504,9 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
 
         series: [
 
-            { valueField: 'Count', name: 'Count', color: highColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Count', name: 'Count', color: highColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'InjuredCount', name: 'Injured Count', color: lowColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'FatalityCount', name: 'Fatality Count', color: medColor, pane: 'topPane', type: 'bar', barWidth: 50, stack: 'detailed' },
 
         ],
         title: 'Ground Report By Route',
@@ -2380,6 +2546,238 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
             size: 'chrt_sizeXS'
         },
     };
+
+
+    //$scope.qaGroundDamage = {
+    //    size: { height: 600 },
+    //    legend: {
+    //        verticalAlignment: 'bottom',
+    //        horizontalAlignment: 'center',
+    //    },
+
+    //    //    title: 'Damage By',
+    //    export: {
+    //        enabled: false,
+    //    },
+    //    onPointClick: function (e) {
+    //        e.target.select();
+    //    },
+    //    argumentAxis: {
+    //        label: {
+    //            visible: true,
+    //        },
+    //    },
+    //    valueAxis: [
+    //        {
+    //            grid: {
+    //                visible: true,
+    //            },
+    //            tickInterval: 1,
+    //        },
+    //    ],
+    //    bindingOptions: {
+    //        dataSource: 'ds_groundDamage',
+    //    },
+    //};
+
+
+
+
+    $scope.chartConfigs = [
+        {
+            type: 'doughnut',
+            tooltip: {
+                enabled: true,
+                location: 'edge',
+                customizeTooltip(arg) {
+                    return {
+                        text: arg.seriesName + ': ' + arg.valueText,
+                    };
+                },
+            },
+
+            commonSeriesSettings: {
+                argumentField: 'DamageBy',
+                label: {
+                    visible: true,
+                    connector: {
+                        visible: true,
+                        width: 1,
+                    },
+                },
+
+            },
+            title: 'Count',
+
+
+            series: [
+
+                { valueField: 'Count', name: 'Count', type: 'doughnut', size: { width: 200 } },
+            ],
+
+            legend: {
+                visible: false
+            },
+
+            export: {
+                enabled: false,
+            },
+            onPointClick(e) {
+                e.target.select();
+            },
+
+            argumentAxis: {
+                label: {
+                    visible: true
+                }
+            },
+            valueAxis: [{
+
+                grid: {
+                    visible: true
+                },
+                tickInterval: 1,
+
+            }
+
+            ],
+
+            bindingOptions:
+            {
+                dataSource: 'ds_groundDamage'
+            },
+        },
+        {
+            type: 'doughnut',
+            tooltip: {
+                enabled: true,
+                location: 'edge',
+                customizeTooltip(arg) {
+                    return {
+                        text: arg.seriesName + ': ' + arg.valueText,
+                    };
+                },
+            },
+
+            commonSeriesSettings: {
+                argumentField: 'DamageBy',
+                label: {
+                    visible: true,
+                    connector: {
+                        visible: true,
+                        width: 1,
+                    },
+                },
+
+            },
+            title: 'Injured Count',
+
+
+            series: [
+
+                { valueField: 'InjuredCount', name: 'Injured Count', type: 'doughnut', size: { width: 200 } },
+
+            ],
+
+
+            legend: {
+                visible: false
+            },
+            export: {
+                enabled: false,
+            },
+            onPointClick(e) {
+                e.target.select();
+            },
+
+            argumentAxis: {
+                label: {
+                    visible: true
+                }
+            },
+            valueAxis: [{
+
+                grid: {
+                    visible: true
+                },
+                tickInterval: 1,
+
+            }
+
+            ],
+
+            bindingOptions:
+            {
+                dataSource: 'ds_groundDamage'
+            },
+        },
+        {
+            type: 'doughnut',
+            tooltip: {
+                enabled: true,
+                location: 'edge',
+                customizeTooltip(arg) {
+                    return {
+                        text: arg.seriesName + ': ' + arg.valueText,
+                    };
+                },
+            },
+
+            commonSeriesSettings: {
+                argumentField: 'DamageBy',
+                label: {
+                    visible: true,
+                    connector: {
+                        visible: true,
+                        width: 1,
+                    },
+                },
+
+            },
+            title: 'Fatality Count',
+
+
+            series: [
+
+                { valueField: 'FatalityCount', name: 'Fatality Count', type: 'doughnut', size: { width: 200 } },
+
+            ],
+
+
+
+            export: {
+                enabled: false,
+            },
+            onPointClick(e) {
+                e.target.select();
+            },
+
+            argumentAxis: {
+                label: {
+                    visible: true
+                }
+            },
+            valueAxis: [{
+
+                grid: {
+                    visible: true
+                },
+                tickInterval: 1,
+
+            }
+
+            ],
+
+            bindingOptions:
+            {
+                dataSource: 'ds_groundDamage'
+            },
+        },
+    ];
+
+    $scope.chartConfigs.forEach(function (chartConfig) {
+        console.log("configs", chartConfig);
+    });
 
 
     $scope.qaCateringChart = {
@@ -2449,7 +2847,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         bindingOptions:
         {
             dataSource: 'ds_cateringDate',
-            size: 'chrt_size'
+            size: 'chrt_size100'
         },
     };
 
@@ -2595,7 +2993,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         bindingOptions:
         {
             dataSource: 'ds_cateringRegister',
-            size: 'chrt_size'
+            size: 'chrt_size100'
         },
     };
 
@@ -2786,6 +3184,120 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         },
     };
 
+    $scope.cateringReasonTitle = {
+        palette: "Green Mist",
+        rtlEnabled: false,
+        onInitialized: function (e) {
+        },
+        sizeGroup: 'sg1',
+        type: "doughnut",
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+            itemTextPosition: 'right',
+            rowCount: 1
+        },
+        tooltip: {
+            enabled: true,
+
+            customizeTooltip: function () {
+                return { text: this.value.toFixed(2) };
+            }
+        },
+        "export": {
+            enabled: false
+        },
+        series: [
+
+            {
+                name: 'Reason',
+                ignoreEmptyPoints: true,
+                argumentField: "ReasonTitle",
+                valueField: "Count",
+                label: {
+                    position: 'inside',
+                    backgroundColor: 'transparent',
+                    visible: true,
+                    font: {
+                        size: 12,
+                        color: 'white',
+                    },
+
+                    connector: {
+                        visible: true
+                    },
+                    customizeText: function (arg) {
+
+                        return arg.percentText;
+                    }
+                }
+            },
+
+        ],
+        size: {
+            height: 450,
+        },
+        bindingOptions: {
+            dataSource: 'ds_cateringReasonTitle',
+
+        }
+    };
+
+    $scope.cateringReasonTitleXS = {
+        palette: "Green Mist",
+        rtlEnabled: false,
+        onInitialized: function (e) {
+        },
+        sizeGroup: 'sg1',
+        type: "doughnut",
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+            itemTextPosition: 'right',
+            rowCount: 1
+        },
+        tooltip: {
+            enabled: true,
+        },
+        "export": {
+            enabled: false
+        },
+        series: [
+
+            {
+                name: 'Reason',
+                ignoreEmptyPoints: true,
+                argumentField: "ReasonTitle",
+                valueField: "Count",
+                label: {
+                    position: 'inside',
+                    backgroundColor: 'transparent',
+                    visible: true,
+                    font: {
+                        size: 12,
+                        color: 'white',
+                    },
+
+                    connector: {
+                        visible: true
+                    },
+                    customizeText: function (arg) {
+
+                        return arg.percentText;
+                    }
+                }
+            },
+
+        ],
+        size: {
+            height: 450,
+        },
+        bindingOptions: {
+            dataSource: 'ds_cateringReasonTitle',
+
+        }
+    };
+
 
     $scope.qaSecurityChart = {
         tooltip: {
@@ -2854,7 +3366,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         bindingOptions:
         {
             dataSource: 'ds_securityDate',
-            size: 'chrt_size'
+            size: 'chrt_size100'
         },
     };
 
@@ -3000,7 +3512,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         bindingOptions:
         {
             dataSource: 'ds_securityRegister',
-            size: 'chrt_size'
+            size: 'chrt_size100'
         },
     };
 
@@ -3190,6 +3702,131 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
             size: 'chrt_sizeXS'
         },
     };
+
+    $scope.securityReasonTitle = {
+        center: {
+            x: '50%',
+            y: '50%',
+        },
+        palette: "Green Mist",
+        rtlEnabled: false,
+        onInitialized: function (e) {
+        },
+      
+        type: "doughnut",
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+            itemTextPosition: 'right',
+            rowCount: 1
+        },
+        tooltip: {
+            enabled: true,
+
+            customizeTooltip: function () {
+                return { text: this.value.toFixed(2) };
+            }
+        },
+        "export": {
+            enabled: false
+        },
+        series: [
+
+            {
+                name: 'Reason',
+                ignoreEmptyPoints: true,
+                argumentField: "ReasonTitle",
+                valueField: "Count",
+                label: {
+                    position: 'inside',
+                    backgroundColor: 'transparent',
+                    visible: true,
+                    font: {
+                        size: 12,
+                        color: 'white',
+                    },
+
+                    connector: {
+                        visible: true
+                    },
+                    customizeText: function (arg) {
+
+                        return arg.percentText;
+                    }
+                }
+            },
+
+        ],
+        size: {
+            height: 450,
+        },
+        bindingOptions: {
+            dataSource: 'ds_securityReasonTitle',
+
+        }
+
+    }
+
+    $scope.securityReasonTitleXS = {
+        palette: "Green Mist",
+        rtlEnabled: false,
+        onInitialized: function (e) {
+        },
+        sizeGroup: 'sg1',
+        type: "doughnut",
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+            itemTextPosition: 'right',
+            rowCount: 1
+        },
+        tooltip: {
+            enabled: true,
+
+            customizeTooltip: function () {
+                return { text: this.value.toFixed(2) };
+            }
+        },
+        "export": {
+            enabled: false
+        },
+        series: [
+
+            {
+                name: 'Reason',
+                ignoreEmptyPoints: true,
+                argumentField: "ReasonTitle",
+                valueField: "Count",
+                label: {
+                    position: 'inside',
+                    backgroundColor: 'transparent',
+                    visible: true,
+                    font: {
+                        size: 12,
+                        color: 'white',
+                    },
+
+                    connector: {
+                        visible: true
+                    },
+                    customizeText: function (arg) {
+
+                        return arg.percentText;
+                    }
+                }
+            },
+
+        ],
+        size: {
+            height: 450,
+        },
+        bindingOptions: {
+            dataSource: 'ds_securityReasonTitle',
+
+        }
+
+    }
+
 
     $scope.qaVoluntaryChart = {
         tooltip: {
@@ -3410,7 +4047,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         bindingOptions:
         {
             dataSource: 'ds_cyberDate',
-            size: 'chrt_size'
+            size: 'chrt_size100'
         },
     };
 
@@ -3556,7 +4193,7 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         bindingOptions:
         {
             dataSource: 'ds_cyberRegister',
-            size: 'chrt_size'
+            size: 'chrt_size100'
         },
     };
 
@@ -4042,13 +4679,13 @@ app.controller('qaReports', ['$http', '$scope', '$location', '$routeParams', '$r
         }
     };
 
-    $scope.get_form_tile_class=function(n){
-		
-		if ($scope.Type==n)
-			return 'tile-form-selected';
-		else
-			return '';
-	};
+    $scope.get_form_tile_class = function (n) {
+
+        if ($scope.Type == n)
+            return 'tile-form-selected';
+        else
+            return '';
+    };
     ////////////////////////
     $scope.monthConvert = function (monthNo) {
         $.each(MonthDataSource, function (_i, _d) {

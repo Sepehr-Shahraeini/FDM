@@ -1,5 +1,5 @@
 ﻿'use strict';
-app.controller('homeController', ['$scope', '$routeParams', 'authService', 'activityService', 'libraryService', 'flightService', '$rootScope', function ($scope, $routeParams, authService, activityService, libraryService,flightService, $rootScope) {
+app.controller('homeController', ['$scope', '$routeParams', 'authService', 'activityService', 'libraryService', 'flightService', '$rootScope', 'qaService', function ($scope, $routeParams, authService, activityService, libraryService, flightService, $rootScope, qaService) {
     
     if ($rootScope.IsOnlyFlightView()) {
         authService.setModule(3);
@@ -1606,12 +1606,108 @@ app.controller('homeController', ['$scope', '$routeParams', 'authService', 'acti
             $scope.flight.Bind();
             //Flight Pocket
 
+            
+            setInterval(function () {
+                //get new records
+                qaService.getDateVisit(4539).then(function (res) {
+                    console.log(res.Data)
 
+                    $.each(res.Data, function (_i, _d) {
+                        switch (_d.Type) {
+                            case 0:
+                                DevExpress.ui.notify({
+                                    message: 'Cabin Safety Report(' + _d.Count + ')',
+                                    type: 'success',
+                                    displayTime: 5000,
+                                    position: 'top right'
+                                });
+                                break;
+                            case 1:
+                                DevExpress.ui.notify({
+                                    message: 'Ground Incident/Accident/Damage Report(' + _d.Count+ ')' ,
+                                    type: 'success',
+                                    displayTime: 5000,
+                                    position: 'top right'
+                                });
+                                break;
+                            case 2:
+                                DevExpress.ui.notify({
+                                    message: 'Voluntary Hazard Reporting(' + _d.Count + ')',
+                                    type: 'success',
+                                    displayTime: 5000,
+                                    position: 'top right'
+                                });
+                                break;
+                            case 3:
+                                DevExpress.ui.notify({
+                                    message: 'Maintenance Occurence Report(' + _d.Count +')',
+                                    type: 'success',
+                                    displayTime: 5000,
+                                    position: 'top right'
+                                });
+                                break;
+                            case 4:
+                                DevExpress.ui.notify({
+                                    message: 'Catering Hazard Report(' + _d.Count + ')',
+                                    type: 'success',
+                                    displayTime: 5000,
+                                    position: 'top right'
+                                });
+                                break;
+                            case 5:
+                                DevExpress.ui.notify({
+                                    message: 'Security Hazard Report(' + _d.Count + ')' ,
+                                    type: 'success',
+                                    displayTime: 5000,
+                                    position: 'top right'
+                                });
+                                break;
+                            case 5:
+                                DevExpress.ui.notify({
+                                    message: 'Dispatch Hazard Report(' + _d.Count + ')',
+                                    type: 'success',
+                                    displayTime: 5000,
+                                    position: 'top right'
+                                });
+                                break;
+                            case 6:
+                                DevExpress.ui.notify({
+                                    message: 'Dispatch Hazard Report(' + _d.Count + ')' ,
+                                    type: 'success',
+                                    displayTime: 5000,
+                                    position: 'top right'
+                                });
+                                break;
+                            case 7:
+                                DevExpress.ui.notify({
+                                    message: 'Cyber Security Report(' + _d.Count + ')' ,
+                                    type: 'success',
+                                    displayTime: 5000,
+                                    position: 'top right'
+                                });
+                                break;
+                            case 8:
+                                DevExpress.ui.notify({
+                                    message: 'Air Safety Report(' + _d.Count + ')',
+                                    type: 'success',
+                                    displayTime: 5000,
+                                    position: 'top right'
+                                });
+                                break;
+
+                        }
+
+                       
+                    });
+                });
+
+            }, 60 * 1000);
             ///// End Flight Pocket
         }
     }
 
 
+    
 
     //////////////////////////////////
 

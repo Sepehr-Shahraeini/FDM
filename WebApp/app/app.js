@@ -686,7 +686,10 @@ app.config(function ($routeProvider) {
         templateUrl: "app/views/qaReport.html"
     });
 
-   
+    $routeProvider.when("/qa/hazard/log", {
+        controller: "qahazardlog",
+        templateUrl: "/app/views/qahazardlog.html"
+    });
 
 
     $routeProvider.otherwise({ redirectTo: "/home" });

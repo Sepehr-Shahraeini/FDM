@@ -41,8 +41,20 @@
 
 
                     <div class="visible-sm visible-md visible-lg">
+                        <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
+                            <tr>
+                                <td colspan="6" style=" padding:7px;text-align:left;color:black;font-weight:bold">
+                                    Id:<span style='display:inline-block;margin-left:5px;'>{{entity.FormNo}}</span>
+                                </td>
+                            </tr>
+                        </table>
                         <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
-
+                            <tr>
+                                <td class="tdStyle" style="font-weight: bold"> Title: </td>
+                                <td class="tdStyle"><div dx-text-box="txt_title" class="center"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> Airport: </td>
+                                <td class="tdStyle"><div dx-select-box="sb_airport" class="center"></div></td>
+                            </tr>
                             <tr>
                                 <td class="tdStyle" style="font-weight: bold"> Date: </td>
                                 <td class="tdStyle"><div dx-date-box="txt_date" class="center"></div></td>
@@ -245,14 +257,14 @@
                                 <td class="tdStyle"> <div dx-text-box="txt_p3Job" class="center"></div></td>
                             </tr>
                             <tr>
-                                <td class="tdStyle" style="font-weight: bold" > Company (شرکت): </td>
-                                <td class="tdStyle" > <div dx-text-box="txt_p3Compony" class="center"></div></td>
-                                <td class="tdStyle"style="font-weight: bold" > staff Nr. (شماره کارمندی): </td>
-                                <td class="tdStyle" > <div dx-text-box="txt_p3StaffNum" class="center"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> Company (شرکت): </td>
+                                <td class="tdStyle"> <div dx-text-box="txt_p3Compony" class="center"></div></td>
+                                <td class="tdStyle" style="font-weight: bold"> staff Nr. (شماره کارمندی): </td>
+                                <td class="tdStyle"> <div dx-text-box="txt_p3StaffNum" class="center"></div></td>
                             </tr>
                             <tr>
                                 <td class="tdStyle" style="font-weight: bold"> license (گواهینامه): </td>
-                                <td class="tdStyle" > <div dx-text-box="txt_p3License" class="center"></div></td>
+                                <td class="tdStyle"> <div dx-text-box="txt_p3License" class="center"></div></td>
                             </tr>
                         </table>
 
@@ -264,16 +276,16 @@
                             </tr>
                             <tr>
                                 <td class="tdStyle" style="font-weight: bold"> Visibillity (دید): </td>
-                                <td class="tdStyle" ><div dx-number-box="txt_VISByMeter" class="center"></div><p>m</p></td>
-                                <td class="tdStyle" ><div dx-number-box="txt_VISByKiloMeter" class="center"></div><p>km</p></td>
+                                <td class="tdStyle"><div dx-number-box="txt_VISByMeter" class="center"></div><p>m</p></td>
+                                <td class="tdStyle"><div dx-number-box="txt_VISByKiloMeter" class="center"></div><p>km</p></td>
                             </tr>
                             <tr>
                                 <td class="tdStyle" style="font-weight: bold"> Wind/gust (باد/تندباد): </td>
-                                <td class="tdStyle" > <div dx-number-box="txt_wind" class="center"></div><p>kts</p></td>
+                                <td class="tdStyle"> <div dx-number-box="txt_wind" class="center"></div><p>kts</p></td>
                             </tr>
                             <tr>
                                 <td class="tdStyle" style="font-weight: bold"> Temperature (دما): </td>
-                                <td class="tdStyle" > <div dx-number-box="txt_temp" class="center"></div><p>c</p></td>
+                                <td class="tdStyle"> <div dx-number-box="txt_temp" class="center"></div><p>c</p></td>
                             </tr>
 
                         </table>
@@ -325,7 +337,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="tdStyle" > <div dx-text-area="txt_contributFact"></div></td>
+                                <td class="tdStyle"> <div dx-text-area="txt_contributFact"></div></td>
                             </tr>
 
                         </table>
@@ -405,7 +417,7 @@
 
         </div>
         <div style="float: right; width: 40%">
-            <div ng-include="'app/views/qaRefer.html?vx=2'" onload="testLoaded()"></div>
+            <div ng-include="'app/views/qaRefer.html?vx=3'" onload="testLoaded()"></div>
         </div>
         <div style='clear:both'></div>
     </div>

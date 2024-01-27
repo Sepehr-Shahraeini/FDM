@@ -95,7 +95,6 @@ app.controller('qaVoluntaryController', ['$scope', '$location', 'qaService', 'au
     /////////////////////////////////
 
     $scope.txt_hazardDate = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         width: '100%',
@@ -105,7 +104,6 @@ app.controller('qaVoluntaryController', ['$scope', '$location', 'qaService', 'au
     }
 
     $scope.txt_repDate = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         width: '100%',
@@ -115,7 +113,6 @@ app.controller('qaVoluntaryController', ['$scope', '$location', 'qaService', 'au
     }
 
     $scope.txt_affectedArea = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -124,7 +121,6 @@ app.controller('qaVoluntaryController', ['$scope', '$location', 'qaService', 'au
     }
 
     $scope.txt_hazardDes = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -133,7 +129,6 @@ app.controller('qaVoluntaryController', ['$scope', '$location', 'qaService', 'au
     }
 
     $scope.txt_recAction = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -143,27 +138,24 @@ app.controller('qaVoluntaryController', ['$scope', '$location', 'qaService', 'au
 
 
     $scope.txt_email = {
-        hoverStateEnabled: false,
-        useMaskBehavior: false,
         readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.Email',
         }
     }
 
     $scope.txt_telNumber = {
-        hoverStateEnabled: false,
-        useMaskBehavior: false,
         readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.Mobile ',
         }
     }
 
     $scope.txt_name = {
-        hoverStateEnabled: false,
-        useMaskBehavior: false,
         readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.EmployeeName',
         }
@@ -184,6 +176,8 @@ app.controller('qaVoluntaryController', ['$scope', '$location', 'qaService', 'au
     }
 
     $scope.txt_relatedDepartment = {
+        readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.RelatedDepartment',
         }
@@ -291,7 +285,7 @@ app.controller('qaVoluntaryController', ['$scope', '$location', 'qaService', 'au
     });
 
 
-    
+
     ///////////////////////////////////
 
     $scope.tempData = null;

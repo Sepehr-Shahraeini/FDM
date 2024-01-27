@@ -36,6 +36,17 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
         return deferred.promise;
     }
 
+   var _getASRId = function (flightId) {
+        var deferred = $q.defer();
+       $http.get(apiQA + "get/ast/entityId/" + employeeId + "/" + type + '/' + id).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            // deferred.reject(Exeptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    }
+
     var _followUpHsitory = function (entityId, type) {
         var deferred = $q.defer();
         $http.get(apiQA + "api/get/followup/" + entityId + "/" + type).then(function (response) {
@@ -449,6 +460,18 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
         return deferred.promise;
     }
 
+    var _getCabinEventReport = function (ymf, ymt) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/qa/csr/event/report/' + ymf + "/" + ymt).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
     var _getMaintenanceReport = function (ymf, ymt) {
 
         var deferred = $q.defer();
@@ -687,6 +710,7 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
 
     var _getImportedFile = function (entityId, employeeId, type) {
 
+        console.log(employeeId);
         var deferred = $q.defer();
         $http.get(apiQA + 'api/get/imported/file/' + entityId + '/' + employeeId + '/' + type).then(function (response) {
             deferred.resolve(response.data);
@@ -780,7 +804,75 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
         return deferred.promise;
     }
 
+    var _getCabinReporter = function () {
 
+        var deferred = $q.defer();
+        $http.get(apiQA + '/api/get/csr/reporter').then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _saveFeedBack = function (entity) {
+        console.log(entity);
+        var deferred = $q.defer();
+        $http.post(apiQA + 'api/qa/save/feedback', entity).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _getFeedBack = function (entityId, type) {
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/qa/get/feedback' + '/' + entityId + '/' + type).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _dltFeedBack = function (id) {
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/qa/delete/feedback' + '/' + id).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _getDateVisit = function (employeeId) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/get/datevisit/' + employeeId).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+     var _setDateVisit = function (employeeId, type) {
+
+        var deferred = $q.defer();
+         $http.get(apiQA + 'api/set/datevisit/' + employeeId + '/' + type).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
 
 
 
@@ -802,6 +894,7 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
     serviceFactory.getCSRById = _getCSRById;
     serviceFactory.getEventTitle = _getEventTitle;
     serviceFactory.getFlightPhase = _getFlightPhase;
+    serviceFactory.getCabinReporter = _getCabinReporter;
 
 
     serviceFactory.getCHRById = _getCHRById;
@@ -833,6 +926,7 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
     serviceFactory.getMaintenanceReport = _getMaintenanceReport
     serviceFactory.getMaintenanceRegReport = _getMaintenanceRegReport
     serviceFactory.getCabinReport = _getCabinReport
+    serviceFactory.getCabinEventReport = _getCabinEventReport
     serviceFactory.getDispatchReport = _getDispatchReport
     serviceFactory.getVoluntaryReport = _getVoluntaryReport
     serviceFactory.getCyberReport = _getCyberReport
@@ -870,6 +964,14 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
     serviceFactory.getQAFormByRegister = _getQAFormByRegister;
     serviceFactory.getQAFormByRoute = _getQAFormByRoute;
 
+    serviceFactory.saveFeedBack = _saveFeedBack;
+    serviceFactory.getFeedBack = _getFeedBack;
+    serviceFactory.dltFeedBack = _dltFeedBack;
+
+
+
+    serviceFactory.getDateVisit = _getDateVisit;
+    serviceFactory.setDateVisit = _setDateVisit;
 
 
     return serviceFactory;

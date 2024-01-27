@@ -29,6 +29,7 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
 
     /////////////////////////////////
     $scope.fill = function (data) {
+        console.log(data);
         $scope.entity = data.result;
         $scope.entity.EventTitleIds = [];
         $rootScope.result.Result = data.result.Result;
@@ -44,6 +45,9 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
     $scope.isLockVisible = false;
     $scope.bind = function () {
 
+        qaService.getCabinReporter().then(function (res) {
+            $scope.ds_reporter = res.Data;
+        });
 
         qaService.getEventTitle().then(function (res) {
             $scope.eventTitle = res.Data;
@@ -85,11 +89,11 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
             options.component.release(true);
 
         },
-		onReachBottom: function(e) {  
-    // ..  
-    e.component.release(true);  
-    // ..  
-} ,
+        onReachBottom: function (e) {
+            // ..  
+            e.component.release(true);
+            // ..  
+        },
         onInitialized: function (e) {
 
 
@@ -156,7 +160,6 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
     }
 
     $scope.txt_repFieldBy = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -164,10 +167,33 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
         }
     }
 
-    $scope.txt_OccurrenceDate = {
-        hoverStateEnabled: false,
-        useMaskBehavior: true,
+    $scope.sb_reporter = {
         readOnly: true,
+        focusStateEnabled: false,
+        showClearButton: false,
+        searchEnabled: false,
+        placeholder: '',
+        displayExpr: 'Title',
+        valueExpr: 'Id',
+        bindingOptions: {
+            value: 'entity.ReporterId',
+            dataSource: 'ds_reporter',
+        }
+    }
+
+    $scope.txt_repFieldBy = {
+        readOnly: true,
+        focusStateEnabled: false,
+        bindingOptions: {
+            value: 'entity.ReportFiledBy',
+            useMaskBehavior: 'isEditable',
+            readOnly: '!isEditable'
+        }
+    }
+
+    $scope.txt_OccurrenceDate = {
+        readOnly: true,
+        focusStateEnabled: false,
         type: 'datetime',
         pickerType: "rollers",
         displayFormat: "yyyy-MMM-dd",
@@ -177,7 +203,8 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
     }
 
     $scope.txt_OccurrenceTime = {
-        hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         type: 'time',
         pickerType: "rollers",
         displayFormat: "HH:mm",
@@ -406,8 +433,8 @@ app.controller('qaCabinController', ['$scope', '$location', 'qaService', 'authSe
     ////////////////////////////////
     var appWindow = angular.element($window);
     appWindow.bind('resize', function () {
-		$scope.scroll_qaCabin_height = $(window).height() - 170;
-	});
+        $scope.scroll_qaCabin_height = $(window).height() - 170;
+    });
 
     $scope.$on('InitQACabin', function (event, prms) {
 

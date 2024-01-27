@@ -1,4 +1,5 @@
-﻿<style>
+﻿﻿
+<style>
     .ctd {
         border: 1px solid #eee;
         text-align: center;
@@ -43,6 +44,13 @@
                 <div class='thin-scroll' style='overflow-y:auto;' ng-style="{height: scroll_qaCyber_height + 'px'}">
 
                     <div class="visible-sm visible-md visible-lg">
+                        <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
+                            <tr>
+                                <td colspan="6" style=" padding:7px;text-align:left;color:black;font-weight:bold">
+                                    Id:<span style='display:inline-block;margin-left:5px;'>{{entity.FormNo}}</span>
+                                </td>
+                            </tr>
+                        </table>
                         <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
                             <tr>
                                 <td class="titleStyle" colspan="4">
@@ -192,7 +200,7 @@
 
         </div>
         <div style="float: right; width:40%">
-            <div ng-include="'app/views/qaRefer.html?vx=2'" onload="testLoaded()"></div>
+            <div ng-include="'app/views/qaRefer.html?vx=3'" onload="testLoaded()"></div>
         </div>
         <div style="clear:both"></div>
     </div>

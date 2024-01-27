@@ -47,6 +47,10 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
 
     $scope.bind = function () {
 
+        qaService.getStation().then(function (res) {
+            $scope.ds_airport = res.Data;
+        });
+
         qaService.getDamageBy().then(function (res) {
             $scope.damageBy = res.Data;
         });
@@ -144,10 +148,32 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
 
+    $scope.sb_airport = {
+        showClearButton: false,
+        searchEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
+        placeholder: '',
+        displayExpr: 'IATA',
+        valueExpr: 'Id',
+        bindingOptions: {
+            value: 'entity.AirportId',
+            dataSource: 'ds_airport',
+        }
+    }
+
+    $scope.txt_title = {
+        readOnly: true,
+        focusStateEnabled: false,
+        bindingOptions: {
+            value: 'entity.Title',
+        }
+    }
+
 
     $scope.txt_date = {
-        hoverStateEnabled: false,
         readOnly: true,
+        focusStateEnabled: false,
         type: 'datetime',
         pickerType: "rollers",
         displayFormat: "yyyy-MMM-dd",
@@ -157,8 +183,8 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_OccurrenceTime = {
-        hoverStateEnabled: false,
         readOnly: true,
+        focusStateEnabled: false,
         type: 'time',
         pickerType: "rollers",
         displayFormat: "HH:mm",
@@ -168,7 +194,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_optPhase = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -177,7 +202,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_occurrecneTime = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -186,7 +210,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_area = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -195,7 +218,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_acRegister = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -204,7 +226,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_acType = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -213,7 +234,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_fltNum = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -222,7 +242,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_gndTime = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         type: 'time',
@@ -234,7 +253,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_fltDelay = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         type: 'time',
@@ -266,7 +284,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
 
 
     $scope.txt_damageDetail = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -275,7 +292,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_eeCasualty = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -284,7 +300,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_eeNonCasualty = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -293,7 +308,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_paxCasualty = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -302,7 +316,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_paxNonCasualty = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -311,7 +324,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_otherCasualty = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -320,7 +332,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_otherNonCasualty = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -329,7 +340,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_veFleetSerial = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -338,7 +348,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_veType = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -347,7 +356,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_veOwner = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -356,7 +364,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_eqArea = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -365,7 +372,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_veAga = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -374,7 +380,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
     }
 
     $scope.txt_veLastOverhaul = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -384,7 +389,6 @@ app.controller('qaGroundController', ['$scope', '$location', 'qaService', 'authS
 
 
     $scope.txt_veRemarks = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {

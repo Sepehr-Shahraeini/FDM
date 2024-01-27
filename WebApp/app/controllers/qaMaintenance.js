@@ -14,7 +14,7 @@ app.controller('qaMaintenanceController', ['$scope', '$location', 'qaService', '
     $rootScope.result = {
         Result: null,
     };
-    
+
     /////////////////////////////////
     $scope.fill = function (data) {
         $scope.entity = data;
@@ -22,6 +22,7 @@ app.controller('qaMaintenanceController', ['$scope', '$location', 'qaService', '
     };
     $scope.isLockVisible = false;
     $scope.bind = function () {
+
 
 
         qaService.getMORCompnSpec().then(function (res) {
@@ -113,11 +114,10 @@ app.controller('qaMaintenanceController', ['$scope', '$location', 'qaService', '
     }
 
     $scope.sb_station = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         placeholder: '',
-        displayExpr: 'Name',
+        displayExpr: 'IATA',
         valueExpr: 'Id',
         bindingOptions: {
             value: "entity.StationId",
@@ -127,9 +127,8 @@ app.controller('qaMaintenanceController', ['$scope', '$location', 'qaService', '
 
 
     $scope.txt_OccurrenceDate = {
-        hoverStateEnabled: false,
         readOnly: true,
-
+        focusStateEnabled: false,
         displayFormat: 'yyyy-MM-dd',
         type: 'datetime',
         pickerType: "rollers",
@@ -139,7 +138,8 @@ app.controller('qaMaintenanceController', ['$scope', '$location', 'qaService', '
     }
 
     $scope.txt_OccurrenceTime = {
-        hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         type: 'time',
         pickerType: "rollers",
         displayFormat: "HH:mm",
@@ -418,12 +418,10 @@ app.controller('qaMaintenanceController', ['$scope', '$location', 'qaService', '
     });
 
     $scope.$on('onEmployeeSelectHide', function (event, prms) {
-        console.log(prms);
         $scope.followUpEntity.Category = prms;
     });
 
     $scope.testLoaded = function () {
-        console.log("loaded");
         $rootScope.$broadcast('InitTest', $scope.tempData);
     }
 

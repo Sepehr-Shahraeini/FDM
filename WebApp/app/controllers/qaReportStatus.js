@@ -1,5 +1,6 @@
 ﻿'use strict';
 app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams', '$rootScope', 'qaService', 'aircraftService', 'authService', 'notificationService', '$route', function ($http, $scope, $location, $routeParams, $rootScope, qaService, aircraftService, authService, notificationService, $route) {
+    $rootScope.employeeId = 4539
     $scope.selectedTabIndex = -1;
     $scope.selectedTabId = null;
     $scope.popupselectedTabIndex = -1;
@@ -21,13 +22,13 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
 
     };
 
-    $rootScope.employeeId = 4539;
     $scope.entity = {
         employeeId: $rootScope.employeeId,
     }
 
     $scope.entity.type = $routeParams.type;
-	
+
+
 
 
     $scope.$watch("selectedTabIndex", function (newValue) {
@@ -56,10 +57,10 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
             }
             if ($scope.dg_new_instance)
                 $scope.dg_new_instance.refresh();
-            if ( $scope.dg_open_instance)
+            if ($scope.dg_open_instance)
                 $scope.dg_open_instance.refresh();
-            if ( $scope.dg_determined_instance)
-                 $scope.dg_determined_instance.refresh();
+            if ($scope.dg_determined_instance)
+                $scope.dg_determined_instance.refresh();
 
         }
         catch (e) {
@@ -198,6 +199,7 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
 
 
     $scope.bind = function () {
+        console.log($scope.entity);
         qaService.getQAStatus($scope.entity).then(function (response) {
             $rootScope.dg_open_ds = response.Data.Open;
             $rootScope.dg_new_ds = response.Data.New;
@@ -249,20 +251,34 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                 $("<div style='text-align:center'/>")
                     .html(options.rowIndex + 1)
                     .appendTo(container);
-            }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+            }, name: 'row', caption: '#', minWidth: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
         },
 
 
 
 
 
-        { dataField: 'Id', caption: 'Id', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100 },
-        { dataField: 'FlightNumber', caption: 'FlightNumber', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 150 },
-        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
-        { dataField: 'Register', caption: 'Register', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
-        { dataField: 'FlightDate', caption: 'Flight Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 250 },
-        { dataField: 'EmployeeName', caption: 'Producer', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, minwidth: 250 },
-        { dataField: 'DateOccurrence', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 250 },
+        { dataField: 'FormNo', caption: 'Form No', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 180 },
+        { dataField: 'DeadLine', caption: 'DeadLine', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 150 },
+        {
+            dataField: 'Priority', caption: 'Priority', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150,
+            cellTemplate: function (container, options) {
+                var priority = options.data.Priority;
+                var priorityText = (priority === 0) ? 'Critical' : priority;
+                var priorityText = (priority === 1) ? 'Major' : priority;
+                var priorityText = (priority === 2) ? 'Minor' : priority;
+
+                $("<div>")
+                    .html(priorityText)
+                    .appendTo(container);
+            }
+        },
+        { dataField: 'FlightNumber', caption: 'Flight No', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 120 },
+        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'Register', caption: 'Reg', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'FlightDate', caption: 'Flight Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 130 },
+        { dataField: 'EmployeeName', caption: 'Reporter', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 300 },
+        { dataField: 'DateOccurrence', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 130 },
         { dataField: 'ReviewResultTitle', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
 
 
@@ -312,13 +328,15 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
         onRowClick: function (e) {
 
 
-               var data = {
+            var data = {
                 Id: e.data.Id,
                 Type: $scope.entity.type,
                 EmployeeId: $rootScope.employeeId,
                 isNotDetermined: true,
                 Category: 'new',
-                ProducerId: e.data.EmployeeId
+                ProducerId: e.data.EmployeeId,
+                FlightId: e.data.FlightId,
+                Priority: e.data.Priority,
             };
 
 
@@ -357,7 +375,11 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
-					  case '7':
+                case '7':
+                    $rootScope.$broadcast('InitOperationPopup', data);
+                    //$rootScope.$broadcast('InitQADispatch', data);
+                    break;
+                case '8':
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
@@ -370,6 +392,12 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                 e.rowElement.css('background', '#ccffcc');
                 $scope.dg_new_ds.ReviewResultTitle = "Closed"
             }
+
+            if (e.rowType == 'data' && e.data && e.data.DeadLine != null) {
+                e.rowElement.css('background', '#ffcc99');
+
+            }
+
         },
 
         onSelectionChanged: function (e) {
@@ -406,13 +434,27 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
         },
 
 
-        { dataField: 'Id', caption: 'Id', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80 },
-        { dataField: 'FlightNumber', caption: 'FlightNumber', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100 },
-        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
-        { dataField: 'Register', caption: 'Register', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
-        { dataField: 'FlightDate', caption: 'Flight Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 180 },
-        { dataField: 'EmployeeName', caption: 'Producer', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, minwidth: 250 },
-        { dataField: 'DateOccurrence', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 180 },
+        { dataField: 'FormNo', caption: 'Form No', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 180 },
+        { dataField: 'DeadLine', caption: 'DeadLine', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 150 },
+        {
+            dataField: 'Priority', caption: 'Priority', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150,
+            cellTemplate: function (container, options) {
+                var priority = options.data.Priority;
+                var priorityText = (priority === 0) ? 'Critical' : priority;
+                var priorityText = (priority === 1) ? 'Major' : priority;
+                var priorityText = (priority === 2) ? 'Minor' : priority;
+
+                $("<div>")
+                    .html(priorityText)
+                    .appendTo(container);
+            }
+        },
+        { dataField: 'FlightNumber', caption: 'Flight No', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100 },
+        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'Register', caption: 'Register', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'FlightDate', caption: 'Flight Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 130 },
+        { dataField: 'EmployeeName', caption: 'Reporter', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 300 },
+        { dataField: 'DateOccurrence', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 130 },
         { dataField: 'ReviewResultTitle', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
         {
             dataField: 'Status', caption: ' Main Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, cellTemplate: function (container, options) {
@@ -478,13 +520,16 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
 
         onRowClick: function (e) {
 
-                var data = {
+
+            var data = {
                 Id: e.data.Id,
                 Type: $scope.entity.type,
                 EmployeeId: $rootScope.employeeId,
                 isNotDetermined: true,
                 Category: 'open',
-                ProducerId: e.data.EmployeeId
+                ProducerId: e.data.EmployeeId,
+                FlightId: e.data.FlightId,
+                Priority: e.data.Priority,
             };
             if (e.data.Status == 1)
                 data.isNotLocked = false;
@@ -521,7 +566,11 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
-					  case '7':
+                case '7':
+                    $rootScope.$broadcast('InitOperationPopup', data);
+                    //$rootScope.$broadcast('InitQADispatch', data);
+                    break;
+                case '8':
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
@@ -546,6 +595,11 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
         onRowPrepared: function (e) {
             if (e.rowType == 'data' && e.data && e.data.Status == 1)
                 e.rowElement.css('background', '#ccffcc');
+
+            if (e.rowType == 'data' && e.data && e.data.DeadLine != null) {
+                e.rowElement.css('background', '#ffcc99');
+
+            }
 
         },
 
@@ -572,13 +626,27 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
         },
 
 
-        { dataField: 'Id', caption: 'Id', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 80 },
-        { dataField: 'FlightNumber', caption: 'FlightNumber', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 100 },
-        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
-        { dataField: 'Register', caption: 'Register', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
-        { dataField: 'Flight Date', caption: 'FlightDate', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 180 },
-        { dataField: 'EmployeeName', caption: 'Producer', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, minwidth: 250 },
-        { dataField: 'DateOccurrence', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 180 },
+        { dataField: 'FormNo', caption: 'FormNo', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 180 },
+        { dataField: 'DeadLine', caption: 'DeadLine', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 150 },
+        {
+            dataField: 'Priority', caption: 'Priority', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150,
+            cellTemplate: function (container, options) {
+                var priority = options.data.Priority;
+                var priorityText = (priority === 0) ? 'Critical' : priority;
+                var priorityText = (priority === 1) ? 'Major' : priority;
+                var priorityText = (priority === 2) ? 'Minor' : priority;
+
+                $("<div>")
+                    .html(priorityText)
+                    .appendTo(container);
+            },
+        },
+        { dataField: 'FlightNumber', caption: 'Flight No', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 120 },
+        { dataField: 'Route', caption: 'Route', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'Register', caption: 'Register', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 120 },
+        { dataField: 'Flight Date', caption: 'FlightDate', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 130 },
+        { dataField: 'EmployeeName', caption: 'Reporter', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 300 },
+        { dataField: 'DateOccurrence', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'date', allowEditing: false, width: 130 },
         { dataField: 'EmployeeStatus', caption: 'Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
         {
             dataField: 'Status', caption: 'Main Status', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150, cellTemplate: function (container, options) {
@@ -631,7 +699,7 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
         selection: { mode: 'single' },
 
         columnAutoWidth: false,
-       height: $(window).height() - 155,
+        height: $(window).height() - 155,
 
         columns: $scope.dg_determined_columns,
         onContentReady: function (e) {
@@ -643,12 +711,14 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
         onRowClick: function (e) {
 
 
-              var data = {
+            var data = {
                 Id: e.data.Id,
                 Type: $scope.entity.type,
                 EmployeeId: $rootScope.employeeId,
                 isNotDetermined: true,
-                ProducerId: e.data.EmployeeId
+                ProducerId: e.data.EmployeeId,
+                FlightId: e.data.FlightId,
+                Priority: e.data.Priority,
             };
 
             if (e.data.Status == 1)
@@ -686,7 +756,11 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
-					  case '7':
+                case '7':
+                    $rootScope.$broadcast('InitOperationPopup', data);
+                    //$rootScope.$broadcast('InitQADispatch', data);
+                    break;
+                case '8':
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
@@ -712,6 +786,11 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
 
             if (e.rowType == 'data' && e.data && e.data.Status == 1) {
                 e.rowElement.css('background', '#ccffcc');
+
+            }
+
+            if (e.rowType == 'data' && e.data && e.data.DeadLine != null) {
+                e.rowElement.css('background', '#ffcc99');
 
             }
 
@@ -755,8 +834,43 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
         authService.redirectToLogin();
     }
     else {
-		 //$rootScope.Title = $routeParams.title.replaceAll('_','/');
-        $rootScope.page_title = '> ' + $rootScope.Title;
+        //$rootScope.Title = $routeParams.title.replaceAll('_','/');
+        //2024-01-17
+        console.log('type', $scope.entity.type);
+        console.log('Route Params', $routeParams.type);
+        switch ($routeParams.type) {
+            case '0':
+                $rootScope.page_title = '> ' + 'Cabin Safety Reports';
+                break;
+            case '1':
+                $rootScope.page_title = '> ' + 'Ground Incident/Accident/Damage Report';
+                break;
+            case '2':
+                $rootScope.page_title = '> ' + 'Voluntary Hazard Reporting';
+                break;
+            case '3':
+                $rootScope.page_title = '> ' + 'Maintenance Occurence Repor';
+                break;
+            case '4':
+                $rootScope.page_title = '> ' + 'Catering Hazard Report';
+                break;
+            case '5':
+                $rootScope.page_title = '> ' + 'Security Hazard Report';
+                break;
+            case '6':
+                $rootScope.page_title = '> ' + 'Dispatch Hazard Report';
+                break;
+            case '7':
+                $rootScope.page_title = '> ' + 'Cyber Security Report';
+                break;
+            case '8':
+                $rootScope.page_title = '> ' + 'Air Safety Report';
+                break;
+            default:
+                $rootScope.page_title = '> ' + 'Others';
+                break;
+        }
+
 
 
         $('.finmonthreport').fadeIn(400, function () {

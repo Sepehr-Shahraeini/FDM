@@ -21,10 +21,17 @@
                 <div class='thin-scroll' style='overflow-y:auto;' ng-style="{height: scroll_qaCatering_height + 'px'}">
 
                     <div class="visible-sm visible-md visible-lg">
+                        <table style="margin-top:10px;border:1px solid #eee;width:100%;color:black" class="dx-border">
+                            <tr>
+                                <td colspan="6" style=" padding:7px;text-align:left;color:black;font-weight:bold">
+                                    Id:<span style='display:inline-block;margin-left:5px;'>{{entity.FormNo}}</span>
+                                </td>
+                            </tr>
+                        </table>
                         <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
                             <tr>
                                 <td class="td-title" colspan="2">
-                                    Contact Information (Optionally) (اطلاعات تماس (اختیاری
+                                    :گزارش دهنده
                                 </td>
                             </tr>
                             <tr>
@@ -44,7 +51,7 @@
                         <table style="margin-top: 10px; border: 1px solid #ccc; width: 100%; color: black" class="dx-border">
                             <tr>
                                 <td class="td-title" colspan="4">
-                                    اطلاعات اولیه
+                                    :اطلاعات اولیه
                                 </td>
                             </tr>
                             <tr>
@@ -57,7 +64,7 @@
                                 <td class="td-field"><div dx-date-box="txt_hazardTime" class="center"></div></td>
                                 <td class="td-field" style="text-align:right; font-weight: bold"> :ساعت بروز رویداد/مخاطره </td>
                                 <td class="td-field"><div dx-text-box="txt_area" class="center" dx-validator="{validationGroup:'asradd',  validationRules: [{ type: 'required',   }]}"></div></td>
-                                <td class="td-field" style="font-weight: bold;text-align:right"> :محل و بروز رویداد/مخاطره </td>
+                                <td class="td-field" style="font-weight: bold;text-align:right"> :محل و بخش بروز رویداد/مخاطره </td>
                             </tr>
                             <tr>
                                 <td class="td-field"><div dx-text-box="txt_register" class="center" dx-validator="{validationGroup:'asradd',  validationRules: [{ type: 'required',   }]}"></div></td>
@@ -73,7 +80,7 @@
                                 <td class="td-field" style="font-weight: bold" colspan="4"> :شرح مخاطره / رویداد </td>
                             </tr>
                             <tr>
-                                <td class="td-field" style="padding:7px;text-align:right;" colspan="4"><div dx-text-area="txt_description" class="center"></div></td>
+                                <td class="td-field" style="height:80px" colspan="4"><div dx-text-area="txt_description" class="center"></div></td>
                             </tr>
                         </table>
 
@@ -85,13 +92,13 @@
                             <div class="col-xs-3 col-sm-3 col-md-3" style="padding: 1%;text-align:right" ng-repeat="x in chrReason">
                                 <p style="margin-right:5px;display:inline-block">{{x.Title}}</p><input type="checkbox" style="text-align:right" ng-checked="x.checked" ng-model="optReason[$index]" ng-disabled="true" ng-change="chkReason($index)" />
                             </div>
-
-                            <div ng-show="showOther" style="margin:1%;border:1px solid #ccc;width:98%;color:black" dx-text-area="txt_eventOther"></div>
+                            <div style="clear:both"></div>
+                            <div class="td-field center" style="height:80px" dx-text-area="txt_eventOther"></div>
                         </div>
                         <table style="margin-top:10px;border:1px solid #ccc;width:100%;color:black" class="dx-border">
                             <tr>
                                 <td class="td-title" colspan="6">
-                                    :جزئیات پتانسیل خطر
+                                    :مشخصات/ نوع و شماره
                                 </td>
                             </tr>
 
@@ -197,7 +204,7 @@
         </div>
 
         <div style="float: right; width: 40%">
-            <div ng-include="'app/views/qaRefer.html?vx=2'" onload="testLoaded()"></div>
+            <div ng-include="'app/views/qaRefer.html?vx=3'" onload="testLoaded()"></div>
         </div>
         <div style='clear:both'></div>
     </div>

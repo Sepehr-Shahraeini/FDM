@@ -1,7 +1,7 @@
 ﻿'use strict';
 app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'authService', '$routeParams', '$rootScope', '$window', function ($scope, $location, qaService, authService, $routeParams, $rootScope, $window) {
     $scope.isFullScreen = false;
-    
+
     var detector = new MobileDetect(window.navigator.userAgent);
     //if (detector.mobile() && !detector.tablet())
 
@@ -221,6 +221,8 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
     ];
 
     $scope.sb_workBreak = {
+        readOnly: true,
+        focusStateEnabled: false,
         showClearButton: false,
         searchEnabled: false,
         dataSource: $scope.dsBeark,
@@ -228,7 +230,7 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
         displayExpr: 'title',
         valueExpr: 'value',
         bindingOptions: {
-            value: 'WorkBreak',
+            value: 'entity.WorkBreak',
         }
     }
 
@@ -238,6 +240,8 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
     ];
 
     $scope.sb_injuryOccuring = {
+        readOnly: true,
+        focusStateEnabled: false,
         showClearButton: false,
         searchEnabled: false,
         dataSource: $scope.dsInjury,
@@ -252,6 +256,8 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
 
 
     $scope.txt_injuryDescription = {
+        readOnly: true,
+        focusStateEnabled: false,
         hoverStateEnabled: false,
         bindingOptions: {
             value: 'entity.InjuryDescription',
@@ -259,7 +265,7 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
     }
 
 
-  
+
 
     $scope.txt_other = {
         readOnly: true,
@@ -308,27 +314,32 @@ app.controller('qaSecurityController', ['$scope', '$location', 'qaService', 'aut
     }
 
     $scope.txt_email = {
-        hoverStateEnabled: false,
-        useMaskBehavior: false,
         readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.Email',
         }
     }
 
-    $scope.txt_telNumber = {
-        hoverStateEnabled: false,
-        useMaskBehavior: false,
+    $scope.txt_description = {
         readOnly: true,
+        focusStateEnabled: false,
+        bindingOptions: {
+            value: 'entity.Description',
+        }
+    }
+
+    $scope.txt_telNumber = {
+        readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.Mobile ',
         }
     }
 
     $scope.txt_name = {
-        hoverStateEnabled: false,
-        useMaskBehavior: false,
         readOnly: true,
+        focusStateEnabled: false,
         bindingOptions: {
             value: 'entity.EmployeeName ',
         }

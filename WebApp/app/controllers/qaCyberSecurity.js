@@ -75,7 +75,7 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
         });
     }
 
-   
+
     $scope.fill = function (data) {
 
         $scope.entity = data;
@@ -96,7 +96,7 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
             if (_d.Id == data.MethodId)
                 _d.checked = true;
         });
-       
+
 
     };
     $scope.isLockVisible = false;
@@ -116,13 +116,13 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
         qaService.getCyberIncident().then(function (res) {
             $scope.incident = res.Data;
             qaService.getCyberById($scope.followUpEntity.Id).then(function (res) {
-               
-                    $scope.fill(res.Data);
-                
+
+                $scope.fill(res.Data);
+
             });
         });
 
-        
+
         qaService.getImportedFile($scope.followUpEntity.Id, $scope.followUpEntity.ProducerId, $scope.followUpEntity.Type).then(function (response) {
             console.log(response);
             $rootScope.dg_attachments_ds = response.Data;
@@ -133,7 +133,7 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
     ////////////////////////////////
     $scope.scroll_qaCyber_height = $(window).height() - 170;
     $scope.scroll_qaCyber = {
-       /* width: '100%',*/
+        /* width: '100%',*/
         bounceEnabled: false,
         showScrollbar: 'never',
         pulledDownText: '',
@@ -159,7 +159,6 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
 
 
     $scope.txt_name = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -168,7 +167,6 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
     }
 
     $scope.txt_jobTitle = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -177,7 +175,6 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
     }
 
     $scope.txt_contactInfo = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -186,9 +183,8 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
     }
 
     $scope.txt_dateEvent = {
-        hoverStateEnabled: false,
-        useMaskBehavior: false,
         readOnly: true,
+        focusStateEnabled: false,
         displayFormat: "yyyy-MMM-dd",
         bindingOptions: {
             value: 'entity.DateOccurrence',
@@ -196,7 +192,8 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
     }
 
     $scope.txt_OccurrenceTime = {
-        hoverStateEnabled: false,
+        readOnly: true,
+        focusStateEnabled: false,
         type: 'time',
         pickerType: "rollers",
         displayFormat: "HH:mm",
@@ -207,7 +204,6 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
 
 
     $scope.txt_dateIncident = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         type: 'datetime',
@@ -220,7 +216,6 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
     }
 
     $scope.txt_attack = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -229,7 +224,6 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
     }
 
     $scope.txt_impacted = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -237,7 +231,6 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
         }
     }
     $scope.txt_breached = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -245,7 +238,6 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
         }
     }
     $scope.txt_containment = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -253,7 +245,6 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
         }
     }
     $scope.txt_other = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
         bindingOptions: {
@@ -262,21 +253,16 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
     }
 
     $scope.txt_mobile = {
-        hoverStateEnabled: false,
         readOnly: true,
         focusStateEnabled: false,
-       
         bindingOptions: {
             value: 'entity.Mobile',
         }
     }
 
     $scope.txt_email = {
-        hoverStateEnabled: false,
-        useMaskBehavior: false,
         readOnly: true,
         focusStateEnabled: false,
-        readOnly: true,
         bindingOptions: {
             value: 'entity.Email',
         }
@@ -407,7 +393,7 @@ app.controller('qaCyberSecurity', ['$scope', '$location', 'qaService', 'authServ
 
         console.log($scope.followUpEntity);
         $scope.bind();
-     
+
 
     });
 
