@@ -153,6 +153,7 @@ app.controller('qaEmployee', ['$scope', '$location', 'authService', '$routeParam
                 Type: $scope.Type,
                 Comment: $scope.Comment,
                 Priority: $scope.Priority,
+               
                 DeadLine: moment(new Date($scope.DeadLine)).format('YYYY-MM-DD')
             });
 

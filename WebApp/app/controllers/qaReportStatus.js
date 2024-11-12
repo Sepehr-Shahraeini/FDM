@@ -1,6 +1,6 @@
 ﻿'use strict';
 app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams', '$rootScope', 'qaService', 'aircraftService', 'authService', 'notificationService', '$route', function ($http, $scope, $location, $routeParams, $rootScope, qaService, aircraftService, authService, notificationService, $route) {
-    $rootScope.employeeId = 4539
+    //$rootScope.employeeId = 3960
     $scope.selectedTabIndex = -1;
     $scope.selectedTabId = null;
     $scope.popupselectedTabIndex = -1;
@@ -337,6 +337,7 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                 ProducerId: e.data.EmployeeId,
                 FlightId: e.data.FlightId,
                 Priority: e.data.Priority,
+                Entity: e.data
             };
 
 
@@ -380,6 +381,10 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
                 case '8':
+                    $rootScope.$broadcast('InitOperationPopup', data);
+                    //$rootScope.$broadcast('InitQADispatch', data);
+                    break;
+                case '9':
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
@@ -530,6 +535,7 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                 ProducerId: e.data.EmployeeId,
                 FlightId: e.data.FlightId,
                 Priority: e.data.Priority,
+                Entity: e.data
             };
             if (e.data.Status == 1)
                 data.isNotLocked = false;
@@ -574,7 +580,10 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
-
+                case '9':
+                    $rootScope.$broadcast('InitOperationPopup', data);
+                    //$rootScope.$broadcast('InitQADispatch', data);
+                    break;
             }
         },
 
@@ -719,6 +728,7 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                 ProducerId: e.data.EmployeeId,
                 FlightId: e.data.FlightId,
                 Priority: e.data.Priority,
+                Entity: e.data
             };
 
             if (e.data.Status == 1)
@@ -764,7 +774,10 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                     $rootScope.$broadcast('InitOperationPopup', data);
                     //$rootScope.$broadcast('InitQADispatch', data);
                     break;
-
+                case '9':
+                    $rootScope.$broadcast('InitOperationPopup', data);
+                    //$rootScope.$broadcast('InitQADispatch', data);
+                    break;
             }
 
         },
@@ -865,6 +878,9 @@ app.controller('qaReportStatus', ['$http', '$scope', '$location', '$routeParams'
                 break;
             case '8':
                 $rootScope.page_title = '> ' + 'Air Safety Report';
+                break;
+            case '9':
+                $rootScope.page_title = '> ' + 'Voyage Report';
                 break;
             default:
                 $rootScope.page_title = '> ' + 'Others';

@@ -194,7 +194,7 @@ app.controller('fdmController', ['$http', '$scope', '$location', '$routeParams',
         placeholder: 'From Year',
         showClearButton: false,
         searchEnabled: false,
-        dataSource: [2021, 2022, 2023],
+        dataSource: [2021, 2022, 2023, 2024],
 
         onSelectionChanged: function (arg) {
 
@@ -210,7 +210,7 @@ app.controller('fdmController', ['$http', '$scope', '$location', '$routeParams',
         placeholder: 'To Year',
         showClearButton: false,
         searchEnabled: false,
-        dataSource: [2021, 2022, 2023],
+        dataSource: [2021, 2022, 2023, 2024],
 
         onSelectionChanged: function (arg) {
 
@@ -343,6 +343,7 @@ app.controller('fdmController', ['$http', '$scope', '$location', '$routeParams',
         { dataField: 'P1Name', caption: 'P1', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 180 },
         //{ dataField: 'P1Code', caption: 'P1Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
         { dataField: 'P2Name', caption: 'P2', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 180 },
+        { dataField: 'PIC', caption: 'PIC', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 180 },
         //{ dataField: 'P2Code', caption: 'P2Code', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 80 },
 
         //{ dataField: 'BlockOff', caption: 'BlockOff', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'yy-MMM-dd HH:MM', allowEditing: false, width: 150 },
@@ -356,7 +357,8 @@ app.controller('fdmController', ['$http', '$scope', '$location', '$routeParams',
         { dataField: 'FlightNumber', caption: 'NO', allowResizing: true, alignment: 'center', dataType: 'numeric', allowEditing: false, width: 100 },
         { dataField: 'FromAirportIATA', caption: 'From', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
         { dataField: 'ToAirportIATA', caption: 'To', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-
+        { dataField: 'MainParameter', caption: 'Main Parameter', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 250 },
+        
 
 
 
@@ -480,6 +482,7 @@ app.controller('fdmController', ['$http', '$scope', '$location', '$routeParams',
         { dataField: 'IPName', caption: 'IP', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 180 },
         { dataField: 'P1Name', caption: 'P1', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 180 },
         { dataField: 'P2Name', caption: 'P2', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 180 },
+        { dataField: 'PIC', caption: 'PIC', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 180 },
         //{ dataField: 'BlockOff', caption: 'BlockOff', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'yy-MMM-dd HH:MM', allowEditing: false, width: 150 },
         //{ dataField: 'BlockOn', caption: 'BlockOn', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'yy-MMM-dd HH:MM', allowEditing: false, width: 150 },
         //{ dataField: 'TakeOff', caption: 'TakeOff', allowResizing: true, alignment: 'center', dataType: 'datetime', format: 'yy-MMM-dd HH:MM', allowEditing: false, width: 150 },
@@ -493,7 +496,7 @@ app.controller('fdmController', ['$http', '$scope', '$location', '$routeParams',
         { dataField: 'FlightNumber', caption: 'Flight Number', allowResizing: true, alignment: 'center', dataType: 'numeric', allowEditing: false, width: 80 },
         { dataField: 'FromAirportIATA', caption: 'From', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
         { dataField: 'ToAirportIATA', caption: 'To', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-
+        { dataField: 'MainParameter', caption: 'Main Parameter', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 250 },
 
 
 

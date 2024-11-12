@@ -126,7 +126,7 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
 
         $scope.isContentVisible = true;
 
-        fdmService.getFDMRegMonthly($scope.ymf, $scope.ymt, $scope.reg).then(function (response) {
+        fdmService.getFDMRegMonthly($scope.ymf + 1, $scope.ymt + 1, $scope.reg).then(function (response) {
             $scope.ds_regEventsMonthly = response.Data.data;
             $scope.ds_regEventsMonthlyGeneral = response.Data;
 
@@ -141,14 +141,14 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
 
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
-        fdmService.getFDMRegCptMonthly($scope.ymf, $scope.ymt, $scope.reg).then(function (response) {
+        fdmService.getFDMRegCptMonthly($scope.ymf + 1, $scope.ymt + 1, $scope.reg).then(function (response) {
             console.log(response);
             $scope.ds_regCprEventsMonthly = response.Data;
             console.log($scope.ds_regCprEventsMonthly);
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
 
-        fdmService.getRegEventsMonthly($scope.ymf, $scope.ymt, $scope.reg).then(function (response) {
+        fdmService.getRegEventsMonthly($scope.ymf + 1, $scope.ymt + 1, $scope.reg).then(function (response) {
             $scope.ds_regEventsNameMonthly = response.Data;
             $scope.arr = [];
             $.each($scope.ds_regEventsNameMonthly, function (_i, _d) {
@@ -197,7 +197,7 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
         placeholder: 'Year',
         showClearButton: false,
         searchEnabled: false,
-        dataSource: [2021, 2022, 2023],
+        dataSource: [2021, 2022, 2023, 2024],
 
         onSelectionChanged: function (arg) {
 
@@ -213,7 +213,7 @@ app.controller('fdmRegMonthlyController', ['$http', '$scope', '$location', '$rou
         placeholder: 'Year',
         showClearButton: false,
         searchEnabled: false,
-        dataSource: [2021, 2022, 2023],
+        dataSource: [2021, 2022, 2023, 2024],
 
         onSelectionChanged: function (arg) {
 

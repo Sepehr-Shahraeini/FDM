@@ -501,7 +501,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
 
             //}, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
-            fdmService.getCptMonthly2($scope.yt, $scope.mt + 1, $scope._crewId).then(function (response) {
+            fdmService.getCptMonthly2($scope.ymf + 1, $scope.ymt + 1, $scope._crewId).then(function (response) {
                 $scope.ds_cptMonthly = response.Data.data;
 
                 //    console.log(response.Data.data);
@@ -602,7 +602,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
         placeholder: 'Year',
         showClearButton: false,
         searchEnabled: false,
-        dataSource: [2021, 2022, 2023],
+        dataSource: [2021, 2022, 2023, 2024],
 
         onSelectionChanged: function (arg) {
 
@@ -618,7 +618,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
         placeholder: 'Year',
         showClearButton: false,
         searchEnabled: false,
-        dataSource: [2021, 2022, 2023],
+        dataSource: [2021, 2022, 2023, 2024],
 
         onSelectionChanged: function (arg) {
 
@@ -699,9 +699,9 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
     /////////////////////////
 
     ///SIZES/////////////////
-    $scope.chrt_size = { height: 600, width: $(window).width() - 100 };
+    $scope.chrt_size = { height: 600, width: $(window).width() - 90};
     $scope.chrt_sizeXS = { height: 600, width: $(window).width() - 20 };
-    $scope.treeChrt_size = { height: 500, width: $(window).width() - 60 };
+    $scope.treeChrt_size = { height: 500, width: $(window).width() - 90};
     $scope.treeChrt_sizeXS = { height: 500, width: $(window).width() };
     $scope.pie_size = { height: 400 };
 
@@ -3320,7 +3320,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
     ////////////////// scroll ////////////////
 
 
-    $scope.rightHeight = $(window).height() - 95;
+    $scope.rightHeight = $(window).height() - 120;
     $scope.fdm_scroll = {
         width: '100%',
         bounceEnabled: false,
@@ -3351,7 +3351,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
 
     $scope.bindCrew = function () {
         var _dt = moment(new Date()).format('YYYY-MM-DDTHH:mm:ss');
-        $scope.loadingVisible = true;
+        //$scope.loadingVisible = true;
 
         flightService.getCrewForRosterByDate(1, _dt).then(function (response) {
             $scope.loadingVisible = false;
@@ -3380,7 +3380,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
             //}
 
 
-            $scope.bind();
+            //$scope.bind();
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
 
@@ -3389,6 +3389,81 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
 
 
     ///////////////////Data Grid///////////////////
+    $scope.dg_crew_columns = [
+        // { dataField: 'Selected', caption: '', allowResizing: true, alignment: 'center', dataType: 'boolean', allowEditing: false, width:45},
+        { dataField: 'Title', caption: 'Schedule Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, sortIndex: 1, sortOrder: 'asc' },
+        { dataField: 'JobGroup', caption: 'GRP', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90 },
+        { dataField: '_ORDER', caption: 'ORD', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 90, visible: false, sortIndex: 0, sortOrder: 'asc' },
+
+    ];
+    $scope.dg_crew_selected = null;
+    $scope.dg_crew_instance = null;
+    $scope.ds_crew = null;
+    $scope.dg_crew = {
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+        keyExpr: 'Id',
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: function () {
+            return $(window).height() - 114;
+        },
+
+        columns: $scope.dg_crew_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_crew_instance)
+                $scope.dg_crew_instance = e.component;
+
+        },
+        onSelectionChanged: function (e) {
+            var data = e.selectedRowsData[0];
+
+            if (!data) {
+                $scope.dg_crew_selected = null;
+
+            }
+            else {
+                $scope.dg_crew_selected = data;
+                $scope.bindCrewData();
+            }
+
+        },
+        onRowPrepared: function (e) {
+            //if (e.data && e.data.AvailabilityId != 1)
+            //    e.rowElement.css('background', '#ffcccc');
+
+        },
+
+        bindingOptions: {
+            dataSource: 'ds_crew'
+        },
+    };
+
+
+    $scope.bindCrewData = function () {
+
+        $scope._crewId = $scope.dg_crew_selected.Id;
+        console.log($scope._crewId);
+        //do something
+    };
+
+
     $scope.dg_fdmEvents_columns = [
         {
             cellTemplate: function (container, options) {

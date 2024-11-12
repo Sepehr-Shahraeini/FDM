@@ -874,6 +874,30 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
         return deferred.promise;
     }
 
+    var _getVoyageReport = function (id) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/get/voyage/' + id ).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
+    var _setReceiverLog = function (id) {
+
+        var deferred = $q.defer();
+        $http.get(apiQA + 'api/receiver/log/' + id ).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            deferred.reject(Exceptions.getMessage(err));
+        })
+
+        return deferred.promise;
+    }
+
 
 
     serviceFactory.getQAByEmployee = _getQAByEmployee;
@@ -972,6 +996,10 @@ app.factory('qaService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functio
 
     serviceFactory.getDateVisit = _getDateVisit;
     serviceFactory.setDateVisit = _setDateVisit;
+
+
+    serviceFactory.getVoyageReport = _getVoyageReport;
+    serviceFactory.setReceiverLog = _setReceiverLog;
 
 
     return serviceFactory;

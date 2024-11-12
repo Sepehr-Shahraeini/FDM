@@ -716,12 +716,15 @@ var serviceBaseTRN = 'http://localhost:4000/';
 var webBase = 'https://fdm.apatlas.com/';
 //var webBase = 'http://localhost:30000/';
 //var serviceBase = 'https://epagriffinapi.apatlas.com/';
-var serviceBase = 'http://localhost:8888/';
-
+//var serviceBase = 'https://auth.apvaresh.com/';
+var serviceBase = 'http://fleet.caspianairlines.com/api/';
 //var serviceBase = 'http://localhost:8888/';
-var serviceBase2 = 'https://localhost:5001/';
+
+var serviceBase2 = 'http://localhost:8888/';
+//var serviceBase2 = 'https://localhost:5001/';
 var apiFdm = 'http://localhost:22554/';
 var apiQA = 'http://localhost:9063/';
+
 //var serviceBase3 = 'https://test.apatlas.com/';
 //var webBase = 'http://localhost:30273/';
 

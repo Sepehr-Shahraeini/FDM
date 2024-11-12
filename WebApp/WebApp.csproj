@@ -229,6 +229,7 @@
     <Content Include="app\controllers\qaOperationPopup.js" />
     <Content Include="app\controllers\qaReports.js" />
     <Content Include="app\controllers\qaReportStatus.js" />
+    <Content Include="app\controllers\qaVoyageController.js" />
     <Content Include="app\controllers\regAvailabilityController.js" />
     <Content Include="app\controllers\regflightmonthly.js" />
     <Content Include="app\controllers\reportFDR.js" />
@@ -434,6 +435,7 @@
     <Content Include="app\views\qaOperationPopup.html" />
     <Content Include="app\views\qaReport.html" />
     <Content Include="app\views\qaReportStatus.html" />
+    <Content Include="app\views\qaVoyage.html" />
     <Content Include="app\views\regavailability.html" />
     <Content Include="app\views\regflightmonthly.html" />
     <Content Include="app\views\reportFDR.html" />

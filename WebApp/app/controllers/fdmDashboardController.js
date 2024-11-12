@@ -2,7 +2,7 @@
 app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$routeParams', '$rootScope', 'flightService', 'fdmService', 'aircraftService', 'authService', 'notificationService', '$route', '$window', function ($http, $scope, $location, $routeParams, $rootScope, flightService, fdmService, aircraftService, authService, notificationService, $route, $window) {
 
 
-
+    $scope.activeTab = 'summary';
 
     $scope.prms = $routeParams.prms;
 
@@ -131,8 +131,11 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
     ];
 
 
-    $scope.yt = new Date().getFullYear();
-    $scope.mt = new Date().getMonth();
+    //$scope.yt = new Date().getFullYear();
+    //$scope.mt = new Date().getMonth();
+
+    $scope.yt = 2023;
+    $scope.mt = 7;
 
     if ($scope.mt - 6 < 0) {
         $scope.result = $scope.mt - 6;
@@ -147,7 +150,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         placeholder: 'Year',
         showClearButton: false,
         searchEnabled: false,
-        dataSource: [2021, 2022, 2023],
+        dataSource: [2021, 2022, 2023, 2024],
 
         onSelectionChanged: function (arg) {
 
@@ -163,7 +166,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         placeholder: 'Year',
         showClearButton: false,
         searchEnabled: false,
-        dataSource: [2021, 2022, 2023],
+        dataSource: [2021, 2022, 2023, 2024],
 
         onSelectionChanged: function (arg) {
 
@@ -273,12 +276,34 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
             $scope.EventsNameData = response.Data.data;
             $scope.EventsNameDataNoZero = Enumerable.From(response.Data.data).Where('Number($.IncidentCount)>0').ToArray();
 
+
+
+
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        fdmService.fdmEventMonthly($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+            $scope.EventsData = response.Data;
+
             $scope.arr = [];
 
-            $.each($scope.EventsNameData, function (_i, _d) {
-                $scope.arr.push({ name: _d.EventName, value: _d.IncidentCount });
-            });
+            //$.each($scope.EventsData, function (_i, _d) {
+            //    $scope.arr.push({ name: _d.EventName, value: _d.EventCount });
+            //});
 
+            //$scope.ds_eventsNameTree = [{ name: 'Events', items: $scope.arr }];
+
+
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        fdmService.fdmTopEventMonthly($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+            $scope.ds_top_event = response.Data;
+
+
+            $scope.arr = [];
+
+            $.each($scope.ds_top_event, function (_i, _d) {
+                $scope.arr.push({ name: _d.EventName, value: _d.EventCount });
+            });
 
             $scope.ds_eventsNameTree = [{ name: 'Events', items: $scope.arr }];
 
@@ -291,6 +316,38 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
 
         fdmService.getTopCpt($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
             $scope.TopCpt = response.Data;
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        fdmService.getTopFo($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+            $scope.TopFo = response.Data;
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        fdmService.getBestCpt($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+            $scope.BestCpt = response.Data;
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        fdmService.getBestFo($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+            $scope.BestFo = response.Data;
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        fdmService.getCpt($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+            $scope.dg_cpt_ds = response.Data;
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        fdmService.getFo($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+            $scope.dg_fo_ds = response.Data;
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        fdmService.getPhase($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+            $scope.ds_phase = response.Data;
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        fdmService.getAllEvent($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+            $scope.dg_event_ds = response.Data;
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        fdmService.fdmAllPilot($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+            $scope.dg_all_pilot_ds = response.Data;
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
         fdmService.compareTopCpt($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
@@ -440,6 +497,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
     /////////////////////////
 
     ///SIZES/////////////////
+    $scope.half_chrt_size = { height: 600, width: $(window).width() / 2 - 50 };
     $scope.chrt_size = { height: 600, width: $(window).width() - 100 };
     $scope.chrt_sizeXS = { height: 600, width: $(window).width() - 15 };
     $scope.treeChrt_size = { height: 600, width: $(window).width() - 60 };
@@ -462,6 +520,433 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         return $scope._title + " (" + year + ")";
     }
 
+    /////////Data Grids/////////
+
+    $scope.dg_cpt_columns = [
+        {
+            cellTemplate: function (container, options) {
+                $("<div style='text-align:center'/>")
+                    .html(options.rowIndex + 1)
+                    .appendTo(container);
+            }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+        },
+
+        { dataField: 'CptName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
+        { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'Score', caption: 'Score', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'EventsCount', caption: 'Events Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'ScorePerFlight', caption: 'Score Per Flight', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
+        { dataField: 'EventPerFlight', caption: 'Event Per Flight', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
+
+    ];
+    $scope.dg_cpt_selected = null;
+    $scope.dg_cpt_instance = null;
+    $scope.dg_cpt = {
+        wordWrapEnabled: true,
+        rowAlternationEnabled: false,
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: function () {
+            return 400;
+        },
+        width: '100%',
+        columns: $scope.dg_cpt_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_cpt_instance)
+                $scope.dg_cpt_instance = e.component;
+
+        },
+
+
+        onCellPrepared: function (e) {
+            if (e.rowType === "data") {
+                if (e.column.dataField === "HighCount") {
+                    e.cellElement.css("background-color", "#ffb3b3");
+                } else if (e.column.dataField === "MediumCount") {
+                    e.cellElement.css("background-color", "#ffd9b3");
+                } else if (e.column.dataField === "LowCount") {
+                    e.cellElement.css("background-color", "#b3ffec");
+                }
+                // Add more conditions for other columns as needed
+            }
+        },
+        bindingOptions: {
+            dataSource: 'dg_cpt_ds'
+        },
+    };
+
+       $scope.dg_fo_columns = [
+        {
+            cellTemplate: function (container, options) {
+                $("<div style='text-align:center'/>")
+                    .html(options.rowIndex + 1)
+                    .appendTo(container);
+            }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+        },
+
+           { dataField: 'P2Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
+        { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'Score', caption: 'Score', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'EventsCount', caption: 'Events Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'ScorePerFlight', caption: 'Score Per Flight', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
+        { dataField: 'EventPerFlight', caption: 'Event Per Flight', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
+
+    ];
+    $scope.dg_fo_selected = null;
+    $scope.dg_fo_instance = null;
+    $scope.dg_fo = {
+        wordWrapEnabled: true,
+        rowAlternationEnabled: false,
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: function () {
+            return 400;
+        },
+        width: '100%',
+        columns: $scope.dg_fo_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_fo_instance)
+                $scope.dg_fo_instance = e.component;
+
+        },
+
+
+        onCellPrepared: function (e) {
+            if (e.rowType === "data") {
+                if (e.column.dataField === "HighCount") {
+                    e.cellElement.css("background-color", "#ffb3b3");
+                } else if (e.column.dataField === "MediumCount") {
+                    e.cellElement.css("background-color", "#ffd9b3");
+                } else if (e.column.dataField === "LowCount") {
+                    e.cellElement.css("background-color", "#b3ffec");
+                }
+                // Add more conditions for other columns as needed
+            }
+        },
+        bindingOptions: {
+            dataSource: 'dg_fo_ds'
+        },
+    };
+
+    $scope.dg_event_columns = [
+        {
+            cellTemplate: function (container, options) {
+                $("<div style='text-align:center'/>")
+                    .html(options.rowIndex + 1)
+                    .appendTo(container);
+            }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+        },
+
+        { dataField: 'EventName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 180 },
+        { dataField: 'EventCount', caption: 'Events Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        
+    ];
+    $scope.dg_event_selected = null;
+    $scope.dg_event_instance = null;
+    $scope.dg_event = {
+        wordWrapEnabled: true,
+        rowAlternationEnabled: false,
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: function () {
+            return 600;
+        },
+        width: '100%',
+        columns: $scope.dg_event_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_event_instance)
+                $scope.dg_event_instance = e.component;
+
+        },
+
+
+        onCellPrepared: function (e) {
+            if (e.rowType === "data") {
+                if (e.column.dataField === "HighCount") {
+                    e.cellElement.css("background-color", "#ffb3b3");
+                } else if (e.column.dataField === "MediumCount") {
+                    e.cellElement.css("background-color", "#ffd9b3");
+                } else if (e.column.dataField === "LowCount") {
+                    e.cellElement.css("background-color", "#b3ffec");
+                }
+                // Add more conditions for other columns as needed
+            }
+        },
+        bindingOptions: {
+            dataSource: 'ds_top_event',
+
+        },
+    };
+
+    $scope.dg_phase_columns = [
+        {
+            cellTemplate: function (container, options) {
+                $("<div style='text-align:center'/>")
+                    .html(options.rowIndex + 1)
+                    .appendTo(container);
+            }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+        },
+
+        { dataField: 'Phase', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 180 },
+        { dataField: 'Count', caption: 'Events Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'Score', caption: 'Score', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        
+    ];
+    $scope.dg_phase_selected = null;
+    $scope.dg_phase_instance = null;
+    $scope.dg_phase = {
+        wordWrapEnabled: true,
+        rowAlternationEnabled: false,
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: function () {
+            return 620;
+        },
+        width: '100%',
+
+        columns: $scope.dg_phase_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_phase_instance)
+                $scope.dg_phase_instance = e.component;
+
+        },
+
+
+       
+        bindingOptions: {
+            dataSource: 'ds_phase',
+         
+        },
+    };
+
+
+    $scope.dg_all_event_columns = [
+        {
+            cellTemplate: function (container, options) {
+                $("<div style='text-align:center'/>")
+                    .html(options.rowIndex + 1)
+                    .appendTo(container);
+            }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+        },
+
+        { dataField: 'EventName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 180 },
+        { dataField: 'EventCount', caption: 'Events Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+
+    ];
+    $scope.dg_all_event_selected = null;
+    $scope.dg_all_event_instance = null;
+    $scope.dg_all_event = {
+        wordWrapEnabled: true,
+        rowAlternationEnabled: false,
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: function () {
+            return 600;
+        },
+        width: '100%',
+        columns: $scope.dg_all_event_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_all_event_instance)
+                $scope.dg_all_event_instance = e.component;
+
+        },
+
+
+        onCellPrepared: function (e) {
+            if (e.rowType === "data") {
+                if (e.column.dataField === "HighCount") {
+                    e.cellElement.css("background-color", "#ffb3b3");
+                } else if (e.column.dataField === "MediumCount") {
+                    e.cellElement.css("background-color", "#ffd9b3");
+                } else if (e.column.dataField === "LowCount") {
+                    e.cellElement.css("background-color", "#b3ffec");
+                }
+                // Add more conditions for other columns as needed
+            }
+        },
+        bindingOptions: {
+            dataSource: 'EventsData',
+
+        },
+    };
+
+    $scope.dg_all_pilot_columns = [
+        {
+            cellTemplate: function (container, options) {
+                $("<div style='text-align:center'/>")
+                    .html(options.rowIndex + 1)
+                    .appendTo(container);
+            }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+        },
+
+        { dataField: 'Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 180 },
+        { dataField: 'EventCount', caption: 'Events Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'Score', caption: 'Score', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+
+    ];
+    $scope.dg_all_pilot_selected = null;
+    $scope.dg_all_pilot_instance = null;
+    $scope.dg_all_pilot = {
+        wordWrapEnabled: true,
+        rowAlternationEnabled: false,
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: function () {
+            return 600;
+        },
+        width: '100%',
+        columns: $scope.dg_all_pilot_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_all_pilot_instance)
+                $scope.dg_all_pilot_instance = e.component;
+
+        },
+
+
+        //onCellPrepared: function (e) {
+        //    if (e.rowType === "data") {
+        //        if (e.column.dataField === "HighCount") {
+        //            e.cellElement.css("background-color", "#ffb3b3");
+        //        } else if (e.column.dataField === "MediumCount") {
+        //            e.cellElement.css("background-color", "#ffd9b3");
+        //        } else if (e.column.dataField === "LowCount") {
+        //            e.cellElement.css("background-color", "#b3ffec");
+        //        }
+        //        // Add more conditions for other columns as needed
+        //    }
+        //},
+        bindingOptions: {
+            dataSource: 'dg_all_pilot_ds',
+
+        },
+    };
+
+
+    //////////////////////////////
 
 
     $scope.eventsNameChart = {
@@ -926,6 +1411,127 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
 
 
 
+    $scope.top_event = {
+        palette: 'Vintage',
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            format: {
+                type: "fixedPoint",
+                precision: 0
+            },
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'EventName',
+            type: 'bar',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+            label: {
+                visible: false,
+                precision: 2
+            },
+        },
+
+        series: [
+            { valueField: 'EventCount', name: 'Count', barWidth: 50 },
+
+        ],
+        title: 'Top Events',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+        valueAxis: {
+            grid: {
+                visible: true,
+            },
+            title: {
+                text: 'Count',
+            },
+        },
+        argumentAxis: { // or valueAxis, or commonAxisSettings
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: -45,
+
+            }
+
+        },
+        bindingOptions:
+        {
+            dataSource: 'ds_top_event',
+            size: 'half_chrt_size'
+        },
+    };
+
+    $scope.phaseChart = {
+        palette: 'Vintage',
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            format: {
+                type: "fixedPoint",
+                precision: 0
+            },
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'Phase',
+            type: 'bar',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+            label: {
+                visible: false,
+                precision: 2
+            },
+        },
+
+        series: [
+            { valueField: 'Count', name: 'Count', barWidth: 50 },
+
+        ],
+        title: 'Events By Phase',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+        valueAxis: {
+            grid: {
+                visible: true,
+            },
+            title: {
+                text: 'Count',
+            },
+        },
+
+        bindingOptions:
+        {
+            dataSource: 'ds_phase',
+            size: 'half_chrt_size'
+        },
+    };
+
     $scope.registerScoresChart = {
         palette: 'Vintage',
         tooltip: {
@@ -980,7 +1586,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         valueAxis: [
 
             {
-                pane: 'topPane',
+                lable: { visible: true },
                 grid: {
                     visible: true,
                 },
@@ -1150,6 +1756,203 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
     };
 
 
+    $scope.foScoresChart = {
+        palette: 'Office',
+
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'P2Name',
+            type: 'bar',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+
+        },
+        panes: [{
+            name: 'topPane',
+
+        },
+
+        {
+            name: 'midPane',
+        },
+
+        {
+            name: 'bottomPane',
+        }],
+        series: [
+
+            { valueField: 'HighScore', name: 'HighScore', color: highColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumScore', name: 'MediumScore', color: medColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowScore', name: 'LowScore', color: lowColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Score', name: 'Score', color: scoreColor, pane: 'topPane', type: 'scatter', stack: 'total' },
+            { valueField: 'FlightCount', name: 'Flights', color: totalFlight, pane: 'midPane', barWidth: 50 },
+            { valueField: 'HighCount', name: 'High', color: highColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumCount', name: 'Medium', color: medColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowCount', name: 'Low', color: lowColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'EventsCount', name: 'TotalEvent', color: totalEvent, pane: 'bottomPane', type: 'scatter', stack: 'total' },
+
+        ],
+        title: '10 Co-Pilot with the Highest Score',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+        valueAxis: [
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores',
+                },
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Flights',
+                },
+            },
+
+            {
+                height: '80%',
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Events',
+                },
+            }],
+
+
+        bindingOptions:
+        {
+            dataSource: 'TopFo',
+            size: 'half_chrt_size'
+        },
+    };
+
+
+    $scope.bestFoScoresChart = {
+        palette: 'Office',
+
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'P2Name',
+            type: 'bar',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+
+        },
+        panes: [{
+            name: 'topPane',
+
+        },
+
+        {
+            name: 'midPane',
+        },
+
+        {
+            name: 'bottomPane',
+        }],
+        series: [
+
+            { valueField: 'HighScore', name: 'HighScore', color: highColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumScore', name: 'MediumScore', color: medColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowScore', name: 'LowScore', color: lowColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Score', name: 'Score', color: scoreColor, pane: 'topPane', type: 'scatter', stack: 'total' },
+            { valueField: 'FlightCount', name: 'Flights', color: totalFlight, pane: 'midPane', barWidth: 50 },
+            { valueField: 'HighCount', name: 'High', color: highColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumCount', name: 'Medium', color: medColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowCount', name: 'Low', color: lowColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'EventsCount', name: 'TotalEvent', color: totalEvent, pane: 'bottomPane', type: 'scatter', stack: 'total' },
+
+        ],
+        title: 'Top 10 Co-Pilot with the Lowest Scores',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+        valueAxis: [
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores',
+                },
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Flights',
+                },
+            },
+
+            {
+                height: '80%',
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Events',
+                },
+            }],
+        argumentAxis: {
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: 90
+            }
+        },
+
+        bindingOptions:
+        {
+            dataSource: 'BestFo',
+            size: 'half_chrt_size'
+        },
+    };
+
+
     $scope.cptScoresChart = {
         palette: 'Office',
 
@@ -1194,7 +1997,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
             { valueField: 'EventsCount', name: 'TotalEvent', color: totalEvent, pane: 'bottomPane', type: 'scatter', stack: 'total' },
 
         ],
-        title: 'Scores & Events By Captain',
+        title: '10 Captain with the Highest Score',
         legend: {
             verticalAlignment: 'bottom',
             horizontalAlignment: 'center',
@@ -1241,9 +2044,112 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         bindingOptions:
         {
             dataSource: 'TopCpt',
-            size: 'chrt_size'
+            size: 'half_chrt_size'
         },
     };
+
+
+    $scope.bestCptScoresChart = {
+        palette: 'Office',
+
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'CptName',
+            type: 'bar',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+
+        },
+        panes: [{
+            name: 'topPane',
+
+        },
+
+        {
+            name: 'midPane',
+        },
+
+        {
+            name: 'bottomPane',
+        }],
+        series: [
+
+            { valueField: 'HighScore', name: 'HighScore', color: highColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumScore', name: 'MediumScore', color: medColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowScore', name: 'LowScore', color: lowColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Score', name: 'Score', color: scoreColor, pane: 'topPane', type: 'scatter', stack: 'total' },
+            { valueField: 'FlightCount', name: 'Flights', color: totalFlight, pane: 'midPane', barWidth: 50 },
+            { valueField: 'HighCount', name: 'High', color: highColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumCount', name: 'Medium', color: medColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowCount', name: 'Low', color: lowColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'EventsCount', name: 'TotalEvent', color: totalEvent, pane: 'bottomPane', type: 'scatter', stack: 'total' },
+
+        ],
+        title: 'Top 10 Captains with the Lowest Scores',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+        valueAxis: [
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores',
+                },
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Flights',
+                },
+            },
+
+            {
+                height: '80%',
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Events',
+                },
+            }],
+
+        argumentAxis: {
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: 90
+            }
+        },
+        bindingOptions:
+        {
+            dataSource: 'BestCpt',
+            size: 'half_chrt_size'
+        },
+    };
+
+
 
     $scope.cptScoresChartXS = {
         palette: 'Office',
@@ -1289,7 +2195,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
             { valueField: 'EventsCount', name: 'TotalEvent', color: totalEvent, pane: 'bottomPane', type: 'scatter', stack: 'total' },
 
         ],
-        title: 'Scores & Events By Captain',
+        title: '10 Captains with the Highest Score',
         legend: {
             verticalAlignment: 'bottom',
             horizontalAlignment: 'center',
@@ -1520,6 +2426,119 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
     };
 
 
+    $scope.eventPerFlightChart2 = {
+        palette: 'Vintage',
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            format: {
+                type: "fixedPoint",
+                precision: 2
+            },
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'CptName',
+            type: 'bar',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+            label: {
+                visible: false,
+                precision: 2
+            },
+        },
+
+        panes: [{
+            name: 'topPane',
+        },
+        {
+            name: 'midPane',
+        },
+        {
+            name: 'bottomPane',
+        }],
+        series: [
+            { valueField: 'ScorePerEvent', name: 'ScorePerEvent', pane: 'topPane', barWidth: 50 },
+            { valueField: 'EventPerFlight', name: 'EventPerFlight', pane: 'midPane', barWidth: 50 },
+            { valueField: 'ScorePerFlight', name: 'ScorePerFlight', pane: 'bottomPane', barWidth: 50 },
+
+        ],
+        title: 'Events & Scores per Flight By Captain ',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+        valueAxis: [
+
+            {
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Score Per Event',
+                },
+
+                //constantLines: [{
+                //    value: 1.5,
+                //    color: '#fc3535',
+                //    dashStyle: 'dash',
+                //    width: 2,
+                //    label: { visible: false },
+                //    //bindingOptions:
+                //    //{
+                //    //    value: 'cptAverage'
+                //    //},
+                //}],
+            },
+
+            {
+                pane: 'midPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Event Per Flight',
+                },
+            },
+
+            {
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Scores Per Flight',
+                },
+            },
+
+
+
+
+        ],
+        argumentAxis: {
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: 90
+            }
+        },
+        bindingOptions:
+        {
+            dataSource: 'TopCpt',
+            size: 'half_chrt_size'
+        },
+    };
+
     $scope.eventPerFlightChartXS = {
         palette: 'Vintage',
         tooltip: {
@@ -1696,7 +2715,76 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
             dataSource: 'compareCpt',
             series: 'cptSeries',
             'argumentAxis.categories': 'yearMonth2',
-            size: 'chrt_size'
+            size: 'half_chrt_size'
+        },
+    };
+
+
+    $scope.compareFo = {
+        palette: 'Office',
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+            format: {
+                type: "fixedPoint",
+                precision: 2
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'YearMonth',
+            type: 'spline',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+            label: {
+                visible: false,
+
+            },
+            point: {
+                hoverStyle: {
+                    color: "#000000"
+                }
+            }
+        },
+
+
+        title: 'Scopre Per Flight' + "' " + 'Co-Pilot Comparison',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+        },
+
+        argumentAxis: {
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: 90,
+                customizeText: function (d) {
+                    return $scope.convertYearMonth(this.value);
+                },
+            }
+        },
+
+        valueAxis: {
+            tickInterval: 0.1,
+
+        },
+
+        bindingOptions:
+        {
+            dataSource: 'compareCpt',
+            series: 'cptSeries',
+            'argumentAxis.categories': 'yearMonth2',
+            size: 'half_chrt_size'
         },
     };
 
@@ -2931,6 +4019,10 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
     };
 
     //////////////////////////////////
+
+
+
+
     $scope.dg_events_columns = [
         //{
         //    cellTemplate: function (container, options) {
@@ -3178,7 +4270,6 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
     }
     else {
         $rootScope.page_title = '> FDM Dashboard';
-
 
         $('.fdmDashboard').fadeIn(400, function () {
 

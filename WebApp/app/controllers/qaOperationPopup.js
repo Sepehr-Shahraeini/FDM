@@ -183,6 +183,11 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
 
     $scope.cabinLoaded = function () {
         $rootScope.$broadcast('InitQACabin', $scope.tempData);
+
+        console.log($scope.tempData.Entity.FollowingId);
+        qaService.setReceiverLog($scope.tempData.Entity.FollowingId).then(function (res) {
+            console.log(res);
+        });
     }
 
     $scope.cateringLoaded = function () {
@@ -215,6 +220,10 @@ app.controller('qaOperationPopup', ['$scope', 'qaService', '$routeParams', '$roo
 
     $scope.asrLoaded = function () {
         $rootScope.$broadcast('InitEfbAsr', $scope.tempData);
+    }
+
+    $scope.vrLoaded = function () {
+        $rootScope.$broadcast('InitVoyage', $scope.tempData);
     }
 
 }]);

@@ -180,7 +180,7 @@ app.controller('fdmFoDashboardMonthlyController', ['$http', '$scope', '$location
         placeholder: 'Year',
         showClearButton: false,
         searchEnabled: false,
-        dataSource: [2018, 2019, 2020, 2021, 2022],
+        dataSource: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
 
         onSelectionChanged: function (arg) {
 
@@ -272,8 +272,8 @@ app.controller('fdmFoDashboardMonthlyController', ['$http', '$scope', '$location
         commonSeriesSettings: {
             argumentField: 'Month',
             type: 'stackedbar',
-              hoverMode: 'allArgumentPoints',
-              selectionMode: 'allArgumentPoints',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
             label: {
                 visible: false,
                 format: {

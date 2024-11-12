@@ -1,7 +1,7 @@
 ﻿'use strict';
 app.controller('qaDashboard', ['$http', '$scope', '$location', '$routeParams', '$rootScope', 'flightService', 'qaService', 'aircraftService', 'authService', 'notificationService', '$route', '$window', function ($http, $scope, $location, $routeParams, $rootScope, flightService, qaService, aircraftService, authService, notificationService, $route, $window) {
 
-    $rootScope.employeeId = 4539;
+    //$rootScope.employeeId = 3960;
 
     $scope.prms = $routeParams.prms;
 
