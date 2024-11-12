@@ -163,6 +163,17 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
         return deferred.promise;
     }
 
+  var _getPhaseMonthly = function (ymf, ymt) {
+        var deferred = $q.defer();
+      $http.get(apiFdm + "api/fdm/phase/monthly/" + ymf + "/" + ymt).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
+            // deferred.reject(Exeptions.getMessage(err));
+        });
+
+        return deferred.promise;
+    }
+
  
     var _compareTopCpt = function (ymf, ymt) {
         var deferred = $q.defer();
@@ -751,9 +762,9 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
 
 
     ///////////////
-    var _fdmDashboardMonthly = function (year, month, ACType) {
+    var _fdmDashboardMonthly = function (year, month) {
         var deferred = $q.defer();
-        $http.get(apiFdm + "api/fdm/dashboard/monthly/" + year + "/" + month + "/" + ACType).then(function (response) {
+        $http.get(apiFdm + "api/fdm/dashboard/monthly/" + year + "/" + month).then(function (response) {
             deferred.resolve(response.data);
         }, function (err, status) {
             // deferred.reject(Exeptions.getMessage(err));
@@ -949,6 +960,7 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
     serviceFactory.getCptAirport = _getCptAirport;
     serviceFactory.updateFDMTBL = _updateFDMTBL;
     serviceFactory.getPhase = _getPhase;
+    serviceFactory.getPhaseMonthly = _getPhaseMonthly;
     serviceFactory.fdmEventMonthly = _fdmEventMonthly;
     serviceFactory.fdmTopEventMonthly = _fdmTopEventMonthly;
     serviceFactory.getBestFo = _getBestFo;

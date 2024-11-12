@@ -338,11 +338,6 @@
                                 <div dx-data-grid="dg_fo" id="dg_fo" class="content" style="overflow-y:hidden"></div>
                             </div>
 
-                            <div class='col-lg-12' style='padding:10px 5px 10px 5px'>
-                                <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                                    <div id="eventPerFlightChart" dx-chart="eventPerFlightChart"></div>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -350,10 +345,10 @@
                     <div ng-show="activeTab === 'events'">
                         <div class="row">
                             <!--<div class='col-lg-12' style='padding:10px 5px 10px 5px'>
-                                <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                                    <div id="compareReg" dx-chart="compareReg"></div>
-                                </div>
-                            </div>-->
+        <div class=" chartBox" style='padding: 10px 0 10px 0'>
+            <div id="compareReg" dx-chart="compareReg"></div>
+        </div>
+    </div>-->
 
                             <div class='col-lg-12' style='padding:10px 5px 10px 5px'>
                                 <div class=" chartBox" style='padding: 10px 0 10px 0'>
@@ -374,15 +369,25 @@
                                 </div>
                             </div>
 
-                            <div class='col-lg-12' style='padding:10px 5px 10px 5px'>
+                            <div class='col-lg-8' style='padding:10px 5px 10px 5px'>
                                 <div class=" chartBox" style='padding: 10px 0 10px 0'>
                                     <div id="eventsMonthlyChart" dx-chart="eventsMonthlyChart"></div>
                                 </div>
                             </div>
+                            <div class='col-lg-4' style='padding:10px 5px 10px 5px'>
+                                <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                                    <div dx-data-grid="dg_event" id="dg_event" class="content" style="overflow-y:hidden"></div>
+                                </div>
+                            </div>
 
-                            <div class='col-lg-12' style='padding:10px 5px 10px 5px'>
+                            <div class='col-lg-8' style='padding:10px 5px 10px 5px'>
                                 <div class=" chartBox" style='padding: 10px 0 10px 0'>
                                     <div id="scoresMonthlyChart" dx-chart="scoresMonthlyChart"></div>
+                                </div>
+                            </div>
+                            <div class='col-lg-4' style='padding:10px 5px 10px 5px'>
+                                <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                                    <div dx-data-grid="dg_event" id="dg_event" class="content" style="overflow-y:hidden"></div>
                                 </div>
                             </div>
                         </div>
@@ -397,6 +402,11 @@
                                 </div>
                             </div>
                             <div class='col-lg-6' style='padding:10px 5px 10px 5px'>
+                                <div class=" chartBox" style='padding: 10px 0 10px 0'>
+                                    <div id="phaseChartPolar" dx-polar-chart="phaseChartPolar"></div>
+                                </div>
+                            </div>
+                            <div class='col-lg-12' style='padding:10px 5px 10px 5px'>
 
                                 <div dx-data-grid="dg_phase" id="dg_phase" class="content" style="overflow-y:hidden"></div>
 
