@@ -242,7 +242,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
 
         $scope.month = $scope.mt + 1;
         $scope.year = $scope.yt;
-        for (let i = 0; i < 13; i++) {
+        for (var i = 0; i < 13; i++) {
             $scope.yearMonth2.push($scope.year.toString() + ($scope.month < 10 ? "0" : "") + $scope.month.toString());
             if ($scope.month === 1) {
                 $scope.year--;
