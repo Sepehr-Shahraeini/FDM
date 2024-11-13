@@ -1285,7 +1285,7 @@ namespace EPAGriffinAPI.ViewModels
             entity.duration = viewflightinformation.duration;
             entity.taskId = viewflightinformation.taskId;
             entity.FlightGroupID = viewflightinformation.FlightGroupID;
-            entity.PlanId = viewflightinformation.PlanId;
+            //entity.PlanId = viewflightinformation.PlanId;
             entity.ManufacturerId = viewflightinformation.ManufacturerId;
             entity.Manufacturer = viewflightinformation.Manufacturer;
             // entity.ToCountry = viewflightinformation.ToCountry;

@@ -30,6 +30,7 @@ namespace EPAGriffinAPI.Models
         public string FullCode { get; set; }
         public string Remark { get; set; }
         public int CustomerId { get; set; }
+        public string FullCode2 { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CourseRelatedGroup> CourseRelatedGroups { get; set; }

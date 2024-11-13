@@ -103,5 +103,7 @@ namespace EPAGriffinAPI.Models
         public string ConfirmedBy { get; set; }
         public int IsConfirmed { get; set; }
         public string UserName { get; set; }
+        public Nullable<int> UPD { get; set; }
+        public Nullable<int> CustomerId { get; set; }
     }
 }

@@ -113,5 +113,30 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> JLBlockTime { get; set; }
         public Nullable<int> JLFlightTime { get; set; }
         public Nullable<decimal> FPFuel { get; set; }
+        public Nullable<int> OFPMINTOFFUEL { get; set; }
+        public Nullable<int> OFPOFFBLOCKFUEL { get; set; }
+        public Nullable<int> OFPTRIPFUEL { get; set; }
+        public Nullable<int> PILOTREQFUEL { get; set; }
+        public Nullable<decimal> FuelPlanned { get; set; }
+        public string PF { get; set; }
+        public Nullable<System.DateTime> STDDayLocal { get; set; }
+        public string FromAirportICAO { get; set; }
+        public string ToAirportICAO { get; set; }
+        public Nullable<System.DateTime> FlightDateX { get; set; }
+        public Nullable<decimal> FPTripFuel { get; set; }
+        public Nullable<int> MaxWeightTO { get; set; }
+        public Nullable<int> MaxWeightLND { get; set; }
+        public string MaxWeighUnit { get; set; }
+        public string ChrCode { get; set; }
+        public string ChrTitle { get; set; }
+        public Nullable<int> ChrCapacity { get; set; }
+        public Nullable<int> ChrAdult { get; set; }
+        public Nullable<int> ChrChild { get; set; }
+        public Nullable<int> ChrInfant { get; set; }
+        public Nullable<long> CargoCost { get; set; }
+        public string CPRegister { get; set; }
+        public string DepCountry { get; set; }
+        public string ArrCountry { get; set; }
+        public Nullable<int> OFPTOTALFUEL { get; set; }
     }
 }

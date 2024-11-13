@@ -41,5 +41,15 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> StandBy { get; set; }
         public Nullable<int> Misson { get; set; }
         public Nullable<int> FixTimeTotal { get; set; }
+        public Nullable<int> FX300000 { get; set; }
+        public Nullable<int> FX300001 { get; set; }
+        public Nullable<int> FX300002 { get; set; }
+        public Nullable<int> FX300003 { get; set; }
+        public Nullable<int> FX300004 { get; set; }
+        public Nullable<int> FX300005 { get; set; }
+        public Nullable<int> FX300006 { get; set; }
+        public Nullable<int> FX300007 { get; set; }
+        public Nullable<int> FX300008 { get; set; }
+        public Nullable<int> FX300009 { get; set; }
     }
 }

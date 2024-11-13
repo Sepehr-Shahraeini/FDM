@@ -112,5 +112,6 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> BaggageCount { get; set; }
         public Nullable<int> JLBlockTime { get; set; }
         public Nullable<int> JLFlightTime { get; set; }
+        public Nullable<decimal> FPFuel { get; set; }
     }
 }

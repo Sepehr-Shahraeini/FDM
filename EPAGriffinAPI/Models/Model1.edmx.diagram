@@ -567,6 +567,7 @@
         <EntityTypeShape EntityType="EPAGRIFFINModel.RptDelayCatRegisterDailyCal" Width="1.5" PointX="20.375" PointY="87.375" />
         <EntityTypeShape EntityType="EPAGRIFFINModel.RptDelayCatDailyCal" Width="1.5" PointX="86.375" PointY="16.75" />
         <EntityTypeShape EntityType="EPAGRIFFINModel.ViewFlightDelay" Width="1.5" PointX="29.375" PointY="73.375" />
+        <EntityTypeShape EntityType="EPAGRIFFINModel.FDMPhaseRouteMonthly" Width="1.5" PointX="86.375" PointY="40.75" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

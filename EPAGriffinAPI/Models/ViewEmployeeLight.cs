@@ -108,5 +108,8 @@ namespace EPAGriffinAPI.Models
         public int IsPassportExpiring { get; set; }
         public string ScheduleName { get; set; }
         public Nullable<bool> InActive { get; set; }
+        public string JobGroup2 { get; set; }
+        public string JobGroupCode2 { get; set; }
+        public Nullable<int> BaseAirportId { get; set; }
     }
 }

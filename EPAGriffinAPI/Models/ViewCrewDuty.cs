@@ -74,5 +74,7 @@ namespace EPAGriffinAPI.Models
         public string ConfirmedBy { get; set; }
         public int IsConfirmed { get; set; }
         public string UserName { get; set; }
+        public Nullable<System.DateTime> DateLocal2 { get; set; }
+        public Nullable<int> BaseAirportId { get; set; }
     }
 }

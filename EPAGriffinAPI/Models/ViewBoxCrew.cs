@@ -107,5 +107,21 @@ namespace EPAGriffinAPI.Models
         public Nullable<System.DateTime> RestFrom { get; set; }
         public Nullable<System.DateTime> DefaultStart { get; set; }
         public Nullable<System.DateTime> DefaultEnd { get; set; }
+        public string PPLNumber { get; set; }
+        public Nullable<System.DateTime> PPLDateIssue { get; set; }
+        public Nullable<System.DateTime> PPLDateExpire { get; set; }
+        public Nullable<int> PPLExpireStatus { get; set; }
+        public string CPLNumber { get; set; }
+        public Nullable<System.DateTime> CPLDateIssue { get; set; }
+        public Nullable<System.DateTime> CPLDateExpire { get; set; }
+        public Nullable<int> CPLExpireStatus { get; set; }
+        public string ATPLNumber { get; set; }
+        public Nullable<System.DateTime> ATPLDateIssue { get; set; }
+        public Nullable<System.DateTime> ATPLDateExpire { get; set; }
+        public Nullable<int> ATPLExpireStatus { get; set; }
+        public string MCCNumber { get; set; }
+        public Nullable<System.DateTime> MCCDateIssue { get; set; }
+        public Nullable<System.DateTime> MCCDateExpire { get; set; }
+        public Nullable<int> MCCExpireStatus { get; set; }
     }
 }

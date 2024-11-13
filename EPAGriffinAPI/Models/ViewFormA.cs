@@ -73,5 +73,6 @@ namespace EPAGriffinAPI.Models
         public Nullable<double> WeightLoadFactor { get; set; }
         public Nullable<double> Distance { get; set; }
         public int IsDom { get; set; }
+        public Nullable<int> FlightMinutes { get; set; }
     }
 }

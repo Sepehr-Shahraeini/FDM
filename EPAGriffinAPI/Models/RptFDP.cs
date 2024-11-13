@@ -53,5 +53,6 @@ namespace EPAGriffinAPI.Models
         public int Leg6 { get; set; }
         public int Leg7 { get; set; }
         public int Leg8 { get; set; }
+        public Nullable<System.TimeSpan> HFixTime2 { get; set; }
     }
 }

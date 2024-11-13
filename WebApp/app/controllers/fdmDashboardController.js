@@ -357,8 +357,16 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
             $scope.ds_phase_monthly = response.Data;
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
-        fdmService.getAllEvent($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
-            $scope.dg_event_ds = response.Data;
+
+        fdmService.getPhaseMonthly($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+            $scope.ds_phase_monthly = response.Data;
+        }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
+
+        fdmService.get_fdm_phase($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
+           // $scope.dg_event_ds = response.Data;
+            $scope.x_ds_phase = response.Data;
+            $scope.build_phase_polar();
+            
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
 
@@ -933,15 +941,8 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
     };
 
     $scope.dg_phase_columns = [
-        {
-            cellTemplate: function (container, options) {
-                $("<div style='text-align:center'/>")
-                    .html(options.rowIndex + 1)
-                    .appendTo(container);
-            }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
-        },
-
-        { dataField: 'Phase', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 180 },
+         
+        { dataField: 'Phase', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false  },
         {
             caption: 'Events',
             alignment: 'center',
@@ -1007,7 +1008,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
 
 
         bindingOptions: {
-            dataSource: 'ds_phase',
+            dataSource: 'x_ds_phase.grp_phase',
 
         },
     };
@@ -1689,7 +1690,60 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
             size: 'half_chrt_size'
         },
     };
+    $scope.build_phase_polar = function () {
+        $.each($scope.x_ds_phase.event_names, function (_i, _d) {
+            $scope.series_polar_phase.push({ valueField: _d.replaceAll(' ',''), name: _d,type:'bar' });
+        });
+        $scope.ds_polar_phase = [];
+       // $.each($scope.x_ds_phase.grp_phase_event2, function (_i, _d) {
+        var _d = $scope.x_ds_phase.grp_phase_event2[0];
+            var row = { arg: _d.Phase };
+            $.each(_d.Items, function (_j, _v) {
+                row[_v.EventName.replaceAll(' ', '')] = _v.EventCount;
+            });
+            $scope.ds_polar_phase.push(row);
+       // });
+        console.log('plr series', $scope.series_polar_phase);
+        console.log('plr ds', $scope.ds_polar_phase);
 
+    };
+    $scope.series_polar_phase = [];
+    $scope.ds_polar_phase = [{
+        arg: "Ground",
+         
+        //current: $scope.current.DelayUnder30Time,
+       // past: $scope.past.DelayUnder30Time,
+
+    }, {
+        arg: "Take Off & Climb",
+        MediumScore:15
+       // current: $scope.current.Delay3060Time,
+       // past: $scope.past.Delay3060Time,
+
+    },
+    {
+        arg: "60-120",
+        MediumScore:5
+      //  current: $scope.current.Delay60120Time,
+      //  past: $scope.past.Delay60120Time,
+
+    },
+    {
+        arg: "120-180",
+        MediumScore:25
+     //   current: $scope.current.Delay120180Time,
+     //   past: $scope.past.Delay120180Time,
+
+    },
+    {
+        arg: "180+",
+        MediumScore:17
+       // current: $scope.current.DelayOver180Time,
+      //  past: $scope.past.DelayOver180Time,
+
+    },
+
+    ];
     $scope.phaseChartPolar = {
         palette: ['#FF0000', '#FFA500', '#008000'],  // Red, Orange, Green for High, Medium, Low
         tooltip: {
@@ -1705,7 +1759,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
                 };
             },
         },
-        commonSeriesSettings: {
+       /* commonSeriesSettings: {
             argumentField: 'YearMonth',  // Or 'Month' if using month as argument
             type: 'bar',
             barWidth: 10,  // Wider bars for wind rose style
@@ -1715,13 +1769,13 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
                 visible: false,
                 precision: 2
             },
-        },
-        series: [
+        },*/
+       /* series: [
             { valueField: 'HighScore', name: 'High Score', color: '#FF0000', type: 'stackedbar', stack: 'detailed' },  // Red for High Score
             { valueField: 'MediumScore', name: 'Medium Score', color: '#FFA500', type: 'stackedbar', stack: 'detailed' },  // Orange for Medium Score
             { valueField: 'LowScore', name: 'Low Score', color: '#008000', type: 'stackedbar', stack: 'detailed' },  // Green for Low Score
-        ],
-        title: 'Monthly Events by Phase (Wind Rose Style)',
+        ],*/
+        title: 'Monthly Events by Phase',
         legend: {
             verticalAlignment: 'bottom',
             horizontalAlignment: 'center',
@@ -1747,16 +1801,18 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
             startAngle: 90,  // Align labels to start at the top (like a wind rose)
             tickInterval: 1,  // Interval to show each month
             label: {
-                customizeText: function () {
-                    return $scope.convertYearMonth(this.value);
-                },
+                //customizeText: function () {
+                //    return $scope.convertYearMonth(this.value);
+                //},
                 indentFromAxis: 15,  // Push labels between the radial sections
                 overlappingBehavior: "rotate"  // Rotate labels if needed
             },
         },
         bindingOptions: {
-            dataSource: 'ds_phase_monthly',
-            size: 'half_chrt_size'
+            //dataSource: 'ds_phase_monthly',
+            size: 'half_chrt_size',
+            dataSource: 'ds_polar_phase',
+            series:'series_polar_phase'
         },
     };
 
@@ -1787,23 +1843,17 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
                 precision: 2
             },
         },
-        panes: [{
-            name: 'topPane',
-        },
-
-        {
-            name: 'bottomPane',
-        }],
+         
         series: [
-            { valueField: 'Count', name: 'Count', pane: 'topPane', barWidth: 50 },
-            { valueField: 'HighScore', name: 'HighScore', color: highColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
-            { valueField: 'MediumScore', name: 'MediumScore', color: medColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
-            { valueField: 'LowScore', name: 'LowScore', color: lowColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+           // { valueField: 'Count', name: 'Count', pane: 'topPane', barWidth: 50 },
+            { valueField: 'HighScore', name: 'HighScore', color: highColor,   type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumScore', name: 'MediumScore', color: medColor,   type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowScore', name: 'LowScore', color: lowColor,   type: 'stackedbar', barWidth: 50, stack: 'detailed' },
 
 
         ],
 
-        title: 'Events By Phase',
+        title: 'Score By Event Phase',
         legend: {
             verticalAlignment: 'bottom',
             horizontalAlignment: 'center',
@@ -1813,36 +1863,146 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         },
         onPointClick(e) {
             e.target.select();
+            if (e.target && e.target.argument) {
+                //ds_phase_event
+                var _phase = Enumerable.From($scope.x_ds_phase.grp_phase_event2).Where(function (x) { return x.Phase == e.target.argument; }).FirstOrDefault();
+                if (_phase)
+                    $scope.ds_phase_event = _phase.Items;
+            }
+            //e.target.argument
+            //e.target.value
         },
 
         valueAxis: [
             {
                 height: '80%',
-                pane: 'topPane',
-                grid: {
-                    visible: true,
-                },
-                title: {
-                    text: 'Count',
-                },
-            },
-            {
-                pane: 'bottomPane',
+                //pane: 'topPane',
                 grid: {
                     visible: true,
                 },
                 title: {
                     text: 'Score',
                 },
+            }
+            //,
+            //{
+            //    pane: 'bottomPane',
+            //    grid: {
+            //        visible: true,
+            //    },
+            //    title: {
+            //        text: 'Score',
+            //    },
+            //},
+
+
+        ],
+        argumentAxis: { // or valueAxis, or commonAxisSettings
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: -45,
+                font: { size: 16 }
+
+            }
+        },
+
+        bindingOptions:
+        {
+            dataSource: 'x_ds_phase.grp_phase',
+            size: 'half_chrt_size'
+        },
+    };
+
+
+
+    $scope.phaseEventChart = {
+        palette: 'Bright',
+        tooltip: {
+            enabled: true,
+            location: 'edge',
+            format: {
+                type: "fixedPoint",
+                precision: 0
             },
+            customizeTooltip(arg) {
+                return {
+                    text: arg.seriesName + ': ' + arg.valueText,//`${arg.seriesName} years: ${arg.valueText}`,
+                };
+            },
+        },
+        commonSeriesSettings: {
+            argumentField: 'EventName',
+            type: 'bar',
+            hoverMode: 'allArgumentPoints',
+            selectionMode: 'allArgumentPoints',
+            label: {
+                visible: false,
+                precision: 2
+            },
+        },
+
+        series: [
+           
+            //{ valueField: 'Score', name: 'Score',   type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+
+            { valueField: 'HighScore', name: 'HighScore', color: highColor, type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumScore', name: 'MediumScore', color: medColor, type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowScore', name: 'LowScore', color: lowColor, type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+         
 
 
         ],
 
+        title: 'Evants',
+        legend: {
+            verticalAlignment: 'bottom',
+            horizontalAlignment: 'center',
+        },
+        export: {
+            enabled: true,
+        },
+        onPointClick(e) {
+            e.target.select();
+            //e.target.argument
+            //e.target.value
+        },
+
+        valueAxis: [
+            {
+                height: '80%',
+                //pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Score',
+                },
+            }
+            //,
+            //{
+            //    pane: 'bottomPane',
+            //    grid: {
+            //        visible: true,
+            //    },
+            //    title: {
+            //        text: 'Score',
+            //    },
+            //},
+
+
+        ],
+        argumentAxis: { // or valueAxis, or commonAxisSettings
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: -45,
+                font: { size: 16 }
+
+            }
+        },
 
         bindingOptions:
         {
-            dataSource: 'ds_phase',
+            dataSource: 'ds_phase_event',
             size: 'half_chrt_size'
         },
     };

@@ -66,7 +66,7 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> TotalCargoWeight { get; set; }
         public string Captain { get; set; }
         public string CaptainName { get; set; }
-        public Nullable<int> CaptainId { get; set; }
+        public int CaptainId { get; set; }
         public Nullable<int> DurationScheduled { get; set; }
         public Nullable<int> DurationActual { get; set; }
         public Nullable<int> FlightTimeFP { get; set; }

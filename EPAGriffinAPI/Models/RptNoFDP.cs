@@ -34,5 +34,6 @@ namespace EPAGriffinAPI.Models
         public string JobGroupCode { get; set; }
         public string JobGroupRoot { get; set; }
         public Nullable<int> Duration { get; set; }
+        public Nullable<int> FX { get; set; }
     }
 }

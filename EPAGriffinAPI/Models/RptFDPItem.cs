@@ -49,5 +49,7 @@ namespace EPAGriffinAPI.Models
         public string JobGroupRoot { get; set; }
         public Nullable<long> Rank { get; set; }
         public Nullable<int> FixedFlightTime { get; set; }
+        public Nullable<bool> IsActiveFix { get; set; }
+        public Nullable<System.DateTime> ChocksOut { get; set; }
     }
 }

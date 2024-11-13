@@ -28,5 +28,7 @@ namespace EPAGriffinAPI.Models
         public Nullable<System.DateTime> DateIssue { get; set; }
         public Nullable<System.DateTime> DateExpire { get; set; }
         public Nullable<long> Rank { get; set; }
+        public Nullable<System.DateTime> DateStart { get; set; }
+        public Nullable<System.DateTime> DateEnd { get; set; }
     }
 }

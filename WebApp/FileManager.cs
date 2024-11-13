@@ -1,4 +1,4 @@
-﻿using Ionic.Zip;
+﻿//using Ionic.Zip;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -15,51 +15,51 @@ namespace WebApp
     {
         internal static string createBookArchived(int id)
         {
-            var clientfiles = HttpContext.Current.Server.MapPath("~/upload/clientsfiles/");
-            var archive = HttpContext.Current.Server.MapPath("~/archived/library-archived-" + id + ".zip");
-            new Thread(() =>
-            {
+            //var clientfiles = HttpContext.Current.Server.MapPath("~/upload/clientsfiles/");
+            //var archive = HttpContext.Current.Server.MapPath("~/archived/library-archived-" + id + ".zip");
+            //new Thread(() =>
+            //{
 
-                string apiUrl = ConfigurationManager.AppSettings["api"] + "odata/library/books/file/" + id;
+            //    string apiUrl = ConfigurationManager.AppSettings["api"] + "odata/library/books/file/" + id;
 
-                File.Delete(archive);
-                object input = new
-                {
+            //    File.Delete(archive);
+            //    object input = new
+            //    {
 
-                };
-                string inputJson = (new JavaScriptSerializer()).Serialize(input);
-                //string inputJson = (new JavaScriptSerializer()).Serialize(input);
-                WebClient client = new WebClient();
-                client.Headers["Content-type"] = "application/json";
-                client.Encoding = Encoding.UTF8;
+            //    };
+            //    string inputJson = (new JavaScriptSerializer()).Serialize(input);
+            //    //string inputJson = (new JavaScriptSerializer()).Serialize(input);
+            //    WebClient client = new WebClient();
+            //    client.Headers["Content-type"] = "application/json";
+            //    client.Encoding = Encoding.UTF8;
 
-                string json = client.UploadString(apiUrl, inputJson);
-                var book = (new JavaScriptSerializer()).Deserialize<BookDto>(json);
-                if (book.Files.Count > 0)
-                    using (ZipFile zip = new ZipFile())
-                    {
-                        zip.AlternateEncodingUsage = ZipOption.AsNecessary;
-                        // zip.AddDirectoryByName("Files");
-                        foreach (var f in book.Files)
-                        {
-
-
-
-
-
-                            var fn = clientfiles + f;
-                            zip.AddFile(fn, book.Title.Replace(" ", "-").Replace("<", "-").Replace(">", "-").Replace(":", "-").Replace("/", "-").Replace("|", "-").Replace("*", "-").Replace("?", "-"));
-                        }
+            //    string json = client.UploadString(apiUrl, inputJson);
+            //    var book = (new JavaScriptSerializer()).Deserialize<BookDto>(json);
+            //    if (book.Files.Count > 0)
+            //        using (ZipFile zip = new ZipFile())
+            //        {
+            //            zip.AlternateEncodingUsage = ZipOption.AsNecessary;
+            //            // zip.AddDirectoryByName("Files");
+            //            foreach (var f in book.Files)
+            //            {
 
 
 
 
-                        zip.Save(archive);
 
-                    }
+            //                var fn = clientfiles + f;
+            //                zip.AddFile(fn, book.Title.Replace(" ", "-").Replace("<", "-").Replace(">", "-").Replace(":", "-").Replace("/", "-").Replace("|", "-").Replace("*", "-").Replace("?", "-"));
+            //            }
 
 
-            }).Start();
+
+
+            //            zip.Save(archive);
+
+            //        }
+
+
+            //}).Start();
             return string.Empty;
         }
         internal static List<string> getBookFiles(int id)
@@ -121,53 +121,54 @@ namespace WebApp
         }
         internal static string getBookArchivedFiles(int id)
         {
-            string apiUrl = ConfigurationManager.AppSettings["api"] + "odata/library/books/file/" + id;
+            //string apiUrl = ConfigurationManager.AppSettings["api"] + "odata/library/books/file/" + id;
 
 
 
-            var archive = HttpContext.Current.Server.MapPath("~/archived/library-archived-" + id + ".zip");
-            if (!File.Exists(archive))
-            {
-                object input = new
-                {
+            //var archive = HttpContext.Current.Server.MapPath("~/archived/library-archived-" + id + ".zip");
+            //if (!File.Exists(archive))
+            //{
+            //    object input = new
+            //    {
 
-                };
-                string inputJson = (new JavaScriptSerializer()).Serialize(input);
-                //string inputJson = (new JavaScriptSerializer()).Serialize(input);
-                WebClient client = new WebClient();
-                client.Headers["Content-type"] = "application/json";
-                client.Encoding = Encoding.UTF8;
+            //    };
+            //    string inputJson = (new JavaScriptSerializer()).Serialize(input);
+            //    //string inputJson = (new JavaScriptSerializer()).Serialize(input);
+            //    WebClient client = new WebClient();
+            //    client.Headers["Content-type"] = "application/json";
+            //    client.Encoding = Encoding.UTF8;
 
-                string json = client.UploadString(apiUrl, inputJson);
-                var book = (new JavaScriptSerializer()).Deserialize<BookDto>(json);
+            //    string json = client.UploadString(apiUrl, inputJson);
+            //    var book = (new JavaScriptSerializer()).Deserialize<BookDto>(json);
 
-                using (ZipFile zip = new ZipFile())
-                {
-                    zip.AlternateEncodingUsage = ZipOption.AsNecessary;
-                    // zip.AddDirectoryByName("Files");
-                    foreach (var f in book.Files)
-                    {
-
-
-
-
-
-                        var fn = HttpContext.Current.Server.MapPath("~/upload/clientsfiles/" + f);
-                        zip.AddFile(fn, book.Title.Replace(" ", "-").Replace("<", "-").Replace(">", "-").Replace(":", "-").Replace("/", "-").Replace("|", "-").Replace("*", "-").Replace("?", "-"));
-                    }
+            //    using (ZipFile zip = new ZipFile())
+            //    {
+            //        zip.AlternateEncodingUsage = ZipOption.AsNecessary;
+            //        // zip.AddDirectoryByName("Files");
+            //        foreach (var f in book.Files)
+            //        {
 
 
 
 
-                    zip.Save(archive);
 
-                }
-
-            }
-
+            //            var fn = HttpContext.Current.Server.MapPath("~/upload/clientsfiles/" + f);
+            //            zip.AddFile(fn, book.Title.Replace(" ", "-").Replace("<", "-").Replace(">", "-").Replace(":", "-").Replace("/", "-").Replace("|", "-").Replace("*", "-").Replace("?", "-"));
+            //        }
 
 
-            return archive;
+
+
+            //        zip.Save(archive);
+
+            //    }
+
+            //}
+
+
+
+            //return archive;
+            return string.Empty;
         }
     }
 
