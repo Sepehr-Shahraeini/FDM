@@ -189,5 +189,6 @@ namespace EPAGriffinAPI.Models
         public Nullable<System.DateTime> JLLanding { get; set; }
         public Nullable<int> JLBlockTime { get; set; }
         public Nullable<int> JLFlightTime { get; set; }
+        public Nullable<long> CargoCost { get; set; }
     }
 }

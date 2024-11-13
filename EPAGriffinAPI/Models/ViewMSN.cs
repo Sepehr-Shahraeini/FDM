@@ -56,5 +56,6 @@ namespace EPAGriffinAPI.Models
         public string AirlineOperators { get; set; }
         public string Customer { get; set; }
         public Nullable<bool> isvirtual { get; set; }
+        public string AircraftType2 { get; set; }
     }
 }

@@ -882,7 +882,17 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
         return deferred.promise;
     }
 
+    var _get_fdm_phase = function (ym1,ym2) {
+        var deferred = $q.defer();
+        $http.get(apiFdm + "api/phase/cockpit/"+ym1+'/'+ym2).then(function (response) {
+            deferred.resolve(response.data);
+        }, function (err, status) {
 
+        });
+        return deferred.promise;
+    }
+
+    serviceFactory.get_fdm_phase = _get_fdm_phase;
 
     //serviceFactory.getAllFDM = _getAllFDM;
     serviceFactory.getFdm = _getFdm;

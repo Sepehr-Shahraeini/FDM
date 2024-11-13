@@ -124,5 +124,6 @@ namespace EPAGriffinAPI.Models
         public Nullable<decimal> UsedPerPaxBlockTimeAvg { get; set; }
         public Nullable<decimal> UsedPerSeatBlockTimeAvg { get; set; }
         public Nullable<decimal> UsedPerPaxBlockTimeDiff { get; set; }
+        public Nullable<decimal> UsedDiffPerLegPercent { get; set; }
     }
 }

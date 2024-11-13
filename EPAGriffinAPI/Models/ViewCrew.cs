@@ -138,5 +138,33 @@ namespace EPAGriffinAPI.Models
         public int IsLineExpired { get; set; }
         public int IsTRIExpired { get; set; }
         public int IsTREExpired { get; set; }
+        public Nullable<System.DateTime> MedicalIssued { get; set; }
+        public Nullable<System.DateTime> SEPTIssued { get; set; }
+        public Nullable<System.DateTime> SEPTPIssued { get; set; }
+        public Nullable<System.DateTime> SEPTPExpired { get; set; }
+        public Nullable<System.DateTime> DGIssued { get; set; }
+        public Nullable<System.DateTime> CCRMIssued { get; set; }
+        public Nullable<System.DateTime> CRMIssued { get; set; }
+        public Nullable<System.DateTime> CRMExpired { get; set; }
+        public Nullable<System.DateTime> SMSIssued { get; set; }
+        public Nullable<System.DateTime> AvSecIssued { get; set; }
+        public Nullable<System.DateTime> ColdWXIssued { get; set; }
+        public Nullable<System.DateTime> HotWXIssued { get; set; }
+        public Nullable<System.DateTime> ColdWXExpired { get; set; }
+        public Nullable<System.DateTime> HotWXExpired { get; set; }
+        public Nullable<System.DateTime> FirstAidIssued { get; set; }
+        public Nullable<System.DateTime> LineIssued { get; set; }
+        public Nullable<System.DateTime> LineExpired { get; set; }
+        public Nullable<System.DateTime> RecurrentIssued { get; set; }
+        public Nullable<System.DateTime> RecurrentExpired { get; set; }
+        public Nullable<System.DateTime> TREExpired { get; set; }
+        public Nullable<System.DateTime> TRIExpired { get; set; }
+        public Nullable<System.DateTime> LPCIssued { get; set; }
+        public Nullable<System.DateTime> OPCIssued { get; set; }
+        public Nullable<System.DateTime> OPCExpired { get; set; }
+        public Nullable<System.DateTime> LicenceIssued { get; set; }
+        public Nullable<System.DateTime> DateExpireNDT { get; set; }
+        public string LicenceTitle { get; set; }
+        public string LicenceNo { get; set; }
     }
 }

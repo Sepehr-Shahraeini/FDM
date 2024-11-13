@@ -86,5 +86,7 @@ namespace EPAGriffinAPI.Models
         public decimal PreUsedPerPaxBlockTime { get; set; }
         public Nullable<decimal> UsedPerWeightToneBlockTime { get; set; }
         public decimal PreUsedPerWeightToneBlockTime { get; set; }
+        public double WeightDistanceToneKM { get; set; }
+        public Nullable<double> UsedPerWeightDistanceKM { get; set; }
     }
 }

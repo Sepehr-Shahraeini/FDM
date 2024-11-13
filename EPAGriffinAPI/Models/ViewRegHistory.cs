@@ -33,7 +33,7 @@ namespace EPAGriffinAPI.Models
         public Nullable<System.DateTime> OffBlockLocal { get; set; }
         public Nullable<System.DateTime> OnBlockLocal { get; set; }
         public string FlightStatus { get; set; }
-        public Nullable<int> FlightStatusID { get; set; }
+        public int FlightStatusID { get; set; }
         public string FromAirportIATA { get; set; }
         public string ToAirportIATA { get; set; }
         public string Route { get; set; }

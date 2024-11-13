@@ -21,7 +21,7 @@ namespace EPAGriffinAPI.Models
         public int BoxId { get; set; }
         public string DateStr { get; set; }
         public int Positioning { get; set; }
-        public int Day1_Flight { get; set; }
+        public Nullable<int> Day1_Flight { get; set; }
         public int Day7_Flight { get; set; }
         public int Day14_Flight { get; set; }
         public int Day28_Flight { get; set; }

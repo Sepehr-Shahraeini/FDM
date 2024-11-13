@@ -428,6 +428,7 @@ namespace EPAGriffinAPI.Models
         public virtual DbSet<RptDelayCatRegisterDailyCal> RptDelayCatRegisterDailyCals { get; set; }
         public virtual DbSet<RptDelayCatDailyCal> RptDelayCatDailyCals { get; set; }
         public virtual DbSet<ViewFlightDelay> ViewFlightDelays { get; set; }
+        public virtual DbSet<FDMPhaseRouteMonthly> FDMPhaseRouteMonthlies { get; set; }
     
         public virtual int GetOverDuty(string aDate, Nullable<int> aDuty, Nullable<int> aFlight, Nullable<int> aPID)
         {

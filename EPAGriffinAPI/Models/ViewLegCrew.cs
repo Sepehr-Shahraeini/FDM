@@ -38,7 +38,7 @@ namespace EPAGriffinAPI.Models
         public Nullable<int> Duty { get; set; }
         public Nullable<int> ScheduledFlightTime { get; set; }
         public Nullable<int> SITATime { get; set; }
-        public Nullable<int> FixTime { get; set; }
+        public int FixTime { get; set; }
         public Nullable<int> FlightTimeActual { get; set; }
         public Nullable<int> FlightTime { get; set; }
         public Nullable<int> BlockTime { get; set; }
@@ -91,5 +91,6 @@ namespace EPAGriffinAPI.Models
         public Nullable<System.DateTime> STD { get; set; }
         public Nullable<System.DateTime> ChocksOut { get; set; }
         public Nullable<System.DateTime> Takeoff { get; set; }
+        public Nullable<System.DateTime> STDDayLocal { get; set; }
     }
 }

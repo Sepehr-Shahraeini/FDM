@@ -77,6 +77,29 @@ namespace EPAGriffinAPI.Models
         public Nullable<System.DateTime> DateConfirmed { get; set; }
         public string ConfirmedBy { get; set; }
         public string UserName { get; set; }
+        public Nullable<decimal> MaxFDP { get; set; }
+        public Nullable<int> BL { get; set; }
+        public Nullable<int> FX { get; set; }
+        public Nullable<System.DateTime> ActualStart { get; set; }
+        public Nullable<System.DateTime> ActualEnd { get; set; }
+        public Nullable<System.DateTime> ActualRestTo { get; set; }
+        public Nullable<bool> IsOver { get; set; }
+        public Nullable<System.DateTime> STD { get; set; }
+        public Nullable<System.DateTime> STA { get; set; }
+        public Nullable<bool> OutOfHomeBase { get; set; }
+        public string InitPosition { get; set; }
+        public Nullable<System.DateTime> PLNEnd { get; set; }
+        public Nullable<System.DateTime> PLNRest { get; set; }
+        public string PosFrom { get; set; }
+        public string PosTo { get; set; }
+        public Nullable<System.DateTime> PosDep { get; set; }
+        public Nullable<System.DateTime> PosArr { get; set; }
+        public string PosAirline { get; set; }
+        public Nullable<int> PosFDPId { get; set; }
+        public string PosRemark { get; set; }
+        public string PosTicketUrl { get; set; }
+        public Nullable<System.DateTime> DutyEndDateLocal { get; set; }
+        public string InitTo { get; set; }
     
         public virtual Box Box { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

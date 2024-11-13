@@ -21,8 +21,8 @@ namespace EPAGriffinAPI.Models
         public int EmployeeId { get; set; }
         public Nullable<int> Items { get; set; }
         public Nullable<int> Files { get; set; }
-        public int NotVisited { get; set; }
-        public int NotDownloaded { get; set; }
+        public Nullable<int> NotVisited { get; set; }
+        public Nullable<int> NotDownloaded { get; set; }
         public Nullable<int> CustomerId { get; set; }
         public Nullable<int> EmployeeCustomerId { get; set; }
     }
