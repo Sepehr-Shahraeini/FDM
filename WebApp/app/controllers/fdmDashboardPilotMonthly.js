@@ -4,11 +4,10 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
     var medColor = '#ffcc66';
     var highColor = '#ff1a1a';
 
-    //$scope._crewId = parseInt($routeParams.crewId);
+    $scope._crewId = 3494;
     //$scope._jobGroup = $routeParams.jobGroup;
 
-    $scope._crewId = null;
-
+    
     $scope.clearPopup = function () {
         $scope.isGround = false;
         $scope.isTraining = false;
@@ -92,8 +91,13 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
         }
     };
 
-    $scope.yt = new Date().getFullYear();
-    $scope.mt = new Date().getMonth();
+    //$scope.yt = new Date().getFullYear();
+    //$scope.mt = new Date().getMonth();
+
+    $scope.yt = 2023;
+    $scope.mt = 7;
+
+    
 
     if ($scope.mt - 6 < 0) {
         $scope.result = $scope.mt - 6;
@@ -699,10 +703,10 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
     /////////////////////////
 
     ///SIZES/////////////////
-    $scope.chrt_size = { height: 600, width: $(window).width() - 90 };
-    $scope.chrt_size_cpt = { height: 800, width: $(window).width() - 90 };
+    $scope.chrt_size = { height: 600, width: $(window).width() - 90};
     $scope.chrt_sizeXS = { height: 600, width: $(window).width() - 20 };
-    $scope.treeChrt_size = { height: 500, width: $(window).width() - 90 };
+    $scope.half_chrt_size = { height: 600, width: $(window).width() / 2 - 50 };
+    $scope.treeChrt_size = { height: 500, width: $(window).width() - 90};
     $scope.treeChrt_sizeXS = { height: 500, width: $(window).width() };
     $scope.pie_size = { height: 400 };
 
@@ -814,35 +818,28 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
 
         },
         panes: [{
-            name: 'firstPane',
+            name: 'topPane',
 
         },
 
         {
-            name: 'secondPane',
+            name: 'midPane',
         },
 
         {
-            name: 'thirdPane',
-        },
-        {
-            name: 'fourthPane',
-        },
-        {
-            name: 'fifthPane',
+            name: 'bottomPane',
         }],
         series: [
 
-            { valueField: 'HighScore', name: 'HighScore', color: highColor, pane: 'firstPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
-            { valueField: 'MediumScore', name: 'MediumScore', color: medColor, pane: 'firstPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
-            { valueField: 'LowScore', name: 'LowScore', color: lowColor, pane: 'firstPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
-            { valueField: 'FlightCount', name: 'Flights', color: totalFlight, pane: 'secondPane', barWidth: 50 },
-            { valueField: 'HighCount', name: 'High', color: highColor, pane: 'thirdPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
-            { valueField: 'MediumCount', name: 'Medium', color: medColor, pane: 'thirdPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
-            { valueField: 'LowCount', name: 'Low', color: lowColor, pane: 'thirdPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
-            { valueField: 'EventPerFlight', color: "#0a7294", name: 'EventPerFlight', pane: 'fourthPane', barWidth: 50 },
-            { valueField: 'ScorePerFlight', color: '#0e3569', name: 'ScorePerFlight', pane: 'fifthPane', barWidth: 50 },
-
+            { valueField: 'HighScore', name: 'HighScore', color: highColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumScore', name: 'MediumScore', color: medColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowScore', name: 'LowScore', color: lowColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'Score', name: 'Score', color: scoreColor, pane: 'topPane', type: 'spline', stack: 'total' },
+            { valueField: 'FlightCount', name: 'Flights', color: totalFlight, pane: 'midPane', barWidth: 50 },
+            { valueField: 'HighCount', name: 'High', color: highColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumCount', name: 'Medium', color: medColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowCount', name: 'Low', color: lowColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'EventCount', name: 'TotalEvent', color: totalEvent, pane: 'bottomPane', type: 'spline', stack: 'total' },
 
         ],
         title: 'Scores & Event By Month',
@@ -858,7 +855,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
         },
         valueAxis: [
             {
-                pane: 'firstPane',
+                pane: 'topPane',
                 grid: {
                     visible: true,
                 },
@@ -868,7 +865,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
             },
 
             {
-                pane: 'secondPane',
+                pane: 'midPane',
                 grid: {
                     visible: true,
                 },
@@ -879,33 +876,14 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
 
             {
                 height: '80%',
-                pane: 'thirdPane',
+                pane: 'bottomPane',
                 grid: {
                     visible: true,
                 },
                 title: {
                     text: 'Events',
                 },
-            },
-            {
-                pane: 'fourthPane',
-                grid: {
-                    visible: true,
-                },
-                title: {
-                    text: 'Event Per Flight',
-                },
-            },
-            {
-                pane: 'fifthPane',
-                grid: {
-                    visible: true,
-                },
-                title: {
-                    text: 'Score Per Flight',
-                },
-            }
-        ],
+            }],
         argumentAxis: { // or valueAxis, or commonAxisSettings
             tickInterval: 1,
             label: {
@@ -920,8 +898,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
         bindingOptions:
         {
             dataSource: 'ds_cptMonthly',
-            size: 'chrt_size_cpt',
-            
+            size: 'half_chrt_size'
         },
     };
 
@@ -1019,12 +996,11 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
             }
 
         },
-        
+
         bindingOptions:
         {
             dataSource: 'ds_cptMonthly',
-            size: 'chrt_sizeXS',
-          
+            size: 'chrt_sizeXS'
         },
     };
 
@@ -1143,7 +1119,7 @@ app.controller('fdmDashboardPilotMonthlyController', ['$http', '$scope', '$locat
         bindingOptions:
         {
             dataSource: 'ds_cptMonthly',
-            size: 'chrt_size'
+            size: 'half_chrt_size'
         },
 
     }
