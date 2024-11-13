@@ -843,8 +843,7 @@ app.factory('fdmService', ['$http', '$q', 'ngAuthSettings', '$rootScope', functi
     }
 
     
-
-
+   
     var _lockMDFDM = function (year, month, usr) {
         var deferred = $q.defer();
         $http.get(apiFdm + "api/fdm/lock/md/" + year + "/" + month + "/" + usr).then(function (response) {

@@ -21,6 +21,18 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
 
     };
 
+    $scope.instanceReferesh = function () {
+        $scope.dg_cpt_instance.refresh(true);
+        $scope.dg_fo_instance.refresh(true);
+        $scope.dg_event_instance.refresh(true);
+        $scope.dg_event2_instance.refresh(true);
+        $scope.dg_scores_instance.refresh(true);
+        $scope.dg_phase_instance.refresh(true);
+        $scope.dg_all_event_instance.refresh(true);
+        $scope.dg_all_pilot_instance.refresh(true);
+        //$scope.dg_events_instance.refresh(true);
+    }
+
     $scope.popup_date_visible = false;
     $scope.popup_date_title = 'Date Picker';
     var pd1 = null;
@@ -349,6 +361,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
             $scope.dg_event_ds = response.Data;
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
 
+
         fdmService.fdmAllPilot($scope.ymf + 1, $scope.ymt + 1).then(function (response) {
             $scope.dg_all_pilot_ds = response.Data;
         }, function (err) { $scope.loadingVisible = false; General.ShowNotify(err.message, 'error'); });
@@ -533,9 +546,15 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         },
 
         { dataField: 'CptName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
-        { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+        {
+            caption: 'Events',
+            alignment: 'center',
+            columns: [
+                { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+                { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+                { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+            ]
+        },
         { dataField: 'Score', caption: 'Score', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
         { dataField: 'EventsCount', caption: 'Events Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
         { dataField: 'ScorePerFlight', caption: 'Score Per Flight', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
@@ -597,7 +616,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         },
     };
 
-       $scope.dg_fo_columns = [
+    $scope.dg_fo_columns = [
         {
             cellTemplate: function (container, options) {
                 $("<div style='text-align:center'/>")
@@ -606,10 +625,16 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
             }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
         },
 
-           { dataField: 'P2Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
-        { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'P2Name', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
+        {
+            caption: 'Events',
+            alignment: 'center',
+            columns: [
+                { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+                { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+                { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+            ]
+        },
         { dataField: 'Score', caption: 'Score', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
         { dataField: 'EventsCount', caption: 'Events Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
         { dataField: 'ScorePerFlight', caption: 'Score Per Flight', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
@@ -682,10 +707,15 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
 
         { dataField: 'EventName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 180 },
         { dataField: 'EventCount', caption: 'Events Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        
+        {
+            caption: 'Events',
+            alignment: 'center',
+            columns: [
+                { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+                { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+                { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+            ]
+        },
     ];
     $scope.dg_event_selected = null;
     $scope.dg_event_instance = null;
@@ -743,6 +773,165 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         },
     };
 
+    $scope.dg_event2_columns = [
+        {
+            cellTemplate: function (container, options) {
+                $("<div style='text-align:center'/>")
+                    .html(options.rowIndex + 1)
+                    .appendTo(container);
+            }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+        },
+
+        { dataField: 'Year', caption: 'Year', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 180 },
+        { dataField: 'Month', caption: 'Month', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        {
+            caption: 'Events',
+            alignment: 'center',
+            columns: [
+                { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+                { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+                { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+            ]
+        },
+        { dataField: 'FlightCount', caption: 'Flights Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'Score', caption: 'Scores', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+
+    ];
+    $scope.dg_event2_selected = null;
+    $scope.dg_event2_instance = null;
+    $scope.dg_event2 = {
+        wordWrapEnabled: true,
+        rowAlternationEnabled: false,
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: function () {
+            return 600;
+        },
+        width: '100%',
+        columns: $scope.dg_event2_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_event2_instance)
+                $scope.dg_event2_instance = e.component;
+
+        },
+
+
+        onCellPrepared: function (e) {
+            if (e.rowType === "data") {
+                if (e.column.dataField === "HighCount") {
+                    e.cellElement.css("background-color", "#ffb3b3");
+                } else if (e.column.dataField === "MediumCount") {
+                    e.cellElement.css("background-color", "#ffd9b3");
+                } else if (e.column.dataField === "LowCount") {
+                    e.cellElement.css("background-color", "#b3ffec");
+                }
+                // Add more conditions for other columns as needed
+            }
+        },
+        bindingOptions: {
+            dataSource: 'monthlyDataChart',
+
+        },
+    };
+    $scope.dg_scores_columns = [
+        {
+            cellTemplate: function (container, options) {
+                $("<div style='text-align:center'/>")
+                    .html(options.rowIndex + 1)
+                    .appendTo(container);
+            }, name: 'row', caption: '#', width: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+        },
+        
+        { dataField: 'Year', caption: 'Year', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 180 },
+        { dataField: 'Month', caption: 'Month', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        {
+            caption: 'Score',
+            alignment: 'center',
+            columns: [
+                { dataField: 'HighScore', caption: 'High Score', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+                { dataField: 'MediumScore', caption: 'Medium Score', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+                { dataField: 'LowScore', caption: 'Low Score', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+          ]
+        },
+       { dataField: 'FlightCount', caption: 'Flights Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+        { dataField: 'Score', caption: 'Scores', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+
+    ];
+    $scope.dg_scores_selected = null;
+    $scope.dg_scores_instance = null;
+    $scope.dg_scores = {
+        wordWrapEnabled: true,
+        rowAlternationEnabled: false,
+        headerFilter: {
+            visible: false
+        },
+        filterRow: {
+            visible: true,
+            showOperationChooser: true,
+        },
+        showRowLines: true,
+        showColumnLines: true,
+        sorting: { mode: 'none' },
+
+        noDataText: '',
+
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        scrolling: { mode: 'infinite' },
+        paging: { pageSize: 100 },
+        showBorders: true,
+        selection: { mode: 'single' },
+
+        columnAutoWidth: false,
+        height: function () {
+            return 600;
+        },
+        width: '100%',
+        columns: $scope.dg_scores_columns,
+        onContentReady: function (e) {
+            if (!$scope.dg_scores_instance)
+                $scope.dg_scores_instance = e.component;
+
+        },
+
+
+        onCellPrepared: function (e) {
+            if (e.rowType === "data") {
+                if (e.column.dataField === "HighScore") {
+                    e.cellElement.css("background-color", "#ffb3b3");
+                } else if (e.column.dataField === "MediumScore") {
+                    e.cellElement.css("background-color", "#ffd9b3");
+                } else if (e.column.dataField === "LowScore") {
+                    e.cellElement.css("background-color", "#b3ffec");
+                }
+                // Add more conditions for other columns as needed
+            }
+        },
+        bindingOptions: {
+            dataSource: 'monthlyDataChart',
+
+        },
+    };
+
     $scope.dg_phase_columns = [
         {
             cellTemplate: function (container, options) {
@@ -753,9 +942,18 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         },
 
         { dataField: 'Phase', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 180 },
-        { dataField: 'Count', caption: 'Events Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'Score', caption: 'Score', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        
+        {
+            caption: 'Events',
+            alignment: 'center',
+            columns: [
+                { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
+                { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
+                { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 180 },
+            ]
+        },
+        { dataField: 'Count', caption: 'Events Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 180 },
+        { dataField: 'Score', caption: 'Score', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 180 },
+
     ];
     $scope.dg_phase_selected = null;
     $scope.dg_phase_instance = null;
@@ -794,12 +992,23 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
                 $scope.dg_phase_instance = e.component;
 
         },
+        onCellPrepared: function (e) {
+            if (e.rowType === "data") {
+                if (e.column.dataField === "HighCount") {
+                    e.cellElement.css("background-color", "#ffb3b3");
+                } else if (e.column.dataField === "MediumCount") {
+                    e.cellElement.css("background-color", "#ffd9b3");
+                } else if (e.column.dataField === "LowCount") {
+                    e.cellElement.css("background-color", "#b3ffec");
+                }
+                // Add more conditions for other columns as needed
+            }
+        },
 
 
-       
         bindingOptions: {
             dataSource: 'ds_phase',
-         
+
         },
     };
 
@@ -815,10 +1024,15 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
 
         { dataField: 'EventName', caption: 'Name', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, minWidth: 180 },
         { dataField: 'EventCount', caption: 'Events Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-
+        {
+            caption: 'Events',
+            alignment: 'center',
+            columns: [
+                { dataField: 'HighCount', caption: 'High Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+                { dataField: 'MediumCount', caption: 'Medium Count', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+                { dataField: 'LowCount', caption: 'LowCount', allowResizing: true, alignment: 'left', dataType: 'string', allowEditing: false, width: 100 },
+            ]
+        },
     ];
     $scope.dg_all_event_selected = null;
     $scope.dg_all_event_instance = null;
@@ -1503,7 +1717,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
             },
         },
         series: [
-            { valueField: 'HighScore', name: 'High Score', color: '#FF0000', type: 'stackedbar',  stack: 'detailed' },  // Red for High Score
+            { valueField: 'HighScore', name: 'High Score', color: '#FF0000', type: 'stackedbar', stack: 'detailed' },  // Red for High Score
             { valueField: 'MediumScore', name: 'Medium Score', color: '#FFA500', type: 'stackedbar', stack: 'detailed' },  // Orange for Medium Score
             { valueField: 'LowScore', name: 'Low Score', color: '#008000', type: 'stackedbar', stack: 'detailed' },  // Green for Low Score
         ],
@@ -1573,11 +1787,22 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
                 precision: 2
             },
         },
+        panes: [{
+            name: 'topPane',
+        },
 
+        {
+            name: 'bottomPane',
+        }],
         series: [
-            { valueField: 'Count', name: 'Count', barWidth: 50 },
+            { valueField: 'Count', name: 'Count', pane: 'topPane', barWidth: 50 },
+            { valueField: 'HighScore', name: 'HighScore', color: highColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumScore', name: 'MediumScore', color: medColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowScore', name: 'LowScore', color: lowColor, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+
 
         ],
+
         title: 'Events By Phase',
         legend: {
             verticalAlignment: 'bottom',
@@ -1589,14 +1814,31 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         onPointClick(e) {
             e.target.select();
         },
-        valueAxis: {
-            grid: {
-                visible: true,
+
+        valueAxis: [
+            {
+                height: '80%',
+                pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Count',
+                },
             },
-            title: {
-                text: 'Count',
+            {
+                pane: 'bottomPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Score',
+                },
             },
-        },
+
+
+        ],
+
 
         bindingOptions:
         {
@@ -1916,6 +2158,13 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
                 },
             }],
 
+        argumentAxis: {
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: 90
+            }
+        },
+
 
         bindingOptions:
         {
@@ -2113,6 +2362,12 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
                 },
             }],
 
+        argumentAxis: {
+            label: {
+                overlappingBehavior: "rotate",
+                rotationAngle: 90
+            }
+        },
 
         bindingOptions:
         {
@@ -2636,7 +2891,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         },
         valueAxis: [
 
-            
+
             {
                 pane: 'topPane',
                 grid: {
@@ -3120,7 +3375,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
             name: 'topPane',
 
         },
-       
+
         {
             name: 'bottomPane',
 
@@ -3128,11 +3383,11 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         ],
         series: [
 
-            { valueField: 'HighScore', name: 'HighScore', color: highColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
-            { valueField: 'MediumScore', name: 'MediumScore', color: medColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
-            { valueField: 'LowScore', name: 'LowScore', color: lowColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'HighCount', name: 'HighCount', color: highColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'MediumCount', name: 'MediumCount', color: medColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
+            { valueField: 'LowCount', name: 'LowCount', color: lowColor, pane: 'topPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
             { valueField: 'EventPerFlight', name: 'Event Per Flight', color: totalEvent, pane: 'bottomPane', type: 'stackedbar', barWidth: 50, stack: 'detailed' },
-            
+
 
         ],
         title: 'Monthly Events',
@@ -3148,7 +3403,17 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         },
         valueAxis: [
             {
+                height: '80%',
                 pane: 'topPane',
+                grid: {
+                    visible: true,
+                },
+                title: {
+                    text: 'Events',
+                },
+            },
+            {
+                pane: 'bottomPane',
                 grid: {
                     visible: true,
                 },
@@ -3157,17 +3422,8 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
                 },
             },
 
-            
-            {
-                height: '80%',
-                pane: 'bottomPane',
-                grid: {
-                    visible: true,
-                },
-                title: {
-                    text: 'Events',
-                },
-            }],
+
+        ],
 
         argumentAxis: { // or valueAxis, or commonAxisSettings
             tickInterval: 1,
@@ -3176,9 +3432,13 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
                     return $scope.convertYearMonth(this.value);
 
                 },
+                overlappingBehavior: "rotate",
+                rotationAngle: 90
             }
 
         },
+
+
 
         bindingOptions:
         {
@@ -3318,7 +3578,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
         panes: [{
             name: 'topPane',
         },
-       
+
         {
             name: 'bottomPane',
         }],
@@ -3358,7 +3618,7 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
 
             },
 
-           
+
 
             {
                 pane: 'bottomPane',
@@ -3381,6 +3641,8 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
                     return $scope.convertYearMonth(this.value);
 
                 },
+                overlappingBehavior: "rotate",
+                rotationAngle: 90
             }
         },
         bindingOptions:
@@ -4009,160 +4271,160 @@ app.controller('fdmDashboardController', ['$http', '$scope', '$location', '$rout
 
 
 
-    $scope.dg_events_columns = [
-        //{
-        //    cellTemplate: function (container, options) {
-        //        $("<div style='text-align:center'/>")
-        //            .html(options.rowIndex + 1)
-        //            .appendTo(container);
-        //    }, name: 'row', caption: '#', barWidth: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
-        //}, 
-        { dataField: 'Date', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 120, format: 'yy-MMM-dd', sortIndex: 0, sortOrder: 'asc', fixed: false, fixedPosition: 'left' },
+    //$scope.dg_events_columns = [
+    //    //{
+    //    //    cellTemplate: function (container, options) {
+    //    //        $("<div style='text-align:center'/>")
+    //    //            .html(options.rowIndex + 1)
+    //    //            .appendTo(container);
+    //    //    }, name: 'row', caption: '#', barWidth: 50, fixed: true, fixedPosition: 'left', allowResizing: false, cssClass: 'rowHeader'
+    //    //}, 
+    //    { dataField: 'Date', caption: 'Date', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 120, format: 'yy-MMM-dd', sortIndex: 0, sortOrder: 'asc', fixed: false, fixedPosition: 'left' },
 
-        { dataField: 'StateName', caption: 'NO', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'FromAirportIATA', caption: 'From', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
-        { dataField: 'ToAirportIATA', caption: 'To', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+    //    { dataField: 'StateName', caption: 'NO', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+    //    { dataField: 'FromAirportIATA', caption: 'From', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
+    //    { dataField: 'ToAirportIATA', caption: 'To', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 100 },
 
-        { dataField: 'AircraftType', caption: 'A/C Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 115 },
-        { dataField: 'Register', caption: 'Register', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 115 },
+    //    { dataField: 'AircraftType', caption: 'A/C Type', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 115 },
+    //    { dataField: 'Register', caption: 'Register', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 115 },
 
-        { dataField: 'P1Name', caption: 'P1', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
-        { dataField: 'P2Name', caption: 'P2', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
-        { dataField: 'IPName', caption: 'IP', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
+    //    { dataField: 'P1Name', caption: 'P1', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
+    //    { dataField: 'P2Name', caption: 'P2', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
+    //    { dataField: 'IPName', caption: 'IP', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 200 },
 
-        { dataField: 'Severity', caption: 'Severity', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
-        { dataField: 'EventName', caption: 'Even tName', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 350 },
-        // { dataField: 'Duration', caption: 'Duration', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 115,  },
-        // { dataField: 'Value', caption: 'Value', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 115,  },
-
-
-
-        { dataField: 'BlockOff', caption: 'BlockOff', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
-        { dataField: 'BlockOn', caption: 'BlockOn', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
-        { dataField: 'TakeOff', caption: 'TakeOff', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
-        { dataField: 'Landing', caption: 'Landing', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
-        { dataField: 'STD', caption: 'STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
-        { dataField: 'STA', caption: 'STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
-
-    ];
-    $scope.dg_events_selected = null;
-    $scope.dg_events_instance = null;
-    $scope.dg_events_ds = null;
-
-    $scope.dg_events = {
-        wordWrapEnabled: true,
-        rowAlternationEnabled: false,
-        headerFilter: {
-            visible: false
-        },
-        filterRow: {
-            visible: true,
-            showOperationChooser: true,
-        },
-        showRowLines: true,
-        showColumnLines: true,
-        sorting: { mode: 'none' },
-
-        noDataText: '',
-
-        allowColumnReordering: true,
-        allowColumnResizing: true,
-        scrolling: { mode: 'infinite' },
-        paging: { pageSize: 100 },
-        showBorders: true,
-        selection: { mode: 'multiple' },
-
-        columnAutoWidth: false,
-
-
-        columns: [],
-        onContentReady: function (e) {
-            if (!$scope.dg_events_instance)
-                $scope.dg_events_instance = e.component;
-
-        },
-        onSelectionChanged: function (e) {
-            //var data = e.selectedRowsData[0];
-
-            //if (!data) {
-            //    $scope.dg_master_selected = null;
-            //}
-            //else
-            //    $scope.dg_master_selected = data;
-
-
-        },
-
-        "export": {
-            enabled: true,
-            fileName: "File",
-            allowExportSelectedData: false
-        },
-
-        onToolbarPreparing: function (e) {
-            var dataGrid = e.component;
-
-            e.toolbarOptions.items.unshift(
-                {
-                    location: "before",
-                    template: "titleTemplate"
-                },
-
-            );
-        },
-        onExporting: function (e) {
-            e.component.beginUpdate();
-            e.component.columnOption("row", "visible", false);
-        },
-        onExported: function (e) {
-            e.component.columnOption("row", "visible", true);
-            e.component.endUpdate();
-        },
-        onRowPrepared: function (e) {
-            if (e.data && e.data.Severity && e.data.Severity == 'High') e.rowElement.css('background', '#ff8566');
-            if (e.data && e.data.Severity && e.data.Severity == 'Medium') e.rowElement.css('background', '#ffd480');
-            //  e.rowElement.css('background', '#ffccff');
-
-        },
-
-        onCellPrepared: function (options) {
-            var data = options.data;
-            var column = options.column;
-            var fieldHtml = "";
-
-            if (data && options.value && column.caption == 'Current') {
-                fieldHtml += "<span style='font-weight:bold'>" + options.value + "</span>";
-                options.cellElement.html(fieldHtml);
-            }
-            if (data && options.value && column.caption == 'Delayed') {
-                fieldHtml += "<span style='color:#cc5200'>" + options.value + "</span>";
-                options.cellElement.html(fieldHtml);
-            }
-            if (data && options.value && column.dataField.includes('Diff')) {
-                var cls = options.value <= 0 ? 'pos' : 'neg';
-                fieldHtml += "<div class='" + cls + "'>"
-                    + "<span style='font-size:12px'>" + options.value + "%" + "</span>"
-                    + (options.value <= 0 ? "<i class='fa fa-caret-down fsymbol-small'></i>" : "<i class='fa fa-caret-up fsymbol-small'></i>")
-                    + "</div>";
-                options.cellElement.html(fieldHtml);
-            }
+    //    { dataField: 'Severity', caption: 'Severity', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 150 },
+    //    { dataField: 'EventName', caption: 'Even tName', allowResizing: true, alignment: 'center', dataType: 'string', allowEditing: false, width: 350 },
+    //    // { dataField: 'Duration', caption: 'Duration', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 115,  },
+    //    // { dataField: 'Value', caption: 'Value', allowResizing: true, alignment: 'center', dataType: 'number', allowEditing: false, width: 115,  },
 
 
 
-        },
-        columns: $scope.dg_events_columns,
+    //    { dataField: 'BlockOff', caption: 'BlockOff', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+    //    { dataField: 'BlockOn', caption: 'BlockOn', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+    //    { dataField: 'TakeOff', caption: 'TakeOff', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+    //    { dataField: 'Landing', caption: 'Landing', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
+    //    { dataField: 'STD', caption: 'STD', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm', },
+    //    { dataField: 'STA', caption: 'STA', allowResizing: true, alignment: 'center', dataType: 'datetime', allowEditing: false, width: 115, format: 'HH:mm' },
 
-        bindingOptions: {
-            "dataSource": "dg_events_ds",
-            "height": "dg_height",
-            //columns: 'dg_monthly_columns',
-        },
-        //keyExpr: ['Year', 'Month', 'Airport'],
-        columnChooser: {
-            enabled: false
-        },
+    //];
+    //$scope.dg_events_selected = null;
+    //$scope.dg_events_instance = null;
+    //$scope.dg_events_ds = null;
 
-    };
+    //$scope.dg_events = {
+    //    wordWrapEnabled: true,
+    //    rowAlternationEnabled: false,
+    //    headerFilter: {
+    //        visible: false
+    //    },
+    //    filterRow: {
+    //        visible: true,
+    //        showOperationChooser: true,
+    //    },
+    //    showRowLines: true,
+    //    showColumnLines: true,
+    //    sorting: { mode: 'none' },
+
+    //    noDataText: '',
+
+    //    allowColumnReordering: true,
+    //    allowColumnResizing: true,
+    //    scrolling: { mode: 'infinite' },
+    //    paging: { pageSize: 100 },
+    //    showBorders: true,
+    //    selection: { mode: 'multiple' },
+
+    //    columnAutoWidth: false,
+
+
+    //    columns: [],
+    //    onContentReady: function (e) {
+    //        if (!$scope.dg_events_instance)
+    //            $scope.dg_events_instance = e.component;
+
+    //    },
+    //    onSelectionChanged: function (e) {
+    //        //var data = e.selectedRowsData[0];
+
+    //        //if (!data) {
+    //        //    $scope.dg_master_selected = null;
+    //        //}
+    //        //else
+    //        //    $scope.dg_master_selected = data;
+
+
+    //    },
+
+    //    "export": {
+    //        enabled: true,
+    //        fileName: "File",
+    //        allowExportSelectedData: false
+    //    },
+
+    //    onToolbarPreparing: function (e) {
+    //        var dataGrid = e.component;
+
+    //        e.toolbarOptions.items.unshift(
+    //            {
+    //                location: "before",
+    //                template: "titleTemplate"
+    //            },
+
+    //        );
+    //    },
+    //    onExporting: function (e) {
+    //        e.component.beginUpdate();
+    //        e.component.columnOption("row", "visible", false);
+    //    },
+    //    onExported: function (e) {
+    //        e.component.columnOption("row", "visible", true);
+    //        e.component.endUpdate();
+    //    },
+    //    onRowPrepared: function (e) {
+    //        if (e.data && e.data.Severity && e.data.Severity == 'High') e.rowElement.css('background', '#ff8566');
+    //        if (e.data && e.data.Severity && e.data.Severity == 'Medium') e.rowElement.css('background', '#ffd480');
+    //        //  e.rowElement.css('background', '#ffccff');
+
+    //    },
+
+    //    onCellPrepared: function (options) {
+    //        var data = options.data;
+    //        var column = options.column;
+    //        var fieldHtml = "";
+
+    //        if (data && options.value && column.caption == 'Current') {
+    //            fieldHtml += "<span style='font-weight:bold'>" + options.value + "</span>";
+    //            options.cellElement.html(fieldHtml);
+    //        }
+    //        if (data && options.value && column.caption == 'Delayed') {
+    //            fieldHtml += "<span style='color:#cc5200'>" + options.value + "</span>";
+    //            options.cellElement.html(fieldHtml);
+    //        }
+    //        if (data && options.value && column.dataField.includes('Diff')) {
+    //            var cls = options.value <= 0 ? 'pos' : 'neg';
+    //            fieldHtml += "<div class='" + cls + "'>"
+    //                + "<span style='font-size:12px'>" + options.value + "%" + "</span>"
+    //                + (options.value <= 0 ? "<i class='fa fa-caret-down fsymbol-small'></i>" : "<i class='fa fa-caret-up fsymbol-small'></i>")
+    //                + "</div>";
+    //            options.cellElement.html(fieldHtml);
+    //        }
+
+
+
+    //    },
+    //    columns: $scope.dg_events_columns,
+
+    //    bindingOptions: {
+    //        "dataSource": "dg_events_ds",
+    //        "height": "dg_height",
+    //        //columns: 'dg_monthly_columns',
+    //    },
+    //    //keyExpr: ['Year', 'Month', 'Airport'],
+    //    columnChooser: {
+    //        enabled: false
+    //    },
+
+    //};
     ///////////////////////////////////
 
     $scope.getEventsByDate = function (df, dt, callback) {

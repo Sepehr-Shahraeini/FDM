@@ -183,6 +183,16 @@
     .dx-scrollable-native.dx-scrollable-vertical, .dx-scrollable-native.dx-scrollable-vertical .dx-scrollable-container {
         overflow-x: auto;
     }
+
+    .thin-scroll3::-webkit-scrollbar {
+        width: 2em;
+        height: 2em;
+    }
+
+    .thin-scroll3::-webkit-scrollbar-thumb {
+        background-color: #ddd;
+        outline: 1px solid slategrey;
+    }
 </style>
 
 
@@ -203,28 +213,28 @@
                 <!-- TAB NAVIGATION -->
                 <ul class="nav nav-tabs">
                     <li style="width:20%;text-align:center" ng-class="{active: activeTab === 'summary'}">
-                        <a style="color: white" ng-style="{'background-color': activeTab === 'summary' ? 'lightgray' : 'gray'}" href="" ng-click="activeTab = 'summary'">Summary</a>
+                        <a style="color: white" ng-style="{'background-color': activeTab === 'summary' ? 'lightgray' : 'gray'}" href="" ng-click="activeTab = 'summary'; instanceReferesh()">Summary</a>
                     </li>
                     <li style="width: 20%; text-align: center" ng-class="{active: activeTab === 'pilots'}">
-                        <a style="color: white" ng-style="{'background-color': activeTab === 'pilots' ? 'lightgray' : 'gray'}" href="" ng-click="activeTab = 'pilots'">Pilots</a>
+                        <a style="color: white" ng-style="{'background-color': activeTab === 'pilots' ? 'lightgray' : 'gray'}" href="" ng-click="activeTab = 'pilots'; instanceReferesh()">Pilots</a>
                     </li>
                     <li style="width: 20%; text-align: center" ng-class="{active: activeTab === 'events'}">
-                        <a style="color: white" ng-style="{'background-color': activeTab === 'events' ? 'lightgray' : 'gray'}" href="" ng-click="activeTab = 'events'">Events</a>
+                        <a style="color: white" ng-style="{'background-color': activeTab === 'events' ? 'lightgray' : 'gray'}" href="" ng-click="activeTab = 'events'; instanceReferesh()">Events</a>
                     </li>
                     <li style="width: 20%; text-align: center" ng-class="{active: activeTab === 'phase'}">
-                        <a style="color: white" ng-style="{'background-color': activeTab === 'phase' ? 'lightgray' : 'gray'}" href="" ng-click="activeTab = 'phase'">Phase</a>
+                        <a style="color: white" ng-style="{'background-color': activeTab === 'phase' ? 'lightgray' : 'gray'}" href="" ng-click="activeTab = 'phase'; instanceReferesh()">Phase</a>
                     </li>
                     <li style="width: 20%; text-align: center" ng-class="{active: activeTab === 'others'}">
-                        <a style="color: white" ng-style="{'background-color': activeTab === 'others' ? 'lightgray' : 'gray'}" href="" ng-click="activeTab = 'others'">Others</a>
+                        <a style="color: white" ng-style="{'background-color': activeTab === 'others' ? 'lightgray' : 'gray'}" href="" ng-click="activeTab = 'others'; instanceReferesh()">Others</a>
                     </li>
                 </ul>
 
 
                 <!-- TAB CONTENT -->
-                <div class="tab-content">
+                <div class="tab-content ">
                     <!-- SUMMARY SECTION -->
                     <div ng-show="activeTab === 'summary'">
-                        <div class="row">
+                        <div class="row ">
                             <div class="col-lg-4 col-md-3" style="padding-right:0;">
                                 <div>
                                     <div class="col-lg-6 col-md-6 generalInfo chartBox">
@@ -376,7 +386,7 @@
                             </div>
                             <div class='col-lg-4' style='padding:10px 5px 10px 5px'>
                                 <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                                    <div dx-data-grid="dg_event" id="dg_event" class="content" style="overflow-y:hidden"></div>
+                                    <div dx-data-grid="dg_event2" id="dg_event2" class="content" style="overflow-y:hidden"></div>
                                 </div>
                             </div>
 
@@ -387,7 +397,7 @@
                             </div>
                             <div class='col-lg-4' style='padding:10px 5px 10px 5px'>
                                 <div class=" chartBox" style='padding: 10px 0 10px 0'>
-                                    <div dx-data-grid="dg_event" id="dg_event" class="content" style="overflow-y:hidden"></div>
+                                    <div dx-data-grid="dg_scores" id="dg_scores" class="content" style="overflow-y:hidden"></div>
                                 </div>
                             </div>
                         </div>
